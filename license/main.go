@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"os/exec"
@@ -11,9 +12,9 @@ import (
 )
 
 var (
-	name    = flag.String("name", "", "name of the person licensing the software")
-	email   = flag.String("email", "", "email of the person licensing the software")
-	outfile = flag.String("out", "LICENSE", "name of the file to write the output to")
+	name  = flag.String("name", "", "name of the person licensing the software")
+	email = flag.String("email", "", "email of the person licensing the software")
+	out   = flag.Bool("out", false, "write to a file instead of stdout")
 
 	showAll = flag.Bool("show", false, "show all licenses instead of generating one")
 )
@@ -47,6 +48,8 @@ func main() {
 
 	kind := flag.Arg(0)
 
+	outfile := "LICENSE"
+
 	var licensetext string
 	if _, ok := licenses[kind]; !ok {
 		fmt.Printf("invalid license kind %s\n", kind)
@@ -55,8 +58,8 @@ func main() {
 
 	licensetext = licenses[kind]
 
-	if kind == "unlicense" && *outfile == "LICENSE" {
-		*outfile = "UNLICENSE"
+	if kind == "unlicense" && *out {
+		outfile = "UNLICENSE"
 	}
 
 	if *name == "" {
@@ -83,18 +86,27 @@ func main() {
 		*email = myemail[:len(myemail)-1]
 	}
 
-	fout, err := os.Create(*outfile)
-	if err != nil {
-		log.Fatal(err)
+	var wr io.Writer
+
+	if *out {
+		fout, err := os.Create(outfile)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer fout.Close()
+
+		wr = fout
+	} else {
+		wr = os.Stdout
+		defer fmt.Println()
 	}
-	defer fout.Close()
 
 	tmpl, err := template.New("license").Parse(licensetext)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	err = tmpl.Execute(fout, struct {
+	err = tmpl.Execute(wr, struct {
 		Name  string
 		Email string
 		Year  int
