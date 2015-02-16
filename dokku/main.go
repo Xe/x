@@ -1,4 +1,4 @@
-package main
+package main // christine.website/go/tools/dokku
 
 import (
 	"flag"
