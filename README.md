@@ -1,6 +1,21 @@
 # tools
 Various tools of mine in Go
 
+Installing these tools
+----------------------
+
+To install any of these tools, type in:
+
+```console
+$ go get christine.website/go/tools/$toolname
+```
+
+For example:
+
+```console
+$ go get christine.website/go/tools/license
+```
+
 `dokku`
 -------
 
