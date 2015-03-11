@@ -16,7 +16,7 @@ var (
 )
 
 var logo string = `                                            ` + reset + " Ram:      %s" + color + `
-    __________.__  __         .__           ` + reset + " Pacakges: %d" + color + `
+    __________.__  __         .__           ` + reset + " Packages: %d" + color + `
     \______   \__|/  |________|__| ____     ` + reset + " CPU:      %s" + color + `
      |    |  _/  \   __\_  __ \  |/ ___\    ` + reset + " Uptime:   %s" + color + `
      |    |   \  ||  |  |  | \/  / /_/  >   ` + reset + " User:     %s" + color + `
