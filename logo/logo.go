@@ -12,7 +12,15 @@ func main() {
 	color := ansi.ColorCode("white+b:green")
 
 	fmt.Print(color)
-	fmt.Printf(logo, 0, 0, 0, "Fast", getUptime(), getUsername(), getHostname())
+	fmt.Printf(
+		logo,
+		"",
+		getPackageCount(),
+		getCPUName(),
+		getUptime(),
+		getUsername(),
+		getHostname(),
+	)
 	fmt.Println(ansi.ColorCode("reset"))
 }
 

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os/exec"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/mgutz/ansi"
@@ -15,13 +16,13 @@ var (
 )
 
 var logo string = `   ____                                            
-  /____\                                           ` + reset + " Ram:      %dM/%dM" + color + `
-  |\   |     __________.__  __         .__         ` + reset + " Pacakges: %d" + color + `
-  | \  |     \______   \__|/  |________|__| ____   ` + reset + " CPU:      %s" + color + `
-  |  \ |      |    |  _/  \   __\_  __ \  |/ ___\  ` + reset + " Uptime:   %s" + color + `
-  |___\|      |    |   \  ||  |  |  | \/  / /_/  > ` + reset + " User:     %s" + color + `
-  |   /|      |______  /__||__|  |__|  |__\___  /  ` + reset + " Hostname: %s" + color + `
-  |  / |             \/                  /_____/   
+  /____\                                           ` + reset + " Ram:      %s" + color + `
+  |\   |   __________.__  __         .__           ` + reset + " Pacakges: %d" + color + `
+  | \  |   \______   \__|/  |________|__| ____     ` + reset + " CPU:      %s" + color + `
+  |  \ |    |    |  _/  \   __\_  __ \  |/ ___\    ` + reset + " Uptime:   %s" + color + `
+  |___\|    |    |   \  ||  |  |  | \/  / /_/  >   ` + reset + " User:     %s" + color + `
+  |   /|    |______  /__||__|  |__|  |__\___  /    ` + reset + " Hostname: %s" + color + `
+  |  / |           \/                  /_____/     
   | /  |                                           
   |/ __|        Version 1.0                        
   |    |___________________________________________`
@@ -45,4 +46,22 @@ func getUptime() string {
 	minutes := int(dur.Minutes()) % 60
 
 	return fmt.Sprintf("%d days, %d hours, %d minutes", days, hours, minutes)
+}
+
+func getPackageCount() int {
+	out, err := exec.Command("pkg_info").Output()
+	if err != nil {
+		panic(err)
+	}
+
+	return len(strings.Split(string(out), "\n"))
+}
+
+func getCPUName() string {
+	out, err := exec.Command("sysctl", "-n", "hw.model").Output()
+	if err != nil {
+		panic(err)
+	}
+
+	return strings.Split(string(out), "@")[0]
 }
