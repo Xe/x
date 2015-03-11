@@ -15,17 +15,15 @@ var (
 	reset = ansi.ColorCode("reset")
 )
 
-var logo string = `   ____                                            
-  /____\                                           ` + reset + " Ram:      %s" + color + `
-  |\   |   __________.__  __         .__           ` + reset + " Pacakges: %d" + color + `
-  | \  |   \______   \__|/  |________|__| ____     ` + reset + " CPU:      %s" + color + `
-  |  \ |    |    |  _/  \   __\_  __ \  |/ ___\    ` + reset + " Uptime:   %s" + color + `
-  |___\|    |    |   \  ||  |  |  | \/  / /_/  >   ` + reset + " User:     %s" + color + `
-  |   /|    |______  /__||__|  |__|  |__\___  /    ` + reset + " Hostname: %s" + color + `
-  |  / |           \/                  /_____/     
-  | /  |                                           
-  |/ __|        Version 1.0                        
-  |    |___________________________________________`
+var logo string = `                                         ` + reset + " Ram:      %s" + color + `
+ __________.__  __         .__           ` + reset + " Pacakges: %d" + color + `
+ \______   \__|/  |________|__| ____     ` + reset + " CPU:      %s" + color + `
+  |    |  _/  \   __\_  __ \  |/ ___\    ` + reset + " Uptime:   %s" + color + `
+  |    |   \  ||  |  |  | \/  / /_/  >   ` + reset + " User:     %s" + color + `
+  |______  /__||__|  |__|  |__\___  /    ` + reset + " Hostname: %s" + color + `
+         \/                  /_____/     
+      Version 1.0                        
+                                         `
 
 func getUptime() string {
 	out, err := exec.Command("sysctl", "-n", "kern.boottime").Output()
