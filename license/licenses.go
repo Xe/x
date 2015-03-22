@@ -4,24 +4,125 @@ var licenses map[string]string
 
 func init() {
 	licenses = map[string]string{
-		"zlib":      ZlibLicense,
-		"unlicense": Unlicense,
-		"mit":       MitLicense,
-		"apache":    ApacheLicense,
-		"bsd-2":     Bsd2Clause,
-		"bsd-3":     Bsd3Clause,
-		"bzip2":     BzipLicense,
-		"isc":       ISCLicense,
-		"gpl-2":     Gpl2License,
-		"gpl-3":     Gpl3License,
-		"lgpl-2":    LGPL2License,
-		"wtfpl":     WTFPlLicense,
-		"afreeo":    AfreeoLicense,
-		"hackmii":   HackMiiLicense,
-		"artistic":  ArtisticLicense,
-		"cc0":       CC0License,
+		"zlib":          ZlibLicense,
+		"unlicense":     Unlicense,
+		"mit":           MitLicense,
+		"apache":        ApacheLicense,
+		"bsd-2":         Bsd2Clause,
+		"bsd-3":         Bsd3Clause,
+		"bzip2":         BzipLicense,
+		"isc":           ISCLicense,
+		"gpl-2":         Gpl2License,
+		"gpl-3":         Gpl3License,
+		"lgpl-2":        LGPL2License,
+		"wtfpl":         WTFPlLicense,
+		"afreeo":        AfreeoLicense,
+		"hackmii":       HackMiiLicense,
+		"artistic":      ArtisticLicense,
+		"cc0":           CC0License,
+		"allpermissive": AllPermissiveLicense,
+		"json":          JsonLicense,
+		"lha":           LhaLicense,
 	}
 }
+
+var LhaLicense = `Copyright (c) {{.Year}} {{.Name}} <{{.Email}}>
+
+Original Authors License Statement (from man/lha.man, translated by
+Osamu Aoki <debian@aokiconsulting.com>):
+
+   Permission is given for redistribution, copy, and modification provided
+   following conditions are met.
+
+   1. Do not remove copyright clause.
+   2. Distribution shall conform:
+    a. The content of redistribution (i.e., source code, documentation,
+       and reference guide for programmers) shall include original contents.
+       If contents are modified, the document clearly indicating
+       the fact of modification must be included.
+    b. If LHa is redistributed with added values, you must put your best
+       effort to include them (Translator comment: If read literally,
+       original Japanese was unclear what "them" means here.  But
+       undoubtedly this "them" means source code for the added value
+       portion and this is a typical Japanese sloppy writing style to
+       abbreviate as such)  Also the document clearly indicating that
+       added value was added must be included.
+    c. Binary only distribution is not allowed (including added value
+       ones.)
+   3. You need to put effort to distribute the latest version (This is not
+      your duty).
+
+      NB: Distribution on Internet is free.  Please notify me by e-mail or
+      other means prior to the distribution if distribution is done through
+      non-Internet media (Magazine, CDROM etc.)  If not, make sure to Email
+      me later.
+
+   4. Any damage caused by the existence and use of this program will not
+      be compensated.
+
+   5. Author will not be responsible to correct errors even if program is
+      defective.
+
+   6. This program, either as a part of this or as a whole of this, may be
+      included into other programs.  In this case, that program is not LHa
+      and can not call itself LHa.
+
+   7. For commercial use, in addition to above conditions, following
+      condition needs to be met.
+
+      a.  The program whose content is mainly this program can not be used
+          commercially.
+      b.  If the recipient of commercial use deems inappropriate as a
+          program user, you must not distribute.
+      c.  If used as a method for the installation, you must not force
+          others to use this program.  In this case, commercial user will
+          perform its work while taking full responsibility of its outcome.
+      d.  If added value is done under the commercial use by using this
+          program, commercial user shall provide its support.
+
+
+(Osamu Aoki also comments:
+   Here "commercial" may be interpreted as "for-fee".  "Added value" seems
+   to mean "feature enhancement".  )
+
+Translated License Statement by Tsugio Okamoto (translated by
+GOTO Masanori <gotom@debian.org>):
+
+   It's free to distribute on the network, but if you distribute for
+   the people who cannot access the network (by magazine or CD-ROM),
+   please send E-Mail (Inter-Net address) to the author before the
+   distribution. That's well where this software is appeard.
+   If you cannot do, you must send me the E-Mail later.`
+
+var JsonLicense = `Copyright (c) {{.Year}} {{.Name}} <{{.Email}}>
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+The Software shall be used for Good, not Evil.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.`
+
+var AllPermissiveLicense = `Copyright (c) {{.Year}} {{.Name}} <{{.Email}}>
+
+Copying and distribution of this file, with or without modification,
+are permitted in any medium without royalty provided the copyright
+notice and this notice are preserved.  This file is offered as-is,
+without any warranty.`
 
 var ZlibLicense = `Copyright (c) {{.Year}} {{.Name}} <{{.Email}}>
 
