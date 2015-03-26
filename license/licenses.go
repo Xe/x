@@ -4,27 +4,32 @@ var licenses map[string]string
 
 func init() {
 	licenses = map[string]string{
-		"zlib":          ZlibLicense,
-		"unlicense":     Unlicense,
-		"mit":           MitLicense,
-		"apache":        ApacheLicense,
-		"bsd-2":         Bsd2Clause,
-		"bsd-3":         Bsd3Clause,
-		"bzip2":         BzipLicense,
-		"isc":           ISCLicense,
-		"gpl-2":         Gpl2License,
-		"gpl-3":         Gpl3License,
-		"lgpl-2":        LGPL2License,
-		"wtfpl":         WTFPlLicense,
-		"afreeo":        AfreeoLicense,
-		"hackmii":       HackMiiLicense,
-		"artistic":      ArtisticLicense,
-		"cc0":           CC0License,
-		"allpermissive": AllPermissiveLicense,
-		"json":          JsonLicense,
-		"lha":           LhaLicense,
+		"zlib":              ZlibLicense,
+		"unlicense":         Unlicense,
+		"mit":               MitLicense,
+		"apache":            ApacheLicense,
+		"bsd-2":             Bsd2Clause,
+		"bsd-3":             Bsd3Clause,
+		"bzip2":             BzipLicense,
+		"isc":               ISCLicense,
+		"gpl-2":             Gpl2License,
+		"gpl-3":             Gpl3License,
+		"lgpl-2":            LGPL2License,
+		"wtfpl":             WTFPlLicense,
+		"afreeo":            AfreeoLicense,
+		"hackmii":           HackMiiLicense,
+		"artistic":          ArtisticLicense,
+		"cc0":               CC0License,
+		"allpermissive":     AllPermissiveLicense,
+		"json":              JsonLicense,
+		"lha":               LhaLicense,
+		"allrightsreserved": AllRightsReserved,
 	}
 }
+
+var AllRightsReserved = `Copyright (c) {{.Year}} {{.Name}} <{{.Email}}>
+
+All rights reserved.`
 
 var LhaLicense = `Copyright (c) {{.Year}} {{.Name}} <{{.Email}}>
 
