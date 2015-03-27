@@ -110,3 +110,17 @@ Command ghstat shows the status of GitHub via their status API.
 
 This follows https://status.github.com/api for all but the list of all recent
 status messages.
+
+```console
+$ ghstat
+Status: minor (Fri Mar 27 15:24:56 2015)
+```
+
+```console
+$ ghstat -message
+Last message:
+Status:  minor
+Message: We've deployed our volumetric attack defenses against an extremely 
+large amount of traffic. Performance is stabilizing.
+Time:    Fri Mar 27 15:04:59 2015
+```
