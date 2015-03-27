@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"os"
 	"time"
 )
 
@@ -45,5 +46,9 @@ func main() {
 		}
 
 		fmt.Printf("Status: %s (%s)\n", s.Status, t.Format(time.ANSIC))
+
+		if s.Status != "good" {
+			os.Exit(1)
+		}
 	}
 }
