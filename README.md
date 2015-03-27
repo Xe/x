@@ -102,7 +102,7 @@ freely, subject to the following restrictions:
 
 `ghstat`
 --------
---
+
 Command ghstat shows the status of GitHub via their status API.
 
     Usage of ./ghstat:
