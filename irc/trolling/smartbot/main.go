@@ -32,8 +32,6 @@ func main() {
 		for s.Scan() {
 			t := s.Text()
 
-			log.Println(t)
-
 			_, err := chain.Write(t)
 			if err != nil {
 				panic(err)
