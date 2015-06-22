@@ -40,12 +40,12 @@ func main() {
 			}
 		}
 
-		err = chain.Save("mybrain.gob")
+		err = chain.Save("mybrain-pc.gob")
 		if err != nil {
 			panic(err)
 		}
 	} else {
-		err := chain.Load("mybrain.gob")
+		err := chain.Load("mybrain-pc.gob")
 		if err != nil {
 			panic(err)
 		}
@@ -55,21 +55,20 @@ func main() {
 
 	conn := irc.IRC("sjj999sjj", "sjj")
 
-	conn.Debug = true
-
-	err := conn.Connect("irc.frenzic.net:6667")
+	err := conn.Connect("irc.ponychat.net:6667")
 	if err != nil {
 		panic(err)
 	}
 
 	conn.AddCallback("001", func(e *irc.Event) {
-		conn.Join("#chat")
+		conn.Join("#geek")
 	})
 
 	conn.AddCallback("PRIVMSG", func(e *irc.Event) {
-		if e.Nick == "jjs999jjs" {
+		if rand.Int()%2 == 1 {
+			log.Printf("writing brain with %s", e.Arguments[1])
 			chain.Write(e.Arguments[1])
-			chain.Save("mybrain.gob")
+			chain.Save("mybrain-pc.gob")
 		}
 	})
 
