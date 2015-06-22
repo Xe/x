@@ -74,7 +74,7 @@ func main() {
 		if rand.Int()%4 == 2 {
 			log.Printf("About to say something...")
 			time.Sleep(time.Duration((rand.Int()%15)+4) * time.Second)
-			conn.Privmsg(e.Arguments[0], chain.Generate((rand.Int()%4)+2))
+			conn.Privmsg(e.Arguments[0], chain.Generate((rand.Int()%15)+2))
 		}
 	})
 
