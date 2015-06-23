@@ -14,6 +14,7 @@ import (
 var (
 	serverloc = flag.String("serverloc", "http://static.xeserv.us/", "server to prepend to url paths")
 	sourceloc = flag.String("sourceloc", "", "source URL for metadata generation")
+	set       = flag.String("set", "", "comic set")
 )
 
 func main() {
@@ -44,6 +45,11 @@ func main() {
 		var i UploadImage
 		i.Image.SourceURL = *sourceloc
 		i.Image.ImageURL = *serverloc + filepath.Base(image.Name())
+		i.Image.Tags = "explicit"
+
+		if *set != "" {
+			i.Image.Tags = i.Image.Tags + ", comic:" + *set
+		}
 
 		outdata, err := json.MarshalIndent(&i, "", "\t")
 		if err != nil {
