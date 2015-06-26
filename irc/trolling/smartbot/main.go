@@ -13,6 +13,7 @@ import (
 
 var (
 	brainInput = flag.String("brain", "", "brain file")
+	lastSpoken time.Time
 )
 
 func main() {
@@ -51,7 +52,7 @@ func main() {
 
 	rand.Seed(time.Now().Unix())
 
-	conn := irc.IRC("sjj999sjj", "sjj")
+	conn := irc.IRC("BeefSupreme", "Doritos")
 
 	err := conn.Connect("irc.ponychat.net:6667")
 	if err != nil {
@@ -63,18 +64,22 @@ func main() {
 	})
 
 	conn.AddCallback("PRIVMSG", func(e *irc.Event) {
-		if rand.Int()%2 == 1 {
-			log.Printf("writing brain with %s", e.Arguments[1])
-			chain.Write(e.Arguments[1])
-			chain.Save("mybrain-pc.gob")
-		}
+		log.Printf("writing brain with %s", e.Arguments[1])
+		chain.Write(e.Arguments[1])
+		chain.Save("mybrain-pc.gob")
 	})
 
 	conn.AddCallback("PRIVMSG", func(e *irc.Event) {
-		if rand.Int()%4 == 2 {
-			log.Printf("About to say something...")
-			time.Sleep(time.Duration((rand.Int()%15)+4) * time.Second)
-			conn.Privmsg(e.Arguments[0], chain.Generate((rand.Int()%15)+2))
+		if lastSpoken.Add(15 * time.Minute).Before(time.Now()) {
+			log.Println("It's been long enough that I can speak!")
+
+			if rand.Int()%4 == 2 {
+				log.Printf("About to say something...")
+				time.Sleep(time.Duration((rand.Int()%15)+4) * time.Second)
+				conn.Privmsg(e.Arguments[0], chain.Generate(15))
+
+				lastSpoken = time.Now()
+			}
 		}
 	})
 
