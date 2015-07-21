@@ -25,8 +25,26 @@ func init() {
 		"lha":               LhaLicense,
 		"allrightsreserved": AllRightsReserved,
 		"mmpl":              MinecraftMod,
+		"nwhml":             TumblrLicense,
 	}
 }
+
+var TumblrLicense = `Copyright (c) {{.Year}} {{.Name}} <{{.Email}}>
+
+Non-White-Heterosexual-Male License
+
+If you are not a white heterosexual male you are permitted to copy,
+sell and use this work in any manner you choose without need to
+include any attribution you do not see fit. You are asked as a
+courtesy to retain this license in any derivatives but you are not
+required. If you are a white heterosexual male you are provided the
+same permissions (reuse, modification, resale) but are required to
+include this license in any documentation and any public facing
+derivative. You are also required to include attribution to the
+original author or to an author responsible for redistribution
+of a derivative.
+
+For additional details see http://nonwhiteheterosexualmalelicense.org`
 
 var AllRightsReserved = `Copyright (c) {{.Year}} {{.Name}} <{{.Email}}>
 
