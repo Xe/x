@@ -70,7 +70,7 @@ func main() {
 	})
 
 	conn.AddCallback("PRIVMSG", func(e *irc.Event) {
-		if lastSpoken.Add(15 * time.Minute).Before(time.Now()) {
+		if lastSpoken.Add(5 * time.Minute).Before(time.Now()) {
 			log.Println("It's been long enough that I can speak!")
 
 			if rand.Int()%4 == 2 {
