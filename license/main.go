@@ -1,4 +1,4 @@
-package main // christine.website/go/tools/license
+package main
 
 import (
 	"flag"
@@ -9,6 +9,8 @@ import (
 	"os/exec"
 	"text/template"
 	"time"
+
+	"github.com/Xe/tools/license/licenses"
 )
 
 var (
@@ -35,7 +37,7 @@ func main() {
 
 	if *showAll {
 		fmt.Println("Licenses available:")
-		for license, _ := range licenses {
+		for license, _ := range licenses.List {
 			fmt.Printf("  %s\n", license)
 		}
 
@@ -51,12 +53,12 @@ func main() {
 	outfile := "LICENSE"
 
 	var licensetext string
-	if _, ok := licenses[kind]; !ok {
+	if _, ok := licenses.List[kind]; !ok {
 		fmt.Printf("invalid license kind %s\n", kind)
 		os.Exit(1)
 	}
 
-	licensetext = licenses[kind]
+	licensetext = licenses.List[kind]
 
 	if kind == "unlicense" && *out {
 		outfile = "UNLICENSE"

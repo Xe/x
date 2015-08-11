@@ -1,9 +1,9 @@
-package main
+package licenses
 
-var licenses map[string]string
+var List map[string]string
 
 func init() {
-	licenses = map[string]string{
+	List = map[string]string{
 		"zlib":              ZlibLicense,
 		"unlicense":         Unlicense,
 		"mit":               MitLicense,
