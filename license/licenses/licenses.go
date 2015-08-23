@@ -29,8 +29,16 @@ func init() {
 		"pftus":             PftusLicense,
 		"bola":              BOLALicense,
 		"downloadmii":       DownloadMiiLicense,
+		"sqlite":            SQLiteBlessing,
 	}
 }
+
+var SQLiteBlessing = `The author disclaims copyright to this source code.  In place of
+a legal notice, here is a blessing:
+
+    May you do good and not evil.
+    May you find forgiveness for yourself and forgive others.
+    May you share freely, never taking more than you give.`
 
 var PftusLicense = `The P.F.T.U.S(Protected Free To Use Software) License
 Copyright {{.Year}} {{.Name}} <{{.Email}}>, see the bottom of the document.
