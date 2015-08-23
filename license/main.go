@@ -64,6 +64,10 @@ func main() {
 		outfile = "UNLICENSE"
 	}
 
+	if kind == "sqlite" && *out {
+		outfile = "BLESSING"
+	}
+
 	if *name == "" {
 		cmd := exec.Command("git", "config", "user.name")
 
