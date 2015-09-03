@@ -18,6 +18,7 @@ func init() {
 		"c52a7ab7202a576ee18d94be687d97190e90fdcc25fc4b1591c1a8e0c1c299a5": "Kelp Dome",
 		"6a6c3a958712adedcceb34f719e220ab0d840d8753e5f51b089d363bd1763c91": "Moray Towers",
 		"a54716422edf71ac0b3d20fbb4ba5970a7a78ba304fcf935aaf69254d61ca709": "Flounder Heights",
+		"fafe7416d363c7adc8c5c7b0f76586216ba86dcfe3fd89708d672e99bc822adc": "Camp Triggerfish",
 	}
 }
 
