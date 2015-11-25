@@ -30,8 +30,17 @@ func init() {
 		"bola":              BOLALicense,
 		"downloadmii":       DownloadMiiLicense,
 		"sqlite":            SQLiteBlessing,
+		"fair":              FairLicense,
 	}
 }
+
+var FairLicense = `Copyright {{.Year}} {{.Name}} <{{.Email}}>
+
+Usage of the works is permitted provided that this instrument is retained
+with the works, so that any entity that uses the works is notified of
+this instrument.
+
+DISCLAIMER: THE WORKS ARE WITHOUT WARRANTY.`
 
 var SQLiteBlessing = `The author disclaims copyright to this source code.  In place of
 a legal notice, here is a blessing:
