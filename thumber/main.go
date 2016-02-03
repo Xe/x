@@ -32,6 +32,10 @@ func makeThumbnail(fname string, info os.FileInfo, err error) error {
 		return nil
 	}
 
+	if strings.HasSuffix(fname, ".html") {
+		return nil
+	}
+
 	_, err = os.Stat("thumbs/" + filepath.Base(fname) + ".thumb.png")
 	if err == nil {
 		log.Printf("skipping %s", fname)
