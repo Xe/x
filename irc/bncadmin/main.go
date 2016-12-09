@@ -73,16 +73,18 @@ func NewBot() *Bot {
 func (b *Bot) Handle(c *irc.Client, m *irc.Message) {
 	b.setupDaemon.Do(func() {
 		go func() {
-			b.lookingForUserNetworks = true
-			c.Writef("PRIVMSG *status ListAllUserNetworks")
-			time.Sleep(2 * time.Second) // always sleep 2
-			b.lookingForUserNetworks = false
+			for {
+				b.lookingForUserNetworks = true
+				c.Writef("PRIVMSG *status ListAllUserNetworks")
+				time.Sleep(2 * time.Second) // always sleep 2
+				b.lookingForUserNetworks = false
 
-			time.Sleep(1 * time.Hour)
+				time.Sleep(1 * time.Hour)
+			}
 		}()
 	})
 
-	// log.Printf("in >> %s", m)
+	log.Printf("in >> %s", m)
 
 	switch m.Command {
 	case "PRIVMSG":
@@ -136,11 +138,52 @@ func (b *Bot) HandleStarStatus(c *irc.Client, m *irc.Message) {
 }
 
 func (b *Bot) HandlePartyLineCommand(c *irc.Client, m *irc.Message) {
+	split := strings.Fields(m.Trailing())
+	username := m.Prefix.Name[1:]
 
+	if len(split) == 0 {
+		return
+	}
+
+	switch strings.ToLower(split[0]) {
+	case "help":
+		c.Writef("PRIVMSG ?%s :Commands available:", username)
+		c.Writef("PRIVMSG ?%s :- ChangeName <new desired \"real name\">", username)
+		c.Writef("PRIVMSG ?%s :  Changes your IRC \"real name\" to a new value instead of the default", username)
+		c.Writef("PRIVMSG ?%s :- Reconnect", username)
+		c.Writef("PRIVMSG ?%s :  Disconnects from PonyChat and connects to PonyChat again", username)
+		c.Writef("PRIVMSG ?%s :- Help", username)
+		c.Writef("PRIVMSG ?%s :  Shows this Message", username)
+	case "changename":
+		if len(split) < 1 {
+			c.Writef("NOTICE %s :Usage: ChangeName <new desired \"real name\">")
+			return
+		}
+
+		gecos := strings.Join(split[1:], " ")
+		c.Writef("PRIVMSG *controlpanel :Set RealName %s %s", username, gecos)
+		c.Writef("PRIVMSG ?%s :Please reply %q to confirm changing your \"real name\" to: %s", username, "Reconnect", gecos)
+	case "reconnect":
+		c.Writef("PRIVMSG ?%s :Reconnecting...", username)
+		c.Writef("PRIVMSG *controlpanel Reconnect %s PonyChat", username)
+	}
 }
 
 func (b *Bot) HandleCommand(c *irc.Client, m *irc.Message) {
-
+	split := strings.Fields(m.Trailing())
+	if split[0][0] == ';' {
+		switch strings.ToLower(split[0][1:]) {
+		case "request":
+			c.Write("PRIVMSG #bnc :In order to request a BNC account, please connect to the bouncer server (bnc.ponychat.net, ssl port 6697, allow untrusted certs) with your nickserv username and passsword in the server password field (example: AzureDiamond:hunter2)")
+		case "help":
+			c.Write("PRIVMSG #bnc :PonyChat bouncer help is available here: https://ponychat.net/help/bnc/")
+		case "rules":
+			c.Write("PRIVMSG #bnc :Terms of the BNC")
+			c.Write("PRIVMSG #bnc :- Do not use the BNC to evade channel bans")
+			c.Write("PRIVMSG #bnc :- Do not use the BNC to violate any network rules")
+			c.Write("PRIVMSG #bnc :- Do not use the BNC to connect to any other IRC network than PonyChat")
+		}
+	}
 }
 
 func (b *Bot) RemoveNetwork(c *irc.Client, username, network string) {
