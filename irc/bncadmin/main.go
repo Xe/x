@@ -84,7 +84,7 @@ func (b *Bot) Handle(c *irc.Client, m *irc.Message) {
 		}()
 	})
 
-	log.Printf("in >> %s", m)
+	// log.Printf("in >> %s", m)
 
 	switch m.Command {
 	case "PRIVMSG":
