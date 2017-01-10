@@ -503,14 +503,13 @@ See the tests here: https://github.com/otm/gluaflag
 ```lua
 local flag = require "flag"
 
-arg = {"test", "-name", "foo", "2"}
 fs = flag.new()
 
 fs:string("name", "foo", "String help string")
 fs:intArg("title", 1, "Title")
 fs:numberArg("title", 1, "Title")
 
-flags = fs:parse(arg)
+flags = fs:parse(arg) -- arg is the remaining command line arguments
 assert(flags.title == 2, "expected title to be 2")
 assert(flags.title == 2.32, "expected title to be 2.32")
 ```
