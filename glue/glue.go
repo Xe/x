@@ -8,8 +8,8 @@ import (
 	"os"
 	"runtime/pprof"
 
-	json "layeh.com/gopher-json"
-
+	"github.com/Xe/tools/glue/libs/gluaexpect"
+	"github.com/Xe/tools/glue/libs/gluasimplebox"
 	"github.com/ailncode/gluaxmlpath"
 	"github.com/cjoudrey/gluahttp"
 	"github.com/cjoudrey/gluaurl"
@@ -25,6 +25,7 @@ import (
 	"github.com/yuin/gluare"
 	"github.com/yuin/gopher-lua"
 	"github.com/yuin/gopher-lua/parse"
+	json "layeh.com/gopher-json"
 )
 
 func main() {
@@ -78,6 +79,8 @@ Available options are:
 		L.SetMx(opt_m)
 	}
 
+	preload(L)
+
 	if opt_v || opt_i {
 		fmt.Println(lua.PackageCopyRight)
 	}
@@ -118,6 +121,7 @@ Available options are:
 				fmt.Println(proto.String())
 			}
 		}
+
 		if err := L.DoFile(script); err != nil {
 			fmt.Println(err.Error())
 			status = 1
@@ -131,6 +135,13 @@ Available options are:
 		}
 	}
 
+	if opt_i {
+		doREPL(L)
+	}
+	return status
+}
+
+func preload(L *lua.LState) {
 	L.PreloadModule("re", gluare.Loader)
 	L.PreloadModule("sh", gluash.Loader)
 	L.PreloadModule("markdown", gluamarkdown.Loader)
@@ -143,13 +154,10 @@ Available options are:
 	L.PreloadModule("flag", gluaflag.Loader)
 	L.PreloadModule("template", gluatemplate.Loader)
 	L.PreloadModule("url", gluaurl.Loader)
+	gluaexpect.Preload(L)
+	gluasimplebox.Preload(L)
 	gluaxmlpath.Preload(L)
 	json.Preload(L)
-
-	if opt_i {
-		doREPL(L)
-	}
-	return status
 }
 
 // do read/eval/print/loop

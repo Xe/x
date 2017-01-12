@@ -550,7 +550,7 @@ sh.ls("-la /")
 #### Piping
 Piping in sh is done almost like piping in the shell. Just call next command as a method on the previous command.
 
-``` lua
+```lua
 sh.du("-sb"):sort("-rn"):print()
 ```
 
@@ -598,14 +598,13 @@ end
 #### stdout([filename]), stderr([filename]), combinedOutput([filename])
 `stdout()`, `stderr()`, and `combinedOutput()` all returns the output of the command as a string. An optional `filename` can be given to the method, in that case the output is also written to the file. The file will be truncated.
 
-``` lua
+```lua
 -- print output of command
 output = sh.echo("hello world"):combinedOutput("/tmp/output")
 print(output)
 ```
 
 In the example above will print `hello world` and it will write it to `/tmp/output`
-
 
 ### Glob Expansion
 There is no glob expansion done on arguments, however there is a glob functionality in sh.
@@ -638,4 +637,25 @@ Returns:
 
 string:	escaped string
 gluare.quote returns a string that quotes all regular expression metacharacters inside the given text.
+```
+
+## `simplebox`
+
+```lua
+local simplebox = require "simplebox"
+```
+
+Simple encryption
+
+### API
+
+#### Create a new instance of simplebox with a newly generated key
+
+```lua
+local simplebox = require "simplebox"
+local key = simplebox.genkey()
+print("key is: " .. key)
+local sb = simplebox.new()
+
+
 ```
