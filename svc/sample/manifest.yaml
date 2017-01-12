@@ -1,0 +1,28 @@
+# service name
+name: printerfacts
+
+# kind of service (website/bot/ops)
+# this influences health-checking
+kind: website
+
+# docker image to run for this service
+image: "xena/printerfacts:latest"
+
+# environment variables to set in this service
+env:
+  FOO: bar
+  FOO2: "bar:with:colons"
+
+# arbitrary settings that the deployment backend may find handy
+settings:
+  # if set, set the container size for the hyper.sh backend
+  hyperSize: s1
+
+  # if set, only one instance of this can be running persistently
+  exclusive: true
+
+  # only supported on backends where volume support exists
+  volumes:
+    - name: "facts"
+      driver: local
+      mountpoint: "/facts"
