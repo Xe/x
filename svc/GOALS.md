@@ -7,24 +7,7 @@
   3. Killing off an old instance of the service
 
 - Create a command line tool that deploys a service to a given provider
-  given configuration in a simple yaml manifest:
-
-```yaml
-name: printerfacts
-kind: website
-image: "xena/printerfacts:latest"
-env:
-  BACKPLANE_TOKEN: hunter2
-  BACKPLANE_LABELS: "service=printerfacts,endpoint=mota.cf,version=2016-10-06-2"
-
-# arbitrary settings that the deployment backend may find handy
-settings:
-  hyperSize: s1
-  exclusive: true # if set, only one instance of this can be running period
-  volumes:
-    - name: "facts" # must be an existing docker volume
-      mountpoint: "/facts"
-```
+  given configuration in a simple yaml manifest (see example [here](https://github.com/Xe/tools/tree/master/svc/sample))
 
 - Persist a mapping of service names -> identifier for keeping track of past deployments
 
