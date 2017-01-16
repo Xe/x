@@ -7,8 +7,8 @@ import (
 	"errors"
 
 	"github.com/brandur/simplebox"
-	luar "github.com/layeh/gopher-luar"
 	lua "github.com/yuin/gopher-lua"
+	luar "layeh.com/gopher-luar"
 )
 
 func Preload(L *lua.LState) {

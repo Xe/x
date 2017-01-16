@@ -2,8 +2,8 @@ package gluaexpect
 
 import (
 	"github.com/ThomasRooney/gexpect"
-	luar "github.com/layeh/gopher-luar"
 	lua "github.com/yuin/gopher-lua"
+	luar "layeh.com/gopher-luar"
 )
 
 func Preload(L *lua.LState) {
