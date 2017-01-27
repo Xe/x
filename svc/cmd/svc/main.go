@@ -2,8 +2,11 @@ package main
 
 import (
 	"context"
+	"crypto/tls"
+	"crypto/x509"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -16,6 +19,7 @@ import (
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/olekukonko/tablewriter"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 	kingpin "gopkg.in/alecthomas/kingpin.v1"
 )
 
@@ -59,11 +63,15 @@ var (
 	deleteCmd  = app.Command("delete", "Deletes an application by name")
 	deleteName = deleteCmd.Arg("name", "name of the service").String()
 
-	hostCmd        = app.Command("host", "Host management")
-	hostAdd        = hostCmd.Command("add", "Add a host to the state file")
-	hostAddTor     = hostAdd.Flag("tor", "connect to this over tor?").Bool()
-	hostAddName    = hostAdd.Arg("name", "name of host to add").Required().String()
-	hostAddAddr    = hostAdd.Arg("addr", "address of taget server (host:port)").Required().String()
+	hostCmd       = app.Command("host", "Host management")
+	hostAdd       = hostCmd.Command("add", "Add a host to the state file")
+	hostAddTor    = hostAdd.Flag("tor", "connect to this over tor?").Bool()
+	hostAddCaCert = hostAdd.Flag("ca-cert", "ca certificate of the server").Default("ca.pem").File()
+	hostAddCert   = hostAdd.Flag("cert", "client certificate").Default("cert.pem").File()
+	hostAddKey    = hostAdd.Flag("key", "client ssl key").Default("key.pem").File()
+	hostAddName   = hostAdd.Arg("name", "name of host to add").Required().String()
+	hostAddAddr   = hostAdd.Arg("addr", "address of taget server (host:port)").Required().String()
+
 	hostRemove     = hostCmd.Command("remove", "Remove a host from the state file")
 	hostRemoveName = hostRemove.Arg("name", "name of host to remove").Required().String()
 )
@@ -88,11 +96,29 @@ func main() {
 			log.Fatal(err)
 		}
 
+		caCertData, err := ioutil.ReadAll(*hostAddCaCert)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		clientCertData, err := ioutil.ReadAll(*hostAddCert)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		clientKeyData, err := ioutil.ReadAll(*hostAddKey)
+		if err != nil {
+			log.Fatal(err)
+		}
+
 		h := &Host{
-			Name:  *hostAddName,
-			Addr:  *hostAddAddr,
-			Token: token,
-			Tor:   *hostAddTor,
+			Name:   *hostAddName,
+			Addr:   *hostAddAddr,
+			Token:  token,
+			Tor:    *hostAddTor,
+			CaCert: caCertData,
+			Cert:   clientCertData,
+			Key:    clientKeyData,
 		}
 
 		state.Hosts[h.Name] = h
@@ -139,8 +165,17 @@ func main() {
 		log.Fatalf("Requested host %q that doesn't exist in state", *host)
 	}
 
+	caCertPool := x509.NewCertPool()
+	caCertPool.AppendCertsFromPEM(hostInfo.CaCert)
+
+	connCreds := credentials.NewTLS(&tls.Config{
+		RootCAs:            caCertPool,
+		InsecureSkipVerify: true,
+	})
+
 	creds := jwtcreds.NewFromToken(hostInfo.Token)
-	conn, err := grpc.Dial(hostInfo.Addr, grpc.WithInsecure(),
+	conn, err := grpc.Dial(hostInfo.Addr,
+		grpc.WithTransportCredentials(connCreds),
 		grpc.WithPerRPCCredentials(creds))
 	if err != nil {
 		log.Fatal(err)
@@ -181,10 +216,13 @@ type state struct {
 }
 
 type Host struct {
-	Name  string
-	Addr  string
-	Token string
-	Tor   bool
+	Name   string
+	Addr   string
+	Token  string
+	Tor    bool
+	CaCert []byte
+	Cert   []byte
+	Key    []byte
 }
 
 func readState() (*state, error) {
