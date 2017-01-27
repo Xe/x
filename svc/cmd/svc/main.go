@@ -17,6 +17,7 @@ import (
 	svc "github.com/Xe/tools/svc/proto"
 	"github.com/Xe/uuid"
 	jwt "github.com/dgrijalva/jwt-go"
+	"github.com/joho/godotenv"
 	"github.com/olekukonko/tablewriter"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
@@ -27,41 +28,24 @@ var (
 	app     = kingpin.New("svc", "A simple service manager")
 	debug   = app.Flag("debug", "print debugging logs?").Bool()
 	host    = app.Flag("host", "host to do these changes to").String()
-	dataDir = app.Flag("data-dir", "place for svc to store data").Default("/home/xena/.local/within/svc").String()
+	dataDir = app.Flag("data-dir", "place for svc to store data").Default(filepath.Join(os.Getenv("HOME"), ".local/within/svc")).String()
+
+	create            = app.Command("create", "Create a new application")
+	createName        = create.Flag("name", "name of the application").Required().String()
+	createEnvFile     = create.Flag("env-file", "file with key->value envvars").ExistingFile()
+	createEnvironment = create.Flag("env", "environment variables for the program").StringMap()
+	createLabels      = create.Flag("label", "additional labels to attach to the service").StringMap()
+	//createAuthorizedUsers = create.Flag("authorized-user", "additional user to allow modification access to").Strings()
+	//createExclusive       = create.Flag("exclusive", "can this only ever have one copy running at once?").Bool()
+	//createInstances       = create.Flag("instances", "number of instances of the backend service").Default("1").Int()
+	createDockerImage = create.Arg("docker image", "docker image to execute for this service").Required().String()
 
 	createToken          = app.Command("create-token", "Creates the initial server control token")
 	createTokenJwtSecret = createToken.Flag("jwt-secret", "jwt secret used on the server").Required().String()
 	createTokenUsername  = createToken.Arg("username", "username to create token for").Required().String()
 
-	list           = app.Command("list", "List apps running with this backend")
-	listLabelKey   = list.Flag("labelKey", "label key to match for").String()
-	listLabelValue = list.Flag("labelValue", "label value to match for (with labelKey)").String()
-
-	create                = app.Command("create", "Create a new application")
-	createName            = create.Flag("name", "name of the application").Required().String()
-	createEnvFile         = create.Flag("env-file", "file with key->value envvars").String()
-	createEnvironment     = create.Flag("env", "environment variables for the program").StringMap()
-	createLabels          = create.Flag("label", "additional labels to attach to the service").StringMap()
-	createAuthorizedUsers = create.Flag("authorized-user", "additional user to allow modification access to").Strings()
-	createExclusive       = create.Flag("exclusive", "can this only ever have one copy running at once?").Bool()
-	createInstances       = create.Flag("instances", "number of instances of the backend service").Default("1").Int()
-	createDockerImage     = create.Arg("docker image", "docker image to execute for this service").Required().String()
-
-	update              = app.Command("update", "Update an application")
-	updateImage         = update.Flag("image", "new docker image to use for this service").String()
-	updateEnvAdd        = update.Flag("env-add", "new environment variables to set").StringMap()
-	updateEnvRm         = update.Flag("env-rm", "environment variables to remove").StringMap()
-	updateLabelAdd      = update.Flag("label-add", "container labels to addB").StringMap()
-	updateLabelRm       = update.Flag("label-rm", "container labels to remove").StringMap()
-	updateGrantUsers    = update.Flag("grant-user", "grant a user permission to this service").Strings()
-	updateRevokeUsers   = update.Flag("revoke-user", "revoke a user's permission to this service").Strings()
-	updateInstanceCount = update.Flag("instances", "updates the instance count of the service").Int()
-
-	inspect     = app.Command("inspect", "Inspect an application")
-	inspectName = inspect.Arg("name", "name of the service").String()
-
 	deleteCmd  = app.Command("delete", "Deletes an application by name")
-	deleteName = deleteCmd.Arg("name", "name of the service").String()
+	deleteName = deleteCmd.Arg("name", "name of the service").Required().String()
 
 	hostCmd       = app.Command("host", "Host management")
 	hostAdd       = hostCmd.Command("add", "Add a host to the state file")
@@ -74,6 +58,23 @@ var (
 
 	hostRemove     = hostCmd.Command("remove", "Remove a host from the state file")
 	hostRemoveName = hostRemove.Arg("name", "name of host to remove").Required().String()
+
+	inspect     = app.Command("inspect", "Inspect an application")
+	inspectName = inspect.Arg("name", "name of the service").String()
+
+	list           = app.Command("list", "List apps running with this backend")
+	listLabelKey   = list.Flag("labelKey", "label key to match for").String()
+	listLabelValue = list.Flag("labelValue", "label value to match for (with labelKey)").String()
+
+	update              = app.Command("update", "Update an application")
+	updateImage         = update.Flag("image", "new docker image to use for this service").String()
+	updateEnvAdd        = update.Flag("env-add", "new environment variables to set").StringMap()
+	updateEnvRm         = update.Flag("env-rm", "environment variables to remove").StringMap()
+	updateLabelAdd      = update.Flag("label-add", "container labels to addB").StringMap()
+	updateLabelRm       = update.Flag("label-rm", "container labels to remove").StringMap()
+	updateGrantUsers    = update.Flag("grant-user", "grant a user permission to this service").Strings()
+	updateRevokeUsers   = update.Flag("revoke-user", "revoke a user's permission to this service").Strings()
+	updateInstanceCount = update.Flag("instances", "updates the instance count of the service").Int()
 )
 
 func main() {
@@ -127,23 +128,27 @@ func main() {
 		log.Println("Host added to hosts file.")
 		return
 	case "host remove":
-		log.Println("removing host not yet implemented")
-		os.Exit(1)
+		_, exists := state.Hosts[*hostRemoveName]
+		if !exists {
+			log.Fatalf("no such host %q", *hostRemoveName)
+		}
+
+		delete(state.Hosts, *hostRemoveName)
+		writeState(state)
+
+		log.Printf("Host %q removed from hosts file", *hostRemoveName)
+		return
 	case "create-token":
 		now := time.Now()
-		nva := now.AddDate(0, 1, 0)  // Expiry time of this token
-		nb4 := now.AddDate(0, 0, -1) // Not before then is this token valid
 
 		hostname, _ := os.Hostname()
 		tid := uuid.New()
 
 		token := jwt.NewWithClaims(jwt.SigningMethodHS512, &jwt.StandardClaims{
-			IssuedAt:  now.Unix(),
-			NotBefore: nb4.Unix(),
-			ExpiresAt: nva.Unix(),
-			Issuer:    hostname,
-			Subject:   *createTokenUsername,
-			Id:        tid,
+			IssuedAt: now.Unix(),
+			Issuer:   hostname,
+			Subject:  *createTokenUsername,
+			Id:       tid,
 		})
 
 		tokenString, err := token.SignedString([]byte(*createTokenJwtSecret))
@@ -201,13 +206,58 @@ func main() {
 		table.Render()
 
 	case create.FullCommand():
-		log.Println("create not implemented")
+		env := map[string]string{}
+
+		for key, val := range *createEnvironment {
+			env[key] = val
+		}
+
+		if *createEnvFile != "" {
+			emap, err := godotenv.Read(*createEnvFile)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			for key, val := range emap {
+				env[key] = val
+			}
+		}
+
+		m := &svc.Manifest{
+			DockerImage: *createDockerImage,
+			Environment: env,
+			Labels:      *createLabels,
+			Name:        *createName,
+		}
+
+		app, err := c.Create(context.Background(), m)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		log.Printf("%s created", app.Name)
+		return
 	case update.FullCommand():
 		log.Println("update not implemented")
 	case inspect.FullCommand():
-		log.Println("inspect not implemented")
+		app, err := c.Inspect(context.Background(), &svc.AppInspect{
+			Name: *inspectName,
+		})
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		e := json.NewEncoder(os.Stdout)
+		e.SetIndent("", "  ")
+		e.Encode(app)
+		return
 	case deleteCmd.FullCommand():
-		log.Println("delete not implemented")
+		ok, err := c.Delete(context.Background(), &svc.AppDelete{Name: *deleteName})
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		log.Println(ok.Message)
 	}
 }
 

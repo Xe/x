@@ -137,6 +137,10 @@ func (s *server) Create(ctx context.Context, manifest *svc.Manifest) (*svc.App, 
 		return nil, err
 	}
 
+	if user != admin {
+		return nil, grpc.Errorf(codes.PermissionDenied, "create: permission denied for user %s", user)
+	}
+
 	env := []string{}
 
 	for key, val := range manifest.Environment {
@@ -188,11 +192,113 @@ func (s *server) Update(ctx context.Context, params *svc.AppUpdate) (*svc.App, e
 }
 
 func (s *server) Inspect(ctx context.Context, params *svc.AppInspect) (*svc.App, error) {
-	return nil, errors.New("not implemented")
+	user, err := s.checkAuth(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	au := s.state[params.Name]
+	if au == nil {
+		s.state[params.Name] = []string{admin}
+		au = s.state[params.Name]
+		s.SaveState("state.json")
+	}
+
+	found := false
+	if user == admin {
+		found = true
+	}
+
+	for _, uu := range au {
+		if user == uu {
+			found = true
+		}
+	}
+
+	if !found {
+		return nil, grpc.Errorf(codes.PermissionDenied, "You do not have permission for this app")
+	}
+
+	svcs, err := s.docker.ServiceList(ctx, types.ServiceListOptions{})
+	if err != nil {
+		return nil, err
+	}
+
+	found = false
+	svcID := ""
+
+	for _, dsvc := range svcs {
+		if dsvc.Spec.Name == params.Name {
+			found = true
+			svcID = dsvc.ID
+		}
+	}
+
+	if !found {
+		return nil, errors.New("service not found")
+	}
+
+	dsvc, _, err := s.docker.ServiceInspectWithRaw(ctx, svcID)
+	if err != nil {
+		return nil, err
+	}
+
+	env := func(kv []string) map[string]string {
+		result := map[string]string{}
+
+		for _, pair := range kv {
+			split := strings.SplitN(pair, "=", 2)
+			result[split[0]] = split[1]
+		}
+
+		return result
+	}(dsvc.Spec.TaskTemplate.ContainerSpec.Env)
+
+	a := &svc.App{
+		Id:              dsvc.ID,
+		Name:            dsvc.Spec.Name,
+		DockerImage:     dsvc.Spec.TaskTemplate.ContainerSpec.Image,
+		Environment:     env,
+		Labels:          dsvc.Spec.Labels,
+		AuthorizedUsers: au,
+	}
+
+	return a, nil
 }
 
 func (s *server) Delete(ctx context.Context, params *svc.AppDelete) (*svc.Ok, error) {
-	return nil, errors.New("not implemented")
+	user, err := s.checkAuth(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	if user != admin {
+		return nil, grpc.Errorf(codes.PermissionDenied, "must be an admin to delete things")
+	}
+
+	svcs, err := s.docker.ServiceList(ctx, types.ServiceListOptions{})
+	if err != nil {
+		return nil, err
+	}
+
+	found := false
+
+	for _, dsvc := range svcs {
+		if dsvc.Spec.Name == params.Name {
+			found = true
+
+			err = s.docker.ServiceRemove(ctx, dsvc.ID)
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	if !found {
+		return nil, errors.New("service not found")
+	}
+
+	return &svc.Ok{Message: "app " + params.Name + " deleted"}, nil
 }
 
 func main() {
