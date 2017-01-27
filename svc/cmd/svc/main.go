@@ -66,15 +66,13 @@ var (
 	listLabelKey   = list.Flag("labelKey", "label key to match for").String()
 	listLabelValue = list.Flag("labelValue", "label value to match for (with labelKey)").String()
 
-	update              = app.Command("update", "Update an application")
-	updateImage         = update.Flag("image", "new docker image to use for this service").String()
-	updateEnvAdd        = update.Flag("env-add", "new environment variables to set").StringMap()
-	updateEnvRm         = update.Flag("env-rm", "environment variables to remove").StringMap()
-	updateLabelAdd      = update.Flag("label-add", "container labels to addB").StringMap()
-	updateLabelRm       = update.Flag("label-rm", "container labels to remove").StringMap()
-	updateGrantUsers    = update.Flag("grant-user", "grant a user permission to this service").Strings()
-	updateRevokeUsers   = update.Flag("revoke-user", "revoke a user's permission to this service").Strings()
-	updateInstanceCount = update.Flag("instances", "updates the instance count of the service").Int()
+	update            = app.Command("update", "Update an application")
+	updateImage       = update.Flag("image", "new docker image to use for this service").String()
+	updateEnvAdd      = update.Flag("env-add", "new environment variables to set").StringMap()
+	updateEnvRm       = update.Flag("env-rm", "environment variables to remove").Strings()
+	updateGrantUsers  = update.Flag("grant-user", "grant a user permission to this service").Strings()
+	updateRevokeUsers = update.Flag("revoke-user", "revoke a user's permission to this service").Strings()
+	updateName        = update.Flag("name", "name of the service to update").Required().String()
 )
 
 func main() {
@@ -238,7 +236,20 @@ func main() {
 		log.Printf("%s created", app.Name)
 		return
 	case update.FullCommand():
-		log.Println("update not implemented")
+		_, err := c.Update(context.Background(), &svc.AppUpdate{
+			Name:        *updateName,
+			NewImage:    *updateImage,
+			EnvAdd:      *updateEnvAdd,
+			EnvRm:       *updateEnvRm,
+			GrantUsers:  *updateGrantUsers,
+			RevokeUsers: *updateRevokeUsers,
+		})
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		log.Println("success")
+		return
 	case inspect.FullCommand():
 		app, err := c.Inspect(context.Background(), &svc.AppInspect{
 			Name: *inspectName,

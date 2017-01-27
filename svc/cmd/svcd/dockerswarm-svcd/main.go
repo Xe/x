@@ -188,6 +188,11 @@ func (s *server) Create(ctx context.Context, manifest *svc.Manifest) (*svc.App, 
 }
 
 func (s *server) Update(ctx context.Context, params *svc.AppUpdate) (*svc.App, error) {
+	user, err := s.checkAuth(ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	au := s.state[params.Name]
 	if au == nil {
 		s.state[params.Name] = []string{admin}
