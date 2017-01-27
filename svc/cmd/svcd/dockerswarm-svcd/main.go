@@ -188,6 +188,93 @@ func (s *server) Create(ctx context.Context, manifest *svc.Manifest) (*svc.App, 
 }
 
 func (s *server) Update(ctx context.Context, params *svc.AppUpdate) (*svc.App, error) {
+	au := s.state[params.Name]
+	if au == nil {
+		s.state[params.Name] = []string{admin}
+		au = s.state[params.Name]
+		s.SaveState("state.json")
+	}
+
+	found := false
+	if user == admin {
+		found = true
+	}
+
+	for _, uu := range au {
+		if user == uu {
+			found = true
+		}
+	}
+
+	if !found {
+		return nil, grpc.Errorf(codes.PermissionDenied, "You do not have permission for this app")
+	}
+
+	found = false
+	var svcToUpdate swarm.Service
+
+	svcs, err := s.docker.ServiceList(ctx, types.ServiceListOptions{})
+	if err != nil {
+		return nil, err
+	}
+
+	for _, dsvc := range svcs {
+		if dsvc.Spec.Name == params.Name {
+			found = true
+			svcToUpdate = dsvc
+		}
+	}
+
+	if !found {
+		return nil, errors.New("service not found")
+	}
+
+	if params.NewImage != "" {
+		svcToUpdate.Spec.TaskTemplate.ContainerSpec.Image = params.NewImage
+	}
+
+	env := svcToUpdate.Spec.TaskTemplate.ContainerSpec.Env
+
+	for key, val := range params.EnvAdd {
+		env = append(env, fmt.Sprintf("%s=%s", key, val))
+	}
+
+	for _, varName := range params.EnvRm {
+		for i, envVar := range env {
+			if strings.HasPrefix(envVar, varName+"=") {
+				env[i] = env[len(env)-1]
+				env[len(env)-1] = ""
+				env = env[:len(env)-1]
+			}
+		}
+	}
+
+	if len(params.GrantUsers) != 0 {
+		s.Lock()
+		for _, u := range params.GrantUsers {
+			s.state[params.Name] = append(s.state[params.Name], u)
+		}
+		s.Unlock()
+	}
+
+	if len(params.RevokeUsers) != 0 {
+		s.Lock()
+		for _, u := range params.GrantUsers {
+			for i, uu := range au {
+				if u == uu {
+					s.state[params.Name][i] = s.state[params.Name][len(s.state[params.Name])-1]
+					s.state[params.Name][len(s.state[params.Name])-1] = ""
+					s.state[params.Name] = s.state[params.Name][:len(s.state[params.Name])-1]
+				}
+			}
+		}
+		s.Unlock()
+	}
+
+	s.SaveState("state.json")
+
+	s.docker.ServiceUpdate(ctx, svcToUpdate.ID, svcToUpdate.Version, svcToUpdate.Spec, types.ServiceUpdateOptions{})
+
 	return nil, errors.New("not implemented")
 }
 
