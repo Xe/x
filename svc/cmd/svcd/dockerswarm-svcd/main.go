@@ -1,10 +1,13 @@
 package main
 
 import (
+	"crypto/tls"
+	"crypto/x509"
 	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net"
 	"os"
@@ -21,6 +24,7 @@ import (
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/metadata"
 )
 
@@ -28,6 +32,7 @@ var (
 	listenAddress = flag.String("listen", "127.0.0.1:23142", "tcp host:port to listen on")
 	sslCert       = flag.String("tls-cert", "cert.pem", "tls certificate to read from")
 	sslKey        = flag.String("tls-key", "key.pem", "tls private key")
+	caCert        = flag.String("ca-cert", "ca.pem", "ca public cert")
 	jwtSecret     = flag.String("jwt-secret", "hunter2", "secret used to sign jwt's")
 )
 
@@ -194,7 +199,25 @@ func main() {
 	flag.Parse()
 	flagenv.Parse()
 
-	gs := grpc.NewServer()
+	cert, err := tls.LoadX509KeyPair(*sslCert, *sslKey)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	rawCaCert, err := ioutil.ReadFile(*caCert)
+	if err != nil {
+		log.Fatal(err)
+	}
+	caCertPool := x509.NewCertPool()
+	caCertPool.AppendCertsFromPEM(rawCaCert)
+
+	creds := credentials.NewTLS(&tls.Config{
+		Certificates: []tls.Certificate{cert},
+		ClientCAs:    caCertPool,
+		ClientAuth:   tls.VerifyClientCertIfGiven,
+	})
+
+	gs := grpc.NewServer(grpc.Creds(creds))
 
 	defaultHeaders := map[string]string{"User-Agent": "dockerswarm-svcd"}
 	cli, err := client.NewClient(client.DefaultDockerHost, client.DefaultVersion, nil, defaultHeaders)
