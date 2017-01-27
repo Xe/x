@@ -10,6 +10,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net"
+	"net/http"
 	"os"
 	"strings"
 	"sync"
@@ -34,6 +35,7 @@ var (
 	sslKey        = flag.String("tls-key", "key.pem", "tls private key")
 	caCert        = flag.String("ca-cert", "ca.pem", "ca public cert")
 	jwtSecret     = flag.String("jwt-secret", "hunter2", "secret used to sign jwt's")
+	httpAddress   = flag.String("http-listen", "127.0.0.1:9090", "tcp host:port to listen the web server on")
 )
 
 const admin = "xena"
@@ -439,6 +441,8 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	go http.ListenAndServe(*httpAddress, gs)
 
 	err = gs.Serve(l)
 	if err != nil {
