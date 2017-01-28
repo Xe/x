@@ -128,6 +128,7 @@ func (s *server) List(ctx context.Context, params *svc.AppsListParams) (*svc.App
 			Environment:     env,
 			Labels:          ssvc.Spec.Labels,
 			AuthorizedUsers: au,
+			Instances:       int32(*ssvc.Spec.Mode.Replicated.Replicas),
 		})
 	}
 
