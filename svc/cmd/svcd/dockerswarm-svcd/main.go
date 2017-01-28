@@ -31,11 +31,12 @@ import (
 
 var (
 	listenAddress = flag.String("listen", "127.0.0.1:23142", "tcp host:port to listen on")
-	sslCert       = flag.String("tls-cert", "cert.pem", "tls certificate to read from")
-	sslKey        = flag.String("tls-key", "key.pem", "tls private key")
-	caCert        = flag.String("ca-cert", "ca.pem", "ca public cert")
+	sslCert       = flag.String("tls-cert", "", "tls certificate to read from")
+	sslKey        = flag.String("tls-key", "", "tls private key")
+	caCert        = flag.String("ca-cert", "", "ca public cert")
 	jwtSecret     = flag.String("jwt-secret", "hunter2", "secret used to sign jwt's")
 	httpAddress   = flag.String("http-listen", "127.0.0.1:9090", "tcp host:port to listen the web server on")
+	dockerAddr    = flag.String("docker-addr", client.DefaultDockerHost, "docker address")
 )
 
 const admin = "xena"
@@ -266,7 +267,7 @@ func (s *server) Update(ctx context.Context, params *svc.AppUpdate) (*svc.App, e
 
 	if len(params.RevokeUsers) != 0 {
 		s.Lock()
-		for _, u := range params.GrantUsers {
+		for _, u := range params.RevokeUsers {
 			for i, uu := range au {
 				if u == uu {
 					s.state[params.Name][i] = s.state[params.Name][len(s.state[params.Name])-1]
@@ -282,7 +283,7 @@ func (s *server) Update(ctx context.Context, params *svc.AppUpdate) (*svc.App, e
 
 	s.docker.ServiceUpdate(ctx, svcToUpdate.ID, svcToUpdate.Version, svcToUpdate.Spec, types.ServiceUpdateOptions{})
 
-	return nil, errors.New("not implemented")
+	return s.Inspect(ctx, &svc.AppInspect{Name: params.Name})
 }
 
 func (s *server) Inspect(ctx context.Context, params *svc.AppInspect) (*svc.App, error) {
@@ -399,25 +400,32 @@ func main() {
 	flag.Parse()
 	flagenv.Parse()
 
-	cert, err := tls.LoadX509KeyPair(*sslCert, *sslKey)
-	if err != nil {
-		log.Fatal(err)
+	var creds credentials.TransportCredentials
+	var gs *grpc.Server
+
+	if *sslCert != "" && *caCert != "" && *sslKey != "" {
+		cert, err := tls.LoadX509KeyPair(*sslCert, *sslKey)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		rawCaCert, err := ioutil.ReadFile(*caCert)
+		if err != nil {
+			log.Fatal(err)
+		}
+		caCertPool := x509.NewCertPool()
+		caCertPool.AppendCertsFromPEM(rawCaCert)
+
+		creds = credentials.NewTLS(&tls.Config{
+			Certificates: []tls.Certificate{cert},
+			ClientCAs:    caCertPool,
+			ClientAuth:   tls.VerifyClientCertIfGiven,
+		})
+
+		gs = grpc.NewServer(grpc.Creds(creds))
+	} else {
+		gs = grpc.NewServer()
 	}
-
-	rawCaCert, err := ioutil.ReadFile(*caCert)
-	if err != nil {
-		log.Fatal(err)
-	}
-	caCertPool := x509.NewCertPool()
-	caCertPool.AppendCertsFromPEM(rawCaCert)
-
-	creds := credentials.NewTLS(&tls.Config{
-		Certificates: []tls.Certificate{cert},
-		ClientCAs:    caCertPool,
-		ClientAuth:   tls.VerifyClientCertIfGiven,
-	})
-
-	gs := grpc.NewServer(grpc.Creds(creds))
 
 	defaultHeaders := map[string]string{"User-Agent": "dockerswarm-svcd"}
 	cli, err := client.NewClient(client.DefaultDockerHost, client.DefaultVersion, nil, defaultHeaders)
