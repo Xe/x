@@ -13,12 +13,14 @@ service Apps {
   rpc Create(Manifest) returns (App) {
     option (google.api.http) = {
       post: "/api/v1/apps/create"
+      body: "*"
     };
   }
 
   rpc Update(AppUpdate) returns (App) {
     option (google.api.http) = {
       post: "/api/v1/apps/{name}/update"
+      body: "*"
     };
   }
 
