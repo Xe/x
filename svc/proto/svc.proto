@@ -65,6 +65,7 @@ message App {
   map<string, string> labels = 5;
   repeated string authorizedUsers = 6;
   int32 instances = 7;
+  string status = 8;
 }
 
 message AppUpdate {
