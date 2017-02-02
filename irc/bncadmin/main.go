@@ -54,7 +54,7 @@ func main() {
 
 	err = c.Run()
 	if err != nil {
-		panic(err)
+		main()
 	}
 }
 
