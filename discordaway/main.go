@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"log"
 	"os/exec"
+	"strings"
 	"time"
 
 	"github.com/bwmarrin/discordgo"
@@ -20,6 +21,13 @@ func main() {
 	flag.Parse()
 
 	dg, err := discordgo.New(*username, *password)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	dg.AddHandler(messageCreate)
+
+	err = dg.Open()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -58,4 +66,29 @@ func isTmuxAttached() (bool, error) {
 	}
 
 	return bytes.HasPrefix(output, []byte("attached")), nil
+}
+
+func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
+	if m.Author.ID == "72838115944828928" {
+		content := m.ContentWithMentionsReplaced()
+
+		if strings.HasPrefix(content, "TODO: ") {
+			todoBody := strings.SplitN(content, "TODO: ", 2)[1]
+
+			log.Printf("todo added: %s", todoBody)
+			todoFields := strings.Fields(todoBody)
+
+			cmd := exec.Command("/home/xena/go/bin/todo", append([]string{"add"}, todoFields...)...)
+			err := cmd.Start()
+			if err != nil {
+				log.Println(err)
+				return
+			}
+
+			err = cmd.Wait()
+			if err != nil {
+				log.Println(err)
+			}
+		}
+	}
 }
