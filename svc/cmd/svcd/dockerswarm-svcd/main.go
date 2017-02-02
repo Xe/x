@@ -21,6 +21,7 @@ import (
 	"github.com/docker/docker/api/types/swarm"
 	"github.com/docker/docker/client"
 	"github.com/facebookgo/flagenv"
+	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	_ "github.com/joho/godotenv/autoload"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
@@ -36,7 +37,6 @@ var (
 	caCert        = flag.String("ca-cert", "", "ca public cert")
 	jwtSecret     = flag.String("jwt-secret", "hunter2", "secret used to sign jwt's")
 	httpAddress   = flag.String("http-listen", "127.0.0.1:9090", "tcp host:port to listen the web server on")
-	dockerAddr    = flag.String("docker-addr", client.DefaultDockerHost, "docker address")
 )
 
 const admin = "xena"
@@ -129,6 +129,7 @@ func (s *server) List(ctx context.Context, params *svc.AppsListParams) (*svc.App
 			Labels:          ssvc.Spec.Labels,
 			AuthorizedUsers: au,
 			Instances:       int32(*ssvc.Spec.Mode.Replicated.Replicas),
+			Status:          "",
 		})
 	}
 
@@ -451,7 +452,16 @@ func main() {
 		log.Fatal(err)
 	}
 
-	go http.ListenAndServe(*httpAddress, gs)
+	mux := runtime.NewServeMux()
+	opts := []grpc.DialOption{grpc.WithTransportCredentials(credentials.NewTLS(&tls.Config{
+		InsecureSkipVerify: true,
+	}))}
+	err = svc.RegisterAppsHandlerFromEndpoint(context.Background(), mux, *listenAddress, opts)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	go http.ListenAndServe(*httpAddress, mux)
 
 	err = gs.Serve(l)
 	if err != nil {
