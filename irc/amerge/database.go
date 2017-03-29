@@ -37,6 +37,7 @@ type Database struct {
 	HostRequests []HostRequest
 
 	ClonesExemptions []ClonesExemption
+	Rwatches         []Line
 
 	lines []*Line
 	file  *bufio.Scanner
@@ -81,10 +82,12 @@ func NewDatabase(fname string) (db *Database, err error) {
 
 		case "MU": // Create a user account
 			a := &Account{
-				Name:     l.Args[1],
-				UID:      l.Args[0],
-				Email:    l.Args[3],
-				Password: l.Args[2],
+				Name:         l.Args[1],
+				UID:          l.Args[0],
+				Email:        l.Args[3],
+				Password:     l.Args[2],
+				Regtime:      l.Args[4],
+				LastSeenTime: l.Args[5],
 
 				Metadata: make(map[string]string),
 			}
@@ -391,7 +394,7 @@ func NewDatabase(fname string) (db *Database, err error) {
 			db.HostRequests = append(db.HostRequests, hr)
 
 		// Verbs to ignore
-		case "GRVER", "XL", "FIM", "FAQ", "RW", "RR", "BE", "CF", "GDBV", "GFA", "CFDBV", "CFCHAN", "CFOP", "BOT-COUNT", "CLONES-DBV", "CLONES-CK", "CLONES-CD", "CLONES-GR":
+		case "":
 
 		default:
 			fmt.Printf("%#v\n", l)
@@ -428,6 +431,15 @@ func (db *Database) GetGroup(name string) (*Group, error) {
 	return group, nil
 }
 
+func (db *Database) GetBot(name string) (*Bot, error) {
+	group, ok := db.Bots[strings.ToUpper(name)]
+	if !ok {
+		return nil, NoSuchGroupErr
+	}
+
+	return group, nil
+}
+
 type Line struct {
 	Verb string
 	Args []string
@@ -440,6 +452,9 @@ type Account struct {
 	Kind     string
 	UID      string
 	Password string
+
+	Regtime      string
+	LastSeenTime string
 
 	Metadata   map[string]string
 	Nicks      []GroupedNick
