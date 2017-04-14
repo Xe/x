@@ -1,0 +1,19 @@
+{
+  "name": "kcpdwhitelist",
+  "version": "0.0.2",
+  "description": "Service",
+  "author": "xena <me@christine.website>",
+  "main": "functions/main/index.js",
+  "dependencies": {},
+  "private": true,
+  "stdlib": {
+    "name": "xena/kcpdwhitelist",
+    "defaultFunction": "main",
+    "timeout": 10000,
+    "publish": true,
+    "personalize": {
+      "keys": [],
+      "user": []
+    }
+  }
+}
