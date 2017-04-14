@@ -19,3 +19,8 @@ ffcf1bedda3b04ebb15a168a59800a73d6dc0f4d	golang.org/x/net/internal/iana
 ffcf1bedda3b04ebb15a168a59800a73d6dc0f4d	golang.org/x/net/internal/netreflect
 ffcf1bedda3b04ebb15a168a59800a73d6dc0f4d	golang.org/x/net/ipv4
 9f9df34309c04878acc86042b16630b0f696e1de (dirty)	gopkg.in/yaml.v1
+a00a8beb369cafd88bb7b32f31fc4ff3219c3565	github.com/Xe/gopreload
+62f833fc9f6c4d3223bdb37bd0c2f8951bed8596	github.com/google/gops/agent
+62f833fc9f6c4d3223bdb37bd0c2f8951bed8596	github.com/google/gops/internal
+62f833fc9f6c4d3223bdb37bd0c2f8951bed8596	github.com/google/gops/signal
+c2c54e542fb797ad986b31721e1baedf214ca413	github.com/kardianos/osext
