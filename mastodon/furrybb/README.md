@@ -7,8 +7,9 @@ hashtags too. Usage is simple:
 ```console
 $ go get github.com/Xe/x/mastodon/furrybb
 $ cd $GOPATH/src/github.com/Xe/x/mastodon/furrybb
-$ go run mkapp.go -help
-Usage of [mkapp.go]:
+$ go get github.com/Xe/x/mastodon/mkapp
+$ mkapp
+Usage of [mkapp]:
   -app-name string
     	app name for mastodon (default "Xe/x bot")
   -instance string
@@ -22,7 +23,7 @@ Usage of [mkapp.go]:
   -website string
     	website for users that click the app name (default "https://github.com/Xe/x")
 exit status 2
-$ go run mkapp.go [your options here] > .env
+$ mkapp [your options here] > .env
 $ echo "HASHTAG=furry" >> .env
 $ go build && ./furrybb
 ```
