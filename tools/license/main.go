@@ -10,7 +10,7 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/Xe/tools/license/licenses"
+	"github.com/Xe/x/tools/license/licenses"
 )
 
 var (
