@@ -2,9 +2,10 @@ package main
 
 import (
 	"bytes"
+	"crypto/rand"
 	"fmt"
 	"io/ioutil"
-	"math/rand"
+	"math/big"
 	"os"
 	"strings"
 	"time"
@@ -39,14 +40,11 @@ func main() {
 		ln.Fatal(ln.F{"err": err, "action": "ioutil.ReadAll(fin)"})
 	}
 
-	c, err := madon.RestoreApp("furry boostbot", cfg.Instance, cfg.AppID, cfg.AppSecret, &madon.UserToken{AccessToken: cfg.Token})
+	c, err := madon.RestoreApp("almarid:", cfg.Instance, cfg.AppID, cfg.AppSecret, &madon.UserToken{AccessToken: cfg.Token})
 	if err != nil {
 		ln.Fatal(ln.F{"err": err, "action": "madon.RestoreApp"})
 	}
 	_ = c
-
-	n := time.Now().UnixNano()
-	rand.Seed(n * n)
 
 	lines := bytes.Split(data, []byte("\n"))
 	words := []string{}
@@ -64,29 +62,48 @@ func main() {
 	}
 
 	ln.Log(ln.F{"action": "words.loaded", "count": len(words)})
-	perms := rand.Perm(len(words))
 
-	for i := range perms {
-		//time.Sleep(5 * time.Minute)
+	lenBig := big.NewInt(int64(len(words)))
+
+	first := true
+
+	for {
+		bi, err := rand.Int(rand.Reader, lenBig)
+		if err != nil {
+			ln.Log(ln.F{
+				"action": "big.Rand",
+				"err":    err,
+			})
+
+			continue
+		}
+
+		i := int(bi.Int64())
+
+		if first {
+			first = false
+		} else {
+			time.Sleep(5 * time.Minute)
+		}
 
 		txt := fmt.Sprintf("%s is not doing, allah is doing", words[i])
 
-		//st, err := c.PostStatus(txt, 0, nil, false, "", "public")
-		//if err != nil {
-		//	ln.Log(ln.F{
-		//		"err":    err,
-		//		"action": "c.PostStatus",
-		//		"text":   txt,
-		//	})
-		//
-		//	continue
-		//}
+		st, err := c.PostStatus(txt, 0, nil, false, "", "public")
+		if err != nil {
+			ln.Log(ln.F{
+				"err":    err,
+				"action": "c.PostStatus",
+				"text":   txt,
+			})
+
+			continue
+		}
 
 		ln.Log(ln.F{
 			"action": "tooted",
 			"text":   txt,
-			//"id": st.ID,
-			//"url": st.URL,
+			"id":     st.ID,
+			"url":    st.URL,
 		})
 	}
 }
