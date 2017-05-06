@@ -7,6 +7,7 @@ import (
 	"runtime"
 	"time"
 
+	"github.com/McKael/madon"
 	"github.com/Xe/ln"
 	"github.com/caarlos0/env"
 	_ "github.com/joho/godotenv/autoload"
@@ -25,6 +26,11 @@ type config struct {
 	TelegramToken     string `env:"TELEGRAM_TOKEN,required"`
 	TelegramAdmin     string `env:"TELEGRAM_ADMIN,required"`
 	TelegramChannelID int64  `env:"TELEGRAM_CHANNEL_ID,required"`
+
+	MastodonToken        string `env:"MASTODON_TOKEN,required"`
+	MastodonClientSecret string `env:"MASTODON_CLIENT_SECRET,required"`
+	MastodonClientID     string `env:"MASTODON_CLIENT_ID,required"`
+	MastodonInstance     string `env:"MASTODON_INSTANCE,required"`
 }
 
 func main() {
@@ -55,9 +61,15 @@ func main() {
 
 	ln.Log(ln.F{"action": "reddit_connected", "user_agent": userAgent})
 
+	md, err := madon.RestoreApp("me_irl", cfg.MastodonInstance, cfg.MastodonClientID, cfg.MastodonClientSecret, &madon.UserToken{AccessToken: cfg.MastodonToken})
+	if err != nil {
+		ln.Fatal(ln.F{"err": err, "action": "madon.RestoreApp"})
+	}
+
 	a := &announcer{
 		cfg: &cfg,
 		tg:  tg,
+		md:  md,
 	}
 
 	stop, wait, err := graw.Scan(a, rd, graw.Config{Subreddits: cfg.Subreddits, Logger: log.New(os.Stderr, "", log.LstdFlags)})
@@ -75,17 +87,24 @@ func main() {
 type announcer struct {
 	cfg *config
 	tg  *tgbotapi.BotAPI
+	md  *madon.Client
 }
 
 func (a *announcer) Post(post *reddit.Post) error {
-	msg := tgbotapi.NewMessage(a.cfg.TelegramChannelID, fmt.Sprintf("me irl\n%s\n(https://reddit.com%s by /u/%s)", post.URL, post.Permalink, post.Author))
-	_, err := a.tg.Send(msg)
+	txt := fmt.Sprintf("me irl\n%s\n(https://reddit.com%s by /u/%s)", post.URL, post.Permalink, post.Author)
+
+	msg := tgbotapi.NewMessage(a.cfg.TelegramChannelID, txt)
+	tmsg, err := a.tg.Send(msg)
 	if err != nil {
-		ln.Error(err, ln.F{"err": err, "action": "telegram_post"})
 		return err
 	}
 
-	ln.Log(ln.F{"action": "new_post", "url": post.URL, "permalink": post.Permalink, "redditor": post.Author})
+	toot, err := a.md.PostStatus(txt, 0, nil, false, "", "public")
+	if err != nil {
+		return err
+	}
+
+	ln.Log(ln.F{"action": "new_post", "url": post.URL, "permalink": post.Permalink, "redditor": post.Author, "toot_id": toot.ID, "tg_id": tmsg.MessageID})
 
 	return nil
 }
