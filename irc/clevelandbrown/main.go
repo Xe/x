@@ -8,7 +8,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/AllenDang/simhash"
 	"github.com/Xe/ln"
 	_ "github.com/joho/godotenv/autoload"
 	irc "gopkg.in/irc.v1"
@@ -195,11 +194,9 @@ func scoreCleveland(c *irc.Client, m *irc.Message) {
 		sc = 0
 	}
 
-	lv := simhash.GetLikenessValue(strings.ToLower(m.Params[1]), showLyrics)
-
 	for _, line := range lines {
 		if strings.Contains(strings.ToLower(m.Trailing()), line) {
-			lv += 1
+			sc += 1
 
 			ln.Log(ln.F{
 				"action":     "siren_compare",
@@ -211,15 +208,21 @@ func scoreCleveland(c *irc.Client, m *irc.Message) {
 		}
 	}
 
-	ln.Log(ln.F{
-		"action":  "score_modification",
-		"user":    m.Prefix.String(),
-		"before":  sc,
-		"score":   sc + lv,
-		"channel": m.Params[0],
-	})
+	thisLine := strings.ToLower(m.Trailing())
 
-	sc += lv
+	for _, efnLine := range efknockr {
+		if strings.Contains(thisLine, strings.ToLower(efnLine)) {
+			sc += 3
+			ln.Log(ln.F{
+				"action":  "efknockr_detected",
+				"score":   sc,
+				"user":    m.Prefix.String(),
+				"channel": m.Params[0],
+				"delta":   3,
+				"svclog":  true,
+			})
+		}
+	}
 
 	scores[m.Prefix.Host] = sc
 
@@ -270,4 +273,29 @@ var lines = []string{
 	"where everyone will know",
 	"my happy mustache face",
 	"this is the cleveland show! haha!",
+}
+
+var efknockr = []string{
+	"THIS NETWORK IS FUCKING BLOWJOBS LOL COME TO WORMSEC FOR SOME ICE COLD CHATS",
+	"0 DAY BANANA BOMBS \"OK\"",
+	"IRC.WORMSEC.US",
+	"THE HOTTEST MOST EXCLUSIVE SEC ON THE NET",
+	"THIS NETWORK IS BLOWJOBS! GET ON SUPERNETS FOR COLD HARD CHATS NOW",
+	"IRC.SUPERNETS.ORG | PORT 6667/6697 (SSL) | #SUPERBOWL | IPV6 READY",
+	"▓█▓▓▓▒▒▒▒▒▒▓▓▓▓▓▓▓▓▓▓▄░  ░▄▓▓▓▓▓▓▓▓▓█▓▓▓  IRC.WORMSEC.US  |  #SUPERBOWL",
+	"THIS NETWORK IS BLOWJOBS! GET ON SUPERNETS FOR COLD HARD CHATS NOW",
+	"▄",
+	"███▓▓▒▒▒▒▒▒▒░░░               ░░░░▒▒▒▓▓▓▓",
+	"▓█▓▓▓▒▒▒▒▒▒▓▓▓▓▓▓▓▓▓▓▄░   ░▄▓▓▓▓▓▓▓▓▓█▓▓▓",
+	"▒▓▓▓▓▒▒░░▒█▓▓▓▓▓▓▓▓▓▓█░▒░░▒▓▓▓▓▓▓▓▓▓▓▓█▓▓",
+	"░▒▓▓▒▒▒▒░░▒▒█▓▓▓▓▓▓▓▓▓█░▒░░░▒▓▓▓▓▓▓▓▓▓▓█▒▓░",
+	"▒▒▒▒▒▒▒▒▒▒▒░░▀▀▀▀▀▀▀ ░▒░░   ░▒▒▒▀▀▀▀▀▀▒▓▓▓▒",
+	"THE HOTTEST MOST EXCLUSIVE SEC ON THE NET",
+	"â–‘â–’â–“â–“â–’â–’â–’â–’â–‘â–‘â–’",
+	"Techman likes to fuck kids in the ass!!",
+	"https://discord.gg/3b86TH7",
+	"|     |\\\\",
+	"/     \\ ||",
+	"(  ,(   )=m=D~~~ LOL DONGS",
+	"/  / |  |",
 }
