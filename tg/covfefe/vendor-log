@@ -1,0 +1,10 @@
+a9c833d2837d3b16888d55d5aafa9ffe9afb22b0	github.com/certifi/gocertifi
+d175f85701dfbf44cb0510114c9943e665e60907	github.com/getsentry/raven-go
+726cc8b906e3d31c70a9671c90a13716a8d3f50d	github.com/joho/godotenv
+726cc8b906e3d31c70a9671c90a13716a8d3f50d	github.com/joho/godotenv/autoload
+3d2cfac89f5f4023604c963214759ea5f5d33972	github.com/justinian/dice
+1fa76025c307b26485b59eaa8bdfb4866cbee29f	github.com/syfaro/finch
+1fa76025c307b26485b59eaa8bdfb4866cbee29f	github.com/syfaro/finch/commands/help
+1fa76025c307b26485b59eaa8bdfb4866cbee29f	github.com/syfaro/finch/commands/info
+a90a01d73ae432e2611d178c18367fbaa13e0154	github.com/technoweenie/multipartstreamer
+0a57807db79efce7f6719fbb2c0e0f83fda79aec	gopkg.in/telegram-bot-api.v4
