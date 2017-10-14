@@ -1,0 +1,205 @@
+memo = "25863b31a291c6fd020e2dc754d72dcd02c20540d69dc876dfe193e13d4bfae7"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/ThomasRooney/gexpect"
+  packages = ["."]
+  revision = "5482f03509440585d13d8f648989e05903001842"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/ailncode/gluaxmlpath"
+  packages = ["."]
+  revision = "6ce478ecb4a60c4fc8929838e0b21b7fb7ca7440"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/brandur/simplebox"
+  packages = ["."]
+  revision = "84e9865bb03ad38c464043bf5382ce8c68ca5f0c"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/cjoudrey/gluahttp"
+  packages = ["."]
+  revision = "b4bfe0c50fea948dcbf3966e120996d6607bbd89"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/cjoudrey/gluaurl"
+  packages = ["."]
+  revision = "31cbb9bef199454415879f2e6d609d1136d60cad"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/howeyc/gopass"
+  packages = ["."]
+  revision = "bf9dde6d0d2c004a008c27aaee91170c786f6db8"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/kballard/go-shellquote"
+  packages = ["."]
+  revision = "cd60e84ee657ff3dc51de0b4f55dd299a3e136f2"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/kohkimakimoto/gluaenv"
+  packages = ["."]
+  revision = "2888db6bbe38923d59c42e443895875cc8ce0820"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/kohkimakimoto/gluafs"
+  packages = ["."]
+  revision = "01391ed2d7ab89dc80157605b073403f960aa223"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/kohkimakimoto/gluamarkdown"
+  packages = ["."]
+  revision = "a1c413d7bbfb1879f33c1a733d5e6df2123814a4"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/kohkimakimoto/gluaquestion"
+  packages = ["."]
+  revision = "311437c29ba54d027ad2af383661725ae2bfdcdc"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/kohkimakimoto/gluassh"
+  packages = ["."]
+  revision = "2a7bd48d7568de8230c87ac1ef4a4c481e45814d"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/kohkimakimoto/gluatemplate"
+  packages = ["."]
+  revision = "d9e2c9d6b00f069a9da377a9ac529c827c1c7d71"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/kohkimakimoto/gluayaml"
+  packages = ["."]
+  revision = "6fe413d49d73d785510ecf1529991ab0573e96c7"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/kr/fs"
+  packages = ["."]
+  revision = "2788f0dbd16903de03cb8186e5c7d97b69ad387b"
+
+[[projects]]
+  name = "github.com/kr/pty"
+  packages = ["."]
+  revision = "95d05c1eef33a45bd58676b6ce28d105839b8d0b"
+  version = "v1.0.1"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/mitchellh/mapstructure"
+  packages = ["."]
+  revision = "d0303fe809921458f417bcf828397a65db30a7e4"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/otm/gluaflag"
+  packages = ["."]
+  revision = "078088de689148194436293886e8e39809167332"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/otm/gluash"
+  packages = ["."]
+  revision = "e145c563986f0b91f740a758a84bca46c163aec7"
+
+[[projects]]
+  name = "github.com/pkg/errors"
+  packages = ["."]
+  revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
+  version = "v0.8.0"
+
+[[projects]]
+  name = "github.com/pkg/sftp"
+  packages = ["."]
+  revision = "98203f5a8333288eb3163b7c667d4260fe1333e9"
+  version = "1.0.0"
+
+[[projects]]
+  name = "github.com/russross/blackfriday"
+  packages = ["."]
+  revision = "cadec560ec52d93835bf2f15bd794700d3a2473b"
+  version = "v2.0.0"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/shurcooL/sanitized_anchor_name"
+  packages = ["."]
+  revision = "86672fcb3f950f35f2e675df2240550f2a50762f"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/yookoala/realpath"
+  packages = ["."]
+  revision = "80fa1befd17fc3b89a788874137207ddad1115c1"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/yuin/gluamapper"
+  packages = ["."]
+  revision = "d836955830e75240d46ce9f0e6d148d94f2e1d3a"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/yuin/gluare"
+  packages = ["."]
+  revision = "d7c94f1a80ede93a621ed100866e6d4745ca8c22"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/yuin/gopher-lua"
+  packages = [".","ast","parse","pm"]
+  revision = "eb1c7299435cc746b72514f37f74a5154dfe460f"
+
+[[projects]]
+  branch = "master"
+  name = "golang.org/x/crypto"
+  packages = ["curve25519","ed25519","ed25519/internal/edwards25519","nacl/secretbox","poly1305","salsa20/salsa","ssh","ssh/agent","ssh/terminal"]
+  revision = "9419663f5a44be8b34ca85f08abc5fe1be11f8a3"
+
+[[projects]]
+  branch = "master"
+  name = "golang.org/x/net"
+  packages = ["html","html/atom"]
+  revision = "a04bdaca5b32abe1c069418fb7088ae607de5bd0"
+
+[[projects]]
+  branch = "master"
+  name = "golang.org/x/sys"
+  packages = ["unix","windows"]
+  revision = "686000749eaec0b8855b8eef5336cf63899fe51d"
+
+[[projects]]
+  branch = "v2"
+  name = "gopkg.in/xmlpath.v2"
+  packages = ["."]
+  revision = "860cbeca3ebcc600db0b213c0e83ad6ce91f5739"
+
+[[projects]]
+  branch = "v2"
+  name = "gopkg.in/yaml.v2"
+  packages = ["."]
+  revision = "eb3733d160e74a9c7e442f435eb3bea458e1d19f"
+
+[[projects]]
+  branch = "master"
+  name = "layeh.com/gopher-json"
+  packages = ["."]
+  revision = "c128cc74278be889c4381681712931976fe0d88b"
+
+[[projects]]
+  branch = "master"
+  name = "layeh.com/gopher-luar"
+  packages = ["."]
+  revision = "189904aa8849a8bcafbccca9ffd3c49d5c8460c2"
