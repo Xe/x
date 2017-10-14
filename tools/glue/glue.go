@@ -8,8 +8,8 @@ import (
 	"os"
 	"runtime/pprof"
 
-	"github.com/Xe/tools/glue/libs/gluaexpect"
-	"github.com/Xe/tools/glue/libs/gluasimplebox"
+	"github.com/Xe/x/tools/glue/libs/gluaexpect"
+	"github.com/Xe/x/tools/glue/libs/gluasimplebox"
 	"github.com/ailncode/gluaxmlpath"
 	"github.com/cjoudrey/gluahttp"
 	"github.com/cjoudrey/gluaurl"
