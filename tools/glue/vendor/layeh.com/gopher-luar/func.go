@@ -1,4 +1,4 @@
-package luar
+package luar // import "layeh.com/gopher-luar"
 
 import (
 	"reflect"
@@ -14,17 +14,17 @@ type LState struct {
 }
 
 var (
-	refTypeLStatePtr  reflect.Type
-	refTypeLuaLValue  reflect.Type
-	refTypeInt        reflect.Type
-	refTypeEmptyIface reflect.Type
+	refTypeLStatePtr      reflect.Type
+	refTypeLuaLValueSlice reflect.Type
+	refTypeLuaLValue      reflect.Type
+	refTypeInt            reflect.Type
 )
 
 func init() {
 	refTypeLStatePtr = reflect.TypeOf(&LState{})
+	refTypeLuaLValueSlice = reflect.TypeOf([]lua.LValue{})
 	refTypeLuaLValue = reflect.TypeOf((*lua.LValue)(nil)).Elem()
 	refTypeInt = reflect.TypeOf(int(0))
-	refTypeEmptyIface = reflect.TypeOf((*interface{})(nil)).Elem()
 }
 
 func getFunc(L *lua.LState) (ref reflect.Value, refType reflect.Type) {
@@ -59,14 +59,13 @@ func funcBypass(L *lua.LState) int {
 	if refType.NumIn() == 2 {
 		receiverHint := refType.In(0)
 		ud = L.Get(1)
-		var err error
 		if isPtrReceiverMethod(L) {
-			receiver, err = lValueToReflect(L, ud, receiverHint, &convertedPtr)
+			receiver = lValueToReflect(L, ud, receiverHint, &convertedPtr)
 		} else {
-			receiver, err = lValueToReflect(L, ud, receiverHint, nil)
+			receiver = lValueToReflect(L, ud, receiverHint, nil)
 		}
-		if err != nil {
-			L.ArgError(1, err.Error())
+		if receiver.Type() != receiverHint {
+			L.RaiseError("incorrect receiver type")
 		}
 		args = append(args, receiver)
 		L.Remove(1)
@@ -105,21 +104,12 @@ func funcRegular(L *lua.LState) int {
 			hint = refType.In(i)
 		}
 		var arg reflect.Value
-		var err error
 		if i == 0 && isPtrReceiverMethod(L) {
 			ud = L.Get(1)
-			v := ud
-			arg, err = lValueToReflect(L, v, hint, &convertedPtr)
-			if err != nil {
-				L.ArgError(1, err.Error())
-			}
+			arg = lValueToReflect(L, ud, hint, &convertedPtr)
 			receiver = arg
 		} else {
-			v := L.Get(i + 1)
-			arg, err = lValueToReflect(L, v, hint, nil)
-			if err != nil {
-				L.ArgError(i+1, err.Error())
-			}
+			arg = lValueToReflect(L, L.Get(i+1), hint, nil)
 		}
 		args[i] = arg
 	}
@@ -129,6 +119,13 @@ func funcRegular(L *lua.LState) int {
 		ud.(*lua.LUserData).Value = receiver.Elem().Interface()
 	}
 
+	if len(ret) == 1 && ret[0].Type() == refTypeLuaLValueSlice {
+		values := ret[0].Interface().([]lua.LValue)
+		for _, value := range values {
+			L.Push(value)
+		}
+		return len(values)
+	}
 	for _, val := range ret {
 		L.Push(New(L, val.Interface()))
 	}

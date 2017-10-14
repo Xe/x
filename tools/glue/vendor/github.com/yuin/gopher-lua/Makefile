@@ -1,4 +1,4 @@
-.PHONY: build test glua
+.PHONY: build test
 
 build:
 	./_tools/go-inline *.go && go fmt . &&  go build

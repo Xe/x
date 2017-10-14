@@ -43,7 +43,6 @@ func main() {
 	config := ssh.ClientConfig{
 		User: *USER,
 		Auth: auths,
-		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
 	}
 	addr := fmt.Sprintf("%s:%d", *HOST, *PORT)
 	conn, err := ssh.Dial("tcp", addr, &config)

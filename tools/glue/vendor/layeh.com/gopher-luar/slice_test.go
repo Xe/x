@@ -38,7 +38,9 @@ func Test_slice_2(t *testing.T) {
 	L.SetGlobal("items", New(L, items))
 
 	testReturn(t, L, `return #items`, "0")
-	testReturn(t, L, `items = items + "hello" + "world"; return #items`, "2")
+	testReturn(t, L, `return items:capacity()`, "10")
+	testReturn(t, L, `items = items:append("hello", "world"); return #items`, "2")
+	testReturn(t, L, `return items:capacity()`, "10")
 	testReturn(t, L, `return items[1]`, "hello")
 	testReturn(t, L, `return items[2]`, "world")
 }

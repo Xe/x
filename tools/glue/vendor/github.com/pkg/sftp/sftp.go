@@ -4,8 +4,6 @@ package sftp
 
 import (
 	"fmt"
-
-	"github.com/pkg/errors"
 )
 
 const (
@@ -184,7 +182,7 @@ func (u *unexpectedPacketErr) Error() string {
 }
 
 func unimplementedPacketErr(u uint8) error {
-	return errors.Errorf("sftp: unimplemented packet type: got %v", fxp(u))
+	return fmt.Errorf("sftp: unimplemented packet type: got %v", fxp(u))
 }
 
 type unexpectedIDErr struct{ want, got uint32 }
@@ -194,11 +192,11 @@ func (u *unexpectedIDErr) Error() string {
 }
 
 func unimplementedSeekWhence(whence int) error {
-	return errors.Errorf("sftp: unimplemented seek whence %v", whence)
+	return fmt.Errorf("sftp: unimplemented seek whence %v", whence)
 }
 
 func unexpectedCount(want, got uint32) error {
-	return errors.Errorf("sftp: unexpected count: want %v, got %v", want, got)
+	return fmt.Errorf("sftp: unexpected count: want %v, got %v", want, got)
 }
 
 type unexpectedVersionErr struct{ want, got uint32 }

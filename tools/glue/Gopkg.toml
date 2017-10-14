@@ -29,10 +29,6 @@
 
 [[dependencies]]
   branch = "master"
-  name = "github.com/kohkimakimoto/gluamarkdown"
-
-[[dependencies]]
-  branch = "master"
   name = "github.com/kohkimakimoto/gluaquestion"
 
 [[dependencies]]

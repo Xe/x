@@ -8,9 +8,8 @@ package main
 import (
 	"flag"
 	"fmt"
-	"os"
-
 	"github.com/yookoala/realpath"
+	"os"
 )
 
 var targets []string

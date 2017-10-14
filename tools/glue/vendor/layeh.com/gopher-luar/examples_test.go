@@ -40,14 +40,12 @@ func ExampleNewType() {
 	}
 
 	L.SetGlobal("Song", NewType(L, Song{}))
-	if err := L.DoString(`
+	L.DoString(`
 		s = Song()
 		s.Title = "Montana"
 		s.Artist = "Tycho"
 		print(s.Artist .. " - " .. s.Title)
-	`); err != nil {
-		panic(err)
-	}
+	`)
 	// Output:
 	// Tycho - Montana
 }

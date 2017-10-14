@@ -23,9 +23,9 @@ func Test_chan(t *testing.T) {
 
 	L.SetGlobal("ch", New(L, ch))
 
-	testReturn(t, L, `return ch()`, "Tim", "true")
-	testReturn(t, L, `ch("John")`)
-	testReturn(t, L, `return ch()`, "nil", "false")
+	testReturn(t, L, `return ch:receive()`, "Tim", "true")
+	testReturn(t, L, `ch:send("John")`)
+	testReturn(t, L, `return ch:receive()`, "nil", "false")
 }
 
 type TestChanString chan string
@@ -49,17 +49,4 @@ func Test_chan_pointermethod(t *testing.T) {
 
 	testReturn(t, L, `return b:Test()`, "TestChanString.Test")
 	testReturn(t, L, `return b:Test2()`, "TestChanString.Test2")
-}
-
-func Test_chan_invaliddirection(t *testing.T) {
-	L := lua.NewState()
-	defer L.Close()
-
-	ch := make(chan string)
-
-	L.SetGlobal("send", New(L, (chan<- string)(ch)))
-	testError(t, L, `send()`, "receive from send-only type chan<- string")
-
-	L.SetGlobal("receive", New(L, (<-chan string)(ch)))
-	testError(t, L, `receive("hello")`, "send to receive-only type <-chan string")
 }

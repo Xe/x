@@ -1,8 +1,6 @@
 package luar
 
 import (
-	"reflect"
-	"strings"
 	"testing"
 
 	"github.com/yuin/gopher-lua"
@@ -103,12 +101,15 @@ func Test_comparisons(t *testing.T) {
 	}
 
 	testReturn(t, L, `return s1 == s1`, "true")
+	testError(t, L, `return s1 == s2`, "invalid operation == on slice")
 	testReturn(t, L, `return sp1 == sp2`, "true")
 
 	testReturn(t, L, `return m1 == m1`, "true")
+	testError(t, L, `return m1 == m2`, "invalid operation == on map")
 	testReturn(t, L, `return mp1 == mp2`, "true")
 
 	testReturn(t, L, `return c1 == c1`, "true")
+	testError(t, L, `return c1 == cp1`, "invalid operation == on mixed chan value and pointer")
 	testReturn(t, L, `return c1 == c3`, "false")
 
 	testReturn(t, L, `return sp1 == sp2`, "true")
@@ -125,11 +126,11 @@ func Test_sliceconversion(t *testing.T) {
 	e := &TestSliceConversion{}
 	L.SetGlobal("e", New(L, e))
 
-	testReturn(t, L, `e.S = {"a", "b", "", "c"}`)
+	testReturn(t, L, `e.S = {"a", "b", "", 3, true, "c"}`)
 
 	valid := true
-	expecting := []string{"a", "b", "", "c"}
-	if len(e.S) != len(expecting) {
+	expecting := []string{"a", "b", "", "3", "true", "c"}
+	if len(e.S) != 6 {
 		valid = false
 	} else {
 		for i, item := range e.S {
@@ -156,11 +157,13 @@ func Test_mapconversion(t *testing.T) {
 	e := &TestMapConversion{}
 	L.SetGlobal("e", New(L, e))
 
-	testReturn(t, L, `e.S = {b = nil, c = "hello"}`)
+	testReturn(t, L, `e.S = {33, a = 123, b = nil, c = "hello", d = false}`)
 
 	valid := true
 	expecting := map[string]string{
+		"a": "123",
 		"c": "hello",
+		"d": "false",
 	}
 
 	if len(e.S) != len(expecting) {
@@ -181,138 +184,5 @@ func Test_mapconversion(t *testing.T) {
 
 	if _, ok := e.S["b"]; ok {
 		t.Fatal(`e.S["b"] should not be set`)
-	}
-}
-
-func Test_udconversion(t *testing.T) {
-	L := lua.NewState()
-	defer L.Close()
-
-	ud := L.NewUserData()
-	ud.Value = "hello world"
-	L.SetGlobal("ud", ud)
-
-	var out int
-	L.SetGlobal("out", New(L, &out))
-
-	testError(t, L, `_ = out ^ ud`, "cannot use hello world (type string) as type int")
-}
-
-func Test_arrayconversion(t *testing.T) {
-	L := lua.NewState()
-	defer L.Close()
-
-	var arr [3]int
-	L.SetGlobal("arr", New(L, &arr))
-	testReturn(t, L, `arr = arr ^ {10, 20, 11}; return arr[1], arr[2], arr[3]`, "10", "20", "11")
-}
-
-type Test_interface_struct struct{}
-
-func Test_interface(t *testing.T) {
-	tbl := []struct {
-		Code         string
-		Var          func(L *lua.LState) lua.LValue
-		Expected     interface{}
-		ExpectedType reflect.Type
-	}{
-		{
-			Code:     `nil`,
-			Expected: interface{}(nil),
-		},
-		{
-			Code:     `"Hello"`,
-			Expected: string("Hello"),
-		},
-		{
-			Code:     `true`,
-			Expected: bool(true),
-		},
-		{
-			Code:     `1`,
-			Expected: float64(1),
-		},
-		{
-			Code: `function(a, b) end`,
-			ExpectedType: reflect.TypeOf(func(...interface{}) []interface{} {
-				return nil
-			}),
-		},
-		{
-			Code: `{hello = "world", [123] = 321}`,
-			Expected: map[interface{}]interface{}{
-				string("hello"): string("world"),
-				float64(123):    float64(321),
-			},
-		},
-		{
-			Code: `var`,
-			Var: func(L *lua.LState) lua.LValue {
-				ud := L.NewUserData()
-				ud.Value = "Hello World"
-				return ud
-			},
-			Expected: string("Hello World"),
-		},
-		// TODO: LChannel
-		// TODO: *LState
-	}
-
-	for _, cur := range tbl {
-		func() {
-			L := lua.NewState()
-			defer L.Close()
-
-			var out interface{} = Test_interface_struct{}
-			L.SetGlobal("out", New(L, &out))
-
-			if cur.Var != nil {
-				L.SetGlobal("var", cur.Var(L))
-			}
-
-			if err := L.DoString(`_ = out ^ ` + cur.Code); err != nil {
-				t.Fatal(err)
-			}
-
-			if cur.ExpectedType != nil {
-				if reflect.TypeOf(out) != cur.ExpectedType {
-					t.Fatalf("expected conversion of %#v = type %s, got type %s\n", cur.Code, cur.ExpectedType, reflect.TypeOf(out))
-				}
-			} else if !reflect.DeepEqual(out, cur.Expected) {
-				t.Fatalf("expected conversion of %#v = %#v (%T), got %#v (%T)\n", cur.Code, cur.Expected, cur.Expected, out, out)
-			}
-		}()
-
-	}
-}
-
-func Test_recursivetable(t *testing.T) {
-	L := lua.NewState()
-	defer L.Close()
-
-	var x interface{}
-	L.SetGlobal("x", New(L, &x))
-
-	if err := L.DoString(`local tbl = {}; tbl.inner = tbl; _ = x ^ tbl`); err != nil {
-		t.Fatal(err)
-	}
-}
-
-func Test_tostringfallback(t *testing.T) {
-	L := lua.NewState()
-	defer L.Close()
-
-	type Struct struct {
-	}
-	var out string
-
-	L.SetGlobal("struct", New(L, &Struct{}))
-	L.SetGlobal("out", New(L, &out))
-	if err := L.DoString(`_ = out ^ tostring(struct)`); err != nil {
-		t.Fatal(err)
-	}
-
-	if !strings.HasPrefix(out, "userdata: ") {
-		t.Fatalf("invalid tostring %#v\n", out)
 	}
 }

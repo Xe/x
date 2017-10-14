@@ -1,4 +1,4 @@
-memo = "25863b31a291c6fd020e2dc754d72dcd02c20540d69dc876dfe193e13d4bfae7"
+memo = ""
 
 [[projects]]
   branch = "master"
@@ -40,7 +40,7 @@ memo = "25863b31a291c6fd020e2dc754d72dcd02c20540d69dc876dfe193e13d4bfae7"
   branch = "master"
   name = "github.com/kballard/go-shellquote"
   packages = ["."]
-  revision = "cd60e84ee657ff3dc51de0b4f55dd299a3e136f2"
+  revision = "d8ec1a69a250a17bb0e419c386eac1f3711dc142"
 
 [[projects]]
   branch = "master"
@@ -53,12 +53,6 @@ memo = "25863b31a291c6fd020e2dc754d72dcd02c20540d69dc876dfe193e13d4bfae7"
   name = "github.com/kohkimakimoto/gluafs"
   packages = ["."]
   revision = "01391ed2d7ab89dc80157605b073403f960aa223"
-
-[[projects]]
-  branch = "master"
-  name = "github.com/kohkimakimoto/gluamarkdown"
-  packages = ["."]
-  revision = "a1c413d7bbfb1879f33c1a733d5e6df2123814a4"
 
 [[projects]]
   branch = "master"
@@ -91,16 +85,16 @@ memo = "25863b31a291c6fd020e2dc754d72dcd02c20540d69dc876dfe193e13d4bfae7"
   revision = "2788f0dbd16903de03cb8186e5c7d97b69ad387b"
 
 [[projects]]
+  branch = "master"
   name = "github.com/kr/pty"
   packages = ["."]
-  revision = "95d05c1eef33a45bd58676b6ce28d105839b8d0b"
-  version = "v1.0.1"
+  revision = "ce7fa45920dc37a92de8377972e52bc55ffa8d57"
 
 [[projects]]
   branch = "master"
   name = "github.com/mitchellh/mapstructure"
   packages = ["."]
-  revision = "d0303fe809921458f417bcf828397a65db30a7e4"
+  revision = "cc8532a8e9a55ea36402aa21efdf403a60d34096"
 
 [[projects]]
   branch = "master"
@@ -115,34 +109,16 @@ memo = "25863b31a291c6fd020e2dc754d72dcd02c20540d69dc876dfe193e13d4bfae7"
   revision = "e145c563986f0b91f740a758a84bca46c163aec7"
 
 [[projects]]
-  name = "github.com/pkg/errors"
-  packages = ["."]
-  revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
-  version = "v0.8.0"
-
-[[projects]]
+  branch = "master"
   name = "github.com/pkg/sftp"
   packages = ["."]
-  revision = "98203f5a8333288eb3163b7c667d4260fe1333e9"
-  version = "1.0.0"
-
-[[projects]]
-  name = "github.com/russross/blackfriday"
-  packages = ["."]
-  revision = "cadec560ec52d93835bf2f15bd794700d3a2473b"
-  version = "v2.0.0"
-
-[[projects]]
-  branch = "master"
-  name = "github.com/shurcooL/sanitized_anchor_name"
-  packages = ["."]
-  revision = "86672fcb3f950f35f2e675df2240550f2a50762f"
+  revision = "e84cc8c755ca39b7b64f510fe1fffc1b51f210a5"
 
 [[projects]]
   branch = "master"
   name = "github.com/yookoala/realpath"
   packages = ["."]
-  revision = "80fa1befd17fc3b89a788874137207ddad1115c1"
+  revision = "c416d99ab5ed256fa30c1f3bab73152deb59bb69"
 
 [[projects]]
   branch = "master"
@@ -154,31 +130,31 @@ memo = "25863b31a291c6fd020e2dc754d72dcd02c20540d69dc876dfe193e13d4bfae7"
   branch = "master"
   name = "github.com/yuin/gluare"
   packages = ["."]
-  revision = "d7c94f1a80ede93a621ed100866e6d4745ca8c22"
+  revision = "8e2742cd1bf2b904720ac66eca3c2091b2ea0720"
 
 [[projects]]
   branch = "master"
   name = "github.com/yuin/gopher-lua"
-  packages = [".","ast","parse","pm"]
-  revision = "eb1c7299435cc746b72514f37f74a5154dfe460f"
+  packages = [".","parse"]
+  revision = "33ebc07735566cd0c3c4b69e2839d522cc389852"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/crypto"
-  packages = ["curve25519","ed25519","ed25519/internal/edwards25519","nacl/secretbox","poly1305","salsa20/salsa","ssh","ssh/agent","ssh/terminal"]
-  revision = "9419663f5a44be8b34ca85f08abc5fe1be11f8a3"
+  packages = ["nacl/secretbox","ssh/terminal","ssh","ssh/agent"]
+  revision = "dd85ac7e6a88fc6ca420478e934de5f1a42dd3c6"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/net"
-  packages = ["html","html/atom"]
-  revision = "a04bdaca5b32abe1c069418fb7088ae607de5bd0"
+  packages = ["html"]
+  revision = "66aacef3dd8a676686c7ae3716979581e8b03c47"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
-  packages = ["unix","windows"]
-  revision = "686000749eaec0b8855b8eef5336cf63899fe51d"
+  packages = ["unix"]
+  revision = "9ccfe848b9db8435a24c424abbc07a921adf1df5"
 
 [[projects]]
   branch = "v2"
@@ -187,10 +163,10 @@ memo = "25863b31a291c6fd020e2dc754d72dcd02c20540d69dc876dfe193e13d4bfae7"
   revision = "860cbeca3ebcc600db0b213c0e83ad6ce91f5739"
 
 [[projects]]
-  branch = "v2"
+  branch = "master"
   name = "gopkg.in/yaml.v2"
   packages = ["."]
-  revision = "eb3733d160e74a9c7e442f435eb3bea458e1d19f"
+  revision = "cd8b52f8269e0feb286dfeef29f8fe4d5b397e0b"
 
 [[projects]]
   branch = "master"
@@ -202,4 +178,4 @@ memo = "25863b31a291c6fd020e2dc754d72dcd02c20540d69dc876dfe193e13d4bfae7"
   branch = "master"
   name = "layeh.com/gopher-luar"
   packages = ["."]
-  revision = "189904aa8849a8bcafbccca9ffd3c49d5c8460c2"
+  revision = "80196fe2abc5682963fc7a5261f5a5d77509938b"

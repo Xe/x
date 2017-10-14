@@ -14,8 +14,8 @@ func Test_type_slice(t *testing.T) {
 
 	L.SetGlobal("newInts", NewType(L, ints{}))
 
-	testReturn(t, L, `ints = newInts(1); return #ints`, "1")
-	testReturn(t, L, `ints = newInts(0, 10); return #ints`, "0")
+	testReturn(t, L, `ints = newInts(1); return #ints, ints:capacity()`, "1", "1")
+	testReturn(t, L, `ints = newInts(0, 10); return #ints, ints:capacity()`, "0", "10")
 }
 
 func Test_type(t *testing.T) {

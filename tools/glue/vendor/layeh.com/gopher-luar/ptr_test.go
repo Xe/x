@@ -42,7 +42,7 @@ func Test_ptr_assignment(t *testing.T) {
 	L.SetGlobal("str", New(L, &str))
 
 	testReturn(t, L, `return tostring(-str)`, "hello")
-	testReturn(t, L, `str = str ^ "world"; return (string.match(tostring(str), "userdata:"))`, "userdata:")
+	testReturn(t, L, `return tostring(str ^ "world")`, "world")
 	testReturn(t, L, `return tostring(-str)`, "world")
 }
 
@@ -67,7 +67,7 @@ func Test_ptr_nested(t *testing.T) {
 		},
 	}
 
-	L.SetGlobal("a", New(L, &a))
+	L.SetGlobal("a", New(L, a))
 	L.SetGlobal("str_ptr", NewType(L, ""))
 
 	testReturn(t, L, `return a.Value == nil`, "true")
@@ -117,7 +117,7 @@ func Test_ptr_nested2(t *testing.T) {
 
 	L.SetGlobal("a", New(L, &a))
 	L.SetGlobal("s", New(L, s))
-	L.SetGlobal("p", New(L, &s[0]))
+	L.SetGlobal("p", New(L, s[0]))
 	L.SetGlobal("str", New(L, &str))
 
 	testReturn(t, L, `return a[1]:AddNumbers(1, 2, 3, 4, 5)`, "Tim counts: 15")

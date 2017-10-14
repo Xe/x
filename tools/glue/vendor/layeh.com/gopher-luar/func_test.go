@@ -1,7 +1,6 @@
 package luar
 
 import (
-	"reflect"
 	"testing"
 
 	"github.com/yuin/gopher-lua"
@@ -51,6 +50,24 @@ func Test_func_structarg(t *testing.T) {
 	L.SetGlobal("getHello", New(L, fn))
 
 	testReturn(t, L, `return getHello(person)`, "Hello, Tim")
+}
+
+func Test_func_unpacking(t *testing.T) {
+	L := lua.NewState()
+	defer L.Close()
+
+	fn := func(name string, count int) []lua.LValue {
+		s := make([]lua.LValue, count+1)
+		s[0] = lua.LNumber(count)
+		for i := 1; i < count+1; i++ {
+			s[i] = lua.LString(name)
+		}
+		return s
+	}
+
+	L.SetGlobal("fn", New(L, fn))
+
+	testReturn(t, L, `return fn("tim", 5)`, "5", "tim", "tim", "tim", "tim", "tim")
 }
 
 func Test_func_nilreference(t *testing.T) {
@@ -198,44 +215,5 @@ func Test_func_luafunccall(t *testing.T) {
 
 	if L.GetTop() != 0 {
 		t.Fatalf("expecting GetTop to return 0, got %d", L.GetTop())
-	}
-}
-
-func Test_func_argerror(t *testing.T) {
-	L := lua.NewState()
-	defer L.Close()
-
-	fn := func(v uint8) {
-	}
-
-	L.SetGlobal("fn", New(L, fn))
-
-	testError(t, L, `fn("hello world")`, "bad argument #1 to fn (cannot use hello world (type lua.LString) as type uint8)")
-}
-
-func Test_func_conversionstack(t *testing.T) {
-	L := lua.NewState()
-	defer L.Close()
-
-	var fn interface{}
-	L.SetGlobal("fn", New(L, &fn))
-	if err := L.DoString(`_ = fn ^ function() return "hello", true, 123 end`); err != nil {
-		t.Fatal(err)
-	}
-
-	callable, ok := fn.(func(...interface{}) []interface{})
-	if !ok {
-		t.Fatal("invalid function signature")
-	}
-	values := callable()
-
-	expected := []interface{}{
-		string("hello"),
-		bool(true),
-		float64(123),
-	}
-
-	if !reflect.DeepEqual(expected, values) {
-		t.Fatalf("expected return %#v, got %#v", expected, values)
 	}
 }

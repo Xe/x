@@ -1,4 +1,4 @@
-package luar
+package luar // import "layeh.com/gopher-luar"
 
 import (
 	"reflect"
@@ -7,7 +7,7 @@ import (
 )
 
 func arrayIndex(L *lua.LState) int {
-	ref, mt := check(L, 1)
+	ref, mt, isPtr := check(L, 1, reflect.Array)
 	ref = reflect.Indirect(ref)
 	key := L.CheckAny(2)
 
@@ -23,7 +23,13 @@ func arrayIndex(L *lua.LState) int {
 		}
 		L.Push(New(L, val.Interface()))
 	case lua.LString:
-		if fn := mt.method(string(converted)); fn != nil {
+		if !isPtr {
+			if fn := mt.method(string(converted)); fn != nil {
+				L.Push(fn)
+				return 1
+			}
+		}
+		if fn := mt.ptrMethod(string(converted)); fn != nil {
 			L.Push(fn)
 			return 1
 		}
@@ -34,43 +40,13 @@ func arrayIndex(L *lua.LState) int {
 	return 1
 }
 
-func arrayPtrIndex(L *lua.LState) int {
-	ref, mt := check(L, 1)
-	ref = ref.Elem()
-	key := L.CheckAny(2)
+func arrayNewIndex(L *lua.LState) int {
+	ref, _, isPtr := check(L, 1, reflect.Array)
 
-	switch converted := key.(type) {
-	case lua.LNumber:
-		index := int(converted)
-		if index < 1 || index > ref.Len() {
-			L.ArgError(2, "index out of range")
-		}
-		val := ref.Index(index - 1)
-		if (val.Kind() == reflect.Struct || val.Kind() == reflect.Array) && val.CanAddr() {
-			val = val.Addr()
-		}
-		L.Push(New(L, val.Interface()))
-	case lua.LString:
-		if fn := mt.method(string(converted)); fn != nil {
-			L.Push(fn)
-			return 1
-		}
-
-		mt = MT(L, ref.Interface())
-		if fn := mt.method(string(converted)); fn != nil {
-			L.Push(fn)
-			return 1
-		}
-
-		return 0
-	default:
-		L.ArgError(2, "must be a number or string")
+	if !isPtr {
+		L.RaiseError("invalid operation on array")
 	}
-	return 1
-}
 
-func arrayPtrNewIndex(L *lua.LState) int {
-	ref, _ := check(L, 1)
 	ref = ref.Elem()
 
 	index := L.CheckInt(2)
@@ -78,25 +54,19 @@ func arrayPtrNewIndex(L *lua.LState) int {
 	if index < 1 || index > ref.Len() {
 		L.ArgError(2, "index out of range")
 	}
-	hint := ref.Type().Elem()
-	val, err := lValueToReflect(L, value, hint, nil)
-	if err != nil {
-		L.ArgError(3, err.Error())
-	}
-	ref.Index(index - 1).Set(val)
+	ref.Index(index - 1).Set(lValueToReflect(L, value, ref.Type().Elem(), nil))
 	return 0
 }
 
 func arrayLen(L *lua.LState) int {
-	ref, _ := check(L, 1)
+	ref, _, _ := check(L, 1, reflect.Array)
 	ref = reflect.Indirect(ref)
-
 	L.Push(lua.LNumber(ref.Len()))
 	return 1
 }
 
 func arrayCall(L *lua.LState) int {
-	ref, _ := check(L, 1)
+	ref, _, _ := check(L, 1, reflect.Array)
 	ref = reflect.Indirect(ref)
 
 	i := 0
@@ -112,13 +82,5 @@ func arrayCall(L *lua.LState) int {
 	}
 
 	L.Push(L.NewFunction(fn))
-	return 1
-}
-
-func arrayEq(L *lua.LState) int {
-	ref1, _ := check(L, 1)
-	ref2, _ := check(L, 2)
-
-	L.Push(lua.LBool(ref1.Interface() == ref2.Interface()))
 	return 1
 }

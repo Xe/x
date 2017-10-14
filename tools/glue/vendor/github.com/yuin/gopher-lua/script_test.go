@@ -66,9 +66,8 @@ func testScriptDir(t *testing.T, tests []string, directory string) {
 		fmt.Printf("testing %s/%s\n", directory, script)
 		testScriptCompile(t, script)
 		L := NewState(Options{
-			RegistrySize:        1024 * 20,
-			CallStackSize:       1024,
-			IncludeGoStackTrace: true,
+			RegistrySize:  1024 * 20,
+			CallStackSize: 1024,
 		})
 		L.SetMx(maxMemory)
 		if err := L.DoFile(script); err != nil {

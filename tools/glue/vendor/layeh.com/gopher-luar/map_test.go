@@ -48,8 +48,6 @@ func Test_map_iterator(t *testing.T) {
 
 	L.SetGlobal("countries", New(L, countries))
 
-	testReturn(t, L, `return #countries`, "3")
-
 	const code = `
 		sorted = {}
 		for k, v in countries() do
@@ -62,35 +60,4 @@ func Test_map_iterator(t *testing.T) {
 	}
 
 	testReturn(t, L, `return #sorted, sorted[1], sorted[2], sorted[3]`, "3", "Canada", "France", "Japan")
-}
-
-type TestMapUsers map[uint32]string
-
-func (m TestMapUsers) Find(name string) uint32 {
-	for id, n := range m {
-		if name == n {
-			return id
-		}
-	}
-	return 0
-}
-
-func Test_map_methods(t *testing.T) {
-	L := lua.NewState()
-	defer L.Close()
-
-	type User struct {
-		Name string
-	}
-
-	users := TestMapUsers{
-		1: "Tim",
-	}
-
-	L.SetGlobal("users", New(L, users))
-
-	testReturn(t, L, `return users[1]`, "Tim")
-	testReturn(t, L, `return users[3]`, "nil")
-	testReturn(t, L, `return users:Find("Tim")`, "1")
-	testReturn(t, L, `return users:Find("Steve")`, "0")
 }

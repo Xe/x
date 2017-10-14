@@ -1,4 +1,4 @@
-package luar
+package luar // import "layeh.com/gopher-luar"
 
 import (
 	"reflect"
@@ -7,10 +7,17 @@ import (
 )
 
 func chanIndex(L *lua.LState) int {
-	_, mt := check(L, 1)
+	_, mt, isPtr := check(L, 1, reflect.Chan)
 	key := L.CheckString(2)
 
-	if fn := mt.method(key); fn != nil {
+	if !isPtr {
+		if fn := mt.method(key); fn != nil {
+			L.Push(fn)
+			return 1
+		}
+	}
+
+	if fn := mt.ptrMethod(key); fn != nil {
 		L.Push(fn)
 		return 1
 	}
@@ -19,63 +26,60 @@ func chanIndex(L *lua.LState) int {
 }
 
 func chanLen(L *lua.LState) int {
-	ref, _ := check(L, 1)
-
+	ref, _, isPtr := check(L, 1, reflect.Chan)
+	if isPtr {
+		L.RaiseError("invalid operation on chan pointer")
+	}
 	L.Push(lua.LNumber(ref.Len()))
 	return 1
 }
 
 func chanEq(L *lua.LState) int {
-	ref1, _ := check(L, 1)
-	ref2, _ := check(L, 2)
+	ref1, _, isPtr1 := check(L, 1, reflect.Chan)
+	ref2, _, isPtr2 := check(L, 2, reflect.Chan)
 
-	L.Push(lua.LBool(ref1.Pointer() == ref2.Pointer()))
+	if isPtr1 && isPtr2 {
+		L.Push(lua.LBool(ref1.Pointer() == ref2.Pointer()))
+		return 1
+	}
+
+	if isPtr1 || isPtr2 {
+		L.RaiseError("invalid operation == on mixed chan value and pointer")
+	}
+
+	L.Push(lua.LBool(ref1.Interface() == ref2.Interface()))
 	return 1
 }
 
-func chanCall(L *lua.LState) int {
-	ref, _ := check(L, 1)
+// chan methods
 
-	switch L.GetTop() {
-	// Receive
-	case 1:
-		if ref.Type().ChanDir()&reflect.RecvDir == 0 {
-			L.ArgError(1, "receive from send-only type "+ref.Type().String())
-		}
-		value, ok := ref.Recv()
-		if ok {
-			L.Push(New(L, value.Interface()))
-			L.Push(lua.LTrue)
-		} else {
-			L.Push(lua.LNil)
-			L.Push(lua.LFalse)
-		}
-		return 2
-
-	// Send
-	case 2:
-		if ref.Type().ChanDir()&reflect.SendDir == 0 {
-			L.ArgError(1, "send to receive-only type "+ref.Type().String())
-		}
-		value := L.CheckAny(2)
-
-		hint := ref.Type().Elem()
-		convertedValue, err := lValueToReflect(L, value, hint, nil)
-		if err != nil {
-			L.ArgError(2, err.Error())
-		}
-
-		ref.Send(convertedValue)
-		return 0
-
-	default:
-		L.RaiseError("expecting 1 or 2 arguments, got %d", L.GetTop())
-		panic("never reaches")
+func chanSend(L *lua.LState) int {
+	ref, _, _ := check(L, 1, reflect.Chan)
+	value := L.CheckAny(2)
+	convertedValue := lValueToReflect(L, value, ref.Type().Elem(), nil)
+	if convertedValue.Type() != ref.Type().Elem() {
+		L.ArgError(2, "incorrect type")
 	}
+	ref.Send(convertedValue)
+	return 0
 }
 
-func chanUnm(L *lua.LState) int {
-	ref, _ := check(L, 1)
+func chanReceive(L *lua.LState) int {
+	ref, _, _ := check(L, 1, reflect.Chan)
+
+	value, ok := ref.Recv()
+	if !ok {
+		L.Push(lua.LNil)
+		L.Push(lua.LBool(false))
+		return 2
+	}
+	L.Push(New(L, value.Interface()))
+	L.Push(lua.LBool(true))
+	return 2
+}
+
+func chanClose(L *lua.LState) int {
+	ref, _, _ := check(L, 1, reflect.Chan)
 	ref.Close()
 	return 0
 }

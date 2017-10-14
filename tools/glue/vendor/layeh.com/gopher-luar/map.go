@@ -1,4 +1,4 @@
-package luar
+package luar // import "layeh.com/gopher-luar"
 
 import (
 	"reflect"
@@ -7,43 +7,62 @@ import (
 )
 
 func mapIndex(L *lua.LState) int {
-	ref, mt := check(L, 1)
+	ref, mt, isPtr := check(L, 1, reflect.Map)
 	key := L.CheckAny(2)
 
-	convertedKey, err := lValueToReflect(L, key, ref.Type().Key(), nil)
-	if err == nil {
-		item := ref.MapIndex(convertedKey)
-		if item.IsValid() {
-			L.Push(New(L, item.Interface()))
-			return 1
+	if isPtr {
+		if lstring, ok := key.(lua.LString); ok {
+			if fn := mt.ptrMethod(string(lstring)); fn != nil {
+				L.Push(fn)
+				return 1
+			}
 		}
+		return 0
 	}
 
-	if lstring, ok := key.(lua.LString); ok {
-		if fn := mt.method(string(lstring)); fn != nil {
-			L.Push(fn)
-			return 1
-		}
-	}
+	convertedKey := lValueToReflect(L, key, ref.Type().Key(), nil)
+	item := ref.MapIndex(convertedKey)
+	if !item.IsValid() {
 
-	return 0
+		if !isPtr {
+			if lstring, ok := key.(lua.LString); ok {
+				if fn := mt.method(string(lstring)); fn != nil {
+					L.Push(fn)
+					return 1
+				}
+			}
+		}
+
+		if lstring, ok := key.(lua.LString); ok {
+			if fn := mt.ptrMethod(string(lstring)); fn != nil {
+				L.Push(fn)
+				return 1
+			}
+		}
+
+		return 0
+	}
+	L.Push(New(L, item.Interface()))
+	return 1
 }
 
 func mapNewIndex(L *lua.LState) int {
-	ref, _ := check(L, 1)
+	ref, _, isPtr := check(L, 1, reflect.Map)
+	if isPtr {
+		L.RaiseError("invalid operation on map pointer")
+	}
 	key := L.CheckAny(2)
 	value := L.CheckAny(3)
 
-	keyHint := ref.Type().Key()
-	convertedKey, err := lValueToReflect(L, key, keyHint, nil)
-	if err != nil {
-		L.ArgError(2, err.Error())
+	convertedKey := lValueToReflect(L, key, ref.Type().Key(), nil)
+	if convertedKey.Type() != ref.Type().Key() {
+		L.ArgError(2, "invalid map key type")
 	}
 	var convertedValue reflect.Value
 	if value != lua.LNil {
-		convertedValue, err = lValueToReflect(L, value, ref.Type().Elem(), nil)
-		if err != nil {
-			L.ArgError(3, err.Error())
+		convertedValue = lValueToReflect(L, value, ref.Type().Elem(), nil)
+		if convertedValue.Type() != ref.Type().Elem() {
+			L.ArgError(3, "invalid map value type")
 		}
 	}
 	ref.SetMapIndex(convertedKey, convertedValue)
@@ -51,15 +70,19 @@ func mapNewIndex(L *lua.LState) int {
 }
 
 func mapLen(L *lua.LState) int {
-	ref, _ := check(L, 1)
-
+	ref, _, isPtr := check(L, 1, reflect.Map)
+	if isPtr {
+		L.RaiseError("invalid operation on map pointer")
+	}
 	L.Push(lua.LNumber(ref.Len()))
 	return 1
 }
 
 func mapCall(L *lua.LState) int {
-	ref, _ := check(L, 1)
-
+	ref, _, isPtr := check(L, 1, reflect.Map)
+	if isPtr {
+		L.RaiseError("invalid operation on map pointer")
+	}
 	keys := ref.MapKeys()
 	i := 0
 	fn := func(L *lua.LState) int {
@@ -73,4 +96,17 @@ func mapCall(L *lua.LState) int {
 	}
 	L.Push(L.NewFunction(fn))
 	return 1
+}
+
+func mapEq(L *lua.LState) int {
+	ref1, _, isPtr1 := check(L, 1, reflect.Map)
+	ref2, _, isPtr2 := check(L, 2, reflect.Map)
+
+	if isPtr1 && isPtr2 {
+		L.Push(lua.LBool(ref1.Pointer() == ref2.Pointer()))
+		return 1
+	}
+
+	L.RaiseError("invalid operation == on map")
+	return 0 // never reaches
 }
