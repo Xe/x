@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"crypto/tls"
 	"log"
 	"os"
@@ -21,6 +22,8 @@ var (
 	scores map[string]float64
 )
 
+var ctx context.Context
+
 func main() {
 	scores = map[string]float64{}
 
@@ -31,7 +34,9 @@ func main() {
 		log.Fatal(err)
 	}
 
-	ln.Log(ln.F{
+	ctx = context.Background()
+
+	ln.Log(ctx, ln.F{
 		"action": "connected",
 		"where":  addr,
 	})
@@ -44,13 +49,13 @@ func main() {
 		Pass:    password,
 	})
 
-	ff := ln.FilterFunc(func(e ln.Event) bool {
+	ff := ln.FilterFunc(func(ctx context.Context, e ln.Event) bool {
 		if val, ok := e.Data["svclog"]; ok && val.(bool) {
 			delete(e.Data, "svclog")
 
-			line, err := ln.DefaultFormatter.Format(e)
+			line, err := ln.DefaultFormatter.Format(ctx, e)
 			if err != nil {
-				ln.Fatal(ln.F{"err": err})
+				ln.FatalErr(ctx, err)
 			}
 
 			err = cli.Writef("PRIVMSG #services :%s", string(line))
@@ -85,7 +90,7 @@ func main() {
 
 			sclock.Unlock()
 
-			ln.Log(ln.F{
+			ln.Log(ctx, ln.F{
 				"action":  "nerfed_scores",
 				"changed": changed,
 				"ignored": ignored,
@@ -120,7 +125,7 @@ func main() {
 
 			scores = nsc
 
-			ln.Log(ln.F{
+			ln.Log(ctx, ln.F{
 				"action":  "reaped_scores",
 				"removed": rem,
 				"halved":  halved,
@@ -131,7 +136,7 @@ func main() {
 		}
 	}()
 
-	ln.Log(ln.F{
+	ln.Log(ctx, ln.F{
 		"action": "accepting_input",
 		"svclog": true,
 	})
@@ -146,7 +151,7 @@ const (
 
 func scoreCleveland(c *irc.Client, m *irc.Message) {
 	if m.Trailing() == "!ohshitkillit" && m.Prefix.Host == "ponychat.net" {
-		ln.Fatal(ln.F{
+		ln.Fatal(ctx, ln.F{
 			"action":  "emergency_stop",
 			"user":    m.Prefix.String(),
 			"channel": m.Params[0],
@@ -198,7 +203,7 @@ func scoreCleveland(c *irc.Client, m *irc.Message) {
 		if strings.Contains(strings.ToLower(m.Trailing()), line) {
 			sc += 1
 
-			ln.Log(ln.F{
+			ln.Log(ctx, ln.F{
 				"action":     "siren_compare",
 				"channel":    m.Params[0],
 				"user":       m.Prefix.String(),
@@ -212,8 +217,8 @@ func scoreCleveland(c *irc.Client, m *irc.Message) {
 
 	for _, efnLine := range efknockr {
 		if strings.Contains(thisLine, strings.ToLower(efnLine)) {
-			sc += 3
-			ln.Log(ln.F{
+			sc += 5
+			ln.Log(ctx, ln.F{
 				"action":  "efknockr_detected",
 				"score":   sc,
 				"user":    m.Prefix.String(),
@@ -227,7 +232,7 @@ func scoreCleveland(c *irc.Client, m *irc.Message) {
 	scores[m.Prefix.Host] = sc
 
 	if sc >= notifyThreshold {
-		ln.Log(ln.F{
+		ln.Log(ctx, ln.F{
 			"action":  "warn",
 			"channel": m.Params[0],
 			"user":    m.Prefix.String(),
@@ -241,7 +246,7 @@ func scoreCleveland(c *irc.Client, m *irc.Message) {
 		c.Writef("PRIVMSG OperServ :AKILL ADD %s spamming | Cleveland show spammer", m.Prefix.Name)
 		c.Writef("PRIVMSG %s :Sorry for that, he's gone now.", m.Params[0])
 
-		ln.Log(ln.F{
+		ln.Log(ctx, ln.F{
 			"action":  "kline_added",
 			"channel": m.Params[0],
 			"user":    m.Prefix.String(),
@@ -298,4 +303,54 @@ var efknockr = []string{
 	"/     \\ ||",
 	"(  ,(   )=m=D~~~ LOL DONGS",
 	"/  / |  |",
+	"ARE YOU MAD THOSE PORCH *ONKEYS ARE ALWAYS BITCHING ABOUT RACISM??",
+	"DO YOU THINK THEY BELONG IN A ZOO WITH OBAMA EATING BANANA'S??",
+	"PLEASE JOIN #/JOIN ON irc.freenode.net OR MESSAGE VAP0R ON FREENODE",
+	"FOR INFORMATION ON A SOON MEETING OF SIMILARLY MINDED INVIDIDUALS",
+	"URGENT!! URGENT!! URGENT!! URGENT!! URGENT!!",
+	"THE DARKIES WHO LOOK LIKE GUERRILLAS WANT OUT OF THE ZOO!!",
+	"IF YOU WANT THEM TO STAY THERE IS A MEETING IN 30 MINS!!!",
+	"TRUMP TRUMP TRUMP TRUMP TRUMP TRUMP TRUMP TRUMP TRUMP TRUMP",
+	"ARE YOU TIRED OF PEOPLE WHO LOOK LIKE MONKEYS",
+	"TRYING TO TAKE MONUMENTS DOWN AND TAKING FREESPEECH AWAY??",
+	"HAVE YOU COME TO REALIZE THAT THEY HAVE A IQ OF 10 AND",
+	"CAN ONLY EAT BANANAS? IF SO PLEASE CHECK OUT",
+	"freedomeu4y6vlqu.onion/6667 (FREESPEECH IRC)",
+	"freedomeu4y6vlqu.onion",
+	"HAVE YOU EVER WANTED TO USE A TERMINAL IRC PROGRAM?",
+	"BUT DID NOT HAVE THE NECESSARY COMPUTER SKILLS?",
+	"WEECHAT IS NOW OFFERING TECH SUPPORT FOR ONLY",
+	"$10 DOLLARS A YEAR!! PLEASE VISIT #WEECHAT",
+	"IRC.FREENODE.NET FOR MORE INFORMATION!!",
+	"TECHPONIES IS NOW OFFERING TECH SUPPORT FOR ONLY",
+	"$10 DOLLARS A YEAR!! PLEASE VISIT #TECHPONIES",
+	"IRC.CANTERNET.ORG FOR MORE INFORMATION!!",
+	"ITS FUND-RAISER WEEK!!",
+	"DONATIONS ARE NEEDED FOR THIS GREAT WORK!!",
+	"PLEASE VISIT #WEECHAT",
+	"IRC.FREENODE.NET FOR MORE INFORMATION!!",
+	"type !donation in channel for donation info",
+	"DON'T YOU THINK ITS TIME FOR A HONEST CONVERSATION",
+	"ON HOW DUMB NIGGAS ARE?? PLEASE JOIN THE CONVO AT",
+	"dumniggaff3fjhrw.onion or with port 6667 (IRC)",
+	"LOOK AT ALL THE NIGGERS LOOTING IN FLORIDA ROFL!!",
+	"JOIN THE DISCUSSION torniggaiaoxhlcl.onion/6667",
+	"When disaster strikes...niggers go shopping",
+	"https://www.youtube.com/watch?v=uVee9A2IK0I",
+	"https://www.youtube.com/watch?v=AZkJzWFT6rA <== all niggers rofl",
+	"JOIN THE DISCUSSION dumniggaff3fjhrw.onion/6667",
+	"ARE YOU TIRED OF THOSE NIGGERS DISRESPECTING THE AMERICAN FLAG??",
+	"DO YOU AGREE WITH TRUMP THAT THOSE NIGGERS SHOULD BE FIRED",
+	"KEKISTAN IS HELPING ORGANIZING FREE SPEECH WEEK!!",
+	"HE CAN BE CONTACTED AT IRC.MADIRC.NET #1337",
+	"gv4z277ijqyn7uenr5pdvsovoawibwcjtlqgkxkfifdcs7csshpq.b32.i2p",
+	"(accessible with tunnel)",
+	"http://lvb6wabr3fuv7l2lmmaj33jwh7ntb7uuhmfmluc7hwtf6rm36k6q.b32.i2p/",
+	"(kiwi client on webpage)",
+	"PLEASE CALL L0DE RIGHT NOW!!!",
+	"415-349-5666",
+	"his live show @",
+	"https://www.youtube.com/watch?v=rXWx3lPlwgE",
+	"WE ARE TRYING TO INCREASE PARTICIPATION IN THIS SHOW",
+	"PLEASE CALL AND PARTICIPATE.",
 }
