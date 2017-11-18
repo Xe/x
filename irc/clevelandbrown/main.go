@@ -5,18 +5,22 @@ import (
 	"crypto/tls"
 	"log"
 	"os"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
 
 	"github.com/Xe/ln"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	_ "github.com/joho/godotenv/autoload"
 	irc "gopkg.in/irc.v1"
 )
 
 var (
-	addr     = os.Getenv("SERVER")
-	password = os.Getenv("PASSWORD")
+	addr      = os.Getenv("SERVER")
+	password  = os.Getenv("PASSWORD")
+	tgToken   = os.Getenv("TELEGRAM_TOKEN")
+	pokeIDStr = os.Getenv("POKE_ID")
 
 	sclock sync.Mutex
 	scores map[string]float64
@@ -27,6 +31,16 @@ var ctx context.Context
 func main() {
 	scores = map[string]float64{}
 
+	pokeID, err := strconv.Atoi(pokeIDStr)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	ba, err := tgbotapi.NewBotAPI(tgToken)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	conn, err := tls.Dial("tcp", addr, &tls.Config{
 		InsecureSkipVerify: true,
 	})
@@ -35,6 +49,7 @@ func main() {
 	}
 
 	ctx = context.Background()
+	ctx = ln.WithF(ctx, ln.F{"app": "clevelandbrown"})
 
 	ln.Log(ctx, ln.F{
 		"action": "connected",
@@ -62,10 +77,19 @@ func main() {
 			if err != nil {
 				log.Fatal(err)
 			}
+
+			msg := tgbotapi.NewMessage(int64(pokeID), string(line))
+
+			_, err = ba.Send(msg)
+			if err != nil {
+				log.Printf("can't send telegram message: %v", err)
+				return true
+			}
 		}
 
 		return true
 	})
+
 	ln.DefaultLogger.Filters = append(ln.DefaultLogger.Filters, ff)
 
 	go func() {
@@ -129,7 +153,6 @@ func main() {
 				"action":  "reaped_scores",
 				"removed": rem,
 				"halved":  halved,
-				"svclog":  true,
 			})
 
 			sclock.Unlock()
@@ -172,25 +195,17 @@ func scoreCleveland(c *irc.Client, m *irc.Message) {
 			}
 	*/
 
+	// channels to ignore
 	switch m.Params[0] {
 	case "#services", "#/dev/syslog":
 		return
 	}
 
+	//opt-out list
 	switch m.Prefix.Name {
 	case "Taz", "cadance-syslog", "FromDiscord", "Sonata_Dusk", "CQ_Discord", "Onion":
 		return
-
-	case "Sparkler":
-		// (Sparkler) lol
-		// (Sparkler) don't banzor me :(
-		return
-
-	case "Aeyris":
-		// known shitposter, collison risk :(
-		return
-
-	case "Ryunosuke", "WaterStar":
+	case "Sparkler", "Aeyris", "Ryunosuke", "WaterStar", "Pegasique":
 		return
 	}
 
@@ -217,13 +232,14 @@ func scoreCleveland(c *irc.Client, m *irc.Message) {
 
 	for _, efnLine := range efknockr {
 		if strings.Contains(thisLine, strings.ToLower(efnLine)) {
-			sc += 5
+			const delta = 5
+			sc += delta
 			ln.Log(ctx, ln.F{
 				"action":  "efknockr_detected",
 				"score":   sc,
 				"user":    m.Prefix.String(),
 				"channel": m.Params[0],
-				"delta":   3,
+				"delta":   delta,
 				"svclog":  true,
 			})
 		}
@@ -242,9 +258,8 @@ func scoreCleveland(c *irc.Client, m *irc.Message) {
 		})
 	}
 
-	if sc >= autobanThreshold {
+	if sc > autobanThreshold {
 		c.Writef("PRIVMSG OperServ :AKILL ADD %s spamming | Cleveland show spammer", m.Prefix.Name)
-		c.Writef("PRIVMSG %s :Sorry for that, he's gone now.", m.Params[0])
 
 		ln.Log(ctx, ln.F{
 			"action":  "kline_added",
@@ -353,4 +368,14 @@ var efknockr = []string{
 	"https://www.youtube.com/watch?v=rXWx3lPlwgE",
 	"WE ARE TRYING TO INCREASE PARTICIPATION IN THIS SHOW",
 	"PLEASE CALL AND PARTICIPATE.",
+	"LOOK BITCHES CALL THE SHOW",
+	"LIVE DISCUSSION ON WHY NIGGERS ARE A CURSE FOR THE USA",
+	"or go to #lrh efnet irc for more information",
+	"THOSE STUPID MUSLIM SAND NIGGERS HAVE KILLED INNOCENT AMERICANS AGAIN",
+	"THE NAZI ORGANIZATION OF AMERICA IS PLANNING AN EMERGENCY MEETING",
+	"TODAY @ #/JOIN ON IRC.FREENODE.NET. DO NOT COMPLAIN IN #FREENODE",
+	"THIS MEETING IS INTENDED TO BE FOR MORE LIKEMINDED INDIVIDUALS",
+	"IF YOU HAVE QUESTIONS PLEASE DONT HESISTATE SENDING A MESSAGE TO",
+	"VAP0R ON IRC.FREENODE.NET.",
+	"The l0de Radio Hour is LIVE ! Call in now /join #LRH on irc.efnet.org !!! JOIN ! NOW !",
 }
