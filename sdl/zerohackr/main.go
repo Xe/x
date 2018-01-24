@@ -3,13 +3,17 @@ package main
 import (
 	"context"
 	"log"
+	"runtime"
 	"time"
 
 	"github.com/Xe/x/sdl/joypad"
+	"github.com/everdev/mack"
 	"github.com/veandco/go-sdl2/sdl"
 )
 
 func main() {
+	runtime.LockOSThread()
+
 	if err := sdl.Init(sdl.INIT_EVERYTHING); err != nil {
 		panic(err)
 	}
@@ -63,9 +67,15 @@ func loopInputs(ctx context.Context, gp joypad.Gamepad) {
 			}
 
 			if r {
-				log.Println("switch to virtual desktop to the right")
+				res, err := mack.Tell("System Events", "key code 124 using control down")
+				if err != nil {
+					panic(err)
+				}
+				log.Println("switch to virtual desktop to the right: ", res)
 				continue
 			}
+		default:
+			sdl.Delay(20)
 		}
 	}
 }
