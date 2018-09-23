@@ -50,6 +50,8 @@ func main() {
 				log.Printf("Can't parse: %v", err)
 			}
 
+			//pretty.Println(parts)
+
 			for _, sent := range parts {
 				req, err := parseRequest(sent)
 				if err != nil {
@@ -57,22 +59,40 @@ func main() {
 					continue
 				}
 
+				if req.Address == nil {
+					log.Println("ilo Kesi was not addressed")
+					continue
+				}
+
 				switch req.Action {
 				case actionFront:
-					if req.Subject == nil {
+					if req.Subject == actionWhat {
 						st, err := sw.Status(context.Background())
 						if err != nil {
 							log.Printf("status error: %v", err)
 							continue
 						}
 
-						fmt.Printf("ilo Kesi\\ jan %s li lawa insa.\n", withinToToki[st.Front])
+						qual := TimeToQualifier(st.StartedAt)
+						fmt.Printf("ilo Kesi\\ %s la jan %s li lawa insa.\n", qual, withinToToki[st.Front])
 
-						log.Printf("Started at: %s (%s ago)", st.StartedAt, time.Since(st.StartedAt))
 						continue
 					}
 
-					log.Printf("setting front not implemented yet :(")
+					front := tokiToWithin[req.Subject]
+
+					_, err := sw.Switch(context.Background(), front)
+					if err != nil {
+						log.Printf("switch error: %v", err)
+						continue
+					}
+
+					fmt.Printf("ijo Kesi\\ tenpo ni la jan %s li lawa insa.\n", req.Subject)
+				case actionWhat:
+					switch req.Subject {
+					case "tenpo ni":
+						fmt.Printf("ilo Kesi\\ ni li tenpo %s\n", time.Now().Format(time.Kitchen))
+					}
 				}
 			}
 		} else if err == liner.ErrPromptAborted {

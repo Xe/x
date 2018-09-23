@@ -7,6 +7,7 @@ import (
 
 const (
 	actionFront = "lawa,insa"
+	actionWhat  = "seme"
 )
 
 var (
@@ -16,7 +17,7 @@ var (
 type Request struct {
 	Address []*part
 	Action  string
-	Subject *string // if null, user is asking for the info
+	Subject string // if null, user is asking for the info
 	Punct   string
 }
 
@@ -28,15 +29,18 @@ func parseRequest(inp Sentence) (*Request, error) {
 		case partAddress:
 			result.Address = part.Parts
 		case partSubject:
-			if len(part.Tokens) == 1 && part.Tokens[0] != "seme" {
-				sub := strings.Join(part.Tokens, ",")
-				result.Subject = &sub
+			if len(part.Tokens) == 0 {
+				sub := strings.Title(strings.Join(part.Parts[1].Tokens, ""))
+				result.Subject = sub
+			} else {
+				sub := strings.Join(part.Tokens, " ")
+				result.Subject = sub
 			}
 		case partObjectMarker:
 			act := strings.Join(part.Tokens, ",")
 
 			switch act {
-			case actionFront:
+			case actionFront, actionWhat:
 			default:
 				return nil, ErrUnknownAction
 			}

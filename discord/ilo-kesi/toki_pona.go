@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"net/http"
+	"time"
 )
 
 type part struct {
@@ -53,4 +54,21 @@ func TokenizeTokiPona(aurl, text string) ([]Sentence, error) {
 	}
 
 	return result, nil
+}
+
+func TimeToQualifier(t time.Time) string {
+	const (
+		nowRange = 15 * time.Minute
+	)
+
+	s := time.Since(t)
+	if s > 0 {
+		return "tenpo kama"
+	}
+
+	if s < nowRange {
+		return "tenpo ni"
+	}
+
+	return "tenpo pini"
 }
