@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"log"
 	"strings"
 	"time"
 
@@ -30,7 +29,6 @@ func parseRequest(inp tokiponatokens.Sentence) (*Request, error) {
 	var result Request
 
 	for _, part := range inp {
-		log.Printf("%s", part)
 		switch part.Type {
 		case tokiponatokens.PartAddress:
 			for i, pt := range part.Parts {
