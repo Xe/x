@@ -68,8 +68,16 @@ func stepImg(img image.Image, count int) image.Image {
 func renderImg(bot *tgbotapi.BotAPI, ps string, update tgbotapi.Update) error {
 	msg := update.Message
 
+	if msg == nil {
+		return nil
+	}
+
 	// ignore chats without photos
-	if len(*msg.Photo) == 0 {
+	if *msg.Photo == nil {
+		return nil
+	}
+
+	if m := *msg.Photo; len(m) == 0 {
 		return nil
 	}
 

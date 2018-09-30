@@ -10,6 +10,7 @@ import (
 	"text/template"
 	"time"
 
+	"github.com/Xe/x/internal"
 	"github.com/Xe/x/tools/license/licenses"
 )
 
@@ -34,6 +35,8 @@ func init() {
 
 func main() {
 	flag.Parse()
+
+	internal.HandleLicense()
 
 	if *showAll {
 		fmt.Println("Licenses available:")

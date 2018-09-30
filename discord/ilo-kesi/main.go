@@ -2,12 +2,14 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"log"
 	"math/rand"
 	"net/http"
 	"time"
 
+	"github.com/Xe/x/internal"
 	"github.com/Xe/x/web/switchcounter"
 	"github.com/Xe/x/web/tokiponatokens"
 	"github.com/joeshaw/envdecode"
@@ -33,6 +35,9 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	flag.Parse()
+	internal.HandleLicense()
 
 	//pretty.Println(cfg)
 

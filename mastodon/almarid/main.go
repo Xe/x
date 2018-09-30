@@ -83,12 +83,12 @@ func main() {
 		if first {
 			first = false
 		} else {
-			time.Sleep(5 * time.Minute)
+			time.Sleep(600 * time.Minute)
 		}
 
 		txt := fmt.Sprintf("%s is not doing, allah is doing", words[i])
 
-		st, err := c.PostStatus(txt, 0, nil, false, "", "public")
+		st, err := c.PostStatus(txt, 0, nil, false, "", "private")
 		if err != nil {
 			ln.Log(ln.F{
 				"err":    err,

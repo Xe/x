@@ -223,7 +223,6 @@ func scoreCleveland(c *irc.Client, m *irc.Message) {
 				"channel":    m.Params[0],
 				"user":       m.Prefix.String(),
 				"scoredelta": 1,
-				"svclog":     true,
 			})
 		}
 	}
@@ -232,7 +231,7 @@ func scoreCleveland(c *irc.Client, m *irc.Message) {
 
 	for _, efnLine := range efknockr {
 		if strings.Contains(thisLine, strings.ToLower(efnLine)) {
-			const delta = 5
+			const delta = 11
 			sc += delta
 			ln.Log(ctx, ln.F{
 				"action":  "efknockr_detected",
@@ -240,7 +239,6 @@ func scoreCleveland(c *irc.Client, m *irc.Message) {
 				"user":    m.Prefix.String(),
 				"channel": m.Params[0],
 				"delta":   delta,
-				"svclog":  true,
 			})
 		}
 	}
@@ -253,8 +251,6 @@ func scoreCleveland(c *irc.Client, m *irc.Message) {
 			"channel": m.Params[0],
 			"user":    m.Prefix.String(),
 			"score":   sc,
-			"svclog":  true,
-			"ping":    "Xena",
 		})
 	}
 
@@ -392,4 +388,8 @@ var efknockr = []string{
 	"Voice your opinions at https://webchat.freenode.net/?channels=#freenode",
 	"This message was brought to you by Private Internet Access. Voice your opinions at https://webchat.freenode.net/?channels=%23freenode",
 	"<script type=\"text/javascript\" src=\"http://web.nba1001.net:8888/tj/tongji.js\"></script>",
+	"Interested in reasonably priced GLOBAL IRC ADVERTISING? Contact me on twitter https://twitter.com/nenolod or linkedin https://www.linkedin.com/in/nenolod",
+	"Want IRC ads? https://williampitcock.com/",
+	"With our IRC ad service you can reach a global audience of entrepreneurs and fentanyl addicts with extraordinary engagement rates! https://williampitcock.com/",
+	"Make sure to report this IP to any DNSBLs you might think of! That'll totally stop the flood. https://dronebl.org/ I also recommend installing https://github.com/kaniini/antissh",
 }

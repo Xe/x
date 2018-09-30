@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/technoweenie/multipartstreamer"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -15,8 +16,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/technoweenie/multipartstreamer"
 )
 
 // BotAPI allows you to interact with the Telegram Bot API.
@@ -449,7 +448,7 @@ func (bot *BotAPI) GetWebhookInfo() (WebhookInfo, error) {
 }
 
 // GetUpdatesChan starts and returns a channel for getting updates.
-func (bot *BotAPI) GetUpdatesChan(config UpdateConfig) (chan Update, error) {
+func (bot *BotAPI) GetUpdatesChan(config UpdateConfig) (<-chan Update, error) {
 	updatesChan := make(chan Update, 100)
 
 	go func() {
