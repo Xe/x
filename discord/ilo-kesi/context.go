@@ -23,10 +23,13 @@ type Request struct {
 	Action  string
 	Subject string
 	Punct   string
+
+	Author string
 }
 
-func parseRequest(inp tokiponatokens.Sentence) (*Request, error) {
+func parseRequest(authorID string, inp tokiponatokens.Sentence) (*Request, error) {
 	var result Request
+	result.Author = authorID
 
 	for _, part := range inp {
 		switch part.Type {

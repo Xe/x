@@ -1,28 +1,35 @@
 package main
 
 import (
-	"context"
 	"flag"
 	"fmt"
 	"log"
 	"math/rand"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/Xe/x/internal"
 	"github.com/Xe/x/web/switchcounter"
-	"github.com/Xe/x/web/tokiponatokens"
+	"github.com/bwmarrin/discordgo"
 	"github.com/joeshaw/envdecode"
 	_ "github.com/joho/godotenv/autoload"
 	"github.com/peterh/liner"
 )
 
+var (
+	repl = flag.Bool("repl", false, "open a bot repl in the console?")
+)
+
 // lipuSona is the configuration.
 type lipuSona struct {
-	//DiscordToken            string   `env:"DISCORD_TOKEN,required"` // lipu pi lukin ala
-	TokiPonaTokenizerAPIURL string `env:"TOKI_PONA_TOKENIZER_API_URL,default=https://us-central1-golden-cove-408.cloudfunctions.net/function-1"`
-	SwitchCounterWebhook    string `env:"SWITCH_COUNTER_WEBHOOK,required"`
-	IloNimi                 string `env:"ILO_NIMI,default=Kesi"`
+	DiscordToken            string   `env:"DISCORD_TOKEN,required"` // lipu pi lukin ala
+	TokiPonaTokenizerAPIURL string   `env:"TOKI_PONA_TOKENIZER_API_URL,default=https://us-central1-golden-cove-408.cloudfunctions.net/function-1"`
+	SwitchCounterWebhook    string   `env:"SWITCH_COUNTER_WEBHOOK,required"`
+	IloNimi                 string   `env:"ILO_NIMI,default=Kesi"`
+	janLawa                 []string `env:"JAN_LAWA,required"`
 }
 
 func init() {
@@ -30,11 +37,15 @@ func init() {
 }
 
 func main() {
+	flag.Parse()
+	internal.HandleLicense()
+
 	var cfg lipuSona
 	err := envdecode.StrictDecode(&cfg)
 	if err != nil {
 		log.Fatal(err)
 	}
+	cfg.janLawa = append(cfg.janLawa, "console")
 
 	flag.Parse()
 	internal.HandleLicense()
@@ -52,85 +63,71 @@ func main() {
 		log.Fatal(err)
 	}
 
+	i := ilo{
+		cfg:   cfg,
+		sw:    sw,
+		chain: chain,
+	}
+
 	line.SetCtrlCAborts(true)
 
-	for {
-		if inp, err := line.Prompt("|: "); err == nil {
-			if inp == "" {
-				return
-			}
+	mc := func(s *discordgo.Session, m *discordgo.MessageCreate) {
+		// Ignore all messages created by the bot itself
+		// This isn't required in this specific example but it's a good practice.
+		if m.Author.ID == s.State.User.ID {
+			return
+		}
 
-			line.AppendHistory(inp)
+		result, err := i.parse(m.Author.ID, m.ContentWithMentionsReplaced())
+		if err != nil {
+			s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("mi tawa ala la %v", err))
+			return
+		}
 
-			parts, err := tokiponatokens.Tokenize(cfg.TokiPonaTokenizerAPIURL, inp)
-			if err != nil {
-				log.Printf("Can't parse: %v", err)
-			}
+		s.ChannelMessageSend(m.ChannelID, result.msg)
+	}
 
-			for _, sent := range parts {
-				req, err := parseRequest(sent)
+	dg, err := discordgo.New("Bot " + cfg.DiscordToken)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	dg.AddHandler(mc)
+	err = dg.Open()
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer dg.Close()
+
+	if *repl {
+		for {
+			if inp, err := line.Prompt("|: "); err == nil {
+				if inp == "" {
+					return
+				}
+
+				line.AppendHistory(inp)
+
+				result, err := i.parse("console", inp)
 				if err != nil {
 					log.Printf("error: %v", err)
-					continue
 				}
 
-				if len(req.Address) != 2 {
-					log.Println("ilo Kesi was not addressed")
-					continue
-				}
-
-				if req.Address[0] != "ilo" {
-					log.Println("Addressed non-ilo")
-					continue
-				}
-
-				if req.Address[1] != cfg.IloNimi {
-					log.Printf("ilo %s was addressed, not ilo %s", req.Address[1], cfg.IloNimi)
-					continue
-				}
-
-				switch req.Action {
-				case actionFront:
-					if req.Subject == actionWhat {
-						st, err := sw.Status(context.Background())
-						if err != nil {
-							log.Printf("status error: %v", err)
-							continue
-						}
-
-						qual := TimeToQualifier(st.StartedAt)
-						fmt.Printf("ilo Kesi\\ %s la jan %s li lawa insa.\n", qual, withinToToki[st.Front])
-
-						continue
-					}
-
-					front := tokiToWithin[req.Subject]
-
-					_, err := sw.Switch(context.Background(), front)
-					if err != nil {
-						log.Printf("switch error: %v", err)
-						continue
-					}
-
-					fmt.Printf("ilo Kesi\\ tenpo ni la jan %s li lawa insa.\n", req.Subject)
-				case actionWhat:
-					switch req.Subject {
-					case "tenpo ni":
-						fmt.Printf("ilo Kesi\\ ni li tenpo %s\n", time.Now().Format(time.Kitchen))
-						continue
-					}
-				}
-
-				switch req.Subject {
-				case "sitelen pakala":
-					fmt.Printf("ilo Kesi\\ %s\n", chain.Generate(20))
-					continue
-				}
+				fmt.Println(result.msg)
+			} else if err == liner.ErrPromptAborted {
+				log.Print("Aborted")
+				break
+			} else {
+				log.Print("Error reading line: ", err)
+				break
 			}
-		} else if err == liner.ErrPromptAborted {
-			log.Print("Aborted")
-		} else {
-			log.Print("Error reading line: ", err)
 		}
+
+		os.Exit(0)
+	} else {
+		log.Println("bot is running")
+		sc := make(chan os.Signal, 1)
+		signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
+		<-sc
 	}
 }
