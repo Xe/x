@@ -80,7 +80,13 @@ func main() {
 
 		result, err := i.parse(m.Author.ID, m.ContentWithMentionsReplaced())
 		if err != nil {
-			s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("mi tawa ala la %v", err))
+			switch err {
+			case ErrJanLawaAla, ErrUnknownAction:
+				s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("mi ken ala la %v", err))
+				return
+			}
+
+			log.Printf("other error: %s", err)
 			return
 		}
 
@@ -101,7 +107,7 @@ func main() {
 
 	if *repl {
 		for {
-			if inp, err := line.Prompt("|: "); err == nil {
+			if inp, err := line.Prompt("|lipu: "); err == nil {
 				if inp == "" {
 					return
 				}
@@ -111,6 +117,7 @@ func main() {
 				result, err := i.parse("console", inp)
 				if err != nil {
 					log.Printf("error: %v", err)
+					continue
 				}
 
 				fmt.Println(result.msg)

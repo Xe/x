@@ -54,7 +54,8 @@ func parseRequest(authorID string, inp tokiponatokens.Sentence) (*Request, error
 			act := strings.Join(part.Tokens, ",")
 
 			switch act {
-			case actionFront, actionWhat, actionMarkov:
+			case actionFront, actionWhat:
+			case actionMarkov:
 			default:
 				return nil, ErrUnknownAction
 			}

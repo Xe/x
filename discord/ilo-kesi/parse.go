@@ -43,10 +43,6 @@ func (i ilo) parse(authorID, inp string) (*reply, error) {
 
 		switch req.Action {
 		case actionFront:
-			if !i.janLawaAnuSeme(authorID) {
-				return nil, ErrJanLawaAla
-			}
-
 			if req.Subject == actionWhat {
 				st, err := i.sw.Status(context.Background())
 				if err != nil {
@@ -55,6 +51,11 @@ func (i ilo) parse(authorID, inp string) (*reply, error) {
 
 				qual := TimeToQualifier(st.StartedAt)
 				fmt.Fprintf(buf, "%s la jan %s li lawa insa.\n", qual, withinToToki[st.Front])
+				goto ok
+			}
+
+			if !i.janLawaAnuSeme(authorID) {
+				return nil, ErrJanLawaAla
 			}
 
 			front := tokiToWithin[req.Subject]
@@ -65,19 +66,25 @@ func (i ilo) parse(authorID, inp string) (*reply, error) {
 			}
 
 			fmt.Fprintf(buf, "tenpo ni la jan %s li lawa insa.\n", req.Subject)
+			goto ok
 		case actionWhat:
 			switch req.Subject {
 			case "tenpo ni":
 				fmt.Fprintf(buf, "ni li tenpo %s\n", time.Now().Format(time.Kitchen))
+				goto ok
 			}
 		}
 
 		switch req.Subject {
 		case "sitelen pakala":
 			fmt.Fprintf(buf, "%s\n", i.chain.Generate(20))
+			goto ok
 		}
+
+		return nil, ErrUnknownAction
 	}
 
+ok:
 	result.msg = buf.String()
 	buf.Reset()
 
