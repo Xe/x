@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 
+	"github.com/Xe/x/markov"
 	"github.com/Xe/x/web/switchcounter"
 )
 
@@ -10,7 +11,7 @@ import (
 type ilo struct {
 	cfg   lipuSona
 	sw    switchcounter.API
-	chain *Chain
+	chain *markov.Chain
 	words []Word
 }
 

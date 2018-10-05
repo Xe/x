@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/Xe/x/internal"
+	"github.com/Xe/x/markov"
 	"github.com/Xe/x/web/switchcounter"
 	"github.com/bwmarrin/discordgo"
 	"github.com/joeshaw/envdecode"
@@ -57,7 +58,7 @@ func main() {
 	line := liner.NewLiner()
 	defer line.Close()
 
-	chain := NewChain(3)
+	chain := markov.NewChain(3)
 	err = chain.Load("cadey.gob")
 	if err != nil {
 		log.Fatal(err)

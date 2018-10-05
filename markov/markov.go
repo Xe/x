@@ -1,10 +1,11 @@
-package main
-
+// Package markov handles markov chain generation.
+//
 // This Markov chain code is taken from the "Generating arbitrary text"
 // codewalk: http://golang.org/doc/codewalk/markov/
 //
 // Minor modifications have been made to make it easier to integrate
 // with a webserver and to save/load state
+package markov
 
 import (
 	"encoding/gob"

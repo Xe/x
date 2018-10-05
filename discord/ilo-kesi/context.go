@@ -15,7 +15,7 @@ const (
 )
 
 var (
-	ErrUnknownAction = errors.New("ijo-kesi: unknown action")
+	ErrUnknownAction = errors.New("ijo-kesi: mi sona ala")
 )
 
 type Request struct {
