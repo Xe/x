@@ -73,8 +73,6 @@ github.com/gorilla/websocket v1.4.0/go.mod h1:E7qHFY5m1UJ88s3WnNqhKjPHQ0heANvMoA
 github.com/gregjones/httpcache v0.0.0-20180305231024-9cad4c3443a7/go.mod h1:FecbI9+v66THATjSRHfNgh1IVFe/9kFxbXtjV0ctIMA=
 github.com/hullerob/go.farbfeld v0.0.0-20160317142651-b572f0728b69 h1:oVHYt/ne+aIKsvK4QhnDeCNz9PNn1FbXLtdsX8qZG34=
 github.com/hullerob/go.farbfeld v0.0.0-20160317142651-b572f0728b69/go.mod h1:mQEoc766DxPTAwQ54neWTK/lFqIeSO7OU6bqZsceglw=
-github.com/hypersleep/easyssh v0.0.0-20170212134900-70879c819ea1 h1:dF6rYzan4BixdI4y84azrhnk+XMxyeAPZw8lmOglhBM=
-github.com/hypersleep/easyssh v0.0.0-20170212134900-70879c819ea1/go.mod h1:3hqqigaRGbAy6sYHeVLQcGLIBtYmwARNWSn4/TqH8SA=
 github.com/jaytaylor/html2text v0.0.0-20180606194806-57d518f124b0 h1:xqgexXAGQgY3HAjNPSaCqn5Aahbo5TKsmhp8VRfr1iQ=
 github.com/jaytaylor/html2text v0.0.0-20180606194806-57d518f124b0/go.mod h1:CVKlgaMiht+LXvHG173ujK6JUhZXKb2u/BQtjPDIvyk=
 github.com/jellevandenhooff/dkim v0.0.0-20150330215556-f50fe3d243e1/go.mod h1:E0B/fFc00Y+Rasa88328GlI/XbtyysCtTHZS8h7IrBU=
@@ -194,13 +192,9 @@ google.golang.org/genproto v0.0.0-20180731170733-daca94659cb5/go.mod h1:JiN7NxoA
 google.golang.org/grpc v1.14.0/go.mod h1:yo6s7OP7yaDglbqo1J04qKzAhqBH6lvTonzMVmEdcZw=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405 h1:yhCVgyC4o1eVCa2tZl7eS0r+SDo693bJlVdllGtEeKM=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
-gopkg.in/gcfg.v1 v1.2.3 h1:m8OOJ4ccYHnx2f4gQwpno8nAX5OGOh7RLaaz0pj3Ogs=
-gopkg.in/gcfg.v1 v1.2.3/go.mod h1:yesOnuUOFQAhST5vPY4nbZsb/huCgGGXlipJsBn0b3o=
 gopkg.in/inf.v0 v0.9.1/go.mod h1:cWUDdTG/fYaXco+Dcufb5Vnc6Gp2YChqWtbxRZE0mXw=
 gopkg.in/irc.v1 v1.3.0 h1:28A0njDuHNueatbQZsRB78CaU8sueA8JWIXVvue60sg=
 gopkg.in/irc.v1 v1.3.0/go.mod h1:yXDeqklL7+ht3OdUIo0r8WaraGQyjyD+/92R1YxNZxM=
-gopkg.in/warnings.v0 v0.1.2 h1:wFXVbFY8DY5/xOe1ECiWdKCzZlxgshcYVNkBHstARME=
-gopkg.in/warnings.v0 v0.1.2/go.mod h1:jksf8JmL6Qr/oQM2OXTHunEvvTAsrWBLb6OOjuVWRNI=
 gopkg.in/yaml.v2 v2.2.1 h1:mUhvW9EsL+naU5Q3cakzfE91YhliOondGd6ZrsDBHQE=
 gopkg.in/yaml.v2 v2.2.1/go.mod h1:hI93XBmqTisBFMUTm0b8Fm+jr3Dg1NNxqwp+5A1VGuI=
 grpc.go4.org v0.0.0-20170609214715-11d0a25b4919/go.mod h1:77eQGdRu53HpSqPFJFmuJdjuHRquDANNeA4x7B8WQ9o=
