@@ -11,6 +11,7 @@ type ilo struct {
 	cfg   lipuSona
 	sw    switchcounter.API
 	chain *Chain
+	words []Word
 }
 
 var (

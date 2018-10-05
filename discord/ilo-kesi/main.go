@@ -63,10 +63,16 @@ func main() {
 		log.Fatal(err)
 	}
 
+	words, err := loadWords("./tokipona.json")
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	i := ilo{
 		cfg:   cfg,
 		sw:    sw,
 		chain: chain,
+		words: words,
 	}
 
 	line.SetCtrlCAborts(true)
@@ -78,7 +84,12 @@ func main() {
 			return
 		}
 
-		result, err := i.parse(m.Author.ID, m.ContentWithMentionsReplaced())
+		msg := m.ContentWithMentionsReplaced()
+		if !i.tokiNiTokiPonaAnuSeme(msg) {
+			return
+		}
+
+		result, err := i.parse(m.Author.ID, msg)
 		if err != nil {
 			switch err {
 			case ErrJanLawaAla, ErrUnknownAction:

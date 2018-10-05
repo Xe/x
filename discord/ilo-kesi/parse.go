@@ -11,6 +11,7 @@ import (
 )
 
 var (
+	ErrNotTokiPona  = errors.New("toki ni li toki pona ala")
 	ErrNotAddressed = errors.New("ilo-kesi: ilo kesi was not addressed")
 )
 
