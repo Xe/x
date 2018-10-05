@@ -38,3 +38,28 @@ func Dial() (*ssh.Client, error) {
 
 	return client, nil
 }
+
+// Exec runs an arbitrary dokku command with OS standard input, output and error.
+func Exec(args string) error {
+	mp, err := Dial()
+	if err != nil {
+		return err
+	}
+	defer mp.Close()
+
+	sess, err := mp.NewSession()
+	if err != nil {
+		return err
+	}
+	defer sess.Close()
+	sess.Stdin = os.Stdin
+	sess.Stdout = os.Stdout
+	sess.Stderr = os.Stderr
+
+	err = sess.Run(args)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

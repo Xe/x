@@ -32,22 +32,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	mp, err := minipaas.Dial()
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer mp.Close()
-
-	sess, err := mp.NewSession()
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer sess.Close()
-	sess.Stdin = os.Stdin
-	sess.Stdout = os.Stdout
-	sess.Stderr = os.Stderr
-
-	err = sess.Run("tar:from sona-pi-toki-pona " + pubURL)
+	err = minipaas.Exec("tar:from sona-pi-toki-pona " + pubURL)
 	if err != nil {
 		log.Fatal(err)
 	}
