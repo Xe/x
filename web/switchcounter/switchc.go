@@ -1,13 +1,9 @@
-// Package switchcounter is a simple interface to the https://www.switchcounter.science/ API.
+// Package switchcounter is a simple interface to the https://www.switcaounter.science/ API.
 package switchcounter
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
-	"fmt"
-	"io/ioutil"
-	"log"
 	"net/http"
 	"time"
 )
@@ -17,27 +13,17 @@ type arg struct {
 	MemberName string `json:"member_name,omitempty"`
 }
 
-// API is the switchcounter API as an abstract interface.
-type API interface {
-	// Status returns the front of the system for this API client.
-	Status(ctx context.Context) (Status, error)
-
-	// Switch changes who is in front.
-	Switch(ctx context.Context, front string) (Status, error)
-}
-
 // Status is the API response.
 type Status struct {
 	Front     string    `json:"member_name"`
 	StartedAt time.Time `json:"started_at"`
 }
 
-type httpClient struct {
-	hc  *http.Client
+type API struct {
 	url string // webhook url
 }
 
-func (hc httpClient) makeRequestWith(ctx context.Context, body interface{}) (*Status, error) {
+func (a API) makeRequestWith(body interface{}) (*http.Request, error) {
 	env := struct {
 		Webhook interface{} `json:"webhook"`
 	}{
@@ -48,59 +34,35 @@ func (hc httpClient) makeRequestWith(ctx context.Context, body interface{}) (*St
 		return nil, err
 	}
 
-	req, err := http.NewRequest("POST", hc.url, bytes.NewBuffer(data))
+	req, err := http.NewRequest(http.MethodPost, a.url, bytes.NewBuffer(data))
 	if err != nil {
 		return nil, err
 	}
-	req = req.WithContext(ctx)
 	req.Header.Add("Content-Type", "application/json")
+	req.Header.Add("Accept", "application/json")
 
-	resp, err := hc.hc.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		data, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return nil, err
-		}
-
-		log.Printf("body: %s", string(data))
-
-		return nil, fmt.Errorf("http response code %d", resp.StatusCode)
-	}
-
-	var result Status
-	err = json.NewDecoder(resp.Body).Decode(&result)
-	if err != nil {
-		return nil, err
-	}
-
-	return &result, nil
+	return req, nil
 }
 
-func (hc httpClient) Status(ctx context.Context) (Status, error) {
-	result, err := hc.makeRequestWith(ctx, arg{Command: "switch"})
+func (a API) Status() *http.Request {
+	result, err := a.makeRequestWith(arg{Command: "switch"})
 	if err != nil {
-		return Status{}, err
+		panic(err)
 	}
-	return *result, nil
+	return result
 }
 
-func (hc httpClient) Switch(ctx context.Context, front string) (Status, error) {
-	result, err := hc.makeRequestWith(ctx, arg{Command: "switch", MemberName: front})
+func (a API) Switch(front string) *http.Request {
+	result, err := a.makeRequestWith(arg{Command: "switch", MemberName: front})
 	if err != nil {
-		return Status{}, err
+		panic(err)
 	}
-	return *result, nil
+	return result
 }
 
 // NewHTTPClient creates a new instance of API over HTTP.
-func NewHTTPClient(hc *http.Client, webhookURL string) API {
-	return httpClient{
-		hc:  hc,
+func NewHTTPClient(a *http.Client, webhookURL string) API {
+	return API{
 		url: webhookURL,
 	}
 }

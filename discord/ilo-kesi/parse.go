@@ -2,11 +2,13 @@ package main
 
 import (
 	"bytes"
-	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
 	"time"
 
+	"github.com/Xe/x/web/switchcounter"
 	"github.com/Xe/x/web/tokiponatokens"
 )
 
@@ -45,7 +47,16 @@ func (i ilo) parse(authorID, inp string) (*reply, error) {
 		switch req.Action {
 		case actionFront:
 			if req.Subject == actionWhat {
-				st, err := i.sw.Status(context.Background())
+				req := i.sw.Status()
+				resp, err := http.DefaultClient.Do(req)
+				if err != nil {
+					return nil, err
+				}
+				if resp.StatusCode/100 != 2 {
+					return nil, errors.New(resp.Status)
+				}
+				var st switchcounter.Status
+				err = json.NewDecoder(resp.Body).Decode(&st)
 				if err != nil {
 					return nil, err
 				}
@@ -61,9 +72,13 @@ func (i ilo) parse(authorID, inp string) (*reply, error) {
 
 			front := tokiToWithin[req.Subject]
 
-			_, err := i.sw.Switch(context.Background(), front)
+			hreq := i.sw.Switch(front)
+			resp, err := http.DefaultClient.Do(hreq)
 			if err != nil {
 				return nil, err
+			}
+			if resp.StatusCode/100 != 2 {
+				return nil, errors.New(resp.Status)
 			}
 
 			fmt.Fprintf(buf, "tenpo ni la jan %s li lawa insa.\n", req.Subject)
