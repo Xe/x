@@ -6,15 +6,19 @@ require (
 	github.com/Xe/Tetra v0.0.0-20150829181626-dd27f12d4383
 	github.com/Xe/gopreload v0.0.0-20170326043426-a00a8beb369c
 	github.com/Xe/ln v0.1.2
+	github.com/bearbin/mcgorcon v0.0.0-20141104170123-f611ad04551a
 	github.com/belak/irc v2.1.0+incompatible
 	github.com/bwmarrin/discordgo v0.18.0
 	github.com/caarlos0/env v3.4.0+incompatible
 	github.com/certifi/gocertifi v0.0.0-20180905225744-ee1a9a0726d2 // indirect
 	github.com/codahale/hdrhistogram v0.0.0-20161010025455-3a0bb77429bd
+	github.com/disintegration/imaging v1.5.0
 	github.com/facebookgo/flagenv v0.0.0-20160425205200-fcd59fca7456
 	github.com/getsentry/raven-go v0.0.0-20180903072508-084a9de9eb03 // indirect
 	github.com/go-telegram-bot-api/telegram-bot-api v4.6.2+incompatible
 	github.com/golang/protobuf v1.2.0 // indirect
+	github.com/google/go-github v17.0.0+incompatible
+	github.com/google/go-querystring v1.0.0 // indirect
 	github.com/google/gops v0.3.5
 	github.com/gorilla/websocket v1.4.0 // indirect
 	github.com/howeyc/gopass v0.0.0-20170109162249-bf9dde6d0d2c
@@ -39,7 +43,8 @@ require (
 	github.com/xtaci/smux v1.0.7
 	go4.org v0.0.0-20180809161055-417644f6feb5
 	golang.org/x/crypto v0.0.0-20181001203147-e3636079e1a4 // indirect
-	golang.org/x/oauth2 v0.0.0-20181003184128-c57b0facaced // indirect
+	golang.org/x/image v0.0.0-20180926015637-991ec62608f3 // indirect
+	golang.org/x/oauth2 v0.0.0-20181003184128-c57b0facaced
 	golang.org/x/sys v0.0.0-20181004145325-8469e314837c // indirect
 	gopkg.in/irc.v1 v1.3.0
 	gopkg.in/telegram-bot-api.v4 v4.6.2
