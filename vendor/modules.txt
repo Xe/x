@@ -5,6 +5,8 @@ github.com/McKael/madon
 # github.com/Xe/ln v0.1.2
 github.com/Xe/ln
 github.com/Xe/ln/opname
+# github.com/aclements/go-moremath v0.0.0-20180329182055-b1aff36309c7
+github.com/aclements/go-moremath/mathx
 # github.com/bearbin/mcgorcon v0.0.0-20141104170123-f611ad04551a
 github.com/bearbin/mcgorcon
 # github.com/belak/irc v2.1.0+incompatible
@@ -15,6 +17,10 @@ github.com/bwmarrin/discordgo
 github.com/caarlos0/env
 # github.com/codahale/hdrhistogram v0.0.0-20161010025455-3a0bb77429bd
 github.com/codahale/hdrhistogram
+# github.com/dgryski/go-failure v0.0.0-20151001134759-4963dbd58fd0
+github.com/dgryski/go-failure
+# github.com/dgryski/go-onlinestats v0.0.0-20170612111826-1c7d19468768
+github.com/dgryski/go-onlinestats
 # github.com/disintegration/imaging v1.5.0
 github.com/disintegration/imaging
 # github.com/facebookgo/flagenv v0.0.0-20160425205200-fcd59fca7456
@@ -38,6 +44,8 @@ github.com/google/go-querystring/query
 github.com/google/gops/agent
 github.com/google/gops/internal
 github.com/google/gops/signal
+# github.com/google/uuid v1.0.0
+github.com/google/uuid
 # github.com/gorilla/websocket v1.4.0
 github.com/gorilla/websocket
 # github.com/hullerob/go.farbfeld v0.0.0-20160317142651-b572f0728b69
@@ -53,6 +61,12 @@ github.com/joho/godotenv
 github.com/joho/godotenv/autoload
 # github.com/kardianos/osext v0.0.0-20170510131534-ae77be60afb1
 github.com/kardianos/osext
+# github.com/klauspost/cpuid v0.0.0-20180405133222-e7e905edc00e
+github.com/klauspost/cpuid
+# github.com/klauspost/crc32 v0.0.0-20170628072449-bab58d77464a
+github.com/klauspost/crc32
+# github.com/klauspost/reedsolomon v0.0.0-20180704173009-925cb01d6510
+github.com/klauspost/reedsolomon
 # github.com/kr/pretty v0.1.0
 github.com/kr/pretty
 # github.com/kr/text v0.1.0
@@ -63,6 +77,8 @@ github.com/mattn/go-runewidth
 github.com/mzohreva/GoGraphviz/graphviz
 # github.com/olekukonko/tablewriter v0.0.0-20180912035003-be2c049b30cc
 github.com/olekukonko/tablewriter
+# github.com/pborman/uuid v1.2.0
+github.com/pborman/uuid
 # github.com/peterh/liner v1.1.0
 github.com/peterh/liner
 # github.com/pkg/errors v0.8.0
@@ -71,8 +87,14 @@ github.com/pkg/errors
 github.com/sendgrid/rest
 # github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf
 github.com/ssor/bom
+# github.com/streamrail/concurrent-map v0.0.0-20160823150647-8bf1e9bacbf6
+github.com/streamrail/concurrent-map
 # github.com/technoweenie/multipartstreamer v1.0.1
 github.com/technoweenie/multipartstreamer
+# github.com/xtaci/kcp-go v2.0.3+incompatible
+github.com/xtaci/kcp-go
+# github.com/xtaci/smux v1.0.7
+github.com/xtaci/smux
 # go4.org v0.0.0-20180809161055-417644f6feb5
 go4.org/legal
 # golang.org/x/build v0.0.0-20181004175654-90ec83e7f349
@@ -81,9 +103,16 @@ golang.org/x/build/envutil
 # golang.org/x/crypto v0.0.0-20181001203147-e3636079e1a4
 golang.org/x/crypto/acme/autocert
 golang.org/x/crypto/nacl/secretbox
+golang.org/x/crypto/acme
 golang.org/x/crypto/ssh
 golang.org/x/crypto/ssh/agent
-golang.org/x/crypto/acme
+golang.org/x/crypto/blowfish
+golang.org/x/crypto/cast5
+golang.org/x/crypto/pbkdf2
+golang.org/x/crypto/salsa20
+golang.org/x/crypto/tea
+golang.org/x/crypto/twofish
+golang.org/x/crypto/xtea
 golang.org/x/crypto/internal/subtle
 golang.org/x/crypto/poly1305
 golang.org/x/crypto/salsa20/salsa
@@ -104,7 +133,11 @@ golang.org/x/image/tiff/lzw
 golang.org/x/net/context
 golang.org/x/net/html
 golang.org/x/net/html/atom
+golang.org/x/net/ipv4
 golang.org/x/net/context/ctxhttp
+golang.org/x/net/bpf
+golang.org/x/net/internal/iana
+golang.org/x/net/internal/socket
 # golang.org/x/oauth2 v0.0.0-20181003184128-c57b0facaced
 golang.org/x/oauth2
 golang.org/x/oauth2/internal
