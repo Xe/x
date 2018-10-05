@@ -1,6 +1,8 @@
 package main
 
 import (
+	"context"
+
 	"github.com/McKael/madon"
 	"github.com/Xe/ln"
 	"github.com/caarlos0/env"
@@ -16,16 +18,17 @@ var cfg = &struct {
 }{}
 
 var scopes = []string{"read", "write", "follow"}
+var ctx = context.Background()
 
 func main() {
 	err := env.Parse(cfg)
 	if err != nil {
-		ln.Fatal(ln.F{"err": err, "action": "startup"})
+		ln.Fatal(ctx, ln.F{"err": err, "action": "startup"})
 	}
 
 	c, err := madon.RestoreApp("furry boostbot", cfg.Instance, cfg.AppID, cfg.AppSecret, &madon.UserToken{AccessToken: cfg.Token})
 	if err != nil {
-		ln.Fatal(ln.F{"err": err, "action": "madon.RestoreApp"})
+		ln.Fatal(ctx, ln.F{"err": err, "action": "madon.RestoreApp"})
 	}
 
 	evChan := make(chan madon.StreamEvent, 10)
@@ -34,10 +37,10 @@ func main() {
 
 	err = c.StreamListener("public", "", evChan, stop, done)
 	if err != nil {
-		ln.Fatal(ln.F{"err": err, "action": "c.StreamListener"})
+		ln.Fatal(ctx, ln.F{"err": err, "action": "c.StreamListener"})
 	}
 
-	ln.Log(ln.F{
+	ln.Log(ctx, ln.F{
 		"action": "streaming.toots",
 	})
 
@@ -45,13 +48,13 @@ func main() {
 		select {
 		case _, ok := <-done:
 			if !ok {
-				ln.Fatal(ln.F{"action": "stream.dead"})
+				ln.Fatal(ctx, ln.F{"action": "stream.dead"})
 			}
 
 		case ev := <-evChan:
 			switch ev.Event {
 			case "error":
-				ln.Fatal(ln.F{"err": ev.Error, "action": "processing.event"})
+				ln.Fatal(ctx, ln.F{"err": ev.Error, "action": "processing.event"})
 			case "update":
 				s := ev.Data.(madon.Status)
 
@@ -59,10 +62,10 @@ func main() {
 					if tag.Name == cfg.Hashtag {
 						err = c.ReblogStatus(s.ID)
 						if err != nil {
-							ln.Fatal(ln.F{"err": err, "action": "c.ReblogStatus", "id": s.ID})
+							ln.Fatal(ctx, ln.F{"err": err, "action": "c.ReblogStatus", "id": s.ID})
 						}
 
-						ln.Log(ln.F{
+						ln.Log(ctx, ln.F{
 							"action": "reblogged",
 							"id":     s.ID,
 						})

@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"crypto/rand"
 	"fmt"
 	"io/ioutil"
@@ -24,25 +25,27 @@ var cfg = &struct {
 	WordFile  string `env:"WORD_FILE,required"`
 }{}
 
+var ctx = context.Background()
+
 func main() {
 	err := env.Parse(cfg)
 	if err != nil {
-		ln.Fatal(ln.F{"err": err, "action": "env.Parse"})
+		ln.Fatal(ctx, ln.F{"err": err, "action": "env.Parse"})
 	}
 
 	fin, err := os.Open(cfg.WordFile)
 	if err != nil {
-		ln.Fatal(ln.F{"err": err, "action": "os.Open(cfg.WordFile)"})
+		ln.Fatal(ctx, ln.F{"err": err, "action": "os.Open(cfg.WordFile)"})
 	}
 
 	data, err := ioutil.ReadAll(fin)
 	if err != nil {
-		ln.Fatal(ln.F{"err": err, "action": "ioutil.ReadAll(fin)"})
+		ln.Fatal(ctx, ln.F{"err": err, "action": "ioutil.ReadAll(fin)"})
 	}
 
 	c, err := madon.RestoreApp("almarid:", cfg.Instance, cfg.AppID, cfg.AppSecret, &madon.UserToken{AccessToken: cfg.Token})
 	if err != nil {
-		ln.Fatal(ln.F{"err": err, "action": "madon.RestoreApp"})
+		ln.Fatal(ctx, ln.F{"err": err, "action": "madon.RestoreApp"})
 	}
 	_ = c
 
@@ -61,7 +64,7 @@ func main() {
 		}
 	}
 
-	ln.Log(ln.F{"action": "words.loaded", "count": len(words)})
+	ln.Log(ctx, ln.F{"action": "words.loaded", "count": len(words)})
 
 	lenBig := big.NewInt(int64(len(words)))
 
@@ -70,7 +73,7 @@ func main() {
 	for {
 		bi, err := rand.Int(rand.Reader, lenBig)
 		if err != nil {
-			ln.Log(ln.F{
+			ln.Log(ctx, ln.F{
 				"action": "big.Rand",
 				"err":    err,
 			})
@@ -90,7 +93,7 @@ func main() {
 
 		st, err := c.PostStatus(txt, 0, nil, false, "", "private")
 		if err != nil {
-			ln.Log(ln.F{
+			ln.Log(ctx, ln.F{
 				"err":    err,
 				"action": "c.PostStatus",
 				"text":   txt,
@@ -99,7 +102,7 @@ func main() {
 			continue
 		}
 
-		ln.Log(ln.F{
+		ln.Log(ctx, ln.F{
 			"action": "tooted",
 			"text":   txt,
 			"id":     st.ID,

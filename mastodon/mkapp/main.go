@@ -22,7 +22,7 @@ var scopes = []string{"read", "write", "follow"}
 func main() {
 	flag.Parse()
 
-	c, err := madon.NewApp(*appName, scopes, *redirectURI, *instance)
+	c, err := madon.NewApp(*appName, *website, scopes, *redirectURI, *instance)
 	if err != nil {
 		log.Fatal(err)
 	}

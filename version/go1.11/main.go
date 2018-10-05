@@ -2,17 +2,17 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// The go1.8 command runs the go command from go1.8.
+// The go1.11 command runs the go command from go1.11.
 //
 // To install, run:
 //
-//     $ go get golang.org/x/build/version/go1.8
-//     $ go1.8 download
+//     $ go get golang.org/x/build/version/go1.11
+//     $ go1.11 download
 //
-// And then use the go1.8 command as if it were your normal go
+// And then use the go1.11 command as if it were your normal go
 // command.
 //
-// See the release notes at https://beta.golang.org/doc/go1.7
+// See the release notes at https://beta.golang.org/doc/go1.11
 //
 // File bugs at http://golang.org/issues/new
 package main
@@ -20,5 +20,5 @@ package main
 import "golang.org/x/build/version"
 
 func main() {
-	version.Run("go1.8.typealias")
+	version.Run("go1.11")
 }
