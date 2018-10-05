@@ -1,4 +1,4 @@
-// Package switchcounter is a simple interface to the https://www.switcaounter.science/ API.
+// Package switchcounter is a simple interface to the https://www.switchcounter.science/ API.
 package switchcounter
 
 import (
