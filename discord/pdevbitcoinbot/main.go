@@ -10,6 +10,7 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/Xe/x/web/discordwebhook"
 	"github.com/caarlos0/env"
 	"github.com/codahale/hdrhistogram"
 	_ "github.com/joho/godotenv/autoload"
@@ -25,27 +26,6 @@ type BitstampReply struct {
 	Low       string  `json:"low"`
 	Ask       string  `json:"ask"`
 	Open      float64 `json:"open"`
-}
-
-type dWebhook struct {
-	Content  string   `json:"content,omitifempty"`
-	Username string   `json:"username"`
-	Embeds   []embeds `json:"embeds,omitifempty"`
-}
-
-type embedField struct {
-	Name   string `json:"name"`
-	Value  string `json:"value"`
-	Inline bool   `json:"inline"`
-}
-
-type embedFooter struct {
-	Text string `json:"text"`
-}
-
-type embeds struct {
-	Fields []embedField `json:"fields"`
-	Footer embedFooter  `json:"footer"`
 }
 
 type data struct {
@@ -73,7 +53,7 @@ func getBitstamp() (*BitstampReply, error) {
 	return &bsr, nil
 }
 
-func sendWebhook(whurl string, dw dWebhook) error {
+func sendWebhook(whurl string, dw discordwebhook.Webhook) error {
 	data, err := json.Marshal(&dw)
 	if err != nil {
 		log.Fatal(err)
@@ -130,18 +110,20 @@ func main() {
 
 	h.RecordValue(int64(bcf))
 
-	var lv string = "_shrug_"
+	var lv = "_shrug_"
 
 	if d.LastValue != nil {
 		lv = *d.LastValue
 	}
 
-	dw := dWebhook{
+	dw := discordwebhook.Webhook{
 		Content:  "BITCOIN PRICE TIEM",
 		Username: "Buttcoin",
-		Embeds: []embeds{embeds{
-			Footer: embedFooter{Text: "powered by pdevbitcoinbot, made by Cadey~#1337"},
-			Fields: []embedField{
+		Embeds: []discordwebhook.Embeds{discordwebhook.Embeds{
+			Footer: discordwebhook.EmbedFooter{
+				Text: "powered by pdevbitcoinbot, made by Cadey~#1337",
+			},
+			Fields: []discordwebhook.EmbedField{
 				{
 					Name:   "Now",
 					Value:  bsr.Ask,
@@ -161,7 +143,12 @@ func main() {
 		}},
 	}
 
-	err = sendWebhook(cfg.WebhookURL, dw)
+	req := discordwebhook.Send(cfg.WebhookURL, dw)
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = discordwebhook.Validate(resp)
 	if err != nil {
 		log.Fatal(err)
 	}
