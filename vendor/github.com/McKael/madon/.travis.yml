@@ -1,0 +1,20 @@
+language: go
+go:
+- "1.7"
+- "1.8"
+- "1.9"
+- "1.10"
+- master
+matrix:
+  allow_failures:
+    - go: master
+  fast_finish: true
+branches:
+  only:
+  - master
+install:
+- go get golang.org/x/oauth2
+- go get github.com/pkg/errors
+- go get github.com/stretchr/testify/assert
+- go get github.com/sendgrid/rest
+- go get github.com/gorilla/websocket

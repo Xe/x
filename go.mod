@@ -1,52 +1,46 @@
 module github.com/Xe/x
 
 require (
+	github.com/GeertJohan/yubigo v0.0.0-20140521141543-b1764f04aa9b
 	github.com/McKael/madon v2.3.0+incompatible
-	github.com/Syfaro/finch v0.0.0-20181005000040-65a305514294 // indirect
-	github.com/Xe/Tetra v0.0.0-20150829181626-dd27f12d4383
-	github.com/Xe/gopreload v0.0.0-20170326043426-a00a8beb369c
 	github.com/Xe/ln v0.1.2
 	github.com/bearbin/mcgorcon v0.0.0-20141104170123-f611ad04551a
 	github.com/belak/irc v2.1.0+incompatible
 	github.com/bwmarrin/discordgo v0.18.0
 	github.com/caarlos0/env v3.4.0+incompatible
-	github.com/certifi/gocertifi v0.0.0-20180905225744-ee1a9a0726d2 // indirect
 	github.com/codahale/hdrhistogram v0.0.0-20161010025455-3a0bb77429bd
 	github.com/disintegration/imaging v1.5.0
+	github.com/facebookgo/ensure v0.0.0-20160127193407-b4ab57deab51 // indirect
 	github.com/facebookgo/flagenv v0.0.0-20160425205200-fcd59fca7456
-	github.com/getsentry/raven-go v0.0.0-20180903072508-084a9de9eb03 // indirect
+	github.com/facebookgo/stack v0.0.0-20160209184415-751773369052 // indirect
+	github.com/facebookgo/subset v0.0.0-20150612182917-8dac2c3c4870 // indirect
+	github.com/fogleman/gg v1.1.0 // indirect
+	github.com/fogleman/primitive v0.0.0-20170926175833-69506c928bef
 	github.com/go-telegram-bot-api/telegram-bot-api v4.6.2+incompatible
-	github.com/golang/protobuf v1.2.0 // indirect
+	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
 	github.com/google/go-github v17.0.0+incompatible
 	github.com/google/go-querystring v1.0.0 // indirect
 	github.com/google/gops v0.3.5
 	github.com/gorilla/websocket v1.4.0 // indirect
-	github.com/howeyc/gopass v0.0.0-20170109162249-bf9dde6d0d2c
+	github.com/hullerob/go.farbfeld v0.0.0-20160317142651-b572f0728b69
+	github.com/hypersleep/easyssh v0.0.0-20170212134900-70879c819ea1
 	github.com/joeshaw/envdecode v0.0.0-20180312135643-c9e015854467
 	github.com/joho/godotenv v1.3.0
-	github.com/justinian/dice v0.0.0-20170728002755-6a18b51d929c
 	github.com/kardianos/osext v0.0.0-20170510131534-ae77be60afb1 // indirect
-	github.com/kelseyhightower/envconfig v1.3.0
-	github.com/klauspost/cpuid v0.0.0-20180405133222-e7e905edc00e // indirect
-	github.com/klauspost/crc32 v0.0.0-20170628072449-bab58d77464a // indirect
-	github.com/klauspost/reedsolomon v0.0.0-20180704173009-925cb01d6510 // indirect
-	github.com/kr/pretty v0.1.0 // indirect
-	github.com/mitchellh/mapstructure v1.1.1 // indirect
+	github.com/kr/pretty v0.1.0
+	github.com/mzohreva/GoGraphviz v0.0.0-20180226085351-533f4a37d9c6
 	github.com/peterh/liner v1.1.0
 	github.com/sendgrid/rest v2.4.1+incompatible // indirect
-	github.com/syfaro/finch v0.0.0-20181005000040-65a305514294
 	github.com/technoweenie/multipartstreamer v1.0.1 // indirect
-	github.com/thoj/go-ircevent v0.0.0-20180816043103-14f3614f28c3
-	github.com/turnage/graw v0.0.0-20180517193449-15877a6c18d6
-	github.com/turnage/redditproto v0.0.0-20151223012412-afedf1b6eddb // indirect
-	github.com/xtaci/kcp-go v2.0.3+incompatible
-	github.com/xtaci/smux v1.0.7
 	go4.org v0.0.0-20180809161055-417644f6feb5
-	golang.org/x/crypto v0.0.0-20181001203147-e3636079e1a4 // indirect
+	golang.org/x/build v0.0.0-20181004175654-90ec83e7f349
+	golang.org/x/crypto v0.0.0-20181001203147-e3636079e1a4
 	golang.org/x/image v0.0.0-20180926015637-991ec62608f3 // indirect
 	golang.org/x/oauth2 v0.0.0-20181003184128-c57b0facaced
 	golang.org/x/sys v0.0.0-20181004145325-8469e314837c // indirect
+	google.golang.org/appengine v1.2.0 // indirect
+	gopkg.in/gcfg.v1 v1.2.3
 	gopkg.in/irc.v1 v1.3.0
-	gopkg.in/telegram-bot-api.v4 v4.6.2
-	gopkg.in/yaml.v1 v1.0.0-20140924161607-9f9df34309c0
+	gopkg.in/warnings.v0 v0.1.2 // indirect
+	gopkg.in/yaml.v2 v2.2.1 // indirect
 )

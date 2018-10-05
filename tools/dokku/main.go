@@ -7,8 +7,8 @@ import (
 	"os"
 	"strings"
 
-	"code.google.com/p/gcfg"
 	"github.com/hypersleep/easyssh"
+	gcfg "gopkg.in/gcfg.v1"
 )
 
 var (
@@ -52,10 +52,13 @@ func main() {
 
 	command := strings.Join(flag.Args(), " ")
 
-	res, err := ssh.Run(command)
+	stdout, stderr, _, err := ssh.Run(command, 360)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Print(res)
+	fmt.Print(stdout)
+	fmt.Println()
+	fmt.Print(stderr)
+	fmt.Println()
 }

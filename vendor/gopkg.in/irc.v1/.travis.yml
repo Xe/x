@@ -1,0 +1,21 @@
+language: go
+
+before_install:
+  - go get github.com/axw/gocov/gocov
+  - go get github.com/mattn/goveralls
+  - go get golang.org/x/tools/cmd/cover
+  # Grab all deps (should just be test deps)
+  - go get -v -t ./...
+  # Linting deps
+  - go get github.com/alecthomas/gometalinter
+  - gometalinter --install
+  # Remove the go file from the test cases dir as it fails linting
+  - rm ./testcases/*.go
+
+script:
+  - gometalinter --fast ./... -D gas
+  - go test -race -v ./...
+  - go test -covermode=count -coverprofile=profile.cov
+
+after_script:
+  - $HOME/gopath/bin/goveralls -coverprofile=profile.cov -service=travis-ci
