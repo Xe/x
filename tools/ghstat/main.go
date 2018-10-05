@@ -1,11 +1,14 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"log"
+	"net/http"
 	"os"
-	"time"
+
+	"github.com/Xe/x/web/ghstat"
 )
 
 var (
@@ -19,7 +22,15 @@ func main() {
 	flag.Parse()
 
 	if *messageFlag {
-		m, err := getMessage()
+		req := ghstat.LastMessage()
+		resp, err := http.DefaultClient.Do(req)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		var m ghstat.Message
+		defer resp.Body.Close()
+		err = json.NewDecoder(resp.Body).Decode(&m)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -27,28 +38,27 @@ func main() {
 		fmt.Printf("Last message:\n")
 		fmt.Printf("Status:  %s\n", m.Status)
 		fmt.Printf("Message: %s\n", m.Body)
+		fmt.Printf("Time:    %s\n", m.CreatedOn)
 
-		t, err := time.Parse(time.RFC3339, m.CreatedOn)
-		if err != nil {
-			log.Fatal(err)
-		}
+		return
+	}
 
-		fmt.Printf("Time:    %s\n", t.Format(time.ANSIC))
-	} else {
-		s, err := getStatus()
-		if err != nil {
-			log.Fatal(err)
-		}
+	req := ghstat.LastStatus()
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-		t, err := time.Parse(time.RFC3339, s.LastUpdated)
-		if err != nil {
-			log.Fatal(err)
-		}
+	var s ghstat.Status
+	defer resp.Body.Close()
+	err = json.NewDecoder(resp.Body).Decode(&s)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-		fmt.Printf("Status: %s (%s)\n", s.Status, t.Format(time.ANSIC))
+	fmt.Printf("Status: %s (%s)\n", s.Status, s.LastUpdated)
 
-		if s.Status != "good" {
-			os.Exit(1)
-		}
+	if s.Status != "good" {
+		os.Exit(1)
 	}
 }
