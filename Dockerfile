@@ -1,4 +1,4 @@
-FROM xena/go:1.11 AS build
+FROM xena/go:1.11.1 AS build
 
 WORKDIR /x
 COPY . .
