@@ -44,6 +44,8 @@ github.com/gorilla/websocket
 github.com/hullerob/go.farbfeld
 # github.com/hypersleep/easyssh v0.0.0-20170212134900-70879c819ea1
 github.com/hypersleep/easyssh
+# github.com/jaytaylor/html2text v0.0.0-20180606194806-57d518f124b0
+github.com/jaytaylor/html2text
 # github.com/joeshaw/envdecode v0.0.0-20180312135643-c9e015854467
 github.com/joeshaw/envdecode
 # github.com/joho/godotenv v1.3.0
@@ -59,12 +61,16 @@ github.com/kr/text
 github.com/mattn/go-runewidth
 # github.com/mzohreva/GoGraphviz v0.0.0-20180226085351-533f4a37d9c6
 github.com/mzohreva/GoGraphviz/graphviz
+# github.com/olekukonko/tablewriter v0.0.0-20180912035003-be2c049b30cc
+github.com/olekukonko/tablewriter
 # github.com/peterh/liner v1.1.0
 github.com/peterh/liner
 # github.com/pkg/errors v0.8.0
 github.com/pkg/errors
 # github.com/sendgrid/rest v2.4.1+incompatible
 github.com/sendgrid/rest
+# github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf
+github.com/ssor/bom
 # github.com/technoweenie/multipartstreamer v1.0.1
 github.com/technoweenie/multipartstreamer
 # go4.org v0.0.0-20180809161055-417644f6feb5
@@ -96,6 +102,8 @@ golang.org/x/image/math/f64
 golang.org/x/image/tiff/lzw
 # golang.org/x/net v0.0.0-20180811021610-c39426892332
 golang.org/x/net/context
+golang.org/x/net/html
+golang.org/x/net/html/atom
 golang.org/x/net/context/ctxhttp
 # golang.org/x/oauth2 v0.0.0-20181003184128-c57b0facaced
 golang.org/x/oauth2

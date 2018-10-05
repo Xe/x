@@ -24,13 +24,16 @@ require (
 	github.com/gorilla/websocket v1.4.0 // indirect
 	github.com/hullerob/go.farbfeld v0.0.0-20160317142651-b572f0728b69
 	github.com/hypersleep/easyssh v0.0.0-20170212134900-70879c819ea1
+	github.com/jaytaylor/html2text v0.0.0-20180606194806-57d518f124b0
 	github.com/joeshaw/envdecode v0.0.0-20180312135643-c9e015854467
 	github.com/joho/godotenv v1.3.0
 	github.com/kardianos/osext v0.0.0-20170510131534-ae77be60afb1 // indirect
 	github.com/kr/pretty v0.1.0
 	github.com/mzohreva/GoGraphviz v0.0.0-20180226085351-533f4a37d9c6
+	github.com/olekukonko/tablewriter v0.0.0-20180912035003-be2c049b30cc // indirect
 	github.com/peterh/liner v1.1.0
 	github.com/sendgrid/rest v2.4.1+incompatible // indirect
+	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect
 	github.com/technoweenie/multipartstreamer v1.0.1 // indirect
 	go4.org v0.0.0-20180809161055-417644f6feb5
 	golang.org/x/build v0.0.0-20181004175654-90ec83e7f349

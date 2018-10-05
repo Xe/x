@@ -6,7 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	madon "github.com/McKael/madon/v2"
+	madon "github.com/McKael/madon"
 	"github.com/Xe/ln"
 	"github.com/Xe/ln/opname"
 	"github.com/Xe/x/web/tokipana"
@@ -86,11 +86,14 @@ func main() {
 						continue
 					}
 
-					st, err := c.PostStatus(madon.PostStatusParams{
-						Text:       fmt.Sprintf(translationTemplate, string(data)),
-						InReplyTo:  s.ID,
-						Visibility: "public",
-					})
+					st, err := c.PostStatus(
+						fmt.Sprintf(translationTemplate, string(data)),
+						s.ID,
+						nil,
+						false,
+						"",
+						"public",
+					)
 					if err != nil {
 						ln.Error(ctx, err)
 						continue
