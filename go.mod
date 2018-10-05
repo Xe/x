@@ -31,6 +31,7 @@ require (
 	github.com/joeshaw/envdecode v0.0.0-20180312135643-c9e015854467
 	github.com/joho/godotenv v1.3.0
 	github.com/kardianos/osext v0.0.0-20170510131534-ae77be60afb1 // indirect
+	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 // indirect
 	github.com/klauspost/cpuid v0.0.0-20180405133222-e7e905edc00e // indirect
 	github.com/klauspost/crc32 v0.0.0-20170628072449-bab58d77464a // indirect
 	github.com/klauspost/reedsolomon v0.0.0-20180704173009-925cb01d6510 // indirect
@@ -44,6 +45,7 @@ require (
 	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect
 	github.com/streamrail/concurrent-map v0.0.0-20160823150647-8bf1e9bacbf6
 	github.com/technoweenie/multipartstreamer v1.0.1 // indirect
+	github.com/tmc/scp v0.0.0-20170824174625-f7b48647feef
 	github.com/xtaci/kcp-go v2.0.3+incompatible
 	github.com/xtaci/smux v1.0.7
 	go4.org v0.0.0-20180809161055-417644f6feb5
