@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/Xe/x/internal/mainsa"
 	"github.com/Xe/x/web/switchcounter"
 	"github.com/Xe/x/web/tokiponatokens"
 )
@@ -86,7 +87,12 @@ func (i ilo) parse(authorID, inp string) (*reply, error) {
 		case actionWhat:
 			switch req.Subject {
 			case "tenpo ni":
-				fmt.Fprintf(buf, "ni li tenpo %s\n", time.Now().Format(time.Kitchen))
+				ni, err := mainsa.At(time.Now())
+				if err != nil {
+					return nil, err
+				}
+
+				fmt.Fprintf(buf, "ni li tenpo %s\n", ni)
 				goto ok
 			}
 		}

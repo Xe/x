@@ -105,18 +105,6 @@ func main() {
 		s.ChannelMessageSend(m.ChannelID, result.msg)
 	}
 
-	dg, err := discordgo.New("Bot " + cfg.DiscordToken)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	dg.AddHandler(mc)
-	err = dg.Open()
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer dg.Close()
-
 	if *repl {
 		for {
 			if inp, err := line.Prompt("|lipu: "); err == nil {
@@ -144,6 +132,18 @@ func main() {
 
 		os.Exit(0)
 	} else {
+		dg, err := discordgo.New("Bot " + cfg.DiscordToken)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		dg.AddHandler(mc)
+		err = dg.Open()
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer dg.Close()
+
 		log.Println("bot is running")
 		sc := make(chan os.Signal, 1)
 		signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
