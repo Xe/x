@@ -8,9 +8,9 @@ import (
 	"log"
 	"os"
 
-	"github.com/Xe/x/internal"
 	"github.com/Xe/x/internal/greedo"
 	"github.com/Xe/x/internal/minipaas"
+	"github.com/Xe/x/internal/yeet"
 )
 
 func main() {
@@ -18,15 +18,15 @@ func main() {
 	defer cancel()
 
 	env := append(os.Environ(), []string{"CGO_ENABLED=0", "GOOS=linux"}...)
-	internal.ShouldWork(ctx, env, internal.WD, "vgo", "build", "-o=sona-pi-toki-pona")
-	internal.ShouldWork(ctx, env, internal.WD, "appsluggr", "-worker=sona-pi-toki-pona")
+	yeet.ShouldWork(ctx, env, yeet.WD, "vgo", "build", "-o=worker")
+	yeet.ShouldWork(ctx, env, yeet.WD, "appsluggr", "-worker=worker")
 	fin, err := os.Open("slug.tar.gz")
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer fin.Close()
 
-	fname := "sona-pi-toki-pona-" + internal.DateTag + ".tar.gz"
+	fname := "sona-pi-toki-pona-" + yeet.DateTag + ".tar.gz"
 	pubURL, err := greedo.CopyFile(fname, fin)
 	if err != nil {
 		log.Fatal(err)

@@ -7,17 +7,22 @@ import (
 	"context"
 	"log"
 
-	"github.com/Xe/x/internal"
+	"github.com/Xe/x/internal/yeet"
 )
 
 func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	tag := "xena/xperimental:" + internal.DateTag
+	tag := "xena/xperimental"
+	yeet.ShouldWork(ctx, nil, yeet.WD, "docker", "build", "-t", tag, ".")
 
-	internal.ShouldWork(ctx, nil, internal.WD, "docker", "build", "-t", tag, ".")
-	internal.ShouldWork(ctx, nil, internal.WD, "docker", "push", tag)
+	resTag, err := yeet.DockerTag(ctx, "xena", "xperimental", tag)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	log.Printf("use %s", tag)
+	yeet.ShouldWork(ctx, nil, yeet.WD, "docker", "push", resTag)
+
+	log.Printf("use %s", resTag)
 }
