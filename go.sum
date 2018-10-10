@@ -6,6 +6,8 @@ github.com/GeertJohan/yubigo v0.0.0-20140521141543-b1764f04aa9b h1:SDBD2Avdba3sX
 github.com/GeertJohan/yubigo v0.0.0-20140521141543-b1764f04aa9b/go.mod h1:njRCDrl+1RQ/A/+KVU8Ho2EWAxUSkohOWczdW3dzDG0=
 github.com/McKael/madon v2.3.0+incompatible h1:xMUA+Fy4saDV+8tN3MMnwJUoYWC//5Fy8LeOqJsRNIM=
 github.com/McKael/madon v2.3.0+incompatible/go.mod h1:+issnvJjN1rpjAHZwXRB/x30uHh/NoQR7QaojJK/lSI=
+github.com/McKael/madon/v2 v2.0.0-20180929094633-c679abc985d6 h1:9cJcTOeILzInNo+DCYmXKME1QfAP07FYdo3M9/9jyc4=
+github.com/McKael/madon/v2 v2.0.0-20180929094633-c679abc985d6/go.mod h1:mvlJhxZCchfiasx3XvN3hBu5RekGwTDm09dKlSM/dQQ=
 github.com/Xe/ln v0.1.2 h1:VTF6Z95Kdd6S1RSjpnn0DFJV5Do9cfmHTHsE9OGI1dw=
 github.com/Xe/ln v0.1.2/go.mod h1:GWZDvjL0ZC/9SSjY8DJ2IOrID6Lejs7D8pgQyjqMYSk=
 github.com/aclements/go-moremath v0.0.0-20180329182055-b1aff36309c7 h1:/NWziSfuX4cu00adiPldD8sdCpKxu6BZtLoALSyElZQ=
@@ -25,6 +27,7 @@ github.com/codahale/hdrhistogram v0.0.0-20161010025455-3a0bb77429bd/go.mod h1:sE
 github.com/coreos/go-systemd v0.0.0-20180705093442-88bfeed483d3/go.mod h1:F5haX7vjVVG0kc13fIWeqUViNPyEJxv/OmvnBo0Yme4=
 github.com/davecgh/go-spew v1.1.0 h1:ZDRjVQ15GmhC3fiQ8ni8+OwkZQO4DARzQgrnXU1Liz8=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
+github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/dgryski/go-failure v0.0.0-20151001134759-4963dbd58fd0 h1:SJzP6kZNFsdxFN4fRtVXu2yrf8QrKnofjQouzaCn36w=
 github.com/dgryski/go-failure v0.0.0-20151001134759-4963dbd58fd0/go.mod h1:vVcpVd0tzL5XdRrkHax1asNJsHVpgA0cd9fHPHU5a/w=
 github.com/dgryski/go-onlinestats v0.0.0-20170612111826-1c7d19468768 h1:Xzl7CSuSnGsyU+9xmSU2h8w3d7Tnis66xeoNN207tLo=
@@ -171,7 +174,10 @@ golang.org/x/net v0.0.0-20180724234803-3673e40ba225/go.mod h1:mL1N/T3taQHkDXs73r
 golang.org/x/net v0.0.0-20180808004115-f9ce57c11b24/go.mod h1:mL1N/T3taQHkDXs73rZJwtUhF3w3ftmwwsq0BUmARs4=
 golang.org/x/net v0.0.0-20180811021610-c39426892332 h1:efGso+ep0DjyCBJPjvoz0HI6UldX4Md2F1rZFe1ir0E=
 golang.org/x/net v0.0.0-20180811021610-c39426892332/go.mod h1:mL1N/T3taQHkDXs73rZJwtUhF3w3ftmwwsq0BUmARs4=
+golang.org/x/net v0.0.0-20180926154720-4dfa2610cdf3 h1:dgd4x4kJt7G4k4m93AYLzM8Ni6h2qLTfh9n9vXJT3/0=
+golang.org/x/net v0.0.0-20180926154720-4dfa2610cdf3/go.mod h1:mL1N/T3taQHkDXs73rZJwtUhF3w3ftmwwsq0BUmARs4=
 golang.org/x/oauth2 v0.0.0-20180724155351-3d292e4d0cdc/go.mod h1:N/0e6XlmueqKjAGxoOufVs8QHGRruUQn6yWY3a++T0U=
+golang.org/x/oauth2 v0.0.0-20180821212333-d2e6202438be/go.mod h1:N/0e6XlmueqKjAGxoOufVs8QHGRruUQn6yWY3a++T0U=
 golang.org/x/oauth2 v0.0.0-20181003184128-c57b0facaced h1:4oqSq7eft7MdPKBGQK11X9WYUxmj6ZLgGTqYIbY1kyw=
 golang.org/x/oauth2 v0.0.0-20181003184128-c57b0facaced/go.mod h1:N/0e6XlmueqKjAGxoOufVs8QHGRruUQn6yWY3a++T0U=
 golang.org/x/perf v0.0.0-20180704124530-6e6d33e29852/go.mod h1:JLpeXjPJfIyPr5TlbXLkXWLhP8nz10XfvxElABhCtcw=

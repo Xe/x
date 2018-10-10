@@ -3,6 +3,7 @@ module github.com/Xe/x
 require (
 	github.com/GeertJohan/yubigo v0.0.0-20140521141543-b1764f04aa9b // indirect
 	github.com/McKael/madon v2.3.0+incompatible
+	github.com/McKael/madon/v2 v2.0.0-20180929094633-c679abc985d6
 	github.com/Xe/ln v0.1.2
 	github.com/aclements/go-moremath v0.0.0-20180329182055-b1aff36309c7 // indirect
 	github.com/bearbin/mcgorcon v0.0.0-20141104170123-f611ad04551a
@@ -24,7 +25,6 @@ require (
 	github.com/google/go-github v17.0.0+incompatible
 	github.com/google/go-querystring v1.0.0 // indirect
 	github.com/google/gops v0.3.5
-	github.com/gorilla/websocket v1.4.0 // indirect
 	github.com/hullerob/go.farbfeld v0.0.0-20160317142651-b572f0728b69
 	github.com/jaytaylor/html2text v0.0.0-20180606194806-57d518f124b0
 	github.com/joeshaw/envdecode v0.0.0-20180312135643-c9e015854467
@@ -39,7 +39,6 @@ require (
 	github.com/pborman/uuid v1.2.0
 	github.com/peterh/liner v1.1.0
 	github.com/pkg/errors v0.8.0
-	github.com/sendgrid/rest v2.4.1+incompatible // indirect
 	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect
 	github.com/streamrail/concurrent-map v0.0.0-20160823150647-8bf1e9bacbf6
 	github.com/technoweenie/multipartstreamer v1.0.1 // indirect
@@ -52,7 +51,6 @@ require (
 	golang.org/x/image v0.0.0-20180926015637-991ec62608f3 // indirect
 	golang.org/x/oauth2 v0.0.0-20181003184128-c57b0facaced
 	golang.org/x/sys v0.0.0-20181004145325-8469e314837c // indirect
-	google.golang.org/appengine v1.2.0 // indirect
 	gopkg.in/irc.v1 v1.3.0
 	gopkg.in/yaml.v2 v2.2.1 // indirect
 )

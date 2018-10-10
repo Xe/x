@@ -6,7 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	madon "github.com/McKael/madon"
+	madon "github.com/McKael/madon/v2"
 	"github.com/Xe/ln"
 	"github.com/Xe/ln/opname"
 	"github.com/Xe/x/web/tokipana"
@@ -35,6 +35,8 @@ func main() {
 		ln.FatalErr(opname.With(ctx, "restore-app"), err)
 	}
 
+	ln.Log(ctx, ln.Info("waiting for messages on #topipona..."))
+
 	for {
 		evChan := make(chan madon.StreamEvent, 10)
 		stop := make(chan bool)
@@ -62,6 +64,17 @@ func main() {
 						"originating_status_url": s.URL,
 					})
 
+					found := false
+					for _, f := range *s.Account.Fields {
+						if f.Name == "enable-bot" && f.Value == "sona-pi-toki-pona" {
+							found = true
+						}
+					}
+					if !found {
+						ln.Log(ctx, ln.Info("ignoring message"))
+						continue
+					}
+
 					text, err := html2text.FromString(s.Content, html2text.Options{PrettyTables: true})
 					if err != nil {
 						ln.Error(ctx, err)
@@ -87,12 +100,11 @@ func main() {
 					}
 
 					st, err := c.PostStatus(
-						fmt.Sprintf(translationTemplate, string(data)),
-						s.ID,
-						nil,
-						false,
-						"",
-						"public",
+						madon.PostStatusParams{
+							Text:       fmt.Sprintf(translationTemplate, string(data)),
+							InReplyTo:  s.ID,
+							Visibility: "public",
+						},
 					)
 					if err != nil {
 						ln.Error(ctx, err)
