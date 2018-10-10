@@ -20,7 +20,7 @@ var (
 )
 
 func (i ilo) janLawaAnuSeme(authorID string) bool {
-	for _, jan := range i.cfg.janLawa {
+	for _, jan := range i.cfg.JanLawa {
 		if authorID == jan {
 			return true
 		}

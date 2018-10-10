@@ -30,7 +30,7 @@ type lipuSona struct {
 	TokiPonaTokenizerAPIURL string   `env:"TOKI_PONA_TOKENIZER_API_URL,default=https://us-central1-golden-cove-408.cloudfunctions.net/function-1"`
 	SwitchCounterWebhook    string   `env:"SWITCH_COUNTER_WEBHOOK,required"`
 	IloNimi                 string   `env:"ILO_NIMI,default=Kesi"`
-	janLawa                 []string `env:"JAN_LAWA,required"`
+	JanLawa                 []string `env:"JAN_LAWA,required"`
 }
 
 func init() {
@@ -46,7 +46,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	cfg.janLawa = append(cfg.janLawa, "console")
+	cfg.JanLawa = append(cfg.JanLawa, "console")
 
 	flag.Parse()
 	internal.HandleLicense()
