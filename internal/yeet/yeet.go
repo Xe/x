@@ -50,7 +50,7 @@ func ShouldWork(ctx context.Context, env []string, dir string, cmdName string, a
 }
 
 /// Output returns the output of a command or an error.
-func output(ctx context.Context, cmd string, args ...string) (string, error) {
+func Output(ctx context.Context, cmd string, args ...string) (string, error) {
 	c := exec.CommandContext(ctx, cmd, args...)
 	c.Env = os.Environ()
 	c.Stderr = os.Stderr
@@ -63,7 +63,7 @@ func output(ctx context.Context, cmd string, args ...string) (string, error) {
 
 // GitTag returns the curreng git tag.
 func GitTag(ctx context.Context) (string, error) {
-	s, err := output(ctx, "git", "describe", "--tags")
+	s, err := Output(ctx, "git", "describe", "--tags")
 	if err != nil {
 		ee, ok := errors.Cause(err).(*exec.ExitError)
 		if ok && ee.Exited() {
