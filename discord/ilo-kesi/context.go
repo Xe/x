@@ -9,13 +9,14 @@ import (
 )
 
 const (
-	actionFront  = "lawa,insa"
-	actionMarkov = "sitelen"
-	actionWhat   = "seme"
+	actionFront   = "lawa,insa"
+	actionMarkov  = "sitelen"
+	actionWhat    = "seme"
+	actionBotInfo = "sina"
 )
 
 var (
-	ErrUnknownAction = errors.New("ijo-kesi: mi sona ala")
+	ErrUnknownAction = errors.New("ilo-kesi: mi sona ala")
 )
 
 type Request struct {
@@ -23,13 +24,15 @@ type Request struct {
 	Action  string
 	Subject string
 	Punct   string
+	Author  string
 
-	Author string
+	Input tokiponatokens.Sentence
 }
 
 func parseRequest(authorID string, inp tokiponatokens.Sentence) (*Request, error) {
 	var result Request
 	result.Author = authorID
+	result.Input = inp
 
 	for _, part := range inp {
 		switch part.Type {

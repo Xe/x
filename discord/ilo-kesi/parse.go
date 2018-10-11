@@ -92,7 +92,16 @@ func (i ilo) parse(authorID, inp string) (*reply, error) {
 					return nil, err
 				}
 
-				fmt.Fprintf(buf, "ni li tenpo %s\n", ni)
+				fmt.Fprintf(buf, "ma insa la tenpo ni li tenpo pi %s\n", ni)
+				goto ok
+			case actionBotInfo:
+				fmt.Fprintf(buf, "mi ilo Kesi. mi ilo e kama sona e pali pona mute. mi wile pona sina. lipu sona mi li sitelen https://github.com/Xe/x/tree/master/discord/ilo-kesi.\n")
+				goto ok
+			}
+		case "":
+			switch req.Subject {
+			case "sina seme":
+				fmt.Fprintf(buf, "mi ilo Kesi. mi ilo e kama sona e pali pona mute. mi wile pona sina. lipu sona mi li sitelen https://github.com/Xe/x/tree/master/discord/ilo-kesi.\n")
 				goto ok
 			}
 		}
