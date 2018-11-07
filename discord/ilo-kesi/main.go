@@ -78,6 +78,28 @@ func main() {
 
 	line.SetCtrlCAborts(true)
 
+	omc := func(s *discordgo.Session, m *discordgo.MessageCreate) {
+		// Ignore all messages created by the bot itself
+		// This isn't required in this specific example but it's a good practice.
+		if m.Author.ID == s.State.User.ID {
+			return
+		}
+
+		mentionsMe := false
+		for _, us := range m.Mentions {
+			if us.ID == s.State.User.ID {
+				mentionsMe = true
+				break
+			}
+		}
+
+		if !mentionsMe {
+			return
+		}
+
+		s.ChannelMessageSend(m.ChannelID, chain.Generate(15))
+	}
+
 	mc := func(s *discordgo.Session, m *discordgo.MessageCreate) {
 		// Ignore all messages created by the bot itself
 		// This isn't required in this specific example but it's a good practice.
@@ -138,6 +160,7 @@ func main() {
 		}
 
 		dg.AddHandler(mc)
+		dg.AddHandler(omc)
 		err = dg.Open()
 		if err != nil {
 			log.Fatal(err)

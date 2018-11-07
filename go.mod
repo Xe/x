@@ -4,6 +4,7 @@ require (
 	github.com/GeertJohan/yubigo v0.0.0-20140521141543-b1764f04aa9b // indirect
 	github.com/McKael/madon v2.3.0+incompatible
 	github.com/McKael/madon/v2 v2.0.0-20180929094633-c679abc985d6
+	github.com/Syfaro/finch v1.0.0
 	github.com/Xe/ln v0.1.2
 	github.com/aclements/go-moremath v0.0.0-20180329182055-b1aff36309c7 // indirect
 	github.com/bearbin/mcgorcon v0.0.0-20141104170123-f611ad04551a
@@ -14,6 +15,8 @@ require (
 	github.com/dgryski/go-failure v0.0.0-20151001134759-4963dbd58fd0
 	github.com/dgryski/go-onlinestats v0.0.0-20170612111826-1c7d19468768 // indirect
 	github.com/disintegration/imaging v1.5.0
+	github.com/eaburns/johaus v0.0.0-20180211190535-0482c3c1f4ff
+	github.com/eaburns/peggy v0.0.0-20180405011029-d685ddd3cbcb // indirect
 	github.com/facebookgo/ensure v0.0.0-20160127193407-b4ab57deab51 // indirect
 	github.com/facebookgo/flagenv v0.0.0-20160425205200-fcd59fca7456
 	github.com/facebookgo/stack v0.0.0-20160209184415-751773369052 // indirect
@@ -21,6 +24,7 @@ require (
 	github.com/fogleman/gg v1.1.0 // indirect
 	github.com/fogleman/primitive v0.0.0-20170926175833-69506c928bef
 	github.com/go-telegram-bot-api/telegram-bot-api v4.6.2+incompatible
+	github.com/go-telegram-bot-api/telegram-bot-api/v5 v5.0.0-rc1
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
 	github.com/google/go-github v17.0.0+incompatible
 	github.com/google/go-querystring v1.0.0 // indirect
@@ -41,7 +45,6 @@ require (
 	github.com/pkg/errors v0.8.0
 	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect
 	github.com/streamrail/concurrent-map v0.0.0-20160823150647-8bf1e9bacbf6
-	github.com/technoweenie/multipartstreamer v1.0.1 // indirect
 	github.com/tmc/scp v0.0.0-20170824174625-f7b48647feef
 	github.com/xtaci/kcp-go v2.0.3+incompatible
 	github.com/xtaci/smux v1.0.7

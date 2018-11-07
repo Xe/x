@@ -8,6 +8,8 @@ github.com/McKael/madon v2.3.0+incompatible h1:xMUA+Fy4saDV+8tN3MMnwJUoYWC//5Fy8
 github.com/McKael/madon v2.3.0+incompatible/go.mod h1:+issnvJjN1rpjAHZwXRB/x30uHh/NoQR7QaojJK/lSI=
 github.com/McKael/madon/v2 v2.0.0-20180929094633-c679abc985d6 h1:9cJcTOeILzInNo+DCYmXKME1QfAP07FYdo3M9/9jyc4=
 github.com/McKael/madon/v2 v2.0.0-20180929094633-c679abc985d6/go.mod h1:mvlJhxZCchfiasx3XvN3hBu5RekGwTDm09dKlSM/dQQ=
+github.com/Syfaro/finch v1.0.0 h1:znxWMPCvB73U9Gtks/2GNnDdvr1GHy0mvGWgrHDHUpY=
+github.com/Syfaro/finch v1.0.0/go.mod h1:k9gfYahBVfVswGiwOKlmuoH/46AL2Y2Pkar0DyeYThM=
 github.com/Xe/ln v0.1.2 h1:VTF6Z95Kdd6S1RSjpnn0DFJV5Do9cfmHTHsE9OGI1dw=
 github.com/Xe/ln v0.1.2/go.mod h1:GWZDvjL0ZC/9SSjY8DJ2IOrID6Lejs7D8pgQyjqMYSk=
 github.com/aclements/go-moremath v0.0.0-20180329182055-b1aff36309c7 h1:/NWziSfuX4cu00adiPldD8sdCpKxu6BZtLoALSyElZQ=
@@ -22,6 +24,8 @@ github.com/bwmarrin/discordgo v0.18.0 h1:XopVQXCIFy7Cr2eT7NcYcm4k0l2PYX+AP5RUbIW
 github.com/bwmarrin/discordgo v0.18.0/go.mod h1:5NIvFv5Z7HddYuXbuQegZ684DleQaCFqChP2iuBivJ8=
 github.com/caarlos0/env v3.4.0+incompatible h1:FRwBdvENjLHZoUbFnULnFss9wKtcapdaM35DfxiTjeM=
 github.com/caarlos0/env v3.4.0+incompatible/go.mod h1:tdCsowwCzMLdkqRYDlHpZCp2UooDD3MspDBjZ2AD02Y=
+github.com/certifi/gocertifi v0.0.0-20180905225744-ee1a9a0726d2 h1:MmeatFT1pTPSVb4nkPmBFN/LRZ97vPjsFKsZrU3KKTs=
+github.com/certifi/gocertifi v0.0.0-20180905225744-ee1a9a0726d2/go.mod h1:GJKEexRPVJrBSOjoqN5VNOIKJ5Q3RViH6eu3puDRwx4=
 github.com/codahale/hdrhistogram v0.0.0-20161010025455-3a0bb77429bd h1:qMd81Ts1T2OTKmB4acZcyKaMtRnY5Y44NuXGX2GFJ1w=
 github.com/codahale/hdrhistogram v0.0.0-20161010025455-3a0bb77429bd/go.mod h1:sE/e/2PUdi/liOCUjSTXgM1o87ZssimdTWN964YiIeI=
 github.com/coreos/go-systemd v0.0.0-20180705093442-88bfeed483d3/go.mod h1:F5haX7vjVVG0kc13fIWeqUViNPyEJxv/OmvnBo0Yme4=
@@ -35,6 +39,10 @@ github.com/dgryski/go-onlinestats v0.0.0-20170612111826-1c7d19468768/go.mod h1:a
 github.com/disintegration/imaging v1.5.0 h1:uYqUhwNmLU4K1FN44vhqS4TZJRAA4RhBINgbQlKyGi0=
 github.com/disintegration/imaging v1.5.0/go.mod h1:9B/deIUIrliYkyMTuXJd6OUFLcrZ2tf+3Qlwnaf/CjU=
 github.com/dustin/go-humanize v0.0.0-20180713052910-9f541cc9db5d/go.mod h1:HtrtbFcZ19U5GC7JDqmcUSB87Iq5E25KnS6fMYU6eOk=
+github.com/eaburns/johaus v0.0.0-20180211190535-0482c3c1f4ff h1:UYJFJoLfHqPuxd9K20qy55nl1d0SLMPMChu0mesV1Nw=
+github.com/eaburns/johaus v0.0.0-20180211190535-0482c3c1f4ff/go.mod h1:haq7Ati+IITjB94ZcX9Pur49JW6bQRs/yTcYaqDPxsc=
+github.com/eaburns/peggy v0.0.0-20180405011029-d685ddd3cbcb h1:VNtdhXiCNFtQkeRwcS8XW2+gyxollG4Kc4wnHbzGpP8=
+github.com/eaburns/peggy v0.0.0-20180405011029-d685ddd3cbcb/go.mod h1:5tfPwI6ukiK3W5vJzkj5MBQKHHY9Gcy2y6k1FC/23Xk=
 github.com/facebookgo/ensure v0.0.0-20160127193407-b4ab57deab51 h1:0JZ+dUmQeA8IIVUMzysrX4/AKuQwWhV2dYQuPZdvdSQ=
 github.com/facebookgo/ensure v0.0.0-20160127193407-b4ab57deab51/go.mod h1:Yg+htXGokKKdzcwhuNDwVvN+uBxDGXJ7G/VN1d8fa64=
 github.com/facebookgo/flagenv v0.0.0-20160425205200-fcd59fca7456 h1:CkmB2l68uhvRlwOTPrwnuitSxi/S3Cg4L5QYOcL9MBc=
@@ -49,9 +57,13 @@ github.com/fogleman/gg v1.1.0/go.mod h1:R/bRT+9gY/C5z7JzPU0zXsXHKM4/ayA+zqcVNZzP
 github.com/fogleman/primitive v0.0.0-20170926175833-69506c928bef h1:b2hzCO7V6vnDYAvucXo5smx9wut3A3Huw4VRNg1SMK8=
 github.com/fogleman/primitive v0.0.0-20170926175833-69506c928bef/go.mod h1:Tm6t8LbdhSCXNfpjTwoL1mdjCnyKHkMyf6PqQXo7Or8=
 github.com/fsnotify/fsnotify v1.4.7/go.mod h1:jwhsz4b93w/PPRr/qN1Yymfu8t87LnFCMoQvtojpjFo=
+github.com/getsentry/raven-go v0.0.0-20180903072508-084a9de9eb03 h1:G/9fPivTr5EiyqE9OlW65iMRUxFXMGRHgZFGo50uG8Q=
+github.com/getsentry/raven-go v0.0.0-20180903072508-084a9de9eb03/go.mod h1:KungGk8q33+aIAZUIVWZDr2OfAEBsO49PX4NzFV5kcQ=
 github.com/gliderlabs/ssh v0.1.1/go.mod h1:U7qILu1NlMHj9FlMhZLlkCdDnU1DBEAqr0aevW3Awn0=
 github.com/go-telegram-bot-api/telegram-bot-api v4.6.2+incompatible h1:tI1+S63aiYb8JDRY8WBqn7Q1Utnr09L9ga5T2VA2ZDI=
 github.com/go-telegram-bot-api/telegram-bot-api v4.6.2+incompatible/go.mod h1:qf9acutJ8cwBUhm1bqgz6Bei9/C/c93FPDljKWwsOgM=
+github.com/go-telegram-bot-api/telegram-bot-api/v5 v5.0.0-rc1 h1:Mr8jIV7wDfLw5Fw6BPupm0aduTFdLjhI3wFuIIZKvO4=
+github.com/go-telegram-bot-api/telegram-bot-api/v5 v5.0.0-rc1/go.mod h1:2s/IzRcxCszyNh760IjJiqoYHTnifk8ZeNYL33z8Pww=
 github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 h1:DACJavvAHhabrF08vX0COfcOBJRhZ8lUbR+ZWIs0Y5g=
 github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0/go.mod h1:E/TSTwGwJL78qG/PmXZO1EjYhfJinVAhrmmHX6Z8B9k=
 github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b/go.mod h1:SBH7ygxi8pfUlaOkMMuAQtPIUF8ecWP5IEl/CR7VP2Q=
