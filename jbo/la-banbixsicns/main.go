@@ -9,6 +9,7 @@ import (
 
 	"github.com/eaburns/johaus/parser"
 	_ "github.com/eaburns/johaus/parser/camxes"
+	"github.com/eaburns/johaus/pretty"
 	_ "github.com/joho/godotenv/autoload"
 )
 
@@ -21,10 +22,34 @@ func main() {
 	}
 
 	log.Printf("Listening on http://0.0.0.0:%s", p)
-	http.ListenAndServe(":"+p, http.HandlerFunc(handle))
+
+	http.DefaultServeMux.HandleFunc("/tree", tree)
+	http.DefaultServeMux.HandleFunc("/braces", braces)
+
+	http.ListenAndServe(":"+p, nil)
 }
 
-func handle(w http.ResponseWriter, r *http.Request) {
+func braces(w http.ResponseWriter, r *http.Request) {
+	data, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, "can't parse: "+err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	tree, err := parser.Parse(dialect, string(data))
+	if err != nil {
+		http.Error(w, "can't parse: "+err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	parser.RemoveMorphology(tree)
+	parser.AddElidedTerminators(tree)
+	parser.RemoveSpace(tree)
+	parser.CollapseLists(tree)
+
+	pretty.Braces(w, tree)
+}
+func tree(w http.ResponseWriter, r *http.Request) {
 	data, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		http.Error(w, "can't parse: "+err.Error(), http.StatusBadRequest)
