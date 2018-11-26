@@ -7,9 +7,9 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/eaburns/johaus/parser"
-	_ "github.com/eaburns/johaus/parser/camxes"
-	"github.com/eaburns/johaus/pretty"
+	"github.com/Xe/johaus/parser"
+	_ "github.com/Xe/johaus/parser/camxes"
+	"github.com/Xe/johaus/pretty"
 	_ "github.com/joho/godotenv/autoload"
 )
 

@@ -5,6 +5,7 @@ require (
 	github.com/McKael/madon v2.3.0+incompatible
 	github.com/McKael/madon/v2 v2.0.0-20180929094633-c679abc985d6
 	github.com/Syfaro/finch v1.0.0
+	github.com/Xe/johaus v0.0.0-20181126154118-fe870a11f3b2
 	github.com/Xe/ln v0.1.2
 	github.com/aclements/go-moremath v0.0.0-20180329182055-b1aff36309c7 // indirect
 	github.com/bearbin/mcgorcon v0.0.0-20141104170123-f611ad04551a
@@ -16,7 +17,6 @@ require (
 	github.com/dgryski/go-onlinestats v0.0.0-20170612111826-1c7d19468768 // indirect
 	github.com/disintegration/imaging v1.5.0
 	github.com/eaburns/johaus v0.0.0-20180211190535-0482c3c1f4ff
-	github.com/eaburns/peggy v0.0.0-20180405011029-d685ddd3cbcb // indirect
 	github.com/facebookgo/ensure v0.0.0-20160127193407-b4ab57deab51 // indirect
 	github.com/facebookgo/flagenv v0.0.0-20160425205200-fcd59fca7456
 	github.com/facebookgo/stack v0.0.0-20160209184415-751773369052 // indirect
