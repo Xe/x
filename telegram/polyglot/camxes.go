@@ -6,9 +6,9 @@ import (
 	"strings"
 
 	"github.com/Syfaro/finch"
-	"github.com/eaburns/johaus/parser"
-	_ "github.com/eaburns/johaus/parser/camxes"
-	"github.com/eaburns/johaus/pretty"
+	"github.com/Xe/johaus/parser"
+	_ "github.com/Xe/johaus/parser/camxes"
+	"github.com/Xe/johaus/pretty"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
