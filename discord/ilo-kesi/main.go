@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"regexp"
 	"syscall"
 	"time"
 
@@ -36,6 +37,8 @@ type lipuSona struct {
 func init() {
 	rand.Seed(time.Now().UnixNano())
 }
+
+var mentionRex = regexp.MustCompile(`<((@!?\d+)|(:.+?:\d+))>`)
 
 func main() {
 	flag.Parse()
@@ -97,7 +100,7 @@ func main() {
 			return
 		}
 
-		s.ChannelMessageSend(m.ChannelID, chain.Generate(15))
+		s.ChannelMessageSend(m.ChannelID, mentionRex.ReplaceAllString(chain.Generate(15), "<narvi'a>"))
 	}
 
 	mc := func(s *discordgo.Session, m *discordgo.MessageCreate) {
