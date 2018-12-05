@@ -15,7 +15,7 @@ type Part struct {
 	Parts  []*Part  `json:"parts"`
 }
 
-func (p Part) String() string {
+func (p Part) Braces() string {
 	switch p.Type {
 	case PartPunctuation:
 		switch p.Tokens[0] {
@@ -27,6 +27,8 @@ func (p Part) String() string {
 			return "?"
 		case PunctComma:
 			return ","
+		case "la":
+			return "la"
 		}
 
 		panic("unknown punctuation " + p.Tokens[0])
@@ -42,11 +44,6 @@ func (p Part) String() string {
 
 	var sb strings.Builder
 
-	for _, pt := range p.Parts {
-		sb.WriteString(pt.String())
-		sb.WriteRune(' ')
-	}
-
 	if p.Sep != nil {
 		sb.WriteString(*p.Sep)
 		sb.WriteRune(' ')
@@ -54,6 +51,13 @@ func (p Part) String() string {
 
 	if len(p.Tokens) != 0 {
 		sb.WriteString(strings.Join(p.Tokens, " "))
+		sb.WriteRune(' ')
+	}
+
+	for _, pt := range p.Parts {
+		sb.WriteRune('^')
+		sb.WriteString(strings.TrimSpace(pt.Braces()))
+		sb.WriteRune('^')
 		sb.WriteRune(' ')
 	}
 

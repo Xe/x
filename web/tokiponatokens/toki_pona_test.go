@@ -1,10 +1,16 @@
 package tokiponatokens
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/kr/pretty"
+)
 
 func TestTokenizeTokiPona(t *testing.T) {
-	_, err := Tokenize("https://us-central1-golden-cove-408.cloudfunctions.net/function-1", "mi olin e sina.")
+	data, err := Tokenize("https://us-central1-golden-cove-408.cloudfunctions.net/function-1", "mi olin e sina.")
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	pretty.Println(data)
 }
