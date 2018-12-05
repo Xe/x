@@ -55,5 +55,6 @@ require (
 	golang.org/x/oauth2 v0.0.0-20181003184128-c57b0facaced
 	golang.org/x/sys v0.0.0-20181004145325-8469e314837c // indirect
 	gopkg.in/irc.v1 v1.3.0
+	gopkg.in/tucnak/telebot.v2 v2.0.0-20181115150921-4688194c178d
 	gopkg.in/yaml.v2 v2.2.1 // indirect
 )

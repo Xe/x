@@ -217,6 +217,8 @@ gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8
 gopkg.in/inf.v0 v0.9.1/go.mod h1:cWUDdTG/fYaXco+Dcufb5Vnc6Gp2YChqWtbxRZE0mXw=
 gopkg.in/irc.v1 v1.3.0 h1:28A0njDuHNueatbQZsRB78CaU8sueA8JWIXVvue60sg=
 gopkg.in/irc.v1 v1.3.0/go.mod h1:yXDeqklL7+ht3OdUIo0r8WaraGQyjyD+/92R1YxNZxM=
+gopkg.in/tucnak/telebot.v2 v2.0.0-20181115150921-4688194c178d h1:rwP+DFa5TQOEP7iCCc2z0ql57CtuI+divggCiXbuYR0=
+gopkg.in/tucnak/telebot.v2 v2.0.0-20181115150921-4688194c178d/go.mod h1:EmWSFwexO5JPTHiU7gDd9HMCCiyatACwO0HhuKNsOd0=
 gopkg.in/yaml.v2 v2.2.1 h1:mUhvW9EsL+naU5Q3cakzfE91YhliOondGd6ZrsDBHQE=
 gopkg.in/yaml.v2 v2.2.1/go.mod h1:hI93XBmqTisBFMUTm0b8Fm+jr3Dg1NNxqwp+5A1VGuI=
 grpc.go4.org v0.0.0-20170609214715-11d0a25b4919/go.mod h1:77eQGdRu53HpSqPFJFmuJdjuHRquDANNeA4x7B8WQ9o=
