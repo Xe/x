@@ -1,30 +1,24 @@
 module github.com/Xe/x
 
 require (
-	github.com/GeertJohan/yubigo v0.0.0-20140521141543-b1764f04aa9b // indirect
 	github.com/McKael/madon v2.3.0+incompatible
 	github.com/McKael/madon/v2 v2.0.0-20180929094633-c679abc985d6
-	github.com/Syfaro/finch v1.0.0
 	github.com/Xe/johaus v0.0.0-20181126154118-fe870a11f3b2
 	github.com/Xe/ln v0.1.2
 	github.com/aclements/go-moremath v0.0.0-20180329182055-b1aff36309c7 // indirect
 	github.com/bearbin/mcgorcon v0.0.0-20141104170123-f611ad04551a
-	github.com/belak/irc v2.1.0+incompatible
 	github.com/bwmarrin/discordgo v0.18.0
 	github.com/caarlos0/env v3.4.0+incompatible
 	github.com/codahale/hdrhistogram v0.0.0-20161010025455-3a0bb77429bd
 	github.com/dgryski/go-failure v0.0.0-20151001134759-4963dbd58fd0
 	github.com/dgryski/go-onlinestats v0.0.0-20170612111826-1c7d19468768 // indirect
 	github.com/disintegration/imaging v1.5.0
-	github.com/eaburns/johaus v0.0.0-20180211190535-0482c3c1f4ff
 	github.com/facebookgo/ensure v0.0.0-20160127193407-b4ab57deab51 // indirect
 	github.com/facebookgo/flagenv v0.0.0-20160425205200-fcd59fca7456
 	github.com/facebookgo/stack v0.0.0-20160209184415-751773369052 // indirect
 	github.com/facebookgo/subset v0.0.0-20150612182917-8dac2c3c4870 // indirect
 	github.com/fogleman/gg v1.1.0 // indirect
 	github.com/fogleman/primitive v0.0.0-20170926175833-69506c928bef
-	github.com/go-telegram-bot-api/telegram-bot-api v4.6.2+incompatible
-	github.com/go-telegram-bot-api/telegram-bot-api/v5 v5.0.0-rc1
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
 	github.com/google/go-github v17.0.0+incompatible
 	github.com/google/go-querystring v1.0.0 // indirect
@@ -39,7 +33,6 @@ require (
 	github.com/klauspost/crc32 v0.0.0-20170628072449-bab58d77464a // indirect
 	github.com/klauspost/reedsolomon v0.0.0-20180704173009-925cb01d6510 // indirect
 	github.com/kr/pretty v0.1.0
-	github.com/mzohreva/GoGraphviz v0.0.0-20180226085351-533f4a37d9c6 // indirect
 	github.com/olekukonko/tablewriter v0.0.0-20180912035003-be2c049b30cc // indirect
 	github.com/pborman/uuid v1.2.0
 	github.com/peterh/liner v1.1.0
@@ -55,7 +48,5 @@ require (
 	golang.org/x/image v0.0.0-20180926015637-991ec62608f3 // indirect
 	golang.org/x/oauth2 v0.0.0-20181003184128-c57b0facaced
 	golang.org/x/sys v0.0.0-20181004145325-8469e314837c // indirect
-	gopkg.in/irc.v1 v1.3.0
 	gopkg.in/tucnak/telebot.v2 v2.0.0-20181115150921-4688194c178d
-	gopkg.in/yaml.v2 v2.2.1 // indirect
 )
