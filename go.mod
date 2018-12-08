@@ -4,7 +4,7 @@ require (
 	github.com/McKael/madon v2.3.0+incompatible
 	github.com/McKael/madon/v2 v2.0.0-20180929094633-c679abc985d6
 	github.com/ThomasRooney/gexpect v0.0.0-20161231170123-5482f0350944
-	github.com/Xe/johaus v0.0.0-20181126154118-fe870a11f3b2
+	github.com/Xe/johaus v0.3.0
 	github.com/Xe/ln v0.1.2
 	github.com/aclements/go-moremath v0.0.0-20180329182055-b1aff36309c7 // indirect
 	github.com/ailncode/gluaxmlpath v0.0.0-20161126153117-6ce478ecb4a6
@@ -19,6 +19,7 @@ require (
 	github.com/dgryski/go-onlinestats v0.0.0-20170612111826-1c7d19468768 // indirect
 	github.com/digitalocean/godo v1.7.2
 	github.com/disintegration/imaging v1.5.0
+	github.com/eaburns/johaus v0.0.0-20181205134717-c190c280194d // indirect
 	github.com/facebookgo/ensure v0.0.0-20160127193407-b4ab57deab51 // indirect
 	github.com/facebookgo/flagenv v0.0.0-20160425205200-fcd59fca7456
 	github.com/facebookgo/stack v0.0.0-20160209184415-751773369052 // indirect

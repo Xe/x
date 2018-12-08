@@ -10,6 +10,8 @@ github.com/ThomasRooney/gexpect v0.0.0-20161231170123-5482f0350944 h1:CjexZrggt4
 github.com/ThomasRooney/gexpect v0.0.0-20161231170123-5482f0350944/go.mod h1:sPML5WwI6oxLRLPuuqbtoOKhtmpVDCYtwsps+I+vjIY=
 github.com/Xe/johaus v0.0.0-20181126154118-fe870a11f3b2 h1:UGyUwa0KVLJ8lA7A5wj9vreeQRDxnWCpTqyI6DRFM6s=
 github.com/Xe/johaus v0.0.0-20181126154118-fe870a11f3b2/go.mod h1:AxheHD7a8X/KIoOUFa2krQkHFIKqhoP+VTWqNJ+3Joo=
+github.com/Xe/johaus v0.0.0-20181205212019-e9efbbc86339/go.mod h1:AxheHD7a8X/KIoOUFa2krQkHFIKqhoP+VTWqNJ+3Joo=
+github.com/Xe/johaus v0.3.0/go.mod h1:AxheHD7a8X/KIoOUFa2krQkHFIKqhoP+VTWqNJ+3Joo=
 github.com/Xe/ln v0.1.2 h1:VTF6Z95Kdd6S1RSjpnn0DFJV5Do9cfmHTHsE9OGI1dw=
 github.com/Xe/ln v0.1.2/go.mod h1:GWZDvjL0ZC/9SSjY8DJ2IOrID6Lejs7D8pgQyjqMYSk=
 github.com/aclements/go-moremath v0.0.0-20180329182055-b1aff36309c7 h1:/NWziSfuX4cu00adiPldD8sdCpKxu6BZtLoALSyElZQ=
@@ -49,6 +51,7 @@ github.com/disintegration/imaging v1.5.0/go.mod h1:9B/deIUIrliYkyMTuXJd6OUFLcrZ2
 github.com/dustin/go-humanize v0.0.0-20180713052910-9f541cc9db5d/go.mod h1:HtrtbFcZ19U5GC7JDqmcUSB87Iq5E25KnS6fMYU6eOk=
 github.com/eaburns/johaus v0.0.0-20180211190535-0482c3c1f4ff h1:UYJFJoLfHqPuxd9K20qy55nl1d0SLMPMChu0mesV1Nw=
 github.com/eaburns/johaus v0.0.0-20180211190535-0482c3c1f4ff/go.mod h1:haq7Ati+IITjB94ZcX9Pur49JW6bQRs/yTcYaqDPxsc=
+github.com/eaburns/johaus v0.0.0-20181205134717-c190c280194d/go.mod h1:haq7Ati+IITjB94ZcX9Pur49JW6bQRs/yTcYaqDPxsc=
 github.com/eaburns/peggy v0.0.0-20180405011029-d685ddd3cbcb h1:VNtdhXiCNFtQkeRwcS8XW2+gyxollG4Kc4wnHbzGpP8=
 github.com/eaburns/peggy v0.0.0-20180405011029-d685ddd3cbcb/go.mod h1:5tfPwI6ukiK3W5vJzkj5MBQKHHY9Gcy2y6k1FC/23Xk=
 github.com/eaburns/pretty v0.0.0-20170305202417-362524b72369 h1:C/RhDONMNTxvyaQNWbxj2RAyHOGVYoq+kP5j9hdnYOk=
