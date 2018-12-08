@@ -12,6 +12,7 @@ require (
 	github.com/codahale/hdrhistogram v0.0.0-20161010025455-3a0bb77429bd
 	github.com/dgryski/go-failure v0.0.0-20151001134759-4963dbd58fd0
 	github.com/dgryski/go-onlinestats v0.0.0-20170612111826-1c7d19468768 // indirect
+	github.com/digitalocean/godo v1.7.2
 	github.com/disintegration/imaging v1.5.0
 	github.com/facebookgo/ensure v0.0.0-20160127193407-b4ab57deab51 // indirect
 	github.com/facebookgo/flagenv v0.0.0-20160425205200-fcd59fca7456
@@ -19,6 +20,7 @@ require (
 	github.com/facebookgo/subset v0.0.0-20150612182917-8dac2c3c4870 // indirect
 	github.com/fogleman/gg v1.1.0 // indirect
 	github.com/fogleman/primitive v0.0.0-20170926175833-69506c928bef
+	github.com/garyburd/redigo v1.6.0
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
 	github.com/google/go-github v17.0.0+incompatible
 	github.com/google/go-querystring v1.0.0 // indirect
@@ -39,6 +41,7 @@ require (
 	github.com/pkg/errors v0.8.0
 	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect
 	github.com/streamrail/concurrent-map v0.0.0-20160823150647-8bf1e9bacbf6
+	github.com/tent/http-link-go v0.0.0-20130702225549-ac974c61c2f9 // indirect
 	github.com/tmc/scp v0.0.0-20170824174625-f7b48647feef
 	github.com/xtaci/kcp-go v2.0.3+incompatible
 	github.com/xtaci/smux v1.0.7
@@ -48,5 +51,7 @@ require (
 	golang.org/x/image v0.0.0-20180926015637-991ec62608f3 // indirect
 	golang.org/x/oauth2 v0.0.0-20181003184128-c57b0facaced
 	golang.org/x/sys v0.0.0-20181004145325-8469e314837c // indirect
+	gopkg.in/irc.v1 v1.3.0
 	gopkg.in/tucnak/telebot.v2 v2.0.0-20181115150921-4688194c178d
+	gopkg.in/yaml.v2 v2.2.2 // indirect
 )
