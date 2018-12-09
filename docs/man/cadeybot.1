@@ -1,0 +1,62 @@
+.Dd December 19, 2018
+.Dt CADEYBOT 1 URM
+
+
+.Sh NAME
+.Nm cadeybot
+.Nd Markov bot based on my discord GDPR dump.
+
+
+.Sh SYNOPSIS
+.Nm
+.Op Fl token Ar TOKEN
+.Op Fl brain Ar BRAIN
+
+
+.Sh DESCRIPTION
+.Nm
+is a simple markov chatbot. Mention it in any channel the bot is in to make it spew out amusing text.
+
+.Bl -tag -width " " -offset indent -compact
+
+.It Ev TOKEN Fl token Ar TOKEN
+Specifies the Discord token that 
+.Nm
+will use for client communication.
+
+.It Ev BRAIN Fl token Ar TOKEN
+Specifies the Markov chain brain that
+.Nm
+should load data into cadey.gob from.
+
+.El
+
+
+.Sh IMPLEMENTATION NOTES
+
+In order for 
+.Nm
+to get markov bot data, please put the importer tool and corpusmake.sh into the messages folder of your Discord GDPR dump. Then run corpusmake.sh and pass the resulting brain.txt as -brain to
+.Nm .
+
+
+.Sh EXAMPLES
+
+.Li cadeybot
+
+.Li cadeybot -brain brain.txt
+
+
+.Sh DIAGNOSTICS
+
+.Ex -std cadeybot
+
+
+.Sh SEE ALSO
+
+.Bl -bullet
+
+.It
+.Lk hyperlink: https://discordapp.com Discord
+
+.El

@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/Xe/x/internal"
 	"github.com/Xe/x/web/ghstat"
 )
 
@@ -20,6 +21,7 @@ var (
 
 func main() {
 	flag.Parse()
+	internal.HandleLicense()
 
 	if *messageFlag {
 		req := ghstat.LastMessage()

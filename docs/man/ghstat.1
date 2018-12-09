@@ -1,0 +1,75 @@
+.Dd December 09, 2018
+.Dt GHSTAT 1 URM
+
+
+.Sh NAME
+.Nm ghstat
+.Nd Look up and summarize the status of GitHub.
+
+
+.Sh SYNOPSIS
+.Nm
+.Op Fl license
+.Op Fl message
+
+
+
+.Sh DESCRIPTION
+.Nm
+is a small tool to help users look up information about
+.Lk hyperlink: https://github.com GitHub
+system status as viewed by their
+.Lk hyperlink: https://status.github.com Status API
+.
+
+By default this tool will print a very small summary of GitHub status followed by the time the last update was made in RFC 3339 time format.
+
+Here's an example:
+
+.Li $ ghstat
+.Li Status: good (2018-12-06T17:09:57Z)
+
+.Bl -tag -width " " -offset indent -compact
+
+.It Fl license
+If set, the tool will show its software license details and then exit.
+
+.It Fl message
+If set, the tool will show the last status message from GitHub more verbosely like such:
+
+.Li $ ghstat -message
+.Li Last message:
+.Li Status:  good
+.Li Message: 
+.Li Time:    
+
+When there is a message relevant to the status, it and its time will be shown here.
+
+.El
+
+
+.Sh EXAMPLES
+
+.Li ghstat
+
+.Li ghstat -license
+
+.Li ghstat -message
+
+
+.Sh DIAGNOSTICS
+
+.Ex -std ghstat
+
+
+.Sh SEE ALSO
+
+.Bl -bullet
+
+.It
+.Lk hyperlink: https://github.com GitHub
+
+.It
+.Lk hyperlink: https://status.github.com GitHub Status
+
+.El

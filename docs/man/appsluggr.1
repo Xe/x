@@ -1,0 +1,113 @@
+.Dd December 09, 2018
+.Dt APPSLUGGR 1 URM
+
+
+.Sh NAME
+.Nm appsluggr
+.Nd appsluggr packages a precompiled binary application as a Heroku style slug for use with Dokku.
+
+
+.Sh SYNOPSIS
+.Nm
+
+.Op Fl fname
+.Op Fl license
+.Op Fl web
+.Op Fl web-scale
+.Op Fl worker
+.Op Fl worker-scale
+
+
+.Sh DESCRIPTION
+.Nm
+is a small tool to package
+.Li GOOS=linux GOARCH=amd64
+binaries for consumption on
+.Li hyperlink: http://dokku.viewdocs.io/dokku/ Dokku
+.
+
+.Bl -tag -width " " -offset indent -compact
+
+.It Fl fname
+The filename to write the resulting slug to.
+
+The default value for this is
+.Li slug.tar.gz
+.
+
+.It Fl license
+If set, the tool will show its software license details and then exit.
+
+.It Fl web
+The path to the binary for the web process.
+
+One of
+.Fl web
+or
+.Fl worker
+must be set.
+
+.It Fl web-scale
+The default scale for web process if defined.
+
+The default value for this is 1.
+
+.It Fl worker
+The path to the binary for the worker process.
+One of
+.Fl web
+or
+.Fl worker
+must be set.
+
+.It Fl worker-scale
+The default scale for the worker process if defined.
+
+The default value for this is 1
+
+.El
+
+
+.Sh EXAMPLES
+
+.Li appsluggr
+
+.Li appsluggr -web web
+
+.Li appsluggr -worker ilo-sona
+
+.Li appsluggr -fname foo.tar.gz -web web -worker worker -web-scale 4 -worker-scale 16
+
+
+.Sh IMPLEMENTATION NOTES
+
+.Nm
+when used with
+.Lk hyperlink: http://dokku.viewdocs.io/dokku/ Dokku
+requires the use of the
+.Lk hyperlink: https://github.com/ryandotsmith/null-buildpack Null Buildpack
+as follows:
+
+.Li $ dokku config:set $APP_NAME BUILDPACK_URL=https://github.com/ryandotsmith/null-buildpack
+
+Or
+
+.Li $ ssh dokku@host config:set <see above>
+
+
+.Sh DIAGNOSTICS
+
+.Ex -std appsluggr
+
+
+.Sh SEE ALSO
+
+.Bl -bullet
+
+.It
+.Lk hyperlink: http://dokku.viewdocs.io/dokku/ Dokku
+
+.It
+.Lk hyperlink: https://github.com/ryandotsmith/null-buildpack Null Buildpack
+
+.El

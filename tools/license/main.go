@@ -35,7 +35,6 @@ func init() {
 
 func main() {
 	flag.Parse()
-
 	internal.HandleLicense()
 
 	if *showAll {

@@ -1,0 +1,130 @@
+.Dd December 19, 2018
+.Dt ILO-KESI 1 URM
+
+
+.Sh NAME
+.Nm ilo-kesi
+.Nd ni li ilo sona pi toki pona.
+
+
+.Sh SYNOPSIS
+.Nm
+.Op Fl repl Ar TOKEN
+
+
+.Sh DESCRIPTION
+.Nm
+communicates with Discord and scans every message in every channel it is in for the following pattern:
+
+.Li ilo ${ILO_NIMI} o
+
+This is usually:
+
+.Li ilo Kesi o
+
+When this condition is met, the chat message will be posted to the
+.Ev TOKI_PONA_TOKENIZER_API_URL
+and the resulting parsed sentences will be analyzed for what is being asked, and then it will be done.
+
+This only works on sentences written in the
+.Lk hyperlink http://tokipona.org Toki Pona
+constructed language.
+
+.Bl -tag -width "routed" -offset -indent -compact
+
+.It Fl repl Ar REPL
+When this flag is passed,
+.Nm
+will function in a mode where it does not connect to discord. This is useful when debugging parts of the grammar parsing. You can pass a junk value to
+.Ev DISCORD_TOKEN
+to help make testing easier.
+
+.El
+
+
+.Sh ENVIRONMENT
+
+.Bl -tag -width " " -offset indent -compact
+
+.It Ev DISCORD_TOKEN
+Specifies the Discord token that 
+.Nm
+will use for client communication.
+
+.It Ev TOKI_PONA_TOKENIZER_API_URL
+Specifies the URL that 
+.Nm
+will use to tokenize Toki Pona sentences. This should be some instance of the following serverless function:
+
+.Lk hyperlink: https://github.com/Xe/x/blob/master/discord/ilo-kesi/function/index.js
+
+The default value for this is:
+
+.Lk hyperlink: https://us-central1-golden-cove-408.cloudfunctions.net/function-1
+
+.It Ev SWITCH_COUNTER_WEBHOOK
+Specifies the URL that
+.Nm
+will use to communicate with
+.Lk hyperlink: https://www.switchcounter.science Switch Counter
+.
+This will be used mainly to read data, unless the user in question is a member of the
+.Ev JAN_LAWA
+id set.
+
+.It Ev ILO_NIMI
+Specifies the name of
+.Nm
+when being commanded to do stuff. This defaults to
+.Li Kesi
+.
+
+.It JAN_LAWA
+Specifies the list of people (via Discord user ID's) that are allowed to use
+.Nm
+to submit switch data to
+.Lk hyperlink: https://www.switchcounter.science Switch Counter
+.
+
+.El
+
+
+.Sh IMPLEMENTATION NOTES
+
+.Nm
+requires a brain created by
+.Xr cadeybot 1
+.
+
+.Nm
+requires a webhook from
+.Lk hyperlink: https://www.switchcounter.science Switch Counter
+.
+
+
+.Sh EXAMPLES
+
+ilo-kesi
+
+ilo-kesi -repl
+
+
+.Sh DIAGNOSTICS
+
+.Ex -std ilo-kesi
+
+
+.Sh SEE ALSO
+
+.Bl -bullet
+
+.It
+.Lk hyperlink: https://discordapp.com Discord
+
+.It
+.Lk hyperlink http://tokipona.org Toki Pona
+
+.It
+.Lk hyperlink: https://www.switchcounter.science Switch Counter
+
+.El
