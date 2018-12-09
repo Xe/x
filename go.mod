@@ -59,6 +59,7 @@ require (
 	github.com/peterh/liner v1.1.0
 	github.com/pkg/errors v0.8.0
 	github.com/pkg/sftp v1.8.3 // indirect
+	github.com/russross/blackfriday-tool v0.0.0-20120308051103-a78eb387e806 // indirect
 	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect
 	github.com/streamrail/concurrent-map v0.0.0-20160823150647-8bf1e9bacbf6
 	github.com/tent/http-link-go v0.0.0-20130702225549-ac974c61c2f9 // indirect
