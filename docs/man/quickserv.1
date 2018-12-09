@@ -1,0 +1,44 @@
+.Dd December 12, 2017
+.Dt QUICKSERV 1 PRM
+
+
+.Sh NAME
+.Nm quickserv
+.Nd quickly and dirtily serve a folder as a HTTP server.
+
+
+.Sh SYNOPSIS
+.Nm
+.Op Fl dir
+.Op Fl port
+
+
+.Sh DESCRIPTION
+.Nm
+serves a local directory of files as an HTTP server.
+
+.Bl -tag -width " " -offset indent -compact
+
+.It Fl dir
+Specifies the local path to be served over HTTP.
+
+.It Fl port
+Specifies the TCP port that quickserv will bind to.
+
+.El
+
+
+.Sh EXAMPLES
+
+.Li quickserv
+
+.Li quickserv -dir ~/public_html -port 9001
+
+
+.Sh SEE ALSO
+
+.Bl -bullet
+
+.It
+.Lk hyperlink: https://godoc.org/net/http#Dir
+
