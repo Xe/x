@@ -11,6 +11,7 @@ github.com/ThomasRooney/gexpect v0.0.0-20161231170123-5482f0350944/go.mod h1:sPM
 github.com/Xe/johaus v0.0.0-20181126154118-fe870a11f3b2 h1:UGyUwa0KVLJ8lA7A5wj9vreeQRDxnWCpTqyI6DRFM6s=
 github.com/Xe/johaus v0.0.0-20181126154118-fe870a11f3b2/go.mod h1:AxheHD7a8X/KIoOUFa2krQkHFIKqhoP+VTWqNJ+3Joo=
 github.com/Xe/johaus v0.0.0-20181205212019-e9efbbc86339/go.mod h1:AxheHD7a8X/KIoOUFa2krQkHFIKqhoP+VTWqNJ+3Joo=
+github.com/Xe/johaus v0.3.0 h1:zw+G99Q/xHx0bL4CQHi2y1C3xGpoXMURrAwhIMsclrk=
 github.com/Xe/johaus v0.3.0/go.mod h1:AxheHD7a8X/KIoOUFa2krQkHFIKqhoP+VTWqNJ+3Joo=
 github.com/Xe/ln v0.1.2 h1:VTF6Z95Kdd6S1RSjpnn0DFJV5Do9cfmHTHsE9OGI1dw=
 github.com/Xe/ln v0.1.2/go.mod h1:GWZDvjL0ZC/9SSjY8DJ2IOrID6Lejs7D8pgQyjqMYSk=
