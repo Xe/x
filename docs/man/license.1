@@ -9,9 +9,9 @@
 
 .Sh SYNOPSIS
 .Nm
-.Op Fl email
+.Op Fl email Ar address
 .Op Fl license
-.Op Fl name
+.Op Fl name Ar name
 .Op Fl out
 .Op Fl show
 
@@ -26,7 +26,7 @@ to parse out your email and "real name" when relevant for the license template r
 .Bl -tag -width " " -offset indent -compact
 
 
-.It Fl email
+.It Fl email Ar address
 The email of the person licensing the software. This should be your email, or a corporation's email. If in doubt, ask a lawyer what to put here.
 
 The default value for this is derived from
@@ -40,7 +40,7 @@ If set,
 .Nm
 will show its software license details and then exit.
 
-.It Fl name
+.It Fl name Ar name
 The name of the person licensing the software. This should be your name, or a corporation's name. If in doubt, ask a lawyer what to put here.
 
 The default value for this is derived from
