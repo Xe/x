@@ -7,12 +7,12 @@ import (
 	"net/http"
 
 	madon "github.com/McKael/madon/v2"
-	"github.com/Xe/ln"
-	"github.com/Xe/ln/opname"
 	"github.com/Xe/x/web/tokipana"
 	"github.com/jaytaylor/html2text"
 	"github.com/joeshaw/envdecode"
 	_ "github.com/joho/godotenv/autoload"
+	"within.website/ln"
+	"within.website/ln/opname"
 )
 
 type lipuSona struct {

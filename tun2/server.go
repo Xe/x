@@ -16,12 +16,12 @@ import (
 	"sync"
 	"time"
 
-	"github.com/Xe/ln"
-	"github.com/Xe/ln/opname"
 	failure "github.com/dgryski/go-failure"
 	"github.com/pborman/uuid"
 	cmap "github.com/streamrail/concurrent-map"
 	"github.com/xtaci/smux"
+	"within.website/ln"
+	"within.website/ln/opname"
 )
 
 // Error values

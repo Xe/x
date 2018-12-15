@@ -11,8 +11,8 @@ import (
 	"net/http/httputil"
 	"net/url"
 
-	"github.com/Xe/ln"
-	"github.com/Xe/ln/opname"
+	"within.website/ln"
+	"within.website/ln/opname"
 	kcp "github.com/xtaci/kcp-go"
 	"github.com/xtaci/smux"
 )
