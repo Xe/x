@@ -59,6 +59,11 @@ func SentenceToSelbris(s tokiponatokens.Sentence) ([]Selbri, error) {
 	for _, pt := range s {
 		switch pt.Type {
 		case tokiponatokens.PartSubject:
+			if strings.Contains(pt.Braces(), " en ") {
+				subjects = append(subjects, strings.Split(strings.Join(pt.Tokens, " "), " en ")...)
+				continue
+			}
+
 			subjects = append(subjects, strings.Join(pt.Tokens, "_"))
 
 		case tokiponatokens.PartVerbMarker:
@@ -68,8 +73,8 @@ func SentenceToSelbris(s tokiponatokens.Sentence) ([]Selbri, error) {
 			objects = append(objects, strings.Join(pt.Tokens, "_"))
 
 		case tokiponatokens.PartPunctuation:
-			if pt.Sep != nil {
-				switch *pt.Sep {
+			if len(pt.Tokens) == 1 {
+				switch pt.Tokens[0] {
 				case "la":
 					context = append(context, subjects[len(subjects)-1])
 					subjects = subjects[:len(subjects)-1]
@@ -87,18 +92,20 @@ func SentenceToSelbris(s tokiponatokens.Sentence) ([]Selbri, error) {
 
 	var result []Selbri
 
-	for _, v := range verbs {
-		// sumti: x1 is a/the argument of predicate function x2 filling place x3 (kind/number)
-		sumti := append([]string{}, context...)
-		sumti = append(sumti, subjects...)
-		sumti = append(sumti, objects...)
+	for _, s := range subjects {
+		for _, v := range verbs {
+			// sumti: x1 is a/the argument of predicate function x2 filling place x3 (kind/number)
+			sumti := append([]string{}, context...)
+			sumti = append(sumti, s)
+			sumti = append(sumti, objects...)
 
-		r := Selbri{
-			Predicate: v,
-			Arguments: sumti,
+			r := Selbri{
+				Predicate: v,
+				Arguments: sumti,
+			}
+
+			result = append(result, r)
 		}
-
-		result = append(result, r)
 	}
 
 	return result, nil

@@ -79,7 +79,7 @@ func TestSentenceToSelbris(t *testing.T) {
 			wantFacts: []string{"ala(tenpo_ni, A)."},
 		},
 		{
-			name: "multiple_verbs",
+			name: "multiple verbs",
 			json: []byte(`[{"part":"subject","tokens":["ona"]},{"part":"verbMarker","sep":"li","tokens":["sona"]},{"part":"verbMarker","sep":"li","tokens":["pona"]},{"part":"objectMarker","sep":"e","tokens":["mute"]},{"part":"punctuation","tokens":["period"]}]`),
 			want: []Selbri{
 				{
@@ -92,6 +92,44 @@ func TestSentenceToSelbris(t *testing.T) {
 				},
 			},
 			wantFacts: []string{"sona(ona, mute).", "pona(ona, mute)."},
+		},
+		{
+			name: "multiple subjects and verbs",
+			json: []byte(`[{"part":"subject","tokens":["ona","en","sina","en","mi"]},{"part":"verbMarker","sep":"li","tokens":["sona"]},{"part":"verbMarker","sep":"li","tokens":["pona"]},{"part":"objectMarker","sep":"e","tokens":["mute"]},{"part":"punctuation","tokens":["period"]}]`),
+			want: []Selbri{
+				{
+					Predicate: "sona",
+					Arguments: []string{"ona", "mute"},
+				},
+				{
+					Predicate: "pona",
+					Arguments: []string{"ona", "mute"},
+				},
+				{
+					Predicate: "sona",
+					Arguments: []string{"sina", "mute"},
+				},
+				{
+					Predicate: "pona",
+					Arguments: []string{"sina", "mute"},
+				},
+				{
+					Predicate: "sona",
+					Arguments: []string{"mi", "mute"},
+				},
+				{
+					Predicate: "pona",
+					Arguments: []string{"mi", "mute"},
+				},
+			},
+			wantFacts: []string{
+				"sona(ona, mute).",
+				"pona(ona, mute).",
+				"sona(sina, mute).",
+				"pona(sina, mute).",
+				"sona(mi, mute).",
+				"pona(mi, mute).",
+			},
 		},
 	}
 
