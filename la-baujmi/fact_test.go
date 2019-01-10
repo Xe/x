@@ -15,8 +15,14 @@ func equal(a, b []string) bool {
 	if len(a) != len(b) {
 		return false
 	}
-	for i, v := range a {
-		if v != b[i] {
+	for _, v := range a {
+		var has bool
+		for _, vv := range b {
+			if v == vv {
+				has = true
+			}
+		}
+		if !has {
 			return false
 		}
 	}
@@ -27,8 +33,15 @@ func selbrisEqual(a, b []Selbri) bool {
 	if len(a) != len(b) {
 		return false
 	}
-	for i := range a {
-		if !a[i].Eq(b[i]) {
+	for _, v := range a {
+		var has bool
+		for _, vv := range b {
+			if v.Eq(vv) {
+				has = true
+			}
+		}
+
+		if !has {
 			return false
 		}
 	}
@@ -131,6 +144,74 @@ func TestSentenceToSelbris(t *testing.T) {
 				"pona(mi, mute).",
 			},
 		},
+		{
+			name: "multiple subjects and verbs and objects",
+			json: []byte(`[{"part":"subject","tokens":["ona","en","sina","en","mi"]},{"part":"verbMarker","sep":"li","tokens":["sona"]},{"part":"verbMarker","sep":"li","tokens":["pona"]},{"part":"objectMarker","sep":"e","tokens":["ijo","mute"]},{"part":"objectMarker","sep":"e","tokens":["ilo","mute"]},{"part":"punctuation","tokens":["period"]}]`),
+			want: []Selbri{
+				{
+					Predicate: "sona",
+					Arguments: []string{"ona", "ijo_mute"},
+				},
+				{
+					Predicate: "sona",
+					Arguments: []string{"ona", "ilo_mute"},
+				},
+				{
+					Predicate: "pona",
+					Arguments: []string{"ona", "ijo_mute"},
+				},
+				{
+					Predicate: "pona",
+					Arguments: []string{"ona", "ilo_mute"},
+				},
+				{
+					Predicate: "sona",
+					Arguments: []string{"sina", "ijo_mute"},
+				},
+				{
+					Predicate: "sona",
+					Arguments: []string{"sina", "ilo_mute"},
+				},
+				{
+					Predicate: "pona",
+					Arguments: []string{"sina", "ijo_mute"},
+				},
+				{
+					Predicate: "pona",
+					Arguments: []string{"sina", "ilo_mute"},
+				},
+				{
+					Predicate: "sona",
+					Arguments: []string{"mi", "ijo_mute"},
+				},
+				{
+					Predicate: "sona",
+					Arguments: []string{"mi", "ilo_mute"},
+				},
+				{
+					Predicate: "pona",
+					Arguments: []string{"mi", "ijo_mute"},
+				},
+				{
+					Predicate: "pona",
+					Arguments: []string{"mi", "ilo_mute"},
+				},
+			},
+			wantFacts: []string{
+				"sona(ona, ijo_mute).",
+				"sona(ona, ilo_mute).",
+				"sona(sina, ijo_mute).",
+				"sona(sina, ilo_mute).",
+				"sona(mi, ijo_mute).",
+				"sona(mi, ilo_mute).",
+				"pona(ona, ijo_mute).",
+				"pona(ona, ilo_mute).",
+				"pona(sina, ijo_mute).",
+				"pona(sina, ilo_mute).",
+				"pona(mi, ijo_mute).",
+				"pona(mi, ilo_mute).",
+			},
+		},
 	}
 
 	for _, cs := range cases {
@@ -152,7 +233,7 @@ func TestSentenceToSelbris(t *testing.T) {
 				log.Println("got:")
 				pretty.Println(sb)
 
-				t.Fatal("see logs")
+				t.Error("see logs")
 			}
 
 			var facts []string
@@ -164,7 +245,7 @@ func TestSentenceToSelbris(t *testing.T) {
 				if !equal(cs.wantFacts, facts) {
 					t.Logf("wanted: %v", cs.wantFacts)
 					t.Logf("got:    %v", facts)
-					t.Fatal("see -v")
+					t.Error("see -v")
 				}
 			})
 		})

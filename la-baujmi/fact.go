@@ -53,7 +53,7 @@ func SentenceToSelbris(s tokiponatokens.Sentence) ([]Selbri, error) {
 		subjects []string
 		verbs    []string
 		objects  []string
-		context  []string
+		context  string
 	)
 
 	for _, pt := range s {
@@ -76,7 +76,7 @@ func SentenceToSelbris(s tokiponatokens.Sentence) ([]Selbri, error) {
 			if len(pt.Tokens) == 1 {
 				switch pt.Tokens[0] {
 				case "la":
-					context = append(context, subjects[len(subjects)-1])
+					context = subjects[len(subjects)-1]
 					subjects = subjects[:len(subjects)-1]
 
 				case tokiponatokens.PunctComma:
@@ -92,19 +92,40 @@ func SentenceToSelbris(s tokiponatokens.Sentence) ([]Selbri, error) {
 
 	var result []Selbri
 
-	for _, s := range subjects {
-		for _, v := range verbs {
-			// sumti: x1 is a/the argument of predicate function x2 filling place x3 (kind/number)
-			sumti := append([]string{}, context...)
-			sumti = append(sumti, s)
-			sumti = append(sumti, objects...)
+	for _, v := range verbs {
+		for _, s := range subjects {
+			if len(objects) == 0 {
+				// sumti: x1 is a/the argument of predicate function x2 filling place x3 (kind/number)
+				var sumti []string
+				if context != "" {
+					sumti = append([]string{}, context)
+				}
+				sumti = append(sumti, s)
 
-			r := Selbri{
-				Predicate: v,
-				Arguments: sumti,
+				r := Selbri{
+					Predicate: v,
+					Arguments: sumti,
+				}
+
+				result = append(result, r)
 			}
 
-			result = append(result, r)
+			for _, o := range objects {
+				// sumti: x1 is a/the argument of predicate function x2 filling place x3 (kind/number)
+				var sumti []string
+				if context != "" {
+					sumti = append([]string{}, context)
+				}
+				sumti = append(sumti, s)
+				sumti = append(sumti, o)
+
+				r := Selbri{
+					Predicate: v,
+					Arguments: sumti,
+				}
+
+				result = append(result, r)
+			}
 		}
 	}
 
