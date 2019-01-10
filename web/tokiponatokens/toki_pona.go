@@ -70,6 +70,7 @@ const (
 	PartAddress      = `address`
 	PartSubject      = `subject`
 	PartObjectMarker = `objectMarker`
+	PartVerbMarker   = `verbMarker`
 	PartPrepPhrase   = `prepPhrase`
 	PartInterjection = `interjection`
 	// A foreign name.
