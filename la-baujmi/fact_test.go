@@ -78,6 +78,21 @@ func TestSentenceToSelbris(t *testing.T) {
 			},
 			wantFacts: []string{"ala(tenpo_ni, A)."},
 		},
+		{
+			name: "multiple_verbs",
+			json: []byte(`[{"part":"subject","tokens":["ona"]},{"part":"verbMarker","sep":"li","tokens":["sona"]},{"part":"verbMarker","sep":"li","tokens":["pona"]},{"part":"objectMarker","sep":"e","tokens":["mute"]},{"part":"punctuation","tokens":["period"]}]`),
+			want: []Selbri{
+				{
+					Predicate: "sona",
+					Arguments: []string{"ona", "mute"},
+				},
+				{
+					Predicate: "pona",
+					Arguments: []string{"ona", "mute"},
+				},
+			},
+			wantFacts: []string{"sona(ona, mute).", "pona(ona, mute)."},
+		},
 	}
 
 	for _, cs := range cases {
