@@ -48,16 +48,19 @@ toki(jan_Kesi, jan_Pola).
 jan Kesi li toki e toki pona.
 Cadey is talking about toki pona.
 toki(jan_Kesi, toki_pona).
+
+ilo Kesi o, toki e jan Kesi.
+Robo-Cadey: talk about Cadey.
+command(ilo_Kesi, toki(ziho, jan_Kesi)). % ziho -> nothing in lojban (zi'o)
 ```
 
 And then we can ask prolog questions about this sentence:
 
 ```
 seme li toki?
-```
-
-```
 > toki(X).
 toki(jan_Kesi).
 jan Kesi li toki.
+toki(jan_Pola).
+jan Pola li toki.
 ```
