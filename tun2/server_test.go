@@ -10,8 +10,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Xe/ln/opname"
 	"github.com/pborman/uuid"
+	"within.website/ln/opname"
 )
 
 // testing constants

@@ -9,11 +9,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/Xe/ln"
-	"github.com/Xe/ln/opname"
 	failure "github.com/dgryski/go-failure"
 	"github.com/pkg/errors"
 	"github.com/xtaci/smux"
+	"within.website/ln"
+	"within.website/ln/opname"
 )
 
 // Connection is a single active client -> server connection and session

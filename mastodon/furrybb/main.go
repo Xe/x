@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/McKael/madon"
-	"github.com/Xe/ln"
+	"within.website/ln"
 	"github.com/caarlos0/env"
 	_ "github.com/joho/godotenv/autoload"
 )

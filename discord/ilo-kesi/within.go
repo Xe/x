@@ -6,6 +6,7 @@ var tokiToWithin = map[string]string{
 	"Lesi": "Jessie",
 	"Sesi": "Sephie",
 	"Ase":  "Ashe",
+	"Mai":  "Mai",
 }
 
 var withinToToki = map[string]string{
@@ -14,4 +15,5 @@ var withinToToki = map[string]string{
 	"Jessie": "Lesi",
 	"Sephie": "Sesi",
 	"Ashe":   "Ase",
+	"Mai":    "Mai",
 }

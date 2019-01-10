@@ -1,5 +1,7 @@
 module github.com/Xe/x
 
+go 1.11.2
+
 require (
 	github.com/McKael/madon v2.3.0+incompatible
 	github.com/McKael/madon/v2 v2.0.0-20180929094633-c679abc985d6
@@ -8,7 +10,6 @@ require (
 	github.com/Xe/ln v0.1.2
 	github.com/aclements/go-moremath v0.0.0-20180329182055-b1aff36309c7 // indirect
 	github.com/ailncode/gluaxmlpath v0.0.0-20161126153117-6ce478ecb4a6
-	github.com/bearbin/mcgorcon v0.0.0-20141104170123-f611ad04551a
 	github.com/brandur/simplebox v0.0.0-20150921201729-84e9865bb03a
 	github.com/bwmarrin/discordgo v0.18.0
 	github.com/caarlos0/env v3.4.0+incompatible
@@ -17,9 +18,7 @@ require (
 	github.com/codahale/hdrhistogram v0.0.0-20161010025455-3a0bb77429bd
 	github.com/dgryski/go-failure v0.0.0-20151001134759-4963dbd58fd0
 	github.com/dgryski/go-onlinestats v0.0.0-20170612111826-1c7d19468768 // indirect
-	github.com/digitalocean/godo v1.7.2
 	github.com/disintegration/imaging v1.5.0
-	github.com/eaburns/johaus v0.0.0-20181205134717-c190c280194d // indirect
 	github.com/facebookgo/ensure v0.0.0-20160127193407-b4ab57deab51 // indirect
 	github.com/facebookgo/flagenv v0.0.0-20160425205200-fcd59fca7456
 	github.com/facebookgo/stack v0.0.0-20160209184415-751773369052 // indirect
@@ -59,9 +58,10 @@ require (
 	github.com/peterh/liner v1.1.0
 	github.com/pkg/errors v0.8.0
 	github.com/pkg/sftp v1.8.3 // indirect
+	github.com/robertkrimen/godocdown v0.0.0-20130622164427-0bfa04905481
+	github.com/russross/blackfriday-tool v0.0.0-20120308051103-a78eb387e806
 	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect
 	github.com/streamrail/concurrent-map v0.0.0-20160823150647-8bf1e9bacbf6
-	github.com/tent/http-link-go v0.0.0-20130702225549-ac974c61c2f9 // indirect
 	github.com/tmc/scp v0.0.0-20170824174625-f7b48647feef
 	github.com/xtaci/kcp-go v2.0.3+incompatible
 	github.com/xtaci/smux v1.0.7
@@ -75,9 +75,10 @@ require (
 	golang.org/x/image v0.0.0-20180926015637-991ec62608f3 // indirect
 	golang.org/x/oauth2 v0.0.0-20181003184128-c57b0facaced
 	golang.org/x/sys v0.0.0-20181004145325-8469e314837c // indirect
-	gopkg.in/irc.v1 v1.3.0
 	gopkg.in/tucnak/telebot.v2 v2.0.0-20181115150921-4688194c178d
 	gopkg.in/xmlpath.v2 v2.0.0-20150820204837-860cbeca3ebc // indirect
 	gopkg.in/yaml.v2 v2.2.2 // indirect
 	layeh.com/gopher-json v0.0.0-20181116191917-d3d498bb4913
+	layeh.com/gopher-luar v1.0.4 // indirect
+	within.website/ln v0.3.0
 )

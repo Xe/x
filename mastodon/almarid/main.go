@@ -12,9 +12,9 @@ import (
 	"time"
 
 	"github.com/McKael/madon"
-	"github.com/Xe/ln"
 	"github.com/caarlos0/env"
 	_ "github.com/joho/godotenv/autoload"
+	"within.website/ln"
 )
 
 var cfg = &struct {
