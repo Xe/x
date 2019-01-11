@@ -1,0 +1,4 @@
+#!/bin/sh
+
+export GO_VERSION=1.11.4
+ko build $*
