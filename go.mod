@@ -56,7 +56,7 @@ require (
 	github.com/otm/gluash v0.0.0-20151226163409-e145c563986f
 	github.com/pborman/uuid v1.2.0
 	github.com/peterh/liner v1.1.0
-	github.com/pkg/errors v0.8.0
+	github.com/pkg/errors v0.8.1
 	github.com/robertkrimen/godocdown v0.0.0-20130622164427-0bfa04905481
 	github.com/russross/blackfriday-tool v0.0.0-20120308051103-a78eb387e806
 	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect
