@@ -1,6 +1,6 @@
 module github.com/Xe/x
 
-go 1.11.2
+go 1.11.4
 
 require (
 	github.com/Greyh4t/gluassh v0.0.0-20180109082511-239b4f6310f4
