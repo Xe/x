@@ -48,6 +48,7 @@ require (
 	github.com/kohkimakimoto/gluatemplate v0.0.0-20160815033744-d9e2c9d6b00f
 	github.com/kohkimakimoto/gluayaml v0.0.0-20160815032708-6fe413d49d73
 	github.com/kr/pretty v0.1.0
+	github.com/kr/pty v1.1.2 // indirect
 	github.com/layeh/gopher-luar v1.0.4
 	github.com/mndrix/golog v0.0.0-20170330170653-a28e2a269775
 	github.com/mndrix/ps v0.0.0-20170330174427-18e65badd6ab // indirect
@@ -58,6 +59,7 @@ require (
 	github.com/peterh/liner v1.1.0
 	github.com/pkg/errors v0.8.1
 	github.com/robertkrimen/godocdown v0.0.0-20130622164427-0bfa04905481
+	github.com/russross/blackfriday v1.5.1 // indirect
 	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect
 	github.com/streamrail/concurrent-map v0.0.0-20160823150647-8bf1e9bacbf6
 	github.com/tmc/scp v0.0.0-20170824174625-f7b48647feef
@@ -67,7 +69,6 @@ require (
 	github.com/yuin/gluare v0.0.0-20170607022532-d7c94f1a80ed
 	github.com/yuin/gopher-lua v0.0.0-20181109042959-a0dfe84f6227
 	go4.org v0.0.0-20180809161055-417644f6feb5
-	golang.org/x/build v0.0.0-20181004175654-90ec83e7f349
 	golang.org/x/crypto v0.0.0-20181001203147-e3636079e1a4
 	golang.org/x/image v0.0.0-20180926015637-991ec62608f3 // indirect
 	golang.org/x/oauth2 v0.0.0-20181003184128-c57b0facaced
