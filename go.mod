@@ -3,6 +3,7 @@ module github.com/Xe/x
 go 1.11.2
 
 require (
+	github.com/Greyh4t/gluassh v0.0.0-20180109082511-239b4f6310f4
 	github.com/McKael/madon v2.3.0+incompatible
 	github.com/McKael/madon/v2 v2.0.0-20180929094633-c679abc985d6
 	github.com/ThomasRooney/gexpect v0.0.0-20161231170123-5482f0350944
@@ -44,13 +45,10 @@ require (
 	github.com/kohkimakimoto/gluafs v0.0.0-20160815050327-01391ed2d7ab
 	github.com/kohkimakimoto/gluamarkdown v0.0.0-20160902030455-a1c413d7bbfb
 	github.com/kohkimakimoto/gluaquestion v0.0.0-20160428074244-311437c29ba5
-	github.com/kohkimakimoto/gluassh v0.0.0-20160112074309-2a7bd48d7568
 	github.com/kohkimakimoto/gluatemplate v0.0.0-20160815033744-d9e2c9d6b00f
 	github.com/kohkimakimoto/gluayaml v0.0.0-20160815032708-6fe413d49d73
-	github.com/kr/fs v0.1.0 // indirect
 	github.com/kr/pretty v0.1.0
 	github.com/layeh/gopher-luar v1.0.4
-	github.com/mitchellh/mapstructure v1.1.2 // indirect
 	github.com/mndrix/golog v0.0.0-20170330170653-a28e2a269775
 	github.com/mndrix/ps v0.0.0-20170330174427-18e65badd6ab // indirect
 	github.com/olekukonko/tablewriter v0.0.0-20180912035003-be2c049b30cc // indirect
@@ -59,7 +57,6 @@ require (
 	github.com/pborman/uuid v1.2.0
 	github.com/peterh/liner v1.1.0
 	github.com/pkg/errors v0.8.0
-	github.com/pkg/sftp v1.8.3 // indirect
 	github.com/robertkrimen/godocdown v0.0.0-20130622164427-0bfa04905481
 	github.com/russross/blackfriday-tool v0.0.0-20120308051103-a78eb387e806
 	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect
@@ -68,7 +65,6 @@ require (
 	github.com/xtaci/kcp-go v2.0.3+incompatible
 	github.com/xtaci/smux v1.0.7
 	github.com/yookoala/realpath v1.0.0 // indirect
-	github.com/yuin/gluamapper v0.0.0-20150323120927-d836955830e7 // indirect
 	github.com/yuin/gluare v0.0.0-20170607022532-d7c94f1a80ed
 	github.com/yuin/gopher-lua v0.0.0-20181109042959-a0dfe84f6227
 	go4.org v0.0.0-20180809161055-417644f6feb5

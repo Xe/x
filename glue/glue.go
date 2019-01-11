@@ -8,6 +8,7 @@ import (
 	"os"
 	"runtime/pprof"
 
+	"github.com/Greyh4t/gluassh"
 	"github.com/Xe/x/internal/gluaexpect"
 	"github.com/Xe/x/internal/gluasimplebox"
 	"github.com/ailncode/gluaxmlpath"
@@ -17,7 +18,6 @@ import (
 	"github.com/kohkimakimoto/gluafs"
 	"github.com/kohkimakimoto/gluamarkdown"
 	"github.com/kohkimakimoto/gluaquestion"
-	"github.com/kohkimakimoto/gluassh"
 	"github.com/kohkimakimoto/gluatemplate"
 	"github.com/kohkimakimoto/gluayaml"
 	"github.com/otm/gluaflag"
