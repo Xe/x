@@ -1,8 +1,6 @@
 #!/bin/sh
 
-for file in *.1
+for file in *.1 *.5
 do
 	mandoc -T markdown $file > ../$file.md
 done
-
-gzip *.1
