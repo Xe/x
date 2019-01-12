@@ -5,6 +5,7 @@ import (
 	"os"
 	"strings"
 
+	_ "github.com/Xe/x/internal/tokipona"
 	"github.com/Xe/x/web/tokiponatokens"
 	"github.com/mndrix/golog"
 	line "github.com/peterh/liner"

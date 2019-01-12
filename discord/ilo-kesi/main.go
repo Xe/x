@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/Xe/x/internal"
+	_ "github.com/Xe/x/internal/tokipona"
 	"github.com/Xe/x/markov"
 	"github.com/Xe/x/web/switchcounter"
 	"github.com/bwmarrin/discordgo"
