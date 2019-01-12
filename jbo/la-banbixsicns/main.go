@@ -2,12 +2,12 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
 
-	_ "github.com/joho/godotenv/autoload"
+	"github.com/Xe/x/internal"
 	"within.website/johaus/parser"
 	_ "within.website/johaus/parser/camxes"
 	"within.website/johaus/pretty"
@@ -15,18 +15,19 @@ import (
 
 const dialect = "camxes"
 
-func main() {
-	p := os.Getenv("PORT")
-	if p == "" {
-		p = "9001"
-	}
+var (
+	port = flag.String("port", "9001", "TCP port to bind on for HTTP")
+)
 
-	log.Printf("Listening on http://0.0.0.0:%s", p)
+func main() {
+	internal.HandleStartup()
+
+	log.Printf("Listening on http://0.0.0.0:%s", *port)
 
 	http.DefaultServeMux.HandleFunc("/tree", tree)
 	http.DefaultServeMux.HandleFunc("/braces", braces)
 
-	http.ListenAndServe(":"+p, nil)
+	http.ListenAndServe(":"+*port, nil)
 }
 
 func braces(w http.ResponseWriter, r *http.Request) {

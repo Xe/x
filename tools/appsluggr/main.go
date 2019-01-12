@@ -24,8 +24,7 @@ var (
 )
 
 func main() {
-	flag.Parse()
-	internal.HandleLicense()
+	internal.HandleStartup()
 
 	fout, err := os.Create(*fname)
 	if err != nil {

@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/McKael/madon"
+	"github.com/McKael/madon/v2"
+	"github.com/Xe/x/internal"
 )
 
 var (
@@ -20,7 +21,7 @@ var (
 var scopes = []string{"read", "write", "follow"}
 
 func main() {
-	flag.Parse()
+	internal.HandleStartup()
 
 	c, err := madon.NewApp(*appName, *website, scopes, *redirectURI, *instance)
 	if err != nil {

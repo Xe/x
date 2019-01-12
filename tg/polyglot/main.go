@@ -2,12 +2,14 @@ package main
 
 import (
 	"bytes"
+	"flag"
 	"fmt"
 	"log"
-	"os"
 	"strings"
 	"time"
 
+	"github.com/Xe/x/internal"
+	_ "github.com/Xe/x/tokipona"
 	"github.com/Xe/x/web/tokiponatokens"
 	_ "github.com/joho/godotenv/autoload"
 	tb "gopkg.in/tucnak/telebot.v2"
@@ -16,9 +18,17 @@ import (
 	"within.website/johaus/pretty"
 )
 
+const tpapiurl = `https://us-central1-golden-cove-408.cloudfunctions.net/toki-pona-verb-marker`
+
+var (
+	telegramToken  = flag.String("telegram-token", "", "telegram bot token")
+	tokiPonaAPIURL = flag.String("toki-pona-tokenizer-api-url", tpapiurl, "toki pona tokenizer API URL")
+)
+
 func main() {
+	internal.HandleStartup()
 	b, err := tb.NewBot(tb.Settings{
-		Token:  os.Getenv("TELEGRAM_TOKEN"),
+		Token:  *telegramToken,
 		Poller: &tb.LongPoller{Timeout: 10 * time.Second},
 	})
 
@@ -40,7 +50,7 @@ func main() {
 		}()
 
 		msg := m.Payload
-		parts, err := tokiponatokens.Tokenize(os.Getenv("TOKI_PONA_TOKENIZER_API_URL"), msg)
+		parts, err := tokiponatokens.Tokenize(*tokiPonaAPIURL, msg)
 		if err != nil {
 			b.Send(m.Sender, err.Error())
 			return

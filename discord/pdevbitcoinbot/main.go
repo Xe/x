@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"io"
 	"log"
@@ -10,10 +11,9 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/Xe/x/internal"
 	"github.com/Xe/x/web/discordwebhook"
-	"github.com/caarlos0/env"
 	"github.com/codahale/hdrhistogram"
-	_ "github.com/joho/godotenv/autoload"
 )
 
 type BitstampReply struct {
@@ -33,9 +33,9 @@ type data struct {
 	LastValue *string
 }
 
-var cfg = struct {
-	WebhookURL string `env:"WEBHOOK_URL,required"`
-}{}
+var (
+	whURL = flag.String("webhook-url", "", "Discord webhook URL")
+)
 
 func getBitstamp() (*BitstampReply, error) {
 	resp, err := http.Get("https://www.bitstamp.net/api/ticker/")
@@ -74,11 +74,7 @@ func sendWebhook(whurl string, dw discordwebhook.Webhook) error {
 }
 
 func main() {
-	err := env.Parse(&cfg)
-	if err != nil {
-		log.Fatal(err)
-	}
-
+	internal.HandleStartup()
 	fin, err := os.Open("./data.json")
 	if err != nil {
 		log.Fatal(err)
@@ -143,7 +139,7 @@ func main() {
 		}},
 	}
 
-	req := discordwebhook.Send(cfg.WebhookURL, dw)
+	req := discordwebhook.Send(*whURL, dw)
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		log.Fatal(err)

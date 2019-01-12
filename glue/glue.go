@@ -9,6 +9,7 @@ import (
 	"runtime/pprof"
 
 	"github.com/Greyh4t/gluassh"
+	"github.com/Xe/x/internal"
 	"github.com/Xe/x/internal/gluaexpect"
 	"github.com/Xe/x/internal/gluasimplebox"
 	"github.com/ailncode/gluaxmlpath"
@@ -55,9 +56,11 @@ Available options are:
   -i       enter interactive mode after executing 'script'
   -p file  write cpu profiles to the file
   -v       show version information
+  -license show license information
+  -manpage generate manpage
 `)
 	}
-	flag.Parse()
+	internal.HandleStartup()
 	if len(opt_p) != 0 {
 		f, err := os.Create(opt_p)
 		if err != nil {

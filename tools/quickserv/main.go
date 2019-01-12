@@ -4,6 +4,8 @@ import (
 	"flag"
 	"log"
 	"net/http"
+
+	"github.com/Xe/x/internal"
 )
 
 var (
@@ -12,7 +14,7 @@ var (
 )
 
 func main() {
-	flag.Parse()
+	internal.HandleStartup()
 	http.Handle("/", http.FileServer(http.Dir(*dir)))
 	log.Printf("Serving %s on port %s", *dir, *port)
 	http.ListenAndServe(":"+*port, nil)

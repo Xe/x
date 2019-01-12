@@ -2,31 +2,29 @@ package main
 
 import (
 	"context"
+	"flag"
 
 	"github.com/McKael/madon"
-	"within.website/ln"
-	"github.com/caarlos0/env"
+	"github.com/Xe/x/internal"
 	_ "github.com/joho/godotenv/autoload"
+	"within.website/ln"
 )
 
-var cfg = &struct {
-	Instance  string `env:"INSTANCE,required"`
-	AppID     string `env:"APP_ID,required"`
-	AppSecret string `env:"APP_SECRET,required"`
-	Token     string `env:"TOKEN,required"`
-	Hashtag   string `env:"HASHTAG,required"`
-}{}
+var (
+	instance  = flag.String("instance", "", "mastodon instance")
+	appID     = flag.String("app-id", "", "oauth2 app id")
+	appSecret = flag.String("app-secret", "", "oauth2 app secret")
+	token     = flag.String("token", "", "oauth2 token")
+	hashtag   = flag.String("hashtag", "furry", "hashtag to monitor")
+)
 
 var scopes = []string{"read", "write", "follow"}
 var ctx = context.Background()
 
 func main() {
-	err := env.Parse(cfg)
-	if err != nil {
-		ln.Fatal(ctx, ln.F{"err": err, "action": "startup"})
-	}
+	internal.HandleStartup()
 
-	c, err := madon.RestoreApp("furry boostbot", cfg.Instance, cfg.AppID, cfg.AppSecret, &madon.UserToken{AccessToken: cfg.Token})
+	c, err := madon.RestoreApp("furry boost bot", *instance, *appID, *appSecret, &madon.UserToken{AccessToken: *token})
 	if err != nil {
 		ln.Fatal(ctx, ln.F{"err": err, "action": "madon.RestoreApp"})
 	}

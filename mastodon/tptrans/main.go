@@ -2,48 +2,49 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 
 	madon "github.com/McKael/madon/v2"
+	"github.com/Xe/x/internal"
+	_ "github.com/Xe/x/tokipona"
 	"github.com/Xe/x/web/tokipana"
 	"github.com/jaytaylor/html2text"
-	"github.com/joeshaw/envdecode"
 	_ "github.com/joho/godotenv/autoload"
 	"within.website/ln"
 	"within.website/ln/opname"
 )
 
-type lipuSona struct {
-	AppID     string `env:"APP_ID,required"`
-	AppSecret string `env:"APP_SECRET,required"`
-	Token     string `env:"TOKEN,required"`
-	Instance  string `env:"INSTANCE,required"`
-}
+var (
+	instance  = flag.String("instance", "", "mastodon instance")
+	appID     = flag.String("app-id", "", "oauth2 app id")
+	appSecret = flag.String("app-secret", "", "oauth2 app secret")
+	token     = flag.String("token", "", "oauth2 token")
+	hashtag   = flag.String("hashtag", "tokipona", "hashtag to monitor")
+)
 
 func main() {
-	ctx := opname.With(context.Background(), "main")
-	var lipu lipuSona
-	err := envdecode.StrictDecode(&lipu)
-	if err != nil {
-		ln.FatalErr(ctx, err)
-	}
+	internal.HandleStartup()
 
-	c, err := madon.RestoreApp("sona-pi-toki-pona:", lipu.Instance, lipu.AppID, lipu.AppSecret, &madon.UserToken{AccessToken: lipu.Token})
+	ctx := opname.With(context.Background(), "main")
+	ctx = ln.WithF(ctx, ln.F{"hashtag": *hashtag})
+
+	c, err := madon.RestoreApp("sona-pi-toki-pona", *instance, *appID, *appSecret, &madon.UserToken{AccessToken: *token})
 	if err != nil {
 		ln.FatalErr(opname.With(ctx, "restore-app"), err)
 	}
 
-	ln.Log(ctx, ln.Info("waiting for messages on #topipona..."))
+	ln.Log(ctx, ln.Info("waiting for messages"))
 
 	for {
 		evChan := make(chan madon.StreamEvent, 10)
 		stop := make(chan bool)
 		done := make(chan bool)
-		ctx = opname.With(ctx, "hashtag-stream")
+		ctx = opname.With(context.Background(), "hashtag-stream")
 
-		err = c.StreamListener("hashtag", "tokipona", evChan, stop, done)
+		err = c.StreamListener("hashtag", *hashtag, evChan, stop, done)
 		if err != nil {
 			ln.FatalErr(ctx, err)
 		}

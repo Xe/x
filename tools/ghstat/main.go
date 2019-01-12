@@ -20,8 +20,7 @@ var (
 )
 
 func main() {
-	flag.Parse()
-	internal.HandleLicense()
+	internal.HandleStartup()
 
 	if *messageFlag {
 		req := ghstat.LastMessage()

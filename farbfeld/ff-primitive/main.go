@@ -8,6 +8,7 @@ import (
 	"runtime"
 	"runtime/pprof"
 
+	"github.com/Xe/x/internal"
 	"github.com/fogleman/primitive/primitive"
 	farbfeld "github.com/hullerob/go.farbfeld"
 )
@@ -31,7 +32,7 @@ func stepImg(img image.Image, count int) image.Image {
 }
 
 func main() {
-	flag.Parse()
+	internal.HandleStartup()
 
 	if *cpuprofile != "" {
 		f, err := os.Create(*cpuprofile)

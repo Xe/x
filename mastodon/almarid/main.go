@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"crypto/rand"
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"math/big"
@@ -11,29 +12,26 @@ import (
 	"strings"
 	"time"
 
-	"github.com/McKael/madon"
-	"github.com/caarlos0/env"
-	_ "github.com/joho/godotenv/autoload"
+	"github.com/McKael/madon/v2"
+	"github.com/Xe/x/internal"
 	"within.website/ln"
 )
 
-var cfg = &struct {
-	Instance  string `env:"INSTANCE,required"`
-	AppID     string `env:"APP_ID,required"`
-	AppSecret string `env:"APP_SECRET,required"`
-	Token     string `env:"TOKEN,required"`
-	WordFile  string `env:"WORD_FILE,required"`
-}{}
+var (
+	instance  = flag.String("instance", "", "mastodon instance")
+	appID     = flag.String("app-id", "", "oauth2 app id")
+	appSecret = flag.String("app-secret", "", "oauth2 app secret")
+	token     = flag.String("token", "", "oauth2 token")
+	wordFile  = flag.String("word-file", "./words.txt", "wordlist file")
+	every     = flag.Duration("every", 12*time.Hour, "duration between utterances")
+)
 
 var ctx = context.Background()
 
 func main() {
-	err := env.Parse(cfg)
-	if err != nil {
-		ln.Fatal(ctx, ln.F{"err": err, "action": "env.Parse"})
-	}
+	internal.HandleStartup()
 
-	fin, err := os.Open(cfg.WordFile)
+	fin, err := os.Open(*wordFile)
 	if err != nil {
 		ln.Fatal(ctx, ln.F{"err": err, "action": "os.Open(cfg.WordFile)"})
 	}
@@ -43,11 +41,12 @@ func main() {
 		ln.Fatal(ctx, ln.F{"err": err, "action": "ioutil.ReadAll(fin)"})
 	}
 
-	c, err := madon.RestoreApp("almarid:", cfg.Instance, cfg.AppID, cfg.AppSecret, &madon.UserToken{AccessToken: cfg.Token})
+	c, err := madon.RestoreApp("almarid:", *instance, *appID, *appSecret, &madon.UserToken{AccessToken: *token})
 	if err != nil {
 		ln.Fatal(ctx, ln.F{"err": err, "action": "madon.RestoreApp"})
 	}
-	_ = c
+
+	ctx = ln.WithF(ctx, ln.F{"every": *every, "instance": *instance, "iam": c.Name})
 
 	lines := bytes.Split(data, []byte("\n"))
 	words := []string{}
@@ -86,12 +85,15 @@ func main() {
 		if first {
 			first = false
 		} else {
-			time.Sleep(600 * time.Minute)
+			time.Sleep(*every)
 		}
 
 		txt := fmt.Sprintf("%s is not doing, allah is doing", words[i])
 
-		st, err := c.PostStatus(txt, 0, nil, false, "", "private")
+		st, err := c.PostStatus(madon.PostStatusParams{
+			Text:       txt,
+			Visibility: "private",
+		})
 		if err != nil {
 			ln.Log(ctx, ln.F{
 				"err":    err,

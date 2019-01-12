@@ -11,6 +11,7 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/Xe/x/internal"
 	"golang.org/x/crypto/acme/autocert"
 )
 
@@ -32,7 +33,7 @@ var (
 )
 
 func main() {
-	flag.Parse()
+	internal.HandleStartup()
 
 	go http.ListenAndServe(*insecurePort, http.HandlerFunc(fwdhttps))
 

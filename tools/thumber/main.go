@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/Xe/x/internal"
 	"github.com/disintegration/imaging"
 )
 
@@ -15,7 +16,7 @@ var (
 )
 
 func main() {
-	flag.Parse()
+	internal.HandleStartup()
 
 	err := filepath.Walk(*dirToWalk, makeThumbnail)
 	if err != nil {

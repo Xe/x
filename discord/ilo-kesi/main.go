@@ -42,7 +42,6 @@ func init() {
 var mentionRex = regexp.MustCompile(`<((@!?\d+)|(:.+?:\d+))>`)
 
 func main() {
-	flag.Parse()
 	internal.HandleLicense()
 
 	var cfg lipuSona
@@ -51,11 +50,6 @@ func main() {
 		log.Fatal(err)
 	}
 	cfg.JanLawa = append(cfg.JanLawa, "console")
-
-	flag.Parse()
-	internal.HandleLicense()
-
-	//pretty.Println(cfg)
 
 	sw := switchcounter.NewHTTPClient(http.DefaultClient, cfg.SwitchCounterWebhook)
 

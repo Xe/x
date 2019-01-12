@@ -10,30 +10,30 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/Xe/x/internal"
 	"github.com/bwmarrin/discordgo"
 	"github.com/garyburd/redigo/redis"
-	_ "github.com/joho/godotenv/autoload"
 )
 
 // Variables used for command line parameters
 var (
-	token    = os.Getenv("DISCORD_TOKEN")
-	redisurl = os.Getenv("REDIS_URL")
+	token    = flag.String("discord-token", "", "Discord bot token")
+	redisurl = flag.String("redis-url", "", "Redis server URL")
 )
 
 func init() {
-	flag.Parse()
+	internal.HandleStartup()
 }
 
 func main() {
 	// Create a new Discord session using the provided bot token.
-	dg, err := discordgo.New("Bot " + token)
+	dg, err := discordgo.New("Bot " + *token)
 	if err != nil {
 		fmt.Println("error creating Discord session,", err)
 		return
 	}
 
-	p, err := NewPool(redisurl)
+	p, err := NewPool(*redisurl)
 	if err != nil {
 		log.Fatal(err)
 	}

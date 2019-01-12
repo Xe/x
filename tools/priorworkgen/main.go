@@ -2,19 +2,26 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"log"
 	"os"
 
+	"github.com/Xe/x/internal"
 	"github.com/google/go-github/github"
 	_ "github.com/joho/godotenv/autoload"
 	"golang.org/x/oauth2"
 )
 
+var (
+	ghToken = flag.String("gh-token", "", "github personal access token")
+)
+
 func main() {
+	internal.HandleStartup()
 	ctx := context.Background()
 	ts := oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: os.Getenv("GH_TOKEN")},
+		&oauth2.Token{AccessToken: *ghToken},
 	)
 	tc := oauth2.NewClient(ctx, ts)
 

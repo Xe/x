@@ -11,7 +11,7 @@ import (
 
 func main() {
 	flag.Parse()
-	internal.HandleLicense()
+	internal.HandleStartup()
 
 	err := minipaas.Exec(strings.Join(flag.Args(), " "))
 	if err != nil {

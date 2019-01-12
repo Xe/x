@@ -34,8 +34,7 @@ func init() {
 }
 
 func main() {
-	flag.Parse()
-	internal.HandleLicense()
+	internal.HandleStartup()
 
 	if *showAll {
 		fmt.Println("Licenses available:")

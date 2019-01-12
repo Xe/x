@@ -8,11 +8,19 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/Xe/x/internal/flagenv"
+	"github.com/Xe/x/internal/manpage"
 	"github.com/Xe/x/tools/license/licenses"
 	"go4.org/legal"
 	"within.website/confyg/flagconfyg"
 	"within.website/ln"
 	"within.website/ln/opname"
+
+	// Debug routes
+	_ "net/http/pprof"
+
+	// Older projects use .env files, shim in compatibility
+	_ "github.com/joho/godotenv/autoload"
 )
 
 var (
@@ -34,8 +42,23 @@ func init() {
 func HandleLicense() { HandleStartup() }
 
 // HandleStartup optionally shows all software licenses or other things.
+// This always loads from the following configuration sources in the following
+// order:
+//
+//     - environment variables
+//     - command line flags (to get -config)
+//     - configuration file (if -config is set)
+//     - command line flags
+//
+// This is done this way to ensure that command line flags always are the deciding
+// factor as an escape hatch.
 func HandleStartup() {
+	flagenv.Parse()
+	flag.Parse()
+
 	ctx := opname.With(context.Background(), "internal.HandleStartup")
+	HandleConfig(ctx)
+
 	if *licenseShow {
 		fmt.Printf("Licenses for %v\n", os.Args)
 
@@ -47,9 +70,17 @@ func HandleStartup() {
 		os.Exit(0)
 	}
 
+	if *manpageGen {
+		manpage.Spew()
+	}
+}
+
+// HandleConfig handles the config file parsing from -config
+func HandleConfig(ctx context.Context) {
 	if *config != "" {
 		ln.Log(ctx, ln.Info("loading config"), ln.F{"path": *config})
 
 		flagconfyg.CmdParse(*config)
 	}
+	flag.Parse()
 }

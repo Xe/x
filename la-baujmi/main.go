@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"log"
 	"os"
 	"strings"
@@ -14,14 +13,13 @@ import (
 )
 
 func main() {
-	flag.Parse()
 	internal.HandleStartup()
 	var m golog.Machine
 	m = golog.NewMachine()
 
 	for {
 		l := line.NewLiner()
-		if inp, err := l.Prompt("|: "); err == nil {
+		if inp, err := l.Prompt("|toki: "); err == nil {
 			if inp == "" {
 				return
 			}

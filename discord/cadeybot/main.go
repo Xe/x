@@ -10,8 +10,9 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/Xe/x/internal"
+	"github.com/Xe/x/internal/flagenv"
 	"github.com/bwmarrin/discordgo"
-	"github.com/facebookgo/flagenv"
 	_ "github.com/joho/godotenv"
 )
 
@@ -23,6 +24,7 @@ var (
 func main() {
 	flagenv.Parse()
 	flag.Parse()
+	internal.HandleStartup()
 
 	chain := NewChain(3)
 
