@@ -18,18 +18,33 @@ type Selbri struct {
 func (s Selbri) Fact() string {
 	var sb strings.Builder
 
-	sb.WriteString(s.Predicate + "(")
-
 	var varCount byte
+
+	sb.WriteString("selbri(verb(")
+
+	if s.Predicate == "seme" {
+		sb.WriteByte(byte('A') + varCount)
+		varCount++
+	} else {
+		sb.WriteString(s.Predicate)
+	}
+	sb.WriteString("), ")
 
 	for i, arg := range s.Arguments {
 		if i != 0 {
 			sb.WriteString(", ")
 		}
 
-		if arg == "seme" {
+		switch arg {
+		case "subject(seme)", "object(seme)":
+			if strings.HasPrefix(arg, "subject") {
+				sb.WriteString("subject(")
+			} else {
+				sb.WriteString("object(")
+			}
 			sb.WriteByte(byte('A') + varCount)
 			varCount++
+			sb.WriteByte(')')
 			continue
 		}
 		sb.WriteString(arg)
@@ -60,7 +75,12 @@ func SentenceToSelbris(s tokiponatokens.Sentence) ([]Selbri, error) {
 		switch pt.Type {
 		case tokiponatokens.PartSubject:
 			if strings.Contains(pt.Braces(), " en ") {
-				subjects = append(subjects, strings.Split(strings.Join(pt.Tokens, " "), " en ")...)
+				temp := strings.Split(strings.Join(pt.Tokens, " "), " en ")
+
+				for _, t := range temp {
+					subjects = append(subjects, "subject("+t+")")
+				}
+
 				continue
 			}
 
@@ -93,7 +113,7 @@ func SentenceToSelbris(s tokiponatokens.Sentence) ([]Selbri, error) {
 				continue
 			}
 
-			subjects = append(subjects, strings.Join(pt.Tokens, "_"))
+			subjects = append(subjects, "subject("+strings.Join(pt.Tokens, "_")+")")
 
 		case tokiponatokens.PartVerbMarker:
 			verbs = append(verbs, strings.Join(pt.Tokens, "_"))
@@ -127,13 +147,13 @@ func SentenceToSelbris(s tokiponatokens.Sentence) ([]Selbri, error) {
 				objects = append(objects, sb.String())
 				continue
 			}
-			objects = append(objects, strings.Join(pt.Tokens, "_"))
+			objects = append(objects, "object("+strings.Join(pt.Tokens, "_")+")")
 
 		case tokiponatokens.PartPunctuation:
 			if len(pt.Tokens) == 1 {
 				switch pt.Tokens[0] {
 				case "la":
-					context = subjects[len(subjects)-1]
+					context = "context(" + subjects[len(subjects)-1] + ")"
 					subjects = subjects[:len(subjects)-1]
 
 				case tokiponatokens.PunctComma:

@@ -75,10 +75,10 @@ func TestSentenceToSelbris(t *testing.T) {
 			want: []Selbri{
 				{
 					Predicate: "sona",
-					Arguments: []string{"ona", "mute"},
+					Arguments: []string{"subject(ona)", "object(mute)"},
 				},
 			},
-			wantFacts: []string{"sona(ona, mute)."},
+			wantFacts: []string{"selbri(verb(sona), subject(ona), object(mute))."},
 		},
 		{
 			name: "zen",
@@ -86,10 +86,10 @@ func TestSentenceToSelbris(t *testing.T) {
 			want: []Selbri{
 				{
 					Predicate: "ala",
-					Arguments: []string{"tenpo_ni", "seme"},
+					Arguments: []string{"context(subject(tenpo_ni))", "subject(seme)"},
 				},
 			},
-			wantFacts: []string{"ala(tenpo_ni, A)."},
+			wantFacts: []string{"selbri(verb(ala), context(subject(tenpo_ni)), subject(A))."},
 		},
 		{
 			name: "pi_subject",
@@ -100,7 +100,7 @@ func TestSentenceToSelbris(t *testing.T) {
 					Arguments: []string{"subject(ilo_mi, pi(kasi, nasa))"},
 				},
 			},
-			wantFacts: []string{"pona_ale(subject(ilo_mi, pi(kasi, nasa)))."},
+			wantFacts: []string{"selbri(verb(pona_ale), subject(ilo_mi, pi(kasi, nasa)))."},
 		},
 		{
 			name: "pi_object",
@@ -108,10 +108,10 @@ func TestSentenceToSelbris(t *testing.T) {
 			want: []Selbri{
 				{
 					Predicate: "esun",
-					Arguments: []string{"mi", "object(ilo, pi(kalama, musi))"},
+					Arguments: []string{"subject(mi)", "object(ilo, pi(kalama, musi))"},
 				},
 			},
-			wantFacts: []string{"esun(mi, object(ilo, pi(kalama, musi)))."},
+			wantFacts: []string{"selbri(verb(esun), subject(mi), object(ilo, pi(kalama, musi)))."},
 		},
 		{
 			name: "multiple verbs",
@@ -119,14 +119,17 @@ func TestSentenceToSelbris(t *testing.T) {
 			want: []Selbri{
 				{
 					Predicate: "sona",
-					Arguments: []string{"ona", "mute"},
+					Arguments: []string{"subject(ona)", "object(mute)"},
 				},
 				{
 					Predicate: "pona",
-					Arguments: []string{"ona", "mute"},
+					Arguments: []string{"subject(ona)", "object(mute)"},
 				},
 			},
-			wantFacts: []string{"sona(ona, mute).", "pona(ona, mute)."},
+			wantFacts: []string{
+				"selbri(verb(sona), subject(ona), object(mute)).",
+				"selbri(verb(pona), subject(ona), object(mute)).",
+			},
 		},
 		{
 			name: "multiple subjects and verbs",
@@ -134,36 +137,36 @@ func TestSentenceToSelbris(t *testing.T) {
 			want: []Selbri{
 				{
 					Predicate: "sona",
-					Arguments: []string{"ona", "mute"},
+					Arguments: []string{"subject(ona)", "object(mute)"},
 				},
 				{
 					Predicate: "pona",
-					Arguments: []string{"ona", "mute"},
+					Arguments: []string{"subject(ona)", "object(mute)"},
 				},
 				{
 					Predicate: "sona",
-					Arguments: []string{"sina", "mute"},
+					Arguments: []string{"subject(sina)", "object(mute)"},
 				},
 				{
 					Predicate: "pona",
-					Arguments: []string{"sina", "mute"},
+					Arguments: []string{"subject(sina)", "object(mute)"},
 				},
 				{
 					Predicate: "sona",
-					Arguments: []string{"mi", "mute"},
+					Arguments: []string{"subject(mi)", "object(mute)"},
 				},
 				{
 					Predicate: "pona",
-					Arguments: []string{"mi", "mute"},
+					Arguments: []string{"subject(mi)", "object(mute)"},
 				},
 			},
 			wantFacts: []string{
-				"sona(ona, mute).",
-				"pona(ona, mute).",
-				"sona(sina, mute).",
-				"pona(sina, mute).",
-				"sona(mi, mute).",
-				"pona(mi, mute).",
+				"selbri(verb(sona), subject(ona), object(mute)).",
+				"selbri(verb(sona), subject(sina), object(mute)).",
+				"selbri(verb(sona), subject(mi), object(mute)).",
+				"selbri(verb(pona), subject(ona), object(mute)).",
+				"selbri(verb(pona), subject(sina), object(mute)).",
+				"selbri(verb(pona), subject(mi), object(mute)).",
 			},
 		},
 		{
@@ -172,66 +175,66 @@ func TestSentenceToSelbris(t *testing.T) {
 			want: []Selbri{
 				{
 					Predicate: "sona",
-					Arguments: []string{"ona", "ijo_mute"},
+					Arguments: []string{"subject(ona)", "object(ijo_mute)"},
 				},
 				{
 					Predicate: "sona",
-					Arguments: []string{"ona", "ilo_mute"},
+					Arguments: []string{"subject(ona)", "object(ilo_mute)"},
 				},
 				{
 					Predicate: "pona",
-					Arguments: []string{"ona", "ijo_mute"},
+					Arguments: []string{"subject(ona)", "object(ijo_mute)"},
 				},
 				{
 					Predicate: "pona",
-					Arguments: []string{"ona", "ilo_mute"},
+					Arguments: []string{"subject(ona)", "object(ilo_mute)"},
 				},
 				{
 					Predicate: "sona",
-					Arguments: []string{"sina", "ijo_mute"},
+					Arguments: []string{"subject(sina)", "object(ijo_mute)"},
 				},
 				{
 					Predicate: "sona",
-					Arguments: []string{"sina", "ilo_mute"},
+					Arguments: []string{"subject(sina)", "object(ilo_mute)"},
 				},
 				{
 					Predicate: "pona",
-					Arguments: []string{"sina", "ijo_mute"},
+					Arguments: []string{"subject(sina)", "object(ijo_mute)"},
 				},
 				{
 					Predicate: "pona",
-					Arguments: []string{"sina", "ilo_mute"},
+					Arguments: []string{"subject(sina)", "object(ilo_mute)"},
 				},
 				{
 					Predicate: "sona",
-					Arguments: []string{"mi", "ijo_mute"},
+					Arguments: []string{"subject(mi)", "object(ijo_mute)"},
 				},
 				{
 					Predicate: "sona",
-					Arguments: []string{"mi", "ilo_mute"},
+					Arguments: []string{"subject(mi)", "object(ilo_mute)"},
 				},
 				{
 					Predicate: "pona",
-					Arguments: []string{"mi", "ijo_mute"},
+					Arguments: []string{"subject(mi)", "object(ijo_mute)"},
 				},
 				{
 					Predicate: "pona",
-					Arguments: []string{"mi", "ilo_mute"},
+					Arguments: []string{"subject(mi)", "object(ilo_mute)"},
 				},
 			},
 			wantFacts: []string{
-				"sona(ona, ijo_mute).",
-				"sona(ona, ilo_mute).",
-				"sona(sina, ijo_mute).",
-				"sona(sina, ilo_mute).",
-				"sona(mi, ijo_mute).",
-				"sona(mi, ilo_mute).",
-				"pona(ona, ijo_mute).",
-				"pona(ona, ilo_mute).",
-				"pona(sina, ijo_mute).",
-				"pona(sina, ilo_mute).",
-				"pona(mi, ijo_mute).",
-				"pona(mi, ilo_mute).",
+				"selbri(verb(sona), subject(ona), object(ijo_mute)).",
+				"selbri(verb(sona), subject(ona), object(ilo_mute)).",
+				"selbri(verb(sona), subject(sina), object(ijo_mute)).",
+				"selbri(verb(sona), subject(sina), object(ilo_mute)).",
+				"selbri(verb(sona), subject(mi), object(ijo_mute)).",
+				"selbri(verb(sona), subject(mi), object(ilo_mute)).",
+				"selbri(verb(pona), subject(ona), object(ijo_mute)).",
+				"selbri(verb(pona), subject(ona), object(ilo_mute)).",
+				"selbri(verb(pona), subject(sina), object(ijo_mute)).",
+				"selbri(verb(pona), subject(sina), object(ilo_mute)).",
+				"selbri(verb(pona), subject(mi), object(ijo_mute)).",
+				"selbri(verb(pona), subject(mi), object(ilo_mute)).",
 			},
 		},
 	}
