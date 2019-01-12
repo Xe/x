@@ -8,11 +8,11 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/Xe/ln"
-	"github.com/Xe/ln/opname"
 	"github.com/Xe/x/tools/license/licenses"
 	"go4.org/legal"
 	"within.website/confyg/flagconfyg"
+	"within.website/ln"
+	"within.website/ln/opname"
 )
 
 var (

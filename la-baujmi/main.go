@@ -1,10 +1,12 @@
 package main
 
 import (
+	"flag"
 	"log"
 	"os"
 	"strings"
 
+	"github.com/Xe/x/internal"
 	_ "github.com/Xe/x/internal/tokipona"
 	"github.com/Xe/x/web/tokiponatokens"
 	"github.com/mndrix/golog"
@@ -12,6 +14,8 @@ import (
 )
 
 func main() {
+	flag.Parse()
+	internal.HandleStartup()
 	var m golog.Machine
 	m = golog.NewMachine()
 

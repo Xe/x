@@ -8,9 +8,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Xe/ln"
-	"github.com/Xe/ln/opname"
 	"golang.org/x/crypto/acme/autocert"
+	"within.website/ln"
+	"within.website/ln/opname"
 )
 
 var (

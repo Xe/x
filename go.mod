@@ -8,7 +8,6 @@ require (
 	github.com/McKael/madon/v2 v2.0.0-20180929094633-c679abc985d6
 	github.com/ThomasRooney/gexpect v0.0.0-20161231170123-5482f0350944
 	github.com/Xe/johaus v0.3.0
-	github.com/Xe/ln v0.1.2
 	github.com/aclements/go-moremath v0.0.0-20180329182055-b1aff36309c7 // indirect
 	github.com/ailncode/gluaxmlpath v0.0.0-20161126153117-6ce478ecb4a6
 	github.com/brandur/simplebox v0.0.0-20150921201729-84e9865bb03a
