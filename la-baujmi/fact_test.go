@@ -92,6 +92,28 @@ func TestSentenceToSelbris(t *testing.T) {
 			wantFacts: []string{"ala(tenpo_ni, A)."},
 		},
 		{
+			name: "pi_subject",
+			json: []byte(`[{"part":"subject","parts":[{"part":"subject","tokens":["ilo","mi"]},{"part":"subject","sep":"pi","tokens":["kasi","nasa"]}]},{"part":"verbMarker","sep":"li","tokens":["pona","ale"]}]`),
+			want: []Selbri{
+				{
+					Predicate: "pona_ale",
+					Arguments: []string{"subject(ilo_mi, pi(kasi, nasa))"},
+				},
+			},
+			wantFacts: []string{"pona_ale(subject(ilo_mi, pi(kasi, nasa)))."},
+		},
+		{
+			name: "pi_object",
+			json: []byte(`[{"part":"subject","tokens":["mi"]},{"part":"verbMarker","sep":"li","tokens":["esun"]},{"part":"objectMarker","sep":"e","parts":[{"part":"objectMarker","tokens":["ilo"]},{"part":"objectMarker","sep":"pi","tokens":["kalama","musi"]}]},{"part":"punctuation","tokens":["period"]}]`),
+			want: []Selbri{
+				{
+					Predicate: "esun",
+					Arguments: []string{"mi", "object(ilo, pi(kalama, musi))"},
+				},
+			},
+			wantFacts: []string{"esun(mi, object(ilo, pi(kalama, musi)))."},
+		},
+		{
 			name: "multiple verbs",
 			json: []byte(`[{"part":"subject","tokens":["ona"]},{"part":"verbMarker","sep":"li","tokens":["sona"]},{"part":"verbMarker","sep":"li","tokens":["pona"]},{"part":"objectMarker","sep":"e","tokens":["mute"]},{"part":"punctuation","tokens":["period"]}]`),
 			want: []Selbri{

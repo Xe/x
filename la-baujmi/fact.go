@@ -64,12 +64,69 @@ func SentenceToSelbris(s tokiponatokens.Sentence) ([]Selbri, error) {
 				continue
 			}
 
+			if len(pt.Parts) != 0 {
+				var sb strings.Builder
+				sb.WriteString("subject(")
+
+				for i, sp := range pt.Parts {
+					if i != 0 {
+						sb.WriteString(", ")
+					}
+					if sp.Sep != nil && *sp.Sep == "pi" {
+						sb.WriteString("pi(")
+						for j, tk := range sp.Tokens {
+							if j != 0 {
+								sb.WriteString(", ")
+							}
+
+							sb.WriteString(tk)
+						}
+						sb.WriteString(")")
+					} else {
+						sb.WriteString(strings.Join(sp.Tokens, "_"))
+					}
+				}
+
+				sb.WriteString(")")
+
+				subjects = append(objects, sb.String())
+				continue
+			}
+
 			subjects = append(subjects, strings.Join(pt.Tokens, "_"))
 
 		case tokiponatokens.PartVerbMarker:
 			verbs = append(verbs, strings.Join(pt.Tokens, "_"))
 
 		case tokiponatokens.PartObjectMarker:
+			if len(pt.Parts) != 0 {
+				var sb strings.Builder
+				sb.WriteString("object(")
+
+				for i, sp := range pt.Parts {
+					if i != 0 {
+						sb.WriteString(", ")
+					}
+					if sp.Sep != nil && *sp.Sep == "pi" {
+						sb.WriteString("pi(")
+						for j, tk := range sp.Tokens {
+							if j != 0 {
+								sb.WriteString(", ")
+							}
+
+							sb.WriteString(tk)
+						}
+						sb.WriteString(")")
+					} else {
+						sb.WriteString(strings.Join(sp.Tokens, "_"))
+					}
+				}
+
+				sb.WriteString(")")
+
+				objects = append(objects, sb.String())
+				continue
+			}
 			objects = append(objects, strings.Join(pt.Tokens, "_"))
 
 		case tokiponatokens.PartPunctuation:
