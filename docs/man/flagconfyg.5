@@ -1,0 +1,27 @@
+.Dd January 12, 2019
+.Dt flagconfyg 5 URM
+.Sh NAME
+.Nm flagconfyg
+.Nd This is the simple configuration format for projects in the x repos.
+.Sh DESCRIPTION
+.Nm
+is a simple configuration language for projects in this repository. They are
+configured by a file that looks like this:
+
+.nf
+// for appsluggr
+web web
+web-scale 1
+
+fname (
+  slug.tar.gz
+)
+.fi
+
+and this gets resolved to the following flag calls:
+
+.nf
+-web=web -web-scale=1 -fname=slug.tar.gz
+.fi
+
+
