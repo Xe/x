@@ -8,12 +8,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Xe/johaus/parser"
-	_ "github.com/Xe/johaus/parser/alldialects"
-	"github.com/Xe/johaus/pretty"
 	"github.com/Xe/x/web/tokiponatokens"
 	_ "github.com/joho/godotenv/autoload"
 	tb "gopkg.in/tucnak/telebot.v2"
+	"within.website/johaus/parser"
+	_ "within.website/johaus/parser/alldialects"
+	"within.website/johaus/pretty"
 )
 
 func main() {

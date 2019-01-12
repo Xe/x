@@ -78,5 +78,6 @@ require (
 	layeh.com/gopher-json v0.0.0-20181116191917-d3d498bb4913
 	layeh.com/gopher-luar v1.0.4 // indirect
 	within.website/confyg v0.0.0-20190112001412-39eaf7bce89f
+	within.website/johaus v1.0.0
 	within.website/ln v0.3.0
 )
