@@ -7,10 +7,10 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/Xe/johaus/parser"
-	_ "github.com/Xe/johaus/parser/camxes"
-	"github.com/Xe/johaus/pretty"
 	_ "github.com/joho/godotenv/autoload"
+	"within.website/johaus/parser"
+	_ "within.website/johaus/parser/camxes"
+	"within.website/johaus/pretty"
 )
 
 const dialect = "camxes"

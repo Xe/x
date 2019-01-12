@@ -16,8 +16,9 @@ import (
 )
 
 var (
-	licenseShow = flag.Bool("license", false, "show software license?")
-	config      = flag.String("config", "", "configuration file, if set")
+	licenseShow = flag.Bool("license", false, "show software licenses?")
+	config      = flag.String("config", "", "configuration file, if set (see flagconfyg(4))")
+	manpageGen  = flag.Bool("manpage", false, "generate a manpage template?")
 )
 
 func init() {
