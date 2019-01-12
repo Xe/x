@@ -4,7 +4,7 @@ import (
 	"context"
 	"flag"
 
-	"github.com/McKael/madon"
+	"github.com/McKael/madon/v2"
 	"github.com/Xe/x/internal"
 	_ "github.com/joho/godotenv/autoload"
 	"within.website/ln"
@@ -57,7 +57,7 @@ func main() {
 				s := ev.Data.(madon.Status)
 
 				for _, tag := range s.Tags {
-					if tag.Name == cfg.Hashtag {
+					if tag.Name == *hashtag {
 						err = c.ReblogStatus(s.ID)
 						if err != nil {
 							ln.Fatal(ctx, ln.F{"err": err, "action": "c.ReblogStatus", "id": s.ID})

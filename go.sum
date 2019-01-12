@@ -1,7 +1,5 @@
 github.com/Greyh4t/gluassh v0.0.0-20180109082511-239b4f6310f4 h1:f6TV2YjK++45AAjV35fvimbImX5MVaOiV2/3DhbNpgg=
 github.com/Greyh4t/gluassh v0.0.0-20180109082511-239b4f6310f4/go.mod h1:e2V5IvwVow5cEY2rUG+D5lNAkusxAZbs7MWLJNPKQIw=
-github.com/McKael/madon v2.3.0+incompatible h1:xMUA+Fy4saDV+8tN3MMnwJUoYWC//5Fy8LeOqJsRNIM=
-github.com/McKael/madon v2.3.0+incompatible/go.mod h1:+issnvJjN1rpjAHZwXRB/x30uHh/NoQR7QaojJK/lSI=
 github.com/McKael/madon/v2 v2.0.0-20180929094633-c679abc985d6 h1:9cJcTOeILzInNo+DCYmXKME1QfAP07FYdo3M9/9jyc4=
 github.com/McKael/madon/v2 v2.0.0-20180929094633-c679abc985d6/go.mod h1:mvlJhxZCchfiasx3XvN3hBu5RekGwTDm09dKlSM/dQQ=
 github.com/ThomasRooney/gexpect v0.0.0-20161231170123-5482f0350944 h1:CjexZrggt4RldpEUXFZf52vSO3cnmFaqW6B4wADj05Q=
@@ -16,8 +14,6 @@ github.com/brandur/simplebox v0.0.0-20150921201729-84e9865bb03a h1:EMG9wk3iGM7WB
 github.com/brandur/simplebox v0.0.0-20150921201729-84e9865bb03a/go.mod h1:8hDWkKEpFQwZcugC69PxsoNQMh+0/A3FzLCppp/yJZM=
 github.com/bwmarrin/discordgo v0.18.0 h1:XopVQXCIFy7Cr2eT7NcYcm4k0l2PYX+AP5RUbIWX2/8=
 github.com/bwmarrin/discordgo v0.18.0/go.mod h1:5NIvFv5Z7HddYuXbuQegZ684DleQaCFqChP2iuBivJ8=
-github.com/caarlos0/env v3.4.0+incompatible h1:FRwBdvENjLHZoUbFnULnFss9wKtcapdaM35DfxiTjeM=
-github.com/caarlos0/env v3.4.0+incompatible/go.mod h1:tdCsowwCzMLdkqRYDlHpZCp2UooDD3MspDBjZ2AD02Y=
 github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e/go.mod h1:nSuG5e5PlCu98SY8svDHJxuZscDgtXS6KTTbou5AhLI=
 github.com/cjoudrey/gluahttp v0.0.0-20180401075744-7065ce73b887 h1:ZArneCReic+EyZX8fEVDdgJbfw57dFx9Q9O4a3S/JrI=
 github.com/cjoudrey/gluahttp v0.0.0-20180401075744-7065ce73b887/go.mod h1:X97UjDTXp+7bayQSFZk2hPvCTmTZIicUjZQRtkwgAKY=
@@ -39,8 +35,6 @@ github.com/eaburns/pretty v0.0.0-20170305202417-362524b72369 h1:C/RhDONMNTxvyaQN
 github.com/eaburns/pretty v0.0.0-20170305202417-362524b72369/go.mod h1:iW/TU1T4mA4w2KzqNbBCjacPFdJ9PfGvNSxr8ajT/iM=
 github.com/facebookgo/ensure v0.0.0-20160127193407-b4ab57deab51 h1:0JZ+dUmQeA8IIVUMzysrX4/AKuQwWhV2dYQuPZdvdSQ=
 github.com/facebookgo/ensure v0.0.0-20160127193407-b4ab57deab51/go.mod h1:Yg+htXGokKKdzcwhuNDwVvN+uBxDGXJ7G/VN1d8fa64=
-github.com/facebookgo/flagenv v0.0.0-20160425205200-fcd59fca7456 h1:CkmB2l68uhvRlwOTPrwnuitSxi/S3Cg4L5QYOcL9MBc=
-github.com/facebookgo/flagenv v0.0.0-20160425205200-fcd59fca7456/go.mod h1:zFhibDvPDWmtk4dAQ05sRobtyoffEHygEt3wSNuAzz8=
 github.com/facebookgo/stack v0.0.0-20160209184415-751773369052 h1:JWuenKqqX8nojtoVVWjGfOF9635RETekkoH6Cc9SX0A=
 github.com/facebookgo/stack v0.0.0-20160209184415-751773369052/go.mod h1:UbMTZqLaRiH3MsBH8va0n7s1pQYcu3uTb8G4tygF4Zg=
 github.com/facebookgo/subset v0.0.0-20150612182917-8dac2c3c4870 h1:E2s37DuLxFhQDg5gKsWoLBOB0n+ZW8s599zru8FJ2/Y=
@@ -184,10 +178,6 @@ layeh.com/gopher-json v0.0.0-20181116191917-d3d498bb4913 h1:7GSXubN0n2gOZFLkm72e
 layeh.com/gopher-json v0.0.0-20181116191917-d3d498bb4913/go.mod h1:ivKkcY8Zxw5ba0jldhZCYYQfGdb2K6u9tbYK1AwMIBc=
 layeh.com/gopher-luar v1.0.4 h1:BFgt94J/CXh4HkDcE2b7A7pBaVeQKEVfHEBRKL/K/Tc=
 layeh.com/gopher-luar v1.0.4/go.mod h1:N3rev/ttQd8yVluXaYsa0M/eknzRYWe+pxZ35ZFmaaI=
-within.website/confyg v0.0.0-20190112001412-39eaf7bce89f h1:bYKewlpJbGbYWiwTOHnZE49KBDwlN1BSTcvTm6UMF40=
-within.website/confyg v0.0.0-20190112001412-39eaf7bce89f/go.mod h1:qKxglCn43FmpkxdqnoLAPXs21JY1vgQfeeaZ/ovKtEE=
-within.website/confyg v0.0.0-20190112151112-df9ff4087a6b h1:noFqDj8XeOoNH8vRGZ0AWcChdX3jXa88PyVro27/VlE=
-within.website/confyg v0.0.0-20190112151112-df9ff4087a6b/go.mod h1:qKxglCn43FmpkxdqnoLAPXs21JY1vgQfeeaZ/ovKtEE=
 within.website/confyg v0.1.0 h1:2/IKJRAwrhqxTi1WZoKOQ0jl/gJ3wGfi05Z3abEC4tw=
 within.website/confyg v0.1.0/go.mod h1:qKxglCn43FmpkxdqnoLAPXs21JY1vgQfeeaZ/ovKtEE=
 within.website/johaus v1.0.0 h1:snIOuMhjotkML54BT6dxGqrHeB2iZAuCPcTnqsgbE/E=

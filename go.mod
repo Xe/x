@@ -2,14 +2,12 @@ module github.com/Xe/x
 
 require (
 	github.com/Greyh4t/gluassh v0.0.0-20180109082511-239b4f6310f4
-	github.com/McKael/madon v2.3.0+incompatible
 	github.com/McKael/madon/v2 v2.0.0-20180929094633-c679abc985d6
 	github.com/ThomasRooney/gexpect v0.0.0-20161231170123-5482f0350944
 	github.com/aclements/go-moremath v0.0.0-20180329182055-b1aff36309c7 // indirect
 	github.com/ailncode/gluaxmlpath v0.0.0-20161126153117-6ce478ecb4a6
 	github.com/brandur/simplebox v0.0.0-20150921201729-84e9865bb03a
 	github.com/bwmarrin/discordgo v0.18.0
-	github.com/caarlos0/env v3.4.0+incompatible
 	github.com/cjoudrey/gluahttp v0.0.0-20180401075744-7065ce73b887
 	github.com/cjoudrey/gluaurl v0.0.0-20161028222611-31cbb9bef199
 	github.com/codahale/hdrhistogram v0.0.0-20161010025455-3a0bb77429bd
@@ -17,7 +15,6 @@ require (
 	github.com/dgryski/go-onlinestats v0.0.0-20170612111826-1c7d19468768 // indirect
 	github.com/disintegration/imaging v1.5.0
 	github.com/facebookgo/ensure v0.0.0-20160127193407-b4ab57deab51
-	github.com/facebookgo/flagenv v0.0.0-20160425205200-fcd59fca7456
 	github.com/facebookgo/stack v0.0.0-20160209184415-751773369052 // indirect
 	github.com/facebookgo/subset v0.0.0-20150612182917-8dac2c3c4870 // indirect
 	github.com/fogleman/gg v1.1.0 // indirect
