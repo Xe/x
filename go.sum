@@ -187,5 +187,7 @@ layeh.com/gopher-json v0.0.0-20181116191917-d3d498bb4913 h1:7GSXubN0n2gOZFLkm72e
 layeh.com/gopher-json v0.0.0-20181116191917-d3d498bb4913/go.mod h1:ivKkcY8Zxw5ba0jldhZCYYQfGdb2K6u9tbYK1AwMIBc=
 layeh.com/gopher-luar v1.0.4 h1:BFgt94J/CXh4HkDcE2b7A7pBaVeQKEVfHEBRKL/K/Tc=
 layeh.com/gopher-luar v1.0.4/go.mod h1:N3rev/ttQd8yVluXaYsa0M/eknzRYWe+pxZ35ZFmaaI=
+within.website/confyg v0.0.0-20190112001412-39eaf7bce89f h1:bYKewlpJbGbYWiwTOHnZE49KBDwlN1BSTcvTm6UMF40=
+within.website/confyg v0.0.0-20190112001412-39eaf7bce89f/go.mod h1:qKxglCn43FmpkxdqnoLAPXs21JY1vgQfeeaZ/ovKtEE=
 within.website/ln v0.3.0 h1:2sJx53horlaU5O5a9rG2GqVgmEeDVdDToJjjLOJscIU=
 within.website/ln v0.3.0/go.mod h1:lF4Q6pUKfkSNFTzujDrjiUQtTQE8XwyTVzGcP5JcCig=

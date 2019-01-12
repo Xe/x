@@ -1,19 +1,23 @@
 package internal
 
 import (
+	"context"
 	"encoding/json"
 	"flag"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 
+	"github.com/Xe/ln"
+	"github.com/Xe/ln/opname"
 	"github.com/Xe/x/tools/license/licenses"
 	"go4.org/legal"
+	"within.website/confyg/flagconfyg"
 )
 
 var (
 	licenseShow = flag.Bool("license", false, "show software license?")
+	config      = flag.String("config", "", "configuration file, if set")
 )
 
 func init() {
@@ -25,10 +29,14 @@ func init() {
 	})
 }
 
-// HandleLicense optionally shows all software licenses.
-func HandleLicense() {
+// HandleLicense is a wrapper for commands that use HandleLicense.
+func HandleLicense() { HandleStartup() }
+
+// HandleStartup optionally shows all software licenses or other things.
+func HandleStartup() {
+	ctx := opname.With(context.Background(), "internal.HandleStartup")
 	if *licenseShow {
-		log.Printf("Licenses for %v", os.Args)
+		fmt.Printf("Licenses for %v\n", os.Args)
 
 		for _, li := range legal.Licenses() {
 			fmt.Println(li)
@@ -36,5 +44,11 @@ func HandleLicense() {
 		}
 
 		os.Exit(0)
+	}
+
+	if *config != "" {
+		ln.Log(ctx, ln.Info("loading config"), ln.F{"path": *config})
+
+		flagconfyg.CmdParse(*config)
 	}
 }
