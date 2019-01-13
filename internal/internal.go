@@ -2,7 +2,6 @@ package internal
 
 import (
 	"context"
-	"encoding/json"
 	"flag"
 	"fmt"
 	"net/http"
@@ -34,7 +33,14 @@ func init() {
 	legal.RegisterLicense(licenses.SQLiteBlessing)
 
 	http.HandleFunc("/.within/licenses", func(w http.ResponseWriter, r *http.Request) {
-		json.NewEncoder(w).Encode(legal.Licenses())
+		fmt.Fprintf(w, "Licenses for this program: %s\n", os.Args[0])
+
+		for _, li := range legal.Licenses() {
+			fmt.Fprintln(w, li)
+			fmt.Fprintln(w)
+		}
+
+		fmt.Fprintln(w, "Be well, Creator.")
 	})
 }
 
@@ -45,19 +51,19 @@ func HandleLicense() { HandleStartup() }
 // This always loads from the following configuration sources in the following
 // order:
 //
-//     - environment variables
 //     - command line flags (to get -config)
+//     - environment variables
 //     - configuration file (if -config is set)
 //     - command line flags
 //
 // This is done this way to ensure that command line flags always are the deciding
 // factor as an escape hatch.
 func HandleStartup() {
-	flagenv.Parse()
 	flag.Parse()
 
 	ctx := opname.With(context.Background(), "internal.HandleStartup")
 	HandleConfig(ctx)
+	flagenv.Parse()
 
 	if *licenseShow {
 		fmt.Printf("Licenses for %v\n", os.Args)
