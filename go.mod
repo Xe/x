@@ -62,6 +62,7 @@ require (
 	github.com/templexxx/xor v0.0.0-20181023030647-4e92f724b73b // indirect
 	github.com/tjfoc/gmsm v1.0.1 // indirect
 	github.com/tmc/scp v0.0.0-20170824174625-f7b48647feef
+	github.com/xlzd/gotp v0.0.0-20181030022105-c8557ba2c119
 	github.com/xtaci/kcp-go v5.0.7+incompatible
 	github.com/xtaci/smux v1.1.0
 	github.com/yookoala/realpath v1.0.0 // indirect

@@ -60,6 +60,8 @@ func main() {
 		Copy(*worker, filepath.Join(dir, "bin", "worker"))
 	}
 
+	os.MkdirAll(filepath.Join(dir, ".config"), 0777)
+
 	err = ioutil.WriteFile(filepath.Join(dir, ".buildpacks"), []byte("https://github.com/ryandotsmith/null-buildpack"), 0666)
 	if err != nil {
 		log.Fatal(err)

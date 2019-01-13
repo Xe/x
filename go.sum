@@ -149,6 +149,8 @@ github.com/tjfoc/gmsm v1.0.1/go.mod h1:XxO4hdhhrzAd+G4CjDqaOkd0hUzmtPR/d3EiBBMn/
 github.com/tmc/scp v0.0.0-20170824174625-f7b48647feef h1:7D6Nm4D6f0ci9yttWaKjM1TMAXrH5Su72dojqYGntFY=
 github.com/tmc/scp v0.0.0-20170824174625-f7b48647feef/go.mod h1:WLFStEdnJXpjK8kd4qKLwQKX/1vrDzp5BcDyiZJBHJM=
 github.com/velour/chat v0.0.0-20180713122344-fd1d1606cb89/go.mod h1:ejwOYCjnDMyO5LXFXRARQJGBZ6xQJZ3rgAHE5drSuMM=
+github.com/xlzd/gotp v0.0.0-20181030022105-c8557ba2c119 h1:YyPWX3jLOtYKulBR6AScGIs74lLrJcgeKRwcbAuQOG4=
+github.com/xlzd/gotp v0.0.0-20181030022105-c8557ba2c119/go.mod h1:/nuTSlK+okRfR/vnIPqR89fFKonnWPiZymN5ydRJkX8=
 github.com/xtaci/kcp-go v5.0.7+incompatible h1:zs9tc8XRID0m+aetu3qPWZFyRt2UIMqbXIBgw+vcnlE=
 github.com/xtaci/kcp-go v5.0.7+incompatible/go.mod h1:bN6vIwHQbfHaHtFpEssmWsN45a+AZwO7eyRCmEIbtvE=
 github.com/xtaci/smux v1.1.0 h1:VO9uJ2TQprdETdlkV+MggqiKLmXvB9I9gZR0AG4RypY=
