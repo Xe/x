@@ -1,5 +1,7 @@
 # idp
 
+idp: IDentity Provider
+
 This is a poor man's implementation of [indieauth's authorization endpoint](https://indieweb.org/authorization-endpoint). Setup and usage is simple:
 
 - `go build -o idp .`
