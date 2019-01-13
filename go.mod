@@ -36,7 +36,6 @@ require (
 	github.com/klauspost/reedsolomon v1.8.0 // indirect
 	github.com/kohkimakimoto/gluaenv v0.0.0-20160815032729-2888db6bbe38
 	github.com/kohkimakimoto/gluafs v0.0.0-20160815050327-01391ed2d7ab
-	github.com/kohkimakimoto/gluamarkdown v0.0.0-20160902030455-a1c413d7bbfb
 	github.com/kohkimakimoto/gluaquestion v0.0.0-20160428074244-311437c29ba5
 	github.com/kohkimakimoto/gluatemplate v0.0.0-20160815033744-d9e2c9d6b00f
 	github.com/kohkimakimoto/gluayaml v0.0.0-20160815032708-6fe413d49d73
@@ -53,11 +52,8 @@ require (
 	github.com/peterh/liner v1.1.0
 	github.com/pkg/errors v0.8.1
 	github.com/robertkrimen/godocdown v0.0.0-20130622164427-0bfa04905481
-	github.com/russross/blackfriday v2.0.0+incompatible // indirect
-	github.com/shurcooL/sanitized_anchor_name v1.0.0 // indirect
 	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect
 	github.com/streamrail/concurrent-map v0.0.0-20160823150647-8bf1e9bacbf6
-	github.com/stretchr/objx v0.1.1 // indirect
 	github.com/stretchr/testify v1.3.0 // indirect
 	github.com/templexxx/cpufeat v0.0.0-20180724012125-cef66df7f161 // indirect
 	github.com/templexxx/xor v0.0.0-20181023030647-4e92f724b73b // indirect

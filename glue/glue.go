@@ -17,7 +17,6 @@ import (
 	"github.com/cjoudrey/gluaurl"
 	"github.com/kohkimakimoto/gluaenv"
 	"github.com/kohkimakimoto/gluafs"
-	"github.com/kohkimakimoto/gluamarkdown"
 	"github.com/kohkimakimoto/gluaquestion"
 	"github.com/kohkimakimoto/gluatemplate"
 	"github.com/kohkimakimoto/gluayaml"
@@ -148,7 +147,6 @@ Available options are:
 func preload(L *lua.LState) {
 	L.PreloadModule("re", gluare.Loader)
 	L.PreloadModule("sh", gluash.Loader)
-	L.PreloadModule("markdown", gluamarkdown.Loader)
 	L.PreloadModule("fs", gluafs.Loader)
 	L.PreloadModule("env", gluaenv.Loader)
 	L.PreloadModule("yaml", gluayaml.Loader)
