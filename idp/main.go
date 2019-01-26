@@ -10,6 +10,7 @@ import (
 	"text/template"
 	"time"
 
+	"github.com/Xe/x/idp/idpmiddleware"
 	"github.com/Xe/x/internal"
 	"github.com/pborman/uuid"
 	"github.com/xlzd/gotp"
@@ -39,13 +40,23 @@ func main() {
 
 	log.Println(i.t.ProvisioningUri(*domain, *domain))
 
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+	def := idpmiddleware.XeProtect("https://" + *domain + "/")(http.DefaultServeMux)
+	mux := http.NewServeMux()
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/auth/challenge" {
+			r.URL.Path = "/.within/x/idpmiddleware/challenge"
+			http.Redirect(w, r, r.URL.String(), http.StatusPermanentRedirect)
+			return
+		}
+
 		w.Header().Set("Content-Type", "text/html")
 		w.Write([]byte(rootPageTemplate))
 	})
-	http.HandleFunc("/auth", i.auth)
-	http.HandleFunc("/challenge", i.challenge)
-	http.ListenAndServe(":"+*port, ex.HTTPLog(http.DefaultServeMux))
+	mux.HandleFunc("/auth", i.auth)
+	mux.HandleFunc("/challenge", i.challenge)
+	mux.Handle("/.within/", def)
+	mux.Handle("/debug/", def)
+	http.ListenAndServe(":"+*port, ex.HTTPLog(mux))
 }
 
 type idp struct {
@@ -183,6 +194,8 @@ func (i *idp) challenge(w http.ResponseWriter, r *http.Request) {
 	q.Set("code", bearerToken)
 	u.RawQuery = q.Encode()
 
+	w.Header().Set("Cache-Control", "no-store, no-cache, must-revalidate")
+	w.Header().Set("Expires", "Thu, 01 Jan 1970 00:00:00 GMT")
 	http.Redirect(w, r, u.String(), http.StatusTemporaryRedirect)
 }
 

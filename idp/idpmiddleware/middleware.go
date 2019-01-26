@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"strings"
 	"sync"
 	"time"
 
@@ -79,7 +78,7 @@ func Protect(idpServer, me, selfURL string) func(next http.Handler) http.Handler
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			ctx := r.Context()
 			ctx = opname.With(ctx, "idpmiddleware.Protect.Handler")
-			if r.URL.Path == "/auth/challenge" {
+			if r.URL.Path == "/.within/x/idpmiddleware/challenge" {
 				v := r.URL.Query()
 				ctx = ln.WithF(ctx, ln.F{"as": me, "state": v.Get("state"), "code": v.Get("code")})
 				ln.Log(ctx, ln.Info("login"))
@@ -109,7 +108,7 @@ func Protect(idpServer, me, selfURL string) func(next http.Handler) http.Handler
 
 					ln.Log(ctx, ln.Info("setting cookie"))
 					http.SetCookie(w, &http.Cookie{
-						Name:     "auth",
+						Name:     "within-x-idpmiddleware",
 						Value:    hash(me, idpServer),
 						HttpOnly: true,
 						Expires:  time.Now().Add(900 * time.Hour),
@@ -118,12 +117,16 @@ func Protect(idpServer, me, selfURL string) func(next http.Handler) http.Handler
 					})
 					delete(codes, cd)
 
-					http.Redirect(w, r, selfURL, http.StatusPermanentRedirect)
+					w.Header().Set("Cache-Control", "no-store, no-cache, must-revalidate")
+					w.Header().Set("Expires", "Thu, 01 Jan 1970 00:00:00 GMT")
+					http.Redirect(w, r, selfURL, http.StatusTemporaryRedirect)
 				}
+
+				http.Error(w, "Programmer error, maybe you have multiple instances of the IDP middleware?", http.StatusInternalServerError)
 				return
 			}
 
-			cookie, err := r.Cookie("auth")
+			cookie, err := r.Cookie("within-x-idpmiddleware")
 			if err != nil || cookie.Value != hash(me, idpServer) {
 				u, err := url.Parse(idpServer)
 				if err != nil {
@@ -131,7 +134,7 @@ func Protect(idpServer, me, selfURL string) func(next http.Handler) http.Handler
 					return
 				}
 
-				code := strings.Replace(uuid.New(), "-", "", 0)
+				code := uuid.New()
 				lock.Lock()
 				codes[code] = code
 				lock.Unlock()
@@ -140,11 +143,13 @@ func Protect(idpServer, me, selfURL string) func(next http.Handler) http.Handler
 				v := url.Values{}
 				v.Set("me", me)
 				v.Set("client_id", selfURL)
-				v.Set("redirect_uri", selfURL+"auth/challenge")
+				v.Set("redirect_uri", selfURL+".within/x/idpmiddleware/challenge")
 				v.Set("state", code)
 				v.Set("response_type", "id")
 				u.RawQuery = v.Encode()
 
+				w.Header().Set("Cache-Control", "no-store, no-cache, must-revalidate")
+				w.Header().Set("Expires", "Thu, 01 Jan 1970 00:00:00 GMT")
 				http.Redirect(w, r, u.String(), http.StatusTemporaryRedirect)
 				return
 			}
