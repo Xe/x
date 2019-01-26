@@ -186,6 +186,7 @@ const authPageTemplate = `<html>
 <head>
 <link rel="stylesheet" href="https://unpkg.com/chota@0.5.2/dist/chota.min.css">
 <title>Auth</title>
+<meta name=viewport content="width=400">
 <style>
 :root {
   --color-primary: #da1d50; /* brand color */

@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strings"
 	"sync"
 	"time"
 
@@ -62,6 +63,11 @@ func validate(resp *http.Response) (string, error) {
 	}
 
 	return result.Me, nil
+}
+
+// XeProtect sets defaults for Xe to use.
+func XeProtect(selfURL string) func(next http.Handler) http.Handler {
+	return Protect("https://idp.christine.website", "https://christine.website/", selfURL)
 }
 
 // Protect protects a given URL behind your given idp(1) server.
@@ -125,7 +131,7 @@ func Protect(idpServer, me, selfURL string) func(next http.Handler) http.Handler
 					return
 				}
 
-				code := uuid.New()
+				code := strings.Replace(uuid.New(), "-", "", 0)
 				lock.Lock()
 				codes[code] = code
 				lock.Unlock()
