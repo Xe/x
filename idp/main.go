@@ -39,6 +39,10 @@ func main() {
 
 	log.Println(i.t.ProvisioningUri(*domain, *domain))
 
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "text/html")
+		w.Write([]byte(rootPageTemplate))
+	})
 	http.HandleFunc("/auth", i.auth)
 	http.HandleFunc("/challenge", i.challenge)
 	http.ListenAndServe(":"+*port, ex.HTTPLog(http.DefaultServeMux))
@@ -182,6 +186,31 @@ func (i *idp) challenge(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, u.String(), http.StatusTemporaryRedirect)
 }
 
+const rootPageTemplate = `<html>
+<head>
+<link rel="stylesheet" href="https://unpkg.com/chota@0.5.2/dist/chota.min.css">
+<title>Auth</title>
+<meta name=viewport content="width=400">
+<style>
+:root {
+  --color-primary: #da1d50; /* brand color */
+  --grid-maxWidth: 40rem;
+}
+</style>
+</head>
+<body id="top">
+<div class="container">
+<div class="card">
+  <header>
+    <h4>Error</h4>
+  </header>
+
+  <p>This is a private identity provider supporting <a href="https://indieauth.net">IndieAuth</a> for the use of <a href="https://christine.website">Christine Dodrill</a> only. Unauthorized access is forbidden.</p>
+</div>
+</div>
+</body>
+</html>`
+
 const authPageTemplate = `<html>
 <head>
 <link rel="stylesheet" href="https://unpkg.com/chota@0.5.2/dist/chota.min.css">
@@ -202,7 +231,7 @@ const authPageTemplate = `<html>
   </header>
   <p><form action="/challenge" method="GET">
   Code: <br>
-  <input type="text" name="code" value=""><br><br>
+  <input type="text" name="code" value="" autofocus><br><br>
   <input type="hidden" name="me" value="{{ .Me }}">
   <input type="hidden" name="state" value="{{ .State }}">
   <input type="hidden" name="client_id" value="{{ .ClientID }}">
