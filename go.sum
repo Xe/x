@@ -104,6 +104,8 @@ github.com/mattn/go-runewidth v0.0.3 h1:a+kO+98RDGEfo6asOGMmpodZq4FNtnGP54yps8Bz
 github.com/mattn/go-runewidth v0.0.3/go.mod h1:LwmH8dsx7+W8Uxz3IHJYH5QSwggIsqBzpuz5H//U1FU=
 github.com/mattn/go-runewidth v0.0.4 h1:2BvfKmzob6Bmd4YsL0zygOqfdFnK7GR4QL06Do4/p7Y=
 github.com/mattn/go-runewidth v0.0.4/go.mod h1:LwmH8dsx7+W8Uxz3IHJYH5QSwggIsqBzpuz5H//U1FU=
+github.com/mmikulicic/stringlist v0.0.0-20170411212101-a0d1ef9a7ccb h1:J7xIYNprbALCDmUz9kVVxJbAg9u7o3JIRwD3mOd89tg=
+github.com/mmikulicic/stringlist v0.0.0-20170411212101-a0d1ef9a7ccb/go.mod h1:19Brp+Rld8TLwZ2oCHvTE3xDhCMr0jSCWwzcc9ejZgQ=
 github.com/mndrix/golog v0.0.0-20170330170653-a28e2a269775 h1:KPqf9x/eMg3ZnHATLXcM1OgQMNVkPUv1QcGv6zTRMRg=
 github.com/mndrix/golog v0.0.0-20170330170653-a28e2a269775/go.mod h1:Q4YHYl483MNk6wwg3g8YsINpKe5S2UzUJCRSRlFaSU0=
 github.com/mndrix/ps v0.0.0-20170330174427-18e65badd6ab h1:fPrYMvMnWuED0MLhLyrny1fLaHhtiXK30pNyBGrk9Gs=
@@ -157,6 +159,8 @@ github.com/yuin/gluare v0.0.0-20170607022532-d7c94f1a80ed h1:I1vcLHWU9m30rA90rMr
 github.com/yuin/gluare v0.0.0-20170607022532-d7c94f1a80ed/go.mod h1:9w6KSdZh23UWqOywWsRLUcJUrUNjRh4Ql3z9uVgnSP4=
 github.com/yuin/gopher-lua v0.0.0-20190111065735-507fb6e5b04d h1:5JtS12nrJrdMZhJOZc5lslNHm9yJv6ig67yjy4nE4OM=
 github.com/yuin/gopher-lua v0.0.0-20190111065735-507fb6e5b04d/go.mod h1:fFiAh+CowNFr0NK5VASokuwKwkbacRmHsVA7Yb1Tqac=
+go.jonnrb.io/vanity v0.1.0 h1:cVGnSsKskgSfmqVpoZLIjJK+RBnNuv38w+s5ETsSY7g=
+go.jonnrb.io/vanity v0.1.0/go.mod h1:dGzlD3p54k6ABHBFWqvGjQ4ZJv5/n7Wl4R/PgkXQS5k=
 go4.org v0.0.0-20181109185143-00e24f1b2599 h1:4WHwK0SeICTm4UREYCO3QAhYgBLbRJKNwoUsFp8nk9o=
 go4.org v0.0.0-20181109185143-00e24f1b2599/go.mod h1:MkTOUMDaeVYJUOUsaDXIhWPZYa1yOyC1qaOBpL57BhE=
 golang.org/x/crypto v0.0.0-20181030102418-4d3f4d9ffa16/go.mod h1:6SG95UA2DQfeDnfUPMdvaQW0Q7yPrPDi9nlGo2tz2b4=

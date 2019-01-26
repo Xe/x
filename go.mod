@@ -44,6 +44,7 @@ require (
 	github.com/kr/pty v1.1.3 // indirect
 	github.com/layeh/gopher-luar v1.0.4
 	github.com/mattn/go-runewidth v0.0.4 // indirect
+	github.com/mmikulicic/stringlist v0.0.0-20170411212101-a0d1ef9a7ccb
 	github.com/mndrix/golog v0.0.0-20170330170653-a28e2a269775
 	github.com/mndrix/ps v0.0.0-20170330174427-18e65badd6ab // indirect
 	github.com/olekukonko/tablewriter v0.0.1 // indirect
@@ -66,6 +67,7 @@ require (
 	github.com/yookoala/realpath v1.0.0 // indirect
 	github.com/yuin/gluare v0.0.0-20170607022532-d7c94f1a80ed
 	github.com/yuin/gopher-lua v0.0.0-20190111065735-507fb6e5b04d
+	go.jonnrb.io/vanity v0.1.0
 	go4.org v0.0.0-20181109185143-00e24f1b2599
 	golang.org/x/crypto v0.0.0-20190103213133-ff983b9c42bc
 	golang.org/x/image v0.0.0-20181116024801-cd38e8056d9b // indirect
