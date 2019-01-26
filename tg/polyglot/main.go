@@ -2,12 +2,17 @@ package main
 
 import (
 	"bytes"
+	"context"
+	"expvar"
+	_ "expvar"
 	"flag"
 	"fmt"
 	"log"
+	"net/http"
 	"strings"
 	"time"
 
+	"github.com/Xe/x/idp/idpmiddleware"
 	"github.com/Xe/x/internal"
 	_ "github.com/Xe/x/tokipona"
 	"github.com/Xe/x/web/tokiponatokens"
@@ -16,13 +21,19 @@ import (
 	"within.website/johaus/parser"
 	_ "within.website/johaus/parser/alldialects"
 	"within.website/johaus/pretty"
+	"within.website/ln"
+	"within.website/ln/opname"
 )
 
-const tpapiurl = `https://us-central1-golden-cove-408.cloudfunctions.net/toki-pona-verb-marker`
+const (
+	tpapiurl = `https://us-central1-golden-cove-408.cloudfunctions.net/toki-pona-verb-marker`
+	selfURL  = `http://10.0.0.240:5009/`
+)
 
 var (
 	telegramToken  = flag.String("telegram-token", "", "telegram bot token")
 	tokiPonaAPIURL = flag.String("toki-pona-tokenizer-api-url", tpapiurl, "toki pona tokenizer API URL")
+	port           = flag.String("port", "5009", "HTTP port for statistics")
 )
 
 func main() {
@@ -31,6 +42,7 @@ func main() {
 		Token:  *telegramToken,
 		Poller: &tb.LongPoller{Timeout: 10 * time.Second},
 	})
+	errCount := expvar.NewInt("errors")
 
 	if err != nil {
 		log.Fatal(err)
@@ -42,17 +54,21 @@ func main() {
 	b.Handle("/maftufa", parserCommandFor(b, "maftufa"))
 	b.Handle("/zantufa", parserCommandFor(b, "zantufa"))
 
+	tokiCount := expvar.NewInt("toki")
 	b.Handle("/toki", func(m *tb.Message) {
 		defer func() {
 			if r := recover(); r != nil {
 				fmt.Println("Recovered in f", r)
+				errCount.Add(1)
 			}
 		}()
+		defer tokiCount.Add(1)
 
 		msg := m.Payload
 		parts, err := tokiponatokens.Tokenize(*tokiPonaAPIURL, msg)
 		if err != nil {
 			b.Send(m.Sender, err.Error())
+			errCount.Add(1)
 			return
 		}
 
@@ -60,13 +76,15 @@ func main() {
 
 		for _, sentence := range parts {
 			bracesReply := tokiBraces(sentence)
-			log.Printf("%s: %s", m.Sender.Username, bracesReply)
 			sb.WriteString(bracesReply)
 			sb.WriteRune('\n')
 		}
 
 		b.Send(m.Sender, sb.String())
 	})
+
+	ln.Log(opname.With(context.Background(), "main"), ln.Info("starting HTTP server"), ln.F{"port": *port, "using": "idpmiddleware", "self_url": selfURL})
+	go http.ListenAndServe(":"+*port, idpmiddleware.XeProtect(selfURL)(http.DefaultServeMux))
 
 	b.Start()
 }
