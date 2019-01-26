@@ -24,7 +24,13 @@ func hash(data string, salt string) string {
 	return fmt.Sprintf("%x", output)
 }
 
-var bootTime = time.Now()
+var (
+	globalSalt string
+)
+
+func init() {
+	globalSalt = hash(uuid.New(), uuid.New())
+}
 
 func verify(ctx context.Context, idpServer, state, code string) *http.Request {
 	u, err := url.Parse(idpServer)
@@ -111,7 +117,7 @@ func Protect(idpServer, me, selfURL string) func(next http.Handler) http.Handler
 					ln.Log(ctx, ln.Info("setting cookie"))
 					http.SetCookie(w, &http.Cookie{
 						Name:     "within-x-idpmiddleware",
-						Value:    hash(me, bootTime.String()),
+						Value:    hash(me, globalSalt),
 						HttpOnly: true,
 						Expires:  time.Now().Add(900 * time.Hour),
 						Path:     "/",
@@ -129,7 +135,7 @@ func Protect(idpServer, me, selfURL string) func(next http.Handler) http.Handler
 			}
 
 			cookie, err := r.Cookie("within-x-idpmiddleware")
-			if err != nil || cookie.Value != hash(me, bootTime.String()) {
+			if err != nil || cookie.Value != hash(me, globalSalt) {
 				u, err := url.Parse(idpServer)
 				if err != nil {
 					http.Error(w, err.Error(), http.StatusInternalServerError)
