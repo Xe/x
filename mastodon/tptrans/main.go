@@ -4,13 +4,11 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"io/ioutil"
-	"net/http"
 
 	madon "github.com/McKael/madon/v2"
 	"github.com/Xe/x/internal"
+	"github.com/Xe/x/tokipona"
 	_ "github.com/Xe/x/tokipona"
-	"github.com/Xe/x/web/tokipana"
 	"github.com/jaytaylor/html2text"
 	_ "github.com/joho/godotenv/autoload"
 	"within.website/ln"
@@ -82,27 +80,11 @@ func main() {
 						continue
 					}
 
-					req := tokipana.Translate(text)
-					resp, err := http.DefaultClient.Do(req)
-					if err != nil {
-						ln.Error(ctx, err)
-						continue
-					}
-					err = tokipana.Validate(resp)
-					if err != nil {
-						ln.Error(ctx, err)
-						continue
-					}
-					data, err := ioutil.ReadAll(resp.Body)
-					resp.Body.Close()
-					if err != nil {
-						ln.Error(ctx, err)
-						continue
-					}
+					data := tokipona.Relex(text)
 
 					st, err := c.PostStatus(
 						madon.PostStatusParams{
-							Text:       fmt.Sprintf(translationTemplate, string(data)),
+							Text:       fmt.Sprintf(translationTemplate, data),
 							InReplyTo:  s.ID,
 							Visibility: "public",
 						},
@@ -121,4 +103,4 @@ func main() {
 redo:
 }
 
-const translationTemplate = `Translated into English: %s`
+const translationTemplate = `Badly translated into English: %s`
