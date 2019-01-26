@@ -189,7 +189,7 @@ func (i *idp) challenge(w http.ResponseWriter, r *http.Request) {
 const rootPageTemplate = `<html>
 <head>
 <link rel="stylesheet" href="https://unpkg.com/chota@0.5.2/dist/chota.min.css">
-<title>Auth</title>
+<title>Forbidden</title>
 <meta name=viewport content="width=400">
 <style>
 :root {
@@ -202,7 +202,7 @@ const rootPageTemplate = `<html>
 <div class="container">
 <div class="card">
   <header>
-    <h4>Error</h4>
+    <h4>Forbidden</h4>
   </header>
 
   <p>This is a private identity provider supporting <a href="https://indieauth.net">IndieAuth</a> for the use of <a href="https://christine.website">Christine Dodrill</a> only. Unauthorized access is forbidden.</p>
