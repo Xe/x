@@ -111,7 +111,7 @@ func Protect(idpServer, me, selfURL string) func(next http.Handler) http.Handler
 					ln.Log(ctx, ln.Info("setting cookie"))
 					http.SetCookie(w, &http.Cookie{
 						Name:     "within-x-idpmiddleware",
-						Value:    hash(me+bootTime.String(), idpServer),
+						Value:    hash(me, bootTime.String()),
 						HttpOnly: true,
 						Expires:  time.Now().Add(900 * time.Hour),
 						Path:     "/",
@@ -129,7 +129,7 @@ func Protect(idpServer, me, selfURL string) func(next http.Handler) http.Handler
 			}
 
 			cookie, err := r.Cookie("within-x-idpmiddleware")
-			if err != nil || cookie.Value != hash(me+bootTime.String(), idpServer) {
+			if err != nil || cookie.Value != hash(me, bootTime.String()) {
 				u, err := url.Parse(idpServer)
 				if err != nil {
 					http.Error(w, err.Error(), http.StatusInternalServerError)
