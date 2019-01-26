@@ -72,7 +72,7 @@ func main() {
 						continue
 					}
 
-					text, err := html2text.FromString(s.Content, html2text.Options{PrettyTables: true})
+					text, err := html2text.FromString(s.Content, html2text.Options{OmitLinks: true})
 					if err != nil {
 						ln.Error(ctx, err)
 						continue
