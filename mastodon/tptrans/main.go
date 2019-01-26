@@ -8,9 +8,7 @@ import (
 	madon "github.com/McKael/madon/v2"
 	"github.com/Xe/x/internal"
 	"github.com/Xe/x/tokipona"
-	_ "github.com/Xe/x/tokipona"
 	"github.com/jaytaylor/html2text"
-	_ "github.com/joho/godotenv/autoload"
 	"within.website/ln"
 	"within.website/ln/opname"
 )
