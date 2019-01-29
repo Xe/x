@@ -4,7 +4,6 @@ package discordwebhook
 import (
 	"bytes"
 	"encoding/json"
-	"io/ioutil"
 	"net/http"
 
 	"github.com/Xe/x/web"
@@ -61,24 +60,7 @@ func Send(whurl string, w Webhook) *http.Request {
 // Validate validates the response from Discord.
 func Validate(resp *http.Response) error {
 	if resp.StatusCode/100 != 2 {
-		data, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return err
-		}
-		resp.Body.Close()
-
-		loc, err := resp.Location()
-		if err != nil {
-			return err
-		}
-
-		return &web.Error{
-			WantStatus:   200,
-			GotStatus:    resp.StatusCode,
-			URL:          loc,
-			Method:       resp.Request.Method,
-			ResponseBody: string(data),
-		}
+		return web.NewError(http.StatusOK, resp)
 	}
 
 	return nil

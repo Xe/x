@@ -4,12 +4,37 @@ package web
 
 import (
 	"fmt"
+	"io/ioutil"
+	"net/http"
 	"net/url"
 
 	"within.website/ln"
 )
 
-// Error is an API error.
+// NewError creates an Error based on an expected HTTP status code vs data populated
+// from an HTTP response.
+func NewError(wantStatusCode int, resp *http.Response) error {
+	data, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+	resp.Body.Close()
+
+	loc, err := resp.Location()
+	if err != nil {
+		return err
+	}
+
+	return &Error{
+		WantStatus:   wantStatusCode,
+		GotStatus:    resp.StatusCode,
+		URL:          loc,
+		Method:       resp.Request.Method,
+		ResponseBody: string(data),
+	}
+}
+
+// Error is a web response error. Use this when API calls don't work out like you wanted them to.
 type Error struct {
 	WantStatus, GotStatus int
 	URL                   *url.URL
