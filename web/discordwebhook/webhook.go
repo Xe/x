@@ -1,11 +1,13 @@
+// Package discordwebhook is a simple low-level HTTP client wrapper around Discord webhooks.
 package discordwebhook
 
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
+
+	"github.com/Xe/x/web"
 )
 
 // Webhook is the parent structure fired off to Discord.
@@ -64,7 +66,19 @@ func Validate(resp *http.Response) error {
 			return err
 		}
 		resp.Body.Close()
-		return fmt.Errorf("status code was %v: %s", resp.StatusCode, string(data))
+
+		loc, err := resp.Location()
+		if err != nil {
+			return err
+		}
+
+		return &web.Error{
+			WantStatus:   200,
+			GotStatus:    resp.StatusCode,
+			URL:          loc,
+			Method:       resp.Request.Method,
+			ResponseBody: string(data),
+		}
 	}
 
 	return nil

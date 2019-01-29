@@ -1,19 +1,24 @@
+// Command pdevbitcoinbot queries the bitstamp API and stores prices in a HDR
+// Histogram. This computes the p95 price of bitcoin.
 package main
 
 import (
-	"bytes"
+	"context"
 	"encoding/json"
 	"flag"
 	"fmt"
-	"io"
 	"log"
 	"net/http"
 	"os"
 	"strconv"
 
 	"github.com/Xe/x/internal"
+	"github.com/Xe/x/web"
 	"github.com/Xe/x/web/discordwebhook"
 	"github.com/codahale/hdrhistogram"
+	experrors "golang.org/x/exp/errors"
+	"within.website/ln"
+	"within.website/ln/opname"
 )
 
 type BitstampReply struct {
@@ -34,7 +39,8 @@ type data struct {
 }
 
 var (
-	whURL = flag.String("webhook-url", "", "Discord webhook URL")
+	whURL            = flag.String("webhook-url", "", "Discord webhook URL")
+	dataFileLocation = flag.String("data", "./data.json", "data file location")
 )
 
 func getBitstamp() (*BitstampReply, error) {
@@ -53,37 +59,29 @@ func getBitstamp() (*BitstampReply, error) {
 	return &bsr, nil
 }
 
-func sendWebhook(whurl string, dw discordwebhook.Webhook) error {
-	data, err := json.Marshal(&dw)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	resp, err := http.Post(whurl, "application/json", bytes.NewBuffer(data))
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	if resp.StatusCode/100 != 2 {
-		io.Copy(os.Stderr, resp.Body)
-		resp.Body.Close()
-		return fmt.Errorf("status code was %v", resp.StatusCode)
-	}
-
-	return nil
-}
-
 func main() {
 	internal.HandleStartup()
-	fin, err := os.Open("./data.json")
+
+	ctx := opname.With(context.Background(), "main")
+
+	fin, err := os.Open(*dataFileLocation)
 	if err != nil {
-		log.Fatal(err)
+		var pe *os.PathError
+		if experrors.As(err, &pe) {
+			ln.Fatal(ctx, ln.F{
+				"err_op":   pe.Op,
+				"err_path": pe.Path,
+				"err_err":  pe.Err,
+			})
+		}
+
+		ln.FatalErr(ctx, err)
 	}
 
 	var d data
 	err = json.NewDecoder(fin).Decode(&d)
 	if err != nil {
-		log.Fatal(err)
+		ln.FatalErr(ctx, err)
 	}
 	fin.Close()
 
@@ -96,12 +94,12 @@ func main() {
 
 	bsr, err := getBitstamp()
 	if err != nil {
-		log.Fatal(err)
+		ln.FatalErr(ctx, err)
 	}
 
 	bcf, err := strconv.ParseFloat(bsr.Ask, 64)
 	if err != nil {
-		log.Fatal(err)
+		ln.FatalErr(ctx, err)
 	}
 
 	h.RecordValue(int64(bcf))
@@ -142,11 +140,16 @@ func main() {
 	req := discordwebhook.Send(*whURL, dw)
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		log.Fatal(err)
+		ln.FatalErr(ctx, err)
 	}
 	err = discordwebhook.Validate(resp)
 	if err != nil {
-		log.Fatal(err)
+		var werr *web.Error
+		if experrors.As(err, &werr) {
+			ln.Fatal(ctx, werr)
+		}
+
+		ln.FatalErr(ctx, err)
 	}
 
 	d.LastValue = &bsr.Ask
@@ -154,11 +157,11 @@ func main() {
 
 	fout, err := os.Create("./data.json")
 	if err != nil {
-		log.Fatal(err)
+		ln.FatalErr(ctx, err)
 	}
 
 	err = json.NewEncoder(fout).Encode(&d)
 	if err != nil {
-		log.Fatal(err)
+		ln.FatalErr(ctx, err)
 	}
 }

@@ -11,7 +11,6 @@ require (
 	github.com/cjoudrey/gluahttp v0.0.0-20190104103309-101c19a37344
 	github.com/cjoudrey/gluaurl v0.0.0-20161028222611-31cbb9bef199
 	github.com/codahale/hdrhistogram v0.0.0-20161010025455-3a0bb77429bd
-	github.com/dave/jennifer v1.2.0 // indirect
 	github.com/dgryski/go-failure v0.0.0-20151001134759-4963dbd58fd0
 	github.com/dgryski/go-onlinestats v0.0.0-20170612111826-1c7d19468768 // indirect
 	github.com/disintegration/imaging v1.5.0
@@ -70,6 +69,7 @@ require (
 	go.jonnrb.io/vanity v0.1.0
 	go4.org v0.0.0-20181109185143-00e24f1b2599
 	golang.org/x/crypto v0.0.0-20190103213133-ff983b9c42bc
+	golang.org/x/exp/errors v0.0.0-20190125153040-c74c464bbbf2
 	golang.org/x/image v0.0.0-20181116024801-cd38e8056d9b // indirect
 	golang.org/x/net v0.0.0-20190110200230-915654e7eabc // indirect
 	golang.org/x/oauth2 v0.0.0-20190111185915-36a7019397c4
