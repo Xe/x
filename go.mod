@@ -82,5 +82,5 @@ require (
 	layeh.com/gopher-luar v1.0.4 // indirect
 	within.website/confyg v0.1.0
 	within.website/johaus v1.0.0
-	within.website/ln v0.5.0
+	within.website/ln v0.5.1
 )
