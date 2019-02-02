@@ -16,7 +16,7 @@ func main() {
 
 	env := append(os.Environ(), []string{"GO111MODULE=on"}...)
 
-	for _, tool := range []string{"github.com/robertkrimen/godocdown/godocdown"} {
+	for _, tool := range []string{"github.com/robertkrimen/godocdown/godocdown", "github.com/go-bindata/go-bindata/go-bindata"} {
 		yeet.ShouldWork(ctx, env, yeet.WD, "go", "install", tool)
 	}
 }

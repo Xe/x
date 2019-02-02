@@ -20,6 +20,7 @@ require (
 	github.com/fogleman/gg v1.1.0 // indirect
 	github.com/fogleman/primitive v0.0.0-20170926175833-69506c928bef
 	github.com/garyburd/redigo v1.6.0
+	github.com/go-bindata/go-bindata v1.0.0 // indirect
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
 	github.com/google/go-github v17.0.0+incompatible
 	github.com/google/go-querystring v1.0.0 // indirect
