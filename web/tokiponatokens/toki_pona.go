@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"net/http"
 	"strings"
+
+	"github.com/Xe/x/web"
 )
 
 // Part is an individual part of a sentence.
@@ -90,6 +92,14 @@ const (
 // Sentence is a series of sentence parts. This correlates to one Toki Pona sentence.
 type Sentence []Part
 
+func validate(resp *http.Response) error {
+	if resp.StatusCode != http.StatusOK {
+		return web.NewError(http.StatusOK, resp)
+	}
+
+	return nil
+}
+
 // Tokenize returns a series of toki pona tokens.
 func Tokenize(aurl, text string) ([]Sentence, error) {
 	buf := bytes.NewBuffer([]byte(text))
@@ -105,6 +115,10 @@ func Tokenize(aurl, text string) ([]Sentence, error) {
 		return nil, err
 	}
 	defer resp.Body.Close()
+	err = validate(resp)
+	if err != nil {
+		return nil, err
+	}
 
 	var result []Sentence
 	err = json.NewDecoder(resp.Body).Decode(&result)

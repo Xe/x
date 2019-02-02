@@ -1,0 +1,15 @@
+{
+    "errors": {
+        "not_allowed": "na e'akne",
+        "forbidden": "narplicru",
+        "url_error": "na jimpe lo urli"
+    },
+
+    "prose": {
+        "index": "ni'o ti samse'u fi lo nu e'ande po la kristin.dadril .i lo narplicru pilno cu na e'akne",
+        "auth": ".i tolna'e fa zoi .uy. {1} .uy. be zoi .uy. {0} .uy."
+    },
+
+    "auth_title": "dubju'o",
+    "submit_button": "dudydatni"
+}

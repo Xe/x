@@ -71,7 +71,7 @@ require (
 	golang.org/x/crypto v0.0.0-20190103213133-ff983b9c42bc
 	golang.org/x/exp/errors v0.0.0-20190125153040-c74c464bbbf2
 	golang.org/x/image v0.0.0-20181116024801-cd38e8056d9b // indirect
-	golang.org/x/net v0.0.0-20190110200230-915654e7eabc // indirect
+	golang.org/x/net v0.0.0-20190125091013-d26f9f9a57f3 // indirect
 	golang.org/x/oauth2 v0.0.0-20190111185915-36a7019397c4
 	golang.org/x/sys v0.0.0-20190109145017-48ac38b7c8cb // indirect
 	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
@@ -82,5 +82,5 @@ require (
 	layeh.com/gopher-luar v1.0.4 // indirect
 	within.website/confyg v0.1.0
 	within.website/johaus v1.0.0
-	within.website/ln v0.4.0
+	within.website/ln v0.5.0
 )

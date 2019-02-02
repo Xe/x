@@ -53,8 +53,9 @@ func (i ilo) parse(authorID, inp string) (*reply, error) {
 				if err != nil {
 					return nil, err
 				}
-				if resp.StatusCode/100 != 2 {
-					return nil, errors.New(resp.Status)
+				err = switchcounter.Validate(resp)
+				if err != nil {
+					return nil, err
 				}
 				var st switchcounter.Status
 				err = json.NewDecoder(resp.Body).Decode(&st)
@@ -78,8 +79,9 @@ func (i ilo) parse(authorID, inp string) (*reply, error) {
 			if err != nil {
 				return nil, err
 			}
-			if resp.StatusCode/100 != 2 {
-				return nil, errors.New(resp.Status)
+			err = switchcounter.Validate(resp)
+			if err != nil {
+				return nil, err
 			}
 
 			fmt.Fprintf(buf, "tenpo ni la jan %s li lawa insa.\n", req.Subject)

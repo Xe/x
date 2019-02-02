@@ -56,8 +56,7 @@ Available options are:
   -p file  write cpu profiles to the file
   -v       show version information
   -license show license information
-  -manpage generate manpage
-`)
+  -manpage generate manpage`)
 	}
 	internal.HandleStartup()
 	if len(opt_p) != 0 {

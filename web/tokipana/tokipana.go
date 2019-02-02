@@ -2,18 +2,14 @@
 package tokipana
 
 import (
-	"errors"
 	"net/http"
 	"net/url"
+
+	"github.com/Xe/x/web"
 )
 
 // The API URL.
 const APIURL = `http://inamidst.com/services/tokipana`
-
-// Errors
-var (
-	ErrInvalidRequest = errors.New("tokipana: invalid request")
-)
 
 // Validate checks if a response from the API is valid or not.
 func Validate(resp *http.Response) error {
@@ -21,11 +17,7 @@ func Validate(resp *http.Response) error {
 		return nil
 	}
 
-	if resp.StatusCode%100 != 2 {
-		return ErrInvalidRequest
-	}
-
-	return nil
+	return web.NewError(http.StatusOK, resp)
 }
 
 // Translate returns a request to translate the given toki pona text into english.

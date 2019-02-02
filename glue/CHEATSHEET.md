@@ -456,8 +456,6 @@ local ssh = require "ssh"
 
 SSH client library
 
-https://github.com/kohkimakimoto/gluassh/blob/master/gluassh_test.go
-
 ## `template`
 
 ```lua

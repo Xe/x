@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
-	"net/http"
 	"os"
 	"os/signal"
 	"regexp"
@@ -51,7 +50,7 @@ func main() {
 	}
 	cfg.JanLawa = append(cfg.JanLawa, "console")
 
-	sw := switchcounter.NewHTTPClient(http.DefaultClient, cfg.SwitchCounterWebhook)
+	sw := switchcounter.NewHTTPClient(cfg.SwitchCounterWebhook)
 
 	line := liner.NewLiner()
 	defer line.Close()

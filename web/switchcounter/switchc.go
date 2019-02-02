@@ -6,6 +6,8 @@ import (
 	"encoding/json"
 	"net/http"
 	"time"
+
+	"github.com/Xe/x/web"
 )
 
 type arg struct {
@@ -19,6 +21,16 @@ type Status struct {
 	StartedAt time.Time `json:"started_at"`
 }
 
+// Validate ensures a HTTP response contains the expected fields.
+func Validate(resp *http.Response) error {
+	if resp.StatusCode == http.StatusOK {
+		return nil
+	}
+
+	return web.NewError(http.StatusOK, resp)
+}
+
+// API is a builder for HTTP requests to interface with Switch Counter.
 type API struct {
 	url string // webhook url
 }
@@ -44,6 +56,7 @@ func (a API) makeRequestWith(body interface{}) (*http.Request, error) {
 	return req, nil
 }
 
+// Status returns a request for which systemmate is currently in front.
 func (a API) Status() *http.Request {
 	result, err := a.makeRequestWith(arg{Command: "switch"})
 	if err != nil {
@@ -52,6 +65,7 @@ func (a API) Status() *http.Request {
 	return result
 }
 
+// Switch changes the recorded front to the given systemmate.
 func (a API) Switch(front string) *http.Request {
 	result, err := a.makeRequestWith(arg{Command: "switch", MemberName: front})
 	if err != nil {
@@ -61,7 +75,7 @@ func (a API) Switch(front string) *http.Request {
 }
 
 // NewHTTPClient creates a new instance of API over HTTP.
-func NewHTTPClient(a *http.Client, webhookURL string) API {
+func NewHTTPClient(webhookURL string) API {
 	return API{
 		url: webhookURL,
 	}

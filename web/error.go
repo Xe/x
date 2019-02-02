@@ -13,6 +13,8 @@ import (
 
 // NewError creates an Error based on an expected HTTP status code vs data populated
 // from an HTTP response.
+//
+// This consumes the body of the HTTP response.
 func NewError(wantStatusCode int, resp *http.Response) error {
 	data, err := ioutil.ReadAll(resp.Body)
 	if err != nil {

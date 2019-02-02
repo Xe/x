@@ -59,7 +59,7 @@ func Send(whurl string, w Webhook) *http.Request {
 
 // Validate validates the response from Discord.
 func Validate(resp *http.Response) error {
-	if resp.StatusCode/100 != 2 {
+	if resp.StatusCode != http.StatusOK {
 		return web.NewError(http.StatusOK, resp)
 	}
 

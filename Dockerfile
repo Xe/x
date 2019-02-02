@@ -1,4 +1,4 @@
-FROM xena/go:1.11.4 AS build
+FROM xena/go:1.11.5 AS build
 WORKDIR /x
 COPY . .
 ENV GOPROXY=https://cache.greedo.xeserv.us
