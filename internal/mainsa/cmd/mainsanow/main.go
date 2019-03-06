@@ -11,7 +11,7 @@ import (
 
 func main() {
 	flag.Parse()
-	internal.HandleLicense()
+	internal.HandleStartup()
 
 	tn, err := mainsa.At(time.Now())
 	if err != nil {
