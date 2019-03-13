@@ -1,0 +1,32 @@
+{
+  "main.title" : "CutleryPlus",
+  "main.subtitle" : "Escajg za svakoga",
+  "menu" : {
+    "home" : "Pocetna",
+    "products": {
+      "self": "Proizvodi",
+      "forks" : "Viljuske",
+      "knives" : "Nozevi",
+      "spoons" : "Kasike"
+    },
+    "gallery" : "Galerija",
+    "about" : "O nama",
+    "contact" : "Kontakt"
+  },
+  "home" : {
+    "title": "Dobrodosli u CutleryPlus!",
+    "text" : {
+      "p1": "Lorem ipsum...",
+      "p2": "Jos jedan ipsum lorem."
+    }
+  },
+  "error" : {
+    "404" : "Stranica {0} ne postoji.",
+    "500" : "Greska sa nase strane, pokusajte ponovo.",
+    "contact" : {
+      "name" : "Ime ne sme biti prazno.",
+      "email" : "Email ne sme biti prazan.",
+      "text" : "Ne mozete poslati praznu poruku."
+    }
+  }
+}

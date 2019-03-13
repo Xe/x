@@ -1,0 +1,32 @@
+{
+  "main.title" : "CutleryPlus",
+  "main.subtitle" : "Knives that put cut in cutlery.",
+  "menu" : {
+    "home" : "Home",
+    "products": {
+      "self": "Products",
+      "forks" : "Forks",
+      "knives" : "Knives",
+      "spoons" : "Spoons"
+    },
+    "gallery" : "Gallery",
+    "about" : "About us",
+    "contact" : "Contact"
+  },
+  "home" : {
+    "title": "Welcome to CutleryPlus!",
+    "text" : {
+      "p1": "Lorem ipsum...",
+      "p2": "Another ipsum lorem."
+    }
+  },
+  "error" : {
+    "404" : "Page {0} not found!",
+    "500" : "Something is wrong on our side, please try again.",
+    "contact" : {
+      "name" : "You must enter your name.",
+      "email" : "You must enter your email.",
+      "text" : "You cannot send an empty message."
+    }
+  }
+}
