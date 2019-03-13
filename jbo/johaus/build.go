@@ -26,13 +26,13 @@ func main() {
 	}
 	defer fin.Close()
 
-	fname := "la-banbixsicns-" + yeet.DateTag + ".tar.gz"
+	fname := "johaus-" + yeet.DateTag + ".tar.gz"
 	pubURL, err := greedo.CopyFile(fname, fin)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	err = minipaas.Exec("tar:from la-banbixsicns " + pubURL)
+	err = minipaas.Exec("tar:from johaus " + pubURL)
 	if err != nil {
 		log.Fatal(err)
 	}
