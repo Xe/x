@@ -10,6 +10,7 @@ import (
 	"text/template"
 	"time"
 
+	"github.com/Xe/x/i18n"
 	"github.com/Xe/x/idp/idpmiddleware"
 	"github.com/Xe/x/internal"
 	"github.com/pborman/uuid"
@@ -19,11 +20,13 @@ import (
 )
 
 var (
-	domain    = flag.String("domain", "idp.christine.website", "domain to be hosted from")
-	otpSecret = flag.String("otp-secret", "", "OTP secret")
-	port      = flag.String("port", "5484", "TCP port to listen on for HTTP")
-	owner     = flag.String("owner", "https://christine.website/", "the me=that is required")
-	secretGen = flag.Int("secret-gen", 0, "generate a secret of len if set")
+	domain      = flag.String("domain", "idp.christine.website", "domain to be hosted from")
+	otpSecret   = flag.String("otp-secret", "", "OTP secret")
+	port        = flag.String("port", "5484", "TCP port to listen on for HTTP")
+	owner       = flag.String("owner", "https://christine.website/", "the me=that is required")
+	secretGen   = flag.Int("secret-gen", 0, "generate a secret of len if set")
+	defaultLang = flag.String("default-language", "en_US", "default language if none is set")
+	gitRev      = flag.String("git-rev", "", "git revision of runtime (used for dokku detection)")
 )
 
 func main() {
@@ -33,8 +36,16 @@ func main() {
 		log.Fatal(gotp.RandomSecret(*secretGen))
 	}
 
+	translationPath := "./translations"
+	if *gitRev != "" {
+		translationPath = "/app/translations"
+	}
+
+	l := i18n.New(*defaultLang, translationPath)
+
 	i := &idp{
 		t:         gotp.NewDefaultTOTP(*otpSecret),
+		l:         l,
 		bearer2me: map[string]string{},
 	}
 
@@ -42,15 +53,30 @@ func main() {
 
 	def := idpmiddleware.XeProtect("https://" + *domain + "/")(http.DefaultServeMux)
 	mux := http.NewServeMux()
+	mux.HandleFunc("/lang", func(w http.ResponseWriter, r *http.Request) {
+		locales := i18n.GetLocales(r)
+
+		json.NewEncoder(w).Encode(locales)
+	})
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path == "/auth/challenge" {
-			r.URL.Path = "/.within/x/idpmiddleware/challenge"
-			http.Redirect(w, r, r.URL.String(), http.StatusPermanentRedirect)
+		tr := i.l.TranslationsForRequest(r)
+		fm := template.FuncMap{
+			"T": tr.Value,
+		}
+
+		t, err := template.New("root").Funcs(fm).Parse(rootPageTemplate)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 
 		w.Header().Set("Content-Type", "text/html")
-		w.Write([]byte(rootPageTemplate))
+		err = t.Execute(w, nil)
+		if err != nil {
+			log.Printf("%v", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 	})
 	mux.HandleFunc("/auth", i.auth)
 	mux.HandleFunc("/challenge", i.challenge)
@@ -62,6 +88,7 @@ func main() {
 type idp struct {
 	t *gotp.TOTP
 
+	l *i18n.L
 	sync.Mutex
 	bearer2me map[string]string
 }
@@ -126,7 +153,12 @@ func (i *idp) auth(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	t, err := template.New("auth").Parse(authPageTemplate)
+	tr := i.l.TranslationsForRequest(r)
+	fm := template.FuncMap{
+		"T": tr.Value,
+	}
+
+	t, err := template.New("auth").Funcs(fm).Parse(authPageTemplate)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -202,7 +234,7 @@ func (i *idp) challenge(w http.ResponseWriter, r *http.Request) {
 const rootPageTemplate = `<html>
 <head>
 <link rel="stylesheet" href="https://unpkg.com/chota@0.5.2/dist/chota.min.css">
-<title>Forbidden</title>
+<title>{{ T "errors.forbidden" }}</title>
 <meta name=viewport content="width=400">
 <style>
 :root {
@@ -215,10 +247,10 @@ const rootPageTemplate = `<html>
 <div class="container">
 <div class="card">
   <header>
-    <h4>Forbidden</h4>
+    <h4>{{ T "errors.forbidden" }}</h4>
   </header>
 
-  <p>This is a private identity provider supporting <a href="https://indieauth.net">IndieAuth</a> for the use of <a href="https://christine.website">Christine Dodrill</a> only. Unauthorized access is forbidden.</p>
+  <p>{{ T "prose.index" }}</p>
 </div>
 </div>
 </body>
@@ -227,7 +259,7 @@ const rootPageTemplate = `<html>
 const authPageTemplate = `<html>
 <head>
 <link rel="stylesheet" href="https://unpkg.com/chota@0.5.2/dist/chota.min.css">
-<title>Auth</title>
+<title>{{ T "auth_title" }}</title>
 <meta name=viewport content="width=400">
 <style>
 :root {
@@ -240,17 +272,17 @@ const authPageTemplate = `<html>
 <div class="container">
 <div class="card">
   <header>
-    <h4>Log in to {{ .ClientID }} as {{ .Me }}</h4>
+    <h4>{{ T "prose.auth" .ClientID .Me }}</h4>
   </header>
   <p><form action="/challenge" method="GET">
-  Code: <br>
+  {{ T "code" }} <br>
   <input type="text" name="code" value="" autofocus><br><br>
   <input type="hidden" name="me" value="{{ .Me }}">
   <input type="hidden" name="state" value="{{ .State }}">
   <input type="hidden" name="client_id" value="{{ .ClientID }}">
   <input type="hidden" name="response_type" value="{{ .ResponseType }}">
   <input type="hidden" name="redirect_uri" value="{{ .RedirectURI }}">
-  <input class="button primary" type="submit" value="Submit">
+  <input class="button primary" type="submit" value="{{ T "submit_button" }}">
 </form></p>
 </div>
 </div>

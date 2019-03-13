@@ -11,5 +11,6 @@
     },
 
     "auth_title": "Auth",
-    "submit_button": "Submit"
+    "submit_button": "Submit",
+    "code": "Code:"
 }
