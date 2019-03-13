@@ -71,7 +71,7 @@ func Copy(mode os.FileMode, fileName string, contents io.Reader, destinationPath
 
 // CopyFile copies a file to Greedo's public files folder and returns its public-facing URL.
 func CopyFile(fileName string, contents io.Reader) (string, error) {
-	err := Copy(0644, fileName, contents, filepath.Join("public_html", "files", fileName))
+	err := Copy(0644, fileName, contents, filepath.Join("public_html", "files", "slugs", fileName))
 	if err != nil {
 		return "", err
 	}
