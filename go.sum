@@ -1,3 +1,4 @@
+bou.ke/monkey v1.0.1/go.mod h1:FgHuK96Rv2Nlf+0u1OOVDpCMdsWyOFmeeketDHE7LIg=
 cloud.google.com/go v0.34.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
 github.com/McKael/madon/v2 v2.0.0-20180929094633-c679abc985d6 h1:9cJcTOeILzInNo+DCYmXKME1QfAP07FYdo3M9/9jyc4=
 github.com/McKael/madon/v2 v2.0.0-20180929094633-c679abc985d6/go.mod h1:mvlJhxZCchfiasx3XvN3hBu5RekGwTDm09dKlSM/dQQ=
@@ -83,6 +84,9 @@ github.com/mndrix/ps v0.0.0-20170330174427-18e65badd6ab h1:fPrYMvMnWuED0MLhLyrny
 github.com/mndrix/ps v0.0.0-20170330174427-18e65badd6ab/go.mod h1:dHgTaDInzkAqJv67VaX1IkK449M2UoBY68CZeI/bNCU=
 github.com/olekukonko/tablewriter v0.0.1 h1:b3iUnf1v+ppJiOfNX4yxxqfWKMQPZR5yoh8urCTFX88=
 github.com/olekukonko/tablewriter v0.0.1/go.mod h1:vsDQFd/mU46D+Z4whnwzcISnGGzXWMclvtLoiIKAKIo=
+github.com/otiai10/copy v1.0.1 h1:gtBjD8aq4nychvRZ2CyJvFWAw0aja+VHazDdruZKGZA=
+github.com/otiai10/copy v1.0.1/go.mod h1:8bMCJrAqOtN/d9oyh5HR7HhLQMvcGMpGdwRDYsfOCHc=
+github.com/otiai10/mint v1.2.3/go.mod h1:YnfyPNhBvnY8bW4SGQHCs/aAFhkgySlMZbrF5U0bOVw=
 github.com/pborman/uuid v1.2.0 h1:J7Q5mO4ysT1dv8hyrUGHb9+ooztCXu1D8MY8DZYsu3g=
 github.com/pborman/uuid v1.2.0/go.mod h1:X/NO0urCmaxf9VXbdlT7C2Yzkj2IKimNn4k+gtPdI/k=
 github.com/peterh/liner v1.1.0 h1:f+aAedNJA6uk7+6rXsYBnhdo4Xux7ESLe+kcuVUF5os=

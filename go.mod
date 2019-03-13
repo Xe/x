@@ -34,6 +34,7 @@ require (
 	github.com/mndrix/golog v0.0.0-20170330170653-a28e2a269775
 	github.com/mndrix/ps v0.0.0-20170330174427-18e65badd6ab // indirect
 	github.com/olekukonko/tablewriter v0.0.1 // indirect
+	github.com/otiai10/copy v1.0.1
 	github.com/pborman/uuid v1.2.0
 	github.com/peterh/liner v1.1.0
 	github.com/pkg/errors v0.8.1

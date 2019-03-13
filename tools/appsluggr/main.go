@@ -12,6 +12,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/otiai10/copy"
 	"github.com/Xe/x/internal"
 )
 
@@ -48,6 +49,7 @@ func main() {
 	os.MkdirAll(filepath.Join(dir, "bin"), 0777)
 	var procfile, scalefile string
 
+	copy.Copy("translations", filepath.Join(dir, "translations"))
 	if *web != "" {
 		procfile += "web: /app/bin/web\n"
 		scalefile += fmt.Sprintf("web=%d", *webScale)
@@ -78,7 +80,12 @@ func main() {
 	filepath.Walk(dir, func(file string, fi os.FileInfo, err error) error {
 		// return on any error
 		if err != nil {
+			log.Printf("got error on %s: %v", file, err)
 			return err
+		}
+
+		if fi.IsDir() {
+			return nil // not a file.  ignore.
 		}
 
 		// create a new dir/file header
