@@ -42,6 +42,7 @@ var (
 // factor as an escape hatch.
 func HandleStartup() {
 	flag.Parse()
+	flagenv.Parse()
 
 	ctx := opname.With(context.Background(), "internal.HandleStartup")
 	if *config != "" {
@@ -50,7 +51,6 @@ func HandleStartup() {
 		flagconfyg.CmdParse(*config)
 	}
 	flag.Parse()
-	flagenv.Parse()
 
 	if *licenseShow {
 		fmt.Printf("Licenses for %v\n", os.Args)
