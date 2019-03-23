@@ -29,6 +29,7 @@ var githubReposDefault = []string{
 	"xultybau",
 	"johaus",
 	"confyg",
+	"derpigo",
 }
 
 var gogsReposDefault = []string{
