@@ -4,6 +4,7 @@ require (
 	github.com/McKael/madon/v2 v2.0.0-20180929094633-c679abc985d6
 	github.com/Yawning/bulb v0.0.0-20170405033506-85d80d893c3d
 	github.com/aclements/go-moremath v0.0.0-20180329182055-b1aff36309c7 // indirect
+	github.com/birkelund/boltdbcache v1.0.0
 	github.com/bwmarrin/discordgo v0.19.0
 	github.com/codahale/hdrhistogram v0.0.0-20161010025455-3a0bb77429bd
 	github.com/dgryski/go-failure v0.0.0-20151001134759-4963dbd58fd0
@@ -20,6 +21,7 @@ require (
 	github.com/google/go-querystring v1.0.0 // indirect
 	github.com/google/gops v0.3.5
 	github.com/google/uuid v1.1.0 // indirect
+	github.com/gregjones/httpcache v0.0.0-20190212212710-3befbb6ad0cc
 	github.com/hullerob/go.farbfeld v0.0.0-20181222022525-3661193c725f
 	github.com/jaytaylor/html2text v0.0.0-20180606194806-57d518f124b0
 	github.com/joeshaw/envdecode v0.0.0-20180312135643-c9e015854467
@@ -41,6 +43,7 @@ require (
 	github.com/peterh/liner v1.1.0
 	github.com/phayes/freeport v0.0.0-20180830031419-95f893ade6f2
 	github.com/pkg/errors v0.8.1
+	github.com/smartystreets/goconvey v0.0.0-20190330032615-68dc04aab96a // indirect
 	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect
 	github.com/streamrail/concurrent-map v0.0.0-20160823150647-8bf1e9bacbf6
 	github.com/stretchr/testify v1.3.0 // indirect
@@ -53,14 +56,14 @@ require (
 	github.com/xtaci/kcp-go v5.0.7+incompatible
 	github.com/xtaci/smux v1.1.0
 	github.com/yawning/bulb v0.0.0-20170405033506-85d80d893c3d // indirect
+	go.chromium.org/luci v0.0.0-20190401164840-97ee9c388f35
 	go.jonnrb.io/vanity v0.1.0
 	go4.org v0.0.0-20181109185143-00e24f1b2599
-	golang.org/x/crypto v0.0.0-20190103213133-ff983b9c42bc
+	golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2
 	golang.org/x/exp/errors v0.0.0-20190125153040-c74c464bbbf2
 	golang.org/x/image v0.0.0-20181116024801-cd38e8056d9b // indirect
-	golang.org/x/net v0.0.0-20190125091013-d26f9f9a57f3 // indirect
+	golang.org/x/net v0.0.0-20190311183353-d8887717615a
 	golang.org/x/oauth2 v0.0.0-20190111185915-36a7019397c4
-	golang.org/x/sys v0.0.0-20190109145017-48ac38b7c8cb // indirect
 	gopkg.in/tucnak/telebot.v2 v2.0.0-20190106130618-430758b3741d
 	within.website/confyg v0.1.0
 	within.website/johaus v1.0.0
