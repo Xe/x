@@ -5,11 +5,12 @@ import (
 	"flag"
 	"log"
 	"net/http"
-
 	"os"
+	"time"
 	"os/signal"
 	"syscall"
 
+	"go.chromium.org/luci/common/flag/stringmapflag"
 	"github.com/Xe/x/internal"
 	"github.com/miekg/dns"
 	"github.com/mmikulicic/stringlist"
@@ -19,6 +20,8 @@ var (
 	port   = flag.String("port", "53", "UDP port to listen on for DNS")
 	server = flag.String("forward-server", "1.1.1.1:53", "forward DNS server")
 
+	prefixes = new(stringmapflag.Value)
+
 	zoneURLs = stringlist.Flag("zone-url", "DNS zonefiles to load")
 )
 
@@ -27,14 +30,60 @@ var (
 		"https://xena.greedo.xeserv.us/files/akua.zone",
 		"https://xena.greedo.xeserv.us/files/adblock.zone",
 	}
+
+	defaultPrefixes = map[string]string {
+		"eq": "10.88.0.1:53",
+	}
 )
 
+func monitorURLs(urls []string) {
+	etags := make(map[string]string)
+
+	t := time.NewTicker(time.Minute)
+	defer t.Stop()
+
+	for {
+		select {
+		case <- t.C:
+			for _, urli := range urls {
+				resp, err := http.Get(urli)
+				if err != nil {
+					panic(err)
+				}
+
+				et := resp.Header.Get("ETag")
+
+				ot, ok := etags[urli]
+				if !ok {
+					log.Printf("stored %s:%s", urli, et)
+					etags[urli] = et
+				}
+				if ok && et != ot {
+					log.Fatalf("url %s has new etag %s and wanted old etag %s", urli, et, ot)
+				}
+			}
+		}
+	}
+}
+
 func main() {
+	flag.Var(prefixes, "prefix", "sets prefix=host:port to forward DNS requests to")
 	internal.HandleStartup()
+
+	if len(*prefixes) == 0 {
+		v := stringmapflag.Value(defaultPrefixes)
+		prefixes = &v
+	}
+
+	for k, v := range *prefixes {
+		log.Printf("conf: -prefix %s=%s", k, v)
+	}
 
 	if len(*zoneURLs) == 0 {
 		*zoneURLs = defaultZoneURLS
 	}
+
+	go monitorURLs(*zoneURLs)
 
 	for _, zurl := range *zoneURLs {
 		log.Printf("conf: -zone-url=%s", zurl)
