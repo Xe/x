@@ -42,14 +42,14 @@ func ShouldWork(ctx context.Context, env []string, dir string, cmdName string, a
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
-	log.Printf("starting process, env: %v, pwd: %s, cmd: %s, args: %v", env, dir, loc, args)
+	log.Printf("starting process, pwd: %s, cmd: %s, args: %v", dir, loc, args)
 	err = cmd.Run()
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
-/// Output returns the output of a command or an error.
+// Output returns the output of a command or an error.
 func Output(ctx context.Context, cmd string, args ...string) (string, error) {
 	c := exec.CommandContext(ctx, cmd, args...)
 	c.Env = os.Environ()

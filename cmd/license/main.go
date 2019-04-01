@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/Xe/x/internal"
-	"github.com/Xe/x/tools/license/licenses"
+	"github.com/Xe/x/cmd/license/licenses"
 )
 
 var (

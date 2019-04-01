@@ -41,7 +41,7 @@ func init() {
 var mentionRex = regexp.MustCompile(`<((@!?\d+)|(:.+?:\d+))>`)
 
 func main() {
-	internal.HandleLicense()
+	internal.HandleStartup()
 
 	var cfg lipuSona
 	err := envdecode.StrictDecode(&cfg)
