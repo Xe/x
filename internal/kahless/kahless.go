@@ -20,7 +20,7 @@ func getAgent() (agent.Agent, error) {
 
 const (
 	greedoAddr = `kahless.wg.akua:22`
-	greedoUser = `xena`
+	greedoUser = `cadey`
 )
 
 // Dial opens a SSH client to greedo.
