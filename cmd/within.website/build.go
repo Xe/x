@@ -8,7 +8,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/Xe/x/internal/greedo"
+	"github.com/Xe/x/internal/kahless"
 	"github.com/Xe/x/internal/minipaas"
 	"github.com/Xe/x/internal/yeet"
 )
@@ -27,7 +27,7 @@ func main() {
 	defer fin.Close()
 
 	fname := "within.website-" + yeet.DateTag + ".tar.gz"
-	pubURL, err := greedo.CopyFile(fname, fin)
+	pubURL, err := kahless.CopyFile(fname, fin)
 	if err != nil {
 		log.Fatal(err)
 	}

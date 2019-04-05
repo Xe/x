@@ -1,4 +1,4 @@
-package greedo
+package kahless
 
 import "testing"
 

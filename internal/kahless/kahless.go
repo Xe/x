@@ -1,4 +1,4 @@
-package greedo
+package kahless
 
 import (
 	"bytes"
@@ -19,7 +19,7 @@ func getAgent() (agent.Agent, error) {
 }
 
 const (
-	greedoAddr = `greedo.xeserv.us:22`
+	greedoAddr = `kahless.wg.akua:22`
 	greedoUser = `xena`
 )
 
@@ -81,5 +81,5 @@ func CopyFile(fileName string, contents io.Reader) (string, error) {
 
 // WebURL constructs a public-facing URL for a given resource by fragment.
 func WebURL(fragment string) string {
-	return "https://xena.greedo.xeserv.us/files/" + fragment
+	return "https://xena.greedo.xeserv.us/files/slugs/" + fragment
 }
