@@ -13,10 +13,9 @@ import (
 	"within.website/johaus/pretty"
 )
 
-const dialect = "camxes"
-
 var (
-	port = flag.String("port", "9001", "TCP port to bind on for HTTP")
+	port    = flag.String("port", "9001", "TCP port to bind on for HTTP")
+	dialect = flag.String("dialect", "camxes", "Lojban dialect to use")
 )
 
 func main() {
@@ -37,7 +36,7 @@ func braces(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tree, err := parser.Parse(dialect, string(data))
+	tree, err := parser.Parse(*dialect, string(data))
 	if err != nil {
 		http.Error(w, "can't parse: "+err.Error(), http.StatusBadRequest)
 		return
@@ -50,6 +49,7 @@ func braces(w http.ResponseWriter, r *http.Request) {
 
 	pretty.Braces(w, tree)
 }
+
 func tree(w http.ResponseWriter, r *http.Request) {
 	data, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -57,7 +57,7 @@ func tree(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tree, err := parser.Parse(dialect, string(data))
+	tree, err := parser.Parse(*dialect, string(data))
 	if err != nil {
 		http.Error(w, "can't parse: "+err.Error(), http.StatusBadRequest)
 		return
