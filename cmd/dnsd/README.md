@@ -47,7 +47,8 @@ variable `FORWARD_SERVER` or the command line flag `-forward-server`.
 ### Docker
 
 ```console
-$ docker run --name dnsd -p 53:53/udp -dit --restart always xena/dnsd:1.0.2-5-g64aea8a \
+$ export DNSD_VERSION=1.0.2-6-g1a2bc63
+$ docker run --name dnsd -p 53:53/udp -dit --restart always xena/dnsd:$DNSD_VERSION \
   dnsd -zone-url https://domain.hostname.tld/path/to/your.zone \
        -zone-url https://domain.hostname.tld/path/to/adblock.zone \
        -forward-server 1.1.1.1:53
@@ -71,7 +72,7 @@ $ sudo systemctl enable dnsd
 
 ```console
 $ dig @127.0.0.1 google.com
-$ dig @127.0.0.1 custom.domain
+$ dig @127.0.0.1 oho.pele
 ```
 
 ## Support
