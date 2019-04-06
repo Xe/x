@@ -99,6 +99,7 @@ func TestBackendAuthV1(t *testing.T) {
 }
 
 func TestBackendRouting(t *testing.T) {
+	t.Skip()
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
