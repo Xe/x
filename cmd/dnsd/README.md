@@ -1,6 +1,6 @@
 # dnsd
 
-A custom DNS server for my network. DNS zone files are dynamically downloaded on
+A custom [DNS](https://en.wikipedia.org/wiki/Domain_Name_System) server for my network. DNS zone files are dynamically downloaded on
 startup and are continuously monitored for changes. When the DNS zone is changed,
 the service reloads it.
 
