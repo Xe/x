@@ -6,11 +6,10 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"time"
 	"os/signal"
 	"syscall"
+	"time"
 
-	"go.chromium.org/luci/common/flag/stringmapflag"
 	"github.com/Xe/x/internal"
 	"github.com/miekg/dns"
 	"github.com/mmikulicic/stringlist"
@@ -20,8 +19,6 @@ var (
 	port   = flag.String("port", "53", "UDP port to listen on for DNS")
 	server = flag.String("forward-server", "1.1.1.1:53", "forward DNS server")
 
-	prefixes = new(stringmapflag.Value)
-
 	zoneURLs = stringlist.Flag("zone-url", "DNS zonefiles to load")
 )
 
@@ -29,10 +26,6 @@ var (
 	defaultZoneURLS = []string{
 		"https://xena.greedo.xeserv.us/files/akua.zone",
 		"https://xena.greedo.xeserv.us/files/adblock.zone",
-	}
-
-	defaultPrefixes = map[string]string {
-		"eq": "10.88.0.1:53",
 	}
 )
 
@@ -44,7 +37,7 @@ func monitorURLs(urls []string) {
 
 	for {
 		select {
-		case <- t.C:
+		case <-t.C:
 			for _, urli := range urls {
 				resp, err := http.Get(urli)
 				if err != nil {
@@ -67,17 +60,7 @@ func monitorURLs(urls []string) {
 }
 
 func main() {
-	flag.Var(prefixes, "prefix", "sets prefix=host:port to forward DNS requests to")
 	internal.HandleStartup()
-
-	if len(*prefixes) == 0 {
-		v := stringmapflag.Value(defaultPrefixes)
-		prefixes = &v
-	}
-
-	for k, v := range *prefixes {
-		log.Printf("conf: -prefix %s=%s", k, v)
-	}
 
 	if len(*zoneURLs) == 0 {
 		*zoneURLs = defaultZoneURLS

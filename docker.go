@@ -6,6 +6,7 @@ package main
 import (
 	"context"
 	"log"
+	"path/filepath"
 
 	"github.com/Xe/x/internal/yeet"
 )
@@ -21,8 +22,17 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	gitTag, err := yeet.GitTag(ctx)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	dnsdTag := "xena/dnsd:" + gitTag
+
+	yeet.ShouldWork(ctx, nil, filepath.Join(yeet.WD, "cmd", "dnsd"), "docker", "build", "-t", dnsdTag, "--build-arg", "X_VERSION="+gitTag, ".")
 
 	yeet.ShouldWork(ctx, nil, yeet.WD, "docker", "push", resTag)
+	yeet.ShouldWork(ctx, nil, yeet.WD, "docker", "push", dnsdTag)
 
 	log.Printf("use %s", resTag)
 }
