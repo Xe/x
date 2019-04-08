@@ -9,7 +9,9 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+	"fmt"
 
+	"github.com/Xe/x/web"
 	"github.com/Xe/x/internal"
 	"github.com/miekg/dns"
 	"github.com/mmikulicic/stringlist"
@@ -75,6 +77,12 @@ func main() {
 	log.Printf("conf: -forward-server=%s", *server)
 
 	rrs := []dns.RR{}
+	ns := []dns.RR{}
+
+	txt, err := dns.NewRR("user-agent. 10 CH TXT " + fmt.Sprintf("%q", web.GenUserAgent()))
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	for _, zurl := range *zoneURLs {
 		resp, err := http.Get(zurl)
@@ -88,6 +96,11 @@ func main() {
 		zp := dns.NewZoneParser(reader, "", zurl)
 		for rr, ok := zp.Next(); ok; rr, ok = zp.Next() {
 			rrs = append(rrs, rr)
+
+			if rr.Header().Rrtype == dns.TypeNS {
+				ns = append(ns, rr)
+			}
+
 			i++
 		}
 
@@ -126,6 +139,9 @@ func main() {
 				for _, a := range resolver(*server, q.Name, q.Qtype) {
 					answers = append(answers, a)
 				}
+			} else {
+				m.Ns = ns
+				m.Extra = []dns.RR{txt}
 			}
 			for _, a := range answers {
 				m.Answer = append(m.Answer, a)

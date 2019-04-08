@@ -4,16 +4,30 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"path/filepath"
 	"runtime"
+	"time"
+
+	"github.com/celrenheit/sandflake"
+)
+
+var (
+	startID  = sandflake.Next()
+	hostname = "<unknown>"
+	started  = time.Now()
 )
 
 func init() {
 	http.DefaultTransport = &userAgentTransport{http.DefaultTransport}
+
+	name, _ := os.Hostname()
+	if name != "" {
+		hostname = name
+	}
 }
 
-func genUserAgent() string {
-	return fmt.Sprintf("github.com-Xe-x (%s/%s/%s; %s/bot; +https://github.com/Xe/x/blob/master/web/x.md)", runtime.Version(), runtime.GOOS, runtime.GOARCH, filepath.Base(os.Args[0]))
+// GenUserAgent creates a unique User-Agent string for outgoing HTTP requests.
+func GenUserAgent() string {
+	return fmt.Sprintf("github.com-Xe-x (%s/%s/%s; %s; +https://github.com/Xe/x/blob/master/web/x.md) Alive (%s; sandflake) Hostname/%s Started (%s)", runtime.Version(), runtime.GOOS, runtime.GOARCH, os.Args[0], startID.String(), hostname, started.Format(time.RFC3339))
 }
 
 type userAgentTransport struct {
@@ -21,6 +35,6 @@ type userAgentTransport struct {
 }
 
 func (uat userAgentTransport) RoundTrip(r *http.Request) (*http.Response, error) {
-	r.Header.Set("User-Agent", genUserAgent())
+	r.Header.Set("User-Agent", GenUserAgent())
 	return uat.rt.RoundTrip(r)
 }

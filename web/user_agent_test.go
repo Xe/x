@@ -3,7 +3,7 @@ package web
 import "testing"
 
 func TestGenUserAgent(t *testing.T) {
-	ua := genUserAgent()
+	ua := GenUserAgent()
 	if ua == "" {
 		t.Fatal("no user agent generated")
 	}
