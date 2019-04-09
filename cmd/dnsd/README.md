@@ -47,7 +47,7 @@ variable `FORWARD_SERVER` or the command line flag `-forward-server`.
 ### Docker
 
 ```console
-$ export DNSD_VERSION=1.0.2-6-g1a2bc63
+$ export DNSD_VERSION=v1.0.3
 $ docker run --name dnsd -p 53:53/udp -dit --restart always xena/dnsd:$DNSD_VERSION \
   dnsd -zone-url https://domain.hostname.tld/path/to/your.zone \
        -zone-url https://domain.hostname.tld/path/to/adblock.zone \
