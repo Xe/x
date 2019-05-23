@@ -12,6 +12,8 @@ github.com/birkelund/boltdbcache v1.0.0 h1:9DlhGw3Gp0DenvEQ7qNVYvz0b4Oi/zAJin+cR
 github.com/birkelund/boltdbcache v1.0.0/go.mod h1:WgJWF40tV+4K0Q7MxAPbWEIkgs4AVUB7EyKVds0EgfQ=
 github.com/bwmarrin/discordgo v0.19.0 h1:kMED/DB0NR1QhRcalb85w0Cu3Ep2OrGAqZH1R5awQiY=
 github.com/bwmarrin/discordgo v0.19.0/go.mod h1:O9S4p+ofTFwB02em7jkpkV8M3R0/PUVOwN61zSZ0r4Q=
+github.com/celrenheit/sandflake v0.0.0-20190410195419-50a943690bc2 h1:/BpnZPo/sk1vPlt62dLya5KCn7PN9ZBDrpTGlQzgUZI=
+github.com/celrenheit/sandflake v0.0.0-20190410195419-50a943690bc2/go.mod h1:7L8gY0+4GYeBc9TvqVuDUq7tXuM6Sj7llnt7HkVwWlQ=
 github.com/codahale/hdrhistogram v0.0.0-20161010025455-3a0bb77429bd h1:qMd81Ts1T2OTKmB4acZcyKaMtRnY5Y44NuXGX2GFJ1w=
 github.com/codahale/hdrhistogram v0.0.0-20161010025455-3a0bb77429bd/go.mod h1:sE/e/2PUdi/liOCUjSTXgM1o87ZssimdTWN964YiIeI=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=

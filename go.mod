@@ -6,10 +6,12 @@ require (
 	github.com/aclements/go-moremath v0.0.0-20180329182055-b1aff36309c7 // indirect
 	github.com/birkelund/boltdbcache v1.0.0
 	github.com/bwmarrin/discordgo v0.19.0
+	github.com/celrenheit/sandflake v0.0.0-20190410195419-50a943690bc2
 	github.com/codahale/hdrhistogram v0.0.0-20161010025455-3a0bb77429bd
 	github.com/dgryski/go-failure v0.0.0-20151001134759-4963dbd58fd0
 	github.com/dgryski/go-onlinestats v0.0.0-20170612111826-1c7d19468768 // indirect
 	github.com/disintegration/imaging v1.6.0
+	github.com/eaburns/peggy v0.0.0-20180405011029-d685ddd3cbcb
 	github.com/facebookgo/ensure v0.0.0-20160127193407-b4ab57deab51
 	github.com/facebookgo/stack v0.0.0-20160209184415-751773369052 // indirect
 	github.com/facebookgo/subset v0.0.0-20150612182917-8dac2c3c4870 // indirect
