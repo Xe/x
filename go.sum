@@ -162,6 +162,8 @@ github.com/xtaci/kcp-go v5.3.9+incompatible h1:cMCYwU9heS96fQSLvPunHkQa5DeCYaGCy
 github.com/xtaci/kcp-go v5.3.9+incompatible/go.mod h1:bN6vIwHQbfHaHtFpEssmWsN45a+AZwO7eyRCmEIbtvE=
 github.com/xtaci/smux v1.1.0 h1:VO9uJ2TQprdETdlkV+MggqiKLmXvB9I9gZR0AG4RypY=
 github.com/xtaci/smux v1.1.0/go.mod h1:f+nYm6SpuHMy/SH0zpbvAFHT1QoMcgLOsWcFip5KfPw=
+github.com/xtaci/smux v1.3.3 h1:+vnzZHTLGHrj+LzUZEkKmvu4KkG7fj4jwMPqhawvErg=
+github.com/xtaci/smux v1.3.3/go.mod h1:f+nYm6SpuHMy/SH0zpbvAFHT1QoMcgLOsWcFip5KfPw=
 github.com/yawning/bulb v0.0.0-20170405033506-85d80d893c3d h1:74VDH65v2A5bu/HCyrRpGJ8tEZ6PY2MXUMDh9YilfPs=
 github.com/yawning/bulb v0.0.0-20170405033506-85d80d893c3d/go.mod h1:2ickkGiASLFhjpaFnwRS1qr2yaY7EgGk73v+DIOL5Bo=
 go.chromium.org/luci v0.0.0-20190401164840-97ee9c388f35 h1:/VuyvxTwNJDTuDg+4W6Lrc8teDd9vgIZG0X6e33JJyw=
