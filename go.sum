@@ -142,6 +142,8 @@ github.com/xlzd/gotp v0.0.0-20181030022105-c8557ba2c119 h1:YyPWX3jLOtYKulBR6AScG
 github.com/xlzd/gotp v0.0.0-20181030022105-c8557ba2c119/go.mod h1:/nuTSlK+okRfR/vnIPqR89fFKonnWPiZymN5ydRJkX8=
 github.com/xtaci/kcp-go v5.0.7+incompatible h1:zs9tc8XRID0m+aetu3qPWZFyRt2UIMqbXIBgw+vcnlE=
 github.com/xtaci/kcp-go v5.0.7+incompatible/go.mod h1:bN6vIwHQbfHaHtFpEssmWsN45a+AZwO7eyRCmEIbtvE=
+github.com/xtaci/kcp-go v5.3.9+incompatible h1:cMCYwU9heS96fQSLvPunHkQa5DeCYaGCyjmrHfzw1y8=
+github.com/xtaci/kcp-go v5.3.9+incompatible/go.mod h1:bN6vIwHQbfHaHtFpEssmWsN45a+AZwO7eyRCmEIbtvE=
 github.com/xtaci/smux v1.1.0 h1:VO9uJ2TQprdETdlkV+MggqiKLmXvB9I9gZR0AG4RypY=
 github.com/xtaci/smux v1.1.0/go.mod h1:f+nYm6SpuHMy/SH0zpbvAFHT1QoMcgLOsWcFip5KfPw=
 github.com/yawning/bulb v0.0.0-20170405033506-85d80d893c3d h1:74VDH65v2A5bu/HCyrRpGJ8tEZ6PY2MXUMDh9YilfPs=
