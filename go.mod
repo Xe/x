@@ -67,5 +67,5 @@ require (
 	gopkg.in/tucnak/telebot.v2 v2.0.0-20190106130618-430758b3741d
 	within.website/confyg v0.1.0
 	within.website/johaus v1.0.0
-	within.website/ln v0.5.1
+	within.website/ln v0.5.2
 )
