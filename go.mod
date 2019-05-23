@@ -53,7 +53,7 @@ require (
 	github.com/tjfoc/gmsm v1.0.1 // indirect
 	github.com/tmc/scp v0.0.0-20170824174625-f7b48647feef
 	github.com/xlzd/gotp v0.0.0-20181030022105-c8557ba2c119
-	github.com/xtaci/kcp-go v5.0.7+incompatible
+	github.com/xtaci/kcp-go v5.3.9+incompatible
 	github.com/xtaci/smux v1.1.0
 	github.com/yawning/bulb v0.0.0-20170405033506-85d80d893c3d // indirect
 	go.chromium.org/luci v0.0.0-20190401164840-97ee9c388f35
