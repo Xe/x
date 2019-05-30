@@ -6,8 +6,8 @@ import (
 	"net/http"
 
 	"github.com/Xe/x/internal"
+	"github.com/Xe/x/vanity"
 	"github.com/mmikulicic/stringlist"
-	"go.jonnrb.io/vanity"
 	"within.website/ln"
 	"within.website/ln/opname"
 )

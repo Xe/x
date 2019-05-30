@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"io"
 	"io/ioutil"
+	"log"
 	"net"
 	"os"
 	"path/filepath"
@@ -19,7 +20,7 @@ func getAgent() (agent.Agent, error) {
 }
 
 const (
-	greedoAddr = `kahless.wg.akua:22`
+	greedoAddr = `kahless.cetacean.club:22`
 	greedoUser = `cadey`
 )
 
@@ -51,10 +52,12 @@ func Copy(mode os.FileMode, fileName string, contents io.Reader, destinationPath
 		return err
 	}
 
+	log.Println("dialing kahless...")
 	client, err := Dial()
 	if err != nil {
 		return err
 	}
+	log.Println("done")
 
 	session, err := client.NewSession()
 	if err != nil {

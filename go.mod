@@ -11,7 +11,7 @@ require (
 	github.com/dgryski/go-failure v0.0.0-20151001134759-4963dbd58fd0
 	github.com/dgryski/go-onlinestats v0.0.0-20170612111826-1c7d19468768 // indirect
 	github.com/disintegration/imaging v1.6.0
-	github.com/eaburns/peggy v0.0.0-20190420135231-b61cdde6efe6
+	github.com/eaburns/peggy v0.0.0-20190420135231-b61cdde6efe6 // indirect
 	github.com/eaburns/pretty v0.0.0-20190404101635-2e1d2550ef0b // indirect
 	github.com/facebookgo/ensure v0.0.0-20160127193407-b4ab57deab51
 	github.com/facebookgo/stack v0.0.0-20160209184415-751773369052 // indirect
@@ -59,9 +59,8 @@ require (
 	github.com/xtaci/kcp-go v5.3.9+incompatible
 	github.com/xtaci/smux v1.3.3
 	github.com/yawning/bulb v0.0.0-20170405033506-85d80d893c3d // indirect
-	go.jonnrb.io/vanity v0.1.0
 	go4.org v0.0.0-20190313082347-94abd6928b1d
-	golang.org/x/crypto v0.0.0-20190530122614-20be4c3c3ed5
+	golang.org/x/crypto v0.0.0-20190513172903-22d7a77e9e5f
 	golang.org/x/exp/errors v0.0.0-20190510132918-efd6b22b2522
 	golang.org/x/image v0.0.0-20190523035834-f03afa92d3ff // indirect
 	golang.org/x/net v0.0.0-20190522155817-f3200d17e092
