@@ -25,7 +25,6 @@ require (
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
 	github.com/golang/mock v1.3.1 // indirect
 	github.com/google/btree v1.0.0 // indirect
-	github.com/google/go-cmp v0.3.0 // indirect
 	github.com/google/go-github v17.0.0+incompatible
 	github.com/google/go-querystring v1.0.0 // indirect
 	github.com/google/gops v0.3.6
@@ -33,7 +32,6 @@ require (
 	github.com/google/uuid v1.1.1 // indirect
 	github.com/gopherjs/gopherjs v0.0.0-20190430165422-3e4dfb77656c // indirect
 	github.com/gregjones/httpcache v0.0.0-20190212212710-3befbb6ad0cc
-	github.com/hashicorp/golang-lru v0.5.1 // indirect
 	github.com/hullerob/go.farbfeld v0.0.0-20181222022525-3661193c725f
 	github.com/jaytaylor/html2text v0.0.0-20190408195923-01ec452cbe43
 	github.com/joeshaw/envdecode v0.0.0-20180312135643-c9e015854467
@@ -41,7 +39,7 @@ require (
 	github.com/kardianos/osext v0.0.0-20190222173326-2bc1f35cddc0 // indirect
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 // indirect
 	github.com/klauspost/cpuid v1.2.1 // indirect
-	github.com/klauspost/reedsolomon v1.9.1 // indirect
+	github.com/klauspost/reedsolomon v1.9.2 // indirect
 	github.com/kr/pretty v0.1.0
 	github.com/kr/pty v1.1.4 // indirect
 	github.com/mattn/go-runewidth v0.0.4 // indirect
@@ -57,7 +55,7 @@ require (
 	github.com/phayes/freeport v0.0.0-20180830031419-95f893ade6f2
 	github.com/pkg/errors v0.8.1
 	github.com/shirou/gopsutil v2.18.12+incompatible // indirect
-	github.com/smartystreets/assertions v0.0.0-20190401211740-f487f9de1cd3 // indirect
+	github.com/smartystreets/assertions v1.0.0 // indirect
 	github.com/smartystreets/goconvey v0.0.0-20190330032615-68dc04aab96a // indirect
 	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect
 	github.com/streamrail/concurrent-map v0.0.0-20160823150647-8bf1e9bacbf6
@@ -72,28 +70,29 @@ require (
 	github.com/xtaci/kcp-go v5.3.9+incompatible
 	github.com/xtaci/smux v1.3.3
 	github.com/yawning/bulb v0.0.0-20170405033506-85d80d893c3d // indirect
-	go.chromium.org/luci v0.0.0-20190525185350-9ace69ddfdaf
+	go.chromium.org/luci v0.0.0-20190601002336-e100acffd659
 	go.jonnrb.io/vanity v0.1.0
+	go.opencensus.io v0.22.0 // indirect
 	go4.org v0.0.0-20190313082347-94abd6928b1d
-	golang.org/x/crypto v0.0.0-20190513172903-22d7a77e9e5f
+	golang.org/x/crypto v0.0.0-20190530122614-20be4c3c3ed5
 	golang.org/x/exp v0.0.0-20190510132918-efd6b22b2522 // indirect
 	golang.org/x/exp/errors v0.0.0-20190510132918-efd6b22b2522
 	golang.org/x/image v0.0.0-20190523035834-f03afa92d3ff // indirect
 	golang.org/x/lint v0.0.0-20190409202823-959b441ac422 // indirect
 	golang.org/x/mobile v0.0.0-20190509164839-32b2708ab171 // indirect
+	golang.org/x/mod v0.1.0 // indirect
 	golang.org/x/net v0.0.0-20190522155817-f3200d17e092
 	golang.org/x/oauth2 v0.0.0-20190523182746-aaccbc9213b0
-	golang.org/x/sys v0.0.0-20190524152521-dbbf3f1254d4 // indirect
-	golang.org/x/text v0.3.2 // indirect
+	golang.org/x/sys v0.0.0-20190531175056-4c3a928424d2 // indirect
 	golang.org/x/time v0.0.0-20190308202827-9d24e82272b4 // indirect
-	golang.org/x/tools v0.0.0-20190525145741-7be61e1b0e51 // indirect
+	golang.org/x/tools v0.0.0-20190601110225-0abef6e9ecb8 // indirect
 	google.golang.org/appengine v1.6.0 // indirect
-	google.golang.org/genproto v0.0.0-20190522204451-c2c4e71fbf69 // indirect
+	google.golang.org/genproto v0.0.0-20190530194941-fb225487d101 // indirect
 	google.golang.org/grpc v1.21.0 // indirect
 	gopkg.in/tucnak/telebot.v2 v2.0.0-20190415090633-8c1c512262f2
-	honnef.co/go/tools v0.0.0-20190523083050-ea95bdfd59fc // indirect
+	honnef.co/go/tools v0.0.0-20190531162725-42df64e2171a // indirect
 	rsc.io/goversion v1.2.0 // indirect
 	within.website/confyg v0.3.0
-	within.website/johaus v1.0.0
+	within.website/johaus v1.1.0
 	within.website/ln v0.5.2
 )
