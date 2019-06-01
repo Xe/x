@@ -9,13 +9,13 @@ import (
 
 	"github.com/Xe/x/internal"
 	"within.website/johaus/parser"
-	_ "within.website/johaus/parser/camxes"
+	_ "within.website/johaus/parser/camxes-beta"
 	"within.website/johaus/pretty"
 )
 
 var (
 	port    = flag.String("port", "9001", "TCP port to bind on for HTTP")
-	dialect = flag.String("dialect", "camxes", "Lojban dialect to use")
+	dialect = flag.String("dialect", "camxes-beta", "Lojban dialect to use")
 )
 
 func main() {
