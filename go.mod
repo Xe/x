@@ -1,9 +1,7 @@
 module github.com/Xe/x
 
 require (
-	cloud.google.com/go v0.39.0 // indirect
 	github.com/McKael/madon/v2 v2.0.0-20180929094633-c679abc985d6
-	github.com/StackExchange/wmi v0.0.0-20190523213315-cbe66965904d // indirect
 	github.com/Yawning/bulb v0.0.0-20170405033506-85d80d893c3d
 	github.com/aclements/go-moremath v0.0.0-20190506201756-286cc0be6f75 // indirect
 	github.com/birkelund/boltdbcache v1.0.0
@@ -21,16 +19,12 @@ require (
 	github.com/fogleman/gg v1.3.0 // indirect
 	github.com/fogleman/primitive v0.0.0-20190214200932-673f57e7b1b5
 	github.com/garyburd/redigo v1.6.0
-	github.com/go-ole/go-ole v1.2.4 // indirect
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
-	github.com/golang/mock v1.3.1 // indirect
-	github.com/google/btree v1.0.0 // indirect
+	github.com/golang/protobuf v1.3.1 // indirect
 	github.com/google/go-github v17.0.0+incompatible
 	github.com/google/go-querystring v1.0.0 // indirect
 	github.com/google/gops v0.3.6
-	github.com/google/pprof v0.0.0-20190515194954-54271f7e092f // indirect
 	github.com/google/uuid v1.1.1 // indirect
-	github.com/gopherjs/gopherjs v0.0.0-20190430165422-3e4dfb77656c // indirect
 	github.com/gregjones/httpcache v0.0.0-20190212212710-3befbb6ad0cc
 	github.com/hullerob/go.farbfeld v0.0.0-20181222022525-3661193c725f
 	github.com/jaytaylor/html2text v0.0.0-20190408195923-01ec452cbe43
@@ -41,7 +35,6 @@ require (
 	github.com/klauspost/cpuid v1.2.1 // indirect
 	github.com/klauspost/reedsolomon v1.9.2 // indirect
 	github.com/kr/pretty v0.1.0
-	github.com/kr/pty v1.1.4 // indirect
 	github.com/mattn/go-runewidth v0.0.4 // indirect
 	github.com/miekg/dns v1.1.13
 	github.com/mmikulicic/stringlist v1.0.0
@@ -54,45 +47,31 @@ require (
 	github.com/peterh/liner v1.1.0
 	github.com/phayes/freeport v0.0.0-20180830031419-95f893ade6f2
 	github.com/pkg/errors v0.8.1
-	github.com/shirou/gopsutil v2.18.12+incompatible // indirect
-	github.com/smartystreets/assertions v1.0.0 // indirect
-	github.com/smartystreets/goconvey v0.0.0-20190330032615-68dc04aab96a // indirect
 	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect
 	github.com/streamrail/concurrent-map v0.0.0-20160823150647-8bf1e9bacbf6
-	github.com/stretchr/objx v0.2.0 // indirect
+	github.com/stretchr/testify v1.3.0 // indirect
 	github.com/sycamoreone/orc v0.0.0-20150204213357-1627eaec2699
 	github.com/templexxx/cpufeat v0.0.0-20180724012125-cef66df7f161 // indirect
 	github.com/templexxx/xor v0.0.0-20181023030647-4e92f724b73b // indirect
 	github.com/tjfoc/gmsm v1.0.1 // indirect
 	github.com/tmc/scp v0.0.0-20170824174625-f7b48647feef
-	github.com/xlab/treeprint v0.0.0-20181112141820-a009c3971eca // indirect
 	github.com/xlzd/gotp v0.0.0-20181030022105-c8557ba2c119
 	github.com/xtaci/kcp-go v5.3.9+incompatible
 	github.com/xtaci/smux v1.3.3
 	github.com/yawning/bulb v0.0.0-20170405033506-85d80d893c3d // indirect
-	go.chromium.org/luci v0.0.0-20190601002336-e100acffd659
 	go.jonnrb.io/vanity v0.1.0
-	go.opencensus.io v0.22.0 // indirect
 	go4.org v0.0.0-20190313082347-94abd6928b1d
 	golang.org/x/crypto v0.0.0-20190530122614-20be4c3c3ed5
-	golang.org/x/exp v0.0.0-20190510132918-efd6b22b2522 // indirect
 	golang.org/x/exp/errors v0.0.0-20190510132918-efd6b22b2522
 	golang.org/x/image v0.0.0-20190523035834-f03afa92d3ff // indirect
-	golang.org/x/lint v0.0.0-20190409202823-959b441ac422 // indirect
-	golang.org/x/mobile v0.0.0-20190509164839-32b2708ab171 // indirect
-	golang.org/x/mod v0.1.0 // indirect
 	golang.org/x/net v0.0.0-20190522155817-f3200d17e092
 	golang.org/x/oauth2 v0.0.0-20190523182746-aaccbc9213b0
-	golang.org/x/sys v0.0.0-20190531175056-4c3a928424d2 // indirect
-	golang.org/x/time v0.0.0-20190308202827-9d24e82272b4 // indirect
-	golang.org/x/tools v0.0.0-20190601110225-0abef6e9ecb8 // indirect
+	golang.org/x/sync v0.0.0-20190423024810-112230192c58 // indirect
+	golang.org/x/sys v0.0.0-20190602015325-4c4f7f33c9ed // indirect
+	golang.org/x/text v0.3.2 // indirect
 	google.golang.org/appengine v1.6.0 // indirect
-	google.golang.org/genproto v0.0.0-20190530194941-fb225487d101 // indirect
-	google.golang.org/grpc v1.21.0 // indirect
 	gopkg.in/tucnak/telebot.v2 v2.0.0-20190415090633-8c1c512262f2
-	honnef.co/go/tools v0.0.0-20190531162725-42df64e2171a // indirect
-	rsc.io/goversion v1.2.0 // indirect
 	within.website/confyg v0.3.0
 	within.website/johaus v1.1.0
-	within.website/ln v0.5.2
+	within.website/ln v0.6.0
 )
