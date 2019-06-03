@@ -101,6 +101,13 @@ const indexTemplate = `<!DOCTYPE html>
 		<main>
 			<h1><code>within.website</code> Go Packages</h1>
 
+			<ul>
+				<li><a href="https://within.website/confyg">confyg</a> - A generic configuration file parser based on the go modfile parser</li>
+				<li><a href="https://within.website/derpigo">derpigo</a> - A simple wrapper to the <a href="https://derpibooru.org">Derpibooru</a> API</li>
+				<li><a href="https://within.website/johaus">johaus</a> - <a href="http://lojban.org">Lojban</a> parsing</li>
+				<li><a href="https://within.website/ln">ln</a> - Key->value based logging made context-aware and simple</li>
+			</ul>
+
 			<hr />
 
 			<footer class="is-text-center">
