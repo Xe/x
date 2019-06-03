@@ -31,6 +31,8 @@ github.com/eaburns/peggy v0.0.0-20190420135231-b61cdde6efe6/go.mod h1:5tfPwI6uki
 github.com/eaburns/pretty v0.0.0-20170305202417-362524b72369/go.mod h1:iW/TU1T4mA4w2KzqNbBCjacPFdJ9PfGvNSxr8ajT/iM=
 github.com/eaburns/pretty v0.0.0-20190404101635-2e1d2550ef0b h1:R9nfsvxwt5wAfutYAJykrIpxPvUX9n5LUit05E2E6vA=
 github.com/eaburns/pretty v0.0.0-20190404101635-2e1d2550ef0b/go.mod h1:iW/TU1T4mA4w2KzqNbBCjacPFdJ9PfGvNSxr8ajT/iM=
+github.com/elazarl/go-bindata-assetfs v1.0.0 h1:G/bYguwHIzWq9ZoyUQqrjTmJbbYn3j3CKKpKinvZLFk=
+github.com/elazarl/go-bindata-assetfs v1.0.0/go.mod h1:v+YaWX3bdea5J/mo8dSETolEo7R71Vk1u8bnjau5yw4=
 github.com/facebookgo/ensure v0.0.0-20160127193407-b4ab57deab51 h1:0JZ+dUmQeA8IIVUMzysrX4/AKuQwWhV2dYQuPZdvdSQ=
 github.com/facebookgo/ensure v0.0.0-20160127193407-b4ab57deab51/go.mod h1:Yg+htXGokKKdzcwhuNDwVvN+uBxDGXJ7G/VN1d8fa64=
 github.com/facebookgo/stack v0.0.0-20160209184415-751773369052 h1:JWuenKqqX8nojtoVVWjGfOF9635RETekkoH6Cc9SX0A=

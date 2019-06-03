@@ -7,10 +7,13 @@ import (
 
 	"github.com/Xe/x/internal"
 	"github.com/Xe/x/vanity"
+	assetfs "github.com/elazarl/go-bindata-assetfs"
 	"github.com/mmikulicic/stringlist"
 	"within.website/ln"
 	"within.website/ln/opname"
 )
+
+//go:generate go-bindata -pkg main static
 
 var (
 	domain         = flag.String("domain", "within.website", "domain this is run on")
@@ -65,6 +68,44 @@ func main() {
 		ln.Log(ctx, ln.F{"gogs_domain": *gogsDomain, "gogs_username": *gogsUsername, "gogs_repo": repo}, ln.Info("adding gogs repo"))
 	}
 
+	http.Handle("/static/", http.FileServer(
+		&assetfs.AssetFS{
+			Asset:    Asset,
+			AssetDir: AssetDir,
+		},
+	))
+
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/" {
+			http.NotFound(w, r)
+			return
+		}
+
+		w.Header().Add("Content-Type", "text/html")
+		w.Write([]byte(indexTemplate))
+	})
+
 	ln.Log(ctx, ln.F{"port": *port}, ln.Info("Listening on HTTP"))
 	http.ListenAndServe(":"+*port, nil)
+
 }
+
+const indexTemplate = `<!DOCTYPE html>
+<html>
+	<head>
+		<title>within.website Go Packages</title>
+		<link rel="stylesheet" href="/static/gruvbox.css">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	</head>
+	<body id="top">
+		<main>
+			<h1><code>within.website</code> Go Packages</h1>
+
+			<hr />
+
+			<footer class="is-text-center">
+				<p>Need help with these packages? Inquire <a href="https://github.com/Xe">Within</a>.</p>
+			</footer>
+		</main>
+	</body>
+</html>`

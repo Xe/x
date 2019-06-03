@@ -13,6 +13,7 @@ require (
 	github.com/disintegration/imaging v1.6.0
 	github.com/eaburns/peggy v0.0.0-20190420135231-b61cdde6efe6 // indirect
 	github.com/eaburns/pretty v0.0.0-20190404101635-2e1d2550ef0b // indirect
+	github.com/elazarl/go-bindata-assetfs v1.0.0
 	github.com/facebookgo/ensure v0.0.0-20160127193407-b4ab57deab51
 	github.com/facebookgo/stack v0.0.0-20160209184415-751773369052 // indirect
 	github.com/facebookgo/subset v0.0.0-20150612182917-8dac2c3c4870 // indirect
