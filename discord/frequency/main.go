@@ -10,7 +10,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/Xe/x/internal"
+	"within.website/x/internal"
 	"github.com/bwmarrin/discordgo"
 	"github.com/garyburd/redigo/redis"
 )

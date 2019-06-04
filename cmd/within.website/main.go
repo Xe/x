@@ -5,8 +5,8 @@ import (
 	"flag"
 	"net/http"
 
-	"github.com/Xe/x/internal"
-	"github.com/Xe/x/vanity"
+	"within.website/x/internal"
+	"within.website/x/vanity"
 	assetfs "github.com/elazarl/go-bindata-assetfs"
 	"github.com/mmikulicic/stringlist"
 	"within.website/ln"

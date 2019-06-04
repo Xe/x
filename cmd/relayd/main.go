@@ -11,7 +11,7 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/Xe/x/internal"
+	"within.website/x/internal"
 	"golang.org/x/crypto/acme/autocert"
 )
 

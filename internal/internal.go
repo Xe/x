@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/Xe/x/internal/flagenv"
-	"github.com/Xe/x/internal/manpage"
+	"within.website/x/internal/flagenv"
+	"within.website/x/internal/manpage"
 	"go4.org/legal"
 	"within.website/confyg/flagconfyg"
 	"within.website/ln"
@@ -20,7 +20,7 @@ import (
 	_ "github.com/joho/godotenv/autoload"
 
 	// User agent init hook
-	_ "github.com/Xe/x/web"
+	_ "within.website/x/web"
 )
 
 var (

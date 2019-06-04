@@ -8,7 +8,7 @@ import (
 	"log"
 	"path/filepath"
 
-	"github.com/Xe/x/internal/yeet"
+	"within.website/x/internal/yeet"
 )
 
 func main() {

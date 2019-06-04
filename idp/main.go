@@ -10,9 +10,9 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/Xe/x/i18n"
-	"github.com/Xe/x/idp/idpmiddleware"
-	"github.com/Xe/x/internal"
+	"within.website/x/i18n"
+	"within.website/x/idp/idpmiddleware"
+	"within.website/x/internal"
 	"github.com/pborman/uuid"
 	"github.com/xlzd/gotp"
 	"within.website/ln"

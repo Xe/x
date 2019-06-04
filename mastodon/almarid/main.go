@@ -13,7 +13,7 @@ import (
 	"time"
 
 	"github.com/McKael/madon/v2"
-	"github.com/Xe/x/internal"
+	"within.website/x/internal"
 	"within.website/ln"
 )
 

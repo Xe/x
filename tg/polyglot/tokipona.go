@@ -3,7 +3,7 @@ package main
 import (
 	"strings"
 
-	"github.com/Xe/x/web/tokiponatokens"
+	"within.website/x/web/tokiponatokens"
 )
 
 func tokiBraces(s tokiponatokens.Sentence) string {

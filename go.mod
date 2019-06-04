@@ -1,4 +1,4 @@
-module github.com/Xe/x
+module within.website/x
 
 require (
 	github.com/McKael/madon/v2 v2.0.0-20180929094633-c679abc985d6

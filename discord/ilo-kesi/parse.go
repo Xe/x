@@ -8,9 +8,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/Xe/x/internal/mainsa"
-	"github.com/Xe/x/web/switchcounter"
-	"github.com/Xe/x/web/tokiponatokens"
+	"within.website/x/internal/mainsa"
+	"within.website/x/web/switchcounter"
+	"within.website/x/web/tokiponatokens"
 )
 
 var (
@@ -97,13 +97,13 @@ func (i ilo) parse(authorID, inp string) (*reply, error) {
 				fmt.Fprintf(buf, "ma insa la tenpo ni li tenpo pi %s\n", ni)
 				goto ok
 			case actionBotInfo:
-				fmt.Fprintf(buf, "mi ilo Kesi. mi ilo e kama sona e pali pona mute. mi wile pona sina. lipu sona mi li sitelen https://github.com/Xe/x/tree/master/discord/ilo-kesi.\n")
+				fmt.Fprintf(buf, "mi ilo Kesi. mi ilo e kama sona e pali pona mute. mi wile pona sina. lipu sona mi li sitelen https://within.website/x/tree/master/discord/ilo-kesi.\n")
 				goto ok
 			}
 		case "":
 			switch req.Subject {
 			case "sina seme":
-				fmt.Fprintf(buf, "mi ilo Kesi. mi ilo e kama sona e pali pona mute. mi wile pona sina. lipu sona mi li sitelen https://github.com/Xe/x/tree/master/discord/ilo-kesi.\n")
+				fmt.Fprintf(buf, "mi ilo Kesi. mi ilo e kama sona e pali pona mute. mi wile pona sina. lipu sona mi li sitelen https://within.website/x/tree/master/discord/ilo-kesi.\n")
 				goto ok
 			}
 		}

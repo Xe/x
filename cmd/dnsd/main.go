@@ -11,8 +11,8 @@ import (
 	"time"
 	"fmt"
 
-	"github.com/Xe/x/web"
-	"github.com/Xe/x/internal"
+	"within.website/x/web"
+	"within.website/x/internal"
 	"github.com/miekg/dns"
 	"github.com/mmikulicic/stringlist"
 )
