@@ -111,6 +111,7 @@ const indexTemplate = `<!DOCTYPE html>
 				<li><a href="https://within.website/derpigo">derpigo</a> - A simple wrapper to the <a href="https://derpibooru.org">Derpibooru</a> API</li>
 				<li><a href="https://within.website/johaus">johaus</a> - <a href="http://lojban.org">Lojban</a> parsing</li>
 				<li><a href="https://within.website/ln">ln</a> - Key->value based logging made context-aware and simple</li>
+				<li><a href="https://within.website/x">x</a> - Experiments, toys and tinkering (many subpackages)</li>
 			</ul>
 
 			<hr />
