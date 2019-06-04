@@ -27,7 +27,7 @@ func init() {
 
 // GenUserAgent creates a unique User-Agent string for outgoing HTTP requests.
 func GenUserAgent() string {
-	return fmt.Sprintf("github.com-Xe-x (%s/%s/%s; %s; +https://within.website/x/blob/master/web/x.md) Alive (%s; sandflake) Hostname/%s Started (%s)", runtime.Version(), runtime.GOOS, runtime.GOARCH, os.Args[0], startID.String(), hostname, started.Format(time.RFC3339))
+	return fmt.Sprintf("github.com-Xe-x (%s/%s/%s; %s; +https://within.website/.x.botinfo) Alive (%s; sandflake) Hostname/%s Started (%s)", runtime.Version(), runtime.GOOS, runtime.GOARCH, os.Args[0], startID.String(), hostname, started.Format(time.RFC3339))
 }
 
 type userAgentTransport struct {
