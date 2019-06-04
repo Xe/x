@@ -5,9 +5,9 @@ import (
 	"os"
 	"strings"
 
-	"github.com/Xe/x/internal"
-	_ "github.com/Xe/x/internal/tokipona"
-	"github.com/Xe/x/web/tokiponatokens"
+	"within.website/x/internal"
+	_ "within.website/x/internal/tokipona"
+	"within.website/x/web/tokiponatokens"
 	"github.com/mndrix/golog"
 	line "github.com/peterh/liner"
 )

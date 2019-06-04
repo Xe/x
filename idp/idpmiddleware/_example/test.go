@@ -7,8 +7,8 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/Xe/x/idp/idpmiddleware"
-	"github.com/Xe/x/internal"
+	"within.website/x/idp/idpmiddleware"
+	"within.website/x/internal"
 	"within.website/ln/ex"
 )
 

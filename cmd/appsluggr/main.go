@@ -13,7 +13,7 @@ import (
 	"strings"
 
 	"github.com/otiai10/copy"
-	"github.com/Xe/x/internal"
+	"within.website/x/internal"
 )
 
 var (

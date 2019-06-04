@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/Xe/x/web"
+	"within.website/x/web"
 )
 
 // Part is an individual part of a sentence.

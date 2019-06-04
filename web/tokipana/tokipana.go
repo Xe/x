@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/Xe/x/web"
+	"within.website/x/web"
 )
 
 // The API URL.

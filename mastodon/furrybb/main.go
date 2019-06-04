@@ -5,7 +5,7 @@ import (
 	"flag"
 
 	"github.com/McKael/madon/v2"
-	"github.com/Xe/x/internal"
+	"within.website/x/internal"
 	_ "github.com/joho/godotenv/autoload"
 	"within.website/ln"
 )

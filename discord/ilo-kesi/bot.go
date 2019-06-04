@@ -3,8 +3,8 @@ package main
 import (
 	"errors"
 
-	"github.com/Xe/x/markov"
-	"github.com/Xe/x/web/switchcounter"
+	"within.website/x/markov"
+	"within.website/x/web/switchcounter"
 )
 
 // ilo li ilo pi toki sona.

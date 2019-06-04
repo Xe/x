@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/Xe/x/web"
+	"within.website/x/web"
 )
 
 // Webhook is the parent structure fired off to Discord.

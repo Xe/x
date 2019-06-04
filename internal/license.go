@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/Xe/x/cmd/license/licenses"
+	"within.website/x/cmd/license/licenses"
 	"go4.org/legal"
 )
 

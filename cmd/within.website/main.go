@@ -5,12 +5,12 @@ import (
 	"flag"
 	"net/http"
 
-	"github.com/Xe/x/internal"
-	"github.com/Xe/x/vanity"
 	assetfs "github.com/elazarl/go-bindata-assetfs"
 	"github.com/mmikulicic/stringlist"
 	"within.website/ln"
 	"within.website/ln/opname"
+	"within.website/x/internal"
+	"within.website/x/vanity"
 )
 
 //go:generate go-bindata -pkg main static
@@ -85,6 +85,11 @@ func main() {
 		w.Write([]byte(indexTemplate))
 	})
 
+	http.HandleFunc("/.x.botinfo", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Add("Content-Type", "text/html")
+		w.Write([]byte(botInfoPage))
+	})
+
 	ln.Log(ctx, ln.F{"port": *port}, ln.Info("Listening on HTTP"))
 	http.ListenAndServe(":"+*port, nil)
 
@@ -116,3 +121,12 @@ const indexTemplate = `<!DOCTYPE html>
 		</main>
 	</body>
 </html>`
+
+const botInfoPage = `<link rel="stylesheet" href="/static/gruvbox.css">
+<main>
+<h1>x repo bots</h1>
+
+Hello, if you are reading this, you have found this URL in your access logs.
+
+If one of these programs is doing something you don't want them to do, please <a href="https://christine.website/contact">contact me</a> or open an issue <a href="https://github.com/Xe/x">here</a>.
+</main>`

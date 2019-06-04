@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/Xe/x/internal"
+	"within.website/x/internal"
 	"github.com/disintegration/imaging"
 )
 

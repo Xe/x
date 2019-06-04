@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 
-	"github.com/Xe/x/tokipona/internal"
+	"within.website/x/tokipona/internal"
 )
 
 // Word is a single word in the Toki Pona dictionary.

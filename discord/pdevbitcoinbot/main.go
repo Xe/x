@@ -12,9 +12,9 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/Xe/x/internal"
-	"github.com/Xe/x/web"
-	"github.com/Xe/x/web/discordwebhook"
+	"within.website/x/internal"
+	"within.website/x/web"
+	"within.website/x/web/discordwebhook"
 	"github.com/codahale/hdrhistogram"
 	experrors "golang.org/x/exp/errors"
 	"within.website/ln"

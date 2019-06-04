@@ -2,4 +2,4 @@
 
 package main
 
-import _ "github.com/Xe/x/internal/gokrazy"
+import _ "within.website/x/internal/gokrazy"

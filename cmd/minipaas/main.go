@@ -5,8 +5,8 @@ import (
 	"log"
 	"strings"
 
-	"github.com/Xe/x/internal"
-	"github.com/Xe/x/internal/minipaas"
+	"within.website/x/internal"
+	"within.website/x/internal/minipaas"
 )
 
 func main() {

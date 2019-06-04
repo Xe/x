@@ -6,8 +6,8 @@ import (
 	"fmt"
 
 	madon "github.com/McKael/madon/v2"
-	"github.com/Xe/x/internal"
-	"github.com/Xe/x/tokipona"
+	"within.website/x/internal"
+	"within.website/x/tokipona"
 	"github.com/jaytaylor/html2text"
 	"within.website/ln"
 	"within.website/ln/opname"

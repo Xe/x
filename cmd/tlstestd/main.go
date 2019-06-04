@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"log"
 
-	"github.com/Xe/x/internal"
+	"within.website/x/internal"
 )
 
 var (

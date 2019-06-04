@@ -8,7 +8,7 @@ import (
 	"runtime"
 	"runtime/pprof"
 
-	"github.com/Xe/x/internal"
+	"within.website/x/internal"
 	"github.com/fogleman/primitive/primitive"
 	farbfeld "github.com/hullerob/go.farbfeld"
 )

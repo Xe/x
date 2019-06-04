@@ -10,8 +10,8 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/Xe/x/internal"
-	"github.com/Xe/x/cmd/license/licenses"
+	"within.website/x/internal"
+	"within.website/x/cmd/license/licenses"
 )
 
 var (

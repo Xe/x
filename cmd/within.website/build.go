@@ -8,9 +8,9 @@ import (
 	"log"
 	"os"
 
-	"github.com/Xe/x/internal/kahless"
-	"github.com/Xe/x/internal/minipaas"
-	"github.com/Xe/x/internal/yeet"
+	"within.website/x/internal/kahless"
+	"within.website/x/internal/minipaas"
+	"within.website/x/internal/yeet"
 )
 
 func main() {

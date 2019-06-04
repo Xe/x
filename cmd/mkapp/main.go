@@ -6,14 +6,14 @@ import (
 	"log"
 
 	"github.com/McKael/madon/v2"
-	"github.com/Xe/x/internal"
+	"within.website/x/internal"
 )
 
 var (
 	instance    = flag.String("instance", "", "mastodon instance")
 	appName     = flag.String("app-name", "Xe/x bot", "app name for mastodon")
 	redirectURI = flag.String("redirect-uri", "urn:ietf:wg:oauth:2.0:oob", "redirect URI for app users")
-	website     = flag.String("website", "https://github.com/Xe/x", "website for users that click the app name")
+	website     = flag.String("website", "https://within.website/x", "website for users that click the app name")
 	username    = flag.String("username", "", "username to generate token")
 	password    = flag.String("password", "", "password to generate token")
 )

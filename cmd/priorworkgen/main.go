@@ -7,7 +7,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/Xe/x/internal"
+	"within.website/x/internal"
 	"github.com/google/go-github/github"
 	_ "github.com/joho/godotenv/autoload"
 	"golang.org/x/oauth2"

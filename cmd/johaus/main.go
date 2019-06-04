@@ -7,7 +7,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/Xe/x/internal"
+	"within.website/x/internal"
 	"within.website/johaus/parser"
 	_ "within.website/johaus/parser/camxes-beta"
 	"within.website/johaus/pretty"
