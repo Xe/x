@@ -124,10 +124,11 @@ const indexTemplate = `<!DOCTYPE html>
 </html>`
 
 const botInfoPage = `<link rel="stylesheet" href="/static/gruvbox.css">
+<title>x repo bots</title>
 <main>
 <h1>x repo bots</h1>
 
-Hello, if you are reading this, you have found this URL in your access logs.
+<p>Hello, if you are reading this, you have found this URL in your access logs.
 
-If one of these programs is doing something you don't want them to do, please <a href="https://christine.website/contact">contact me</a> or open an issue <a href="https://github.com/Xe/x">here</a>.
+If one of these programs is doing something you don't want them to do, please <a href="https://christine.website/contact">contact me</a> or open an issue <a href="https://github.com/Xe/x">here</a>.</p>
 </main>`
