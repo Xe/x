@@ -7,15 +7,15 @@ import (
 	"log"
 	"net/http"
 
-	"within.website/x/internal"
 	"within.website/johaus/parser"
-	_ "within.website/johaus/parser/camxes-beta"
+	_ "within.website/johaus/parser/camxes"
 	"within.website/johaus/pretty"
+	"within.website/x/internal"
 )
 
 var (
 	port    = flag.String("port", "9001", "TCP port to bind on for HTTP")
-	dialect = flag.String("dialect", "camxes-beta", "Lojban dialect to use")
+	dialect = flag.String("dialect", "camxes", "Lojban dialect to use")
 )
 
 func main() {
