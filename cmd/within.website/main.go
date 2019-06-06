@@ -21,6 +21,7 @@ var (
 	gogsDomain     = flag.String("gogs-url", "https://git.xeserv.us", "Gogs domain to use")
 	gogsUsername   = flag.String("gogs-username", "xena", "Gogs username for above Gogs instance")
 	port           = flag.String("port", "2134", "HTTP port to listen on")
+	goProxyServer  = flag.String("go-proxy-server", "https://cache.greedo.xeserv.us", "go proxy server to point to for go module clients")
 
 	githubRepos = stringlist.Flag("github-repo", "list of GitHub repositories to use")
 	gogsRepos   = stringlist.Flag("gogs-repo", "list of Gogs repositories to use")
@@ -43,7 +44,8 @@ func main() {
 	internal.HandleStartup()
 	ctx := opname.With(context.Background(), "main")
 	ctx = ln.WithF(ctx, ln.F{
-		"domain": *domain,
+		"domain":       *domain,
+		"proxy_server": *goProxyServer,
 	})
 
 	if len(*githubRepos) == 0 {
@@ -55,15 +57,15 @@ func main() {
 	}
 
 	for _, repo := range *githubRepos {
-		http.Handle("/"+repo, vanity.GitHubHandler(*domain+"/"+repo, *githubUsername, repo, "https"))
-		http.Handle("/"+repo+"/", vanity.GitHubHandler(*domain+"/"+repo, *githubUsername, repo, "https"))
+		http.Handle("/"+repo, vanity.GitHubHandler(*domain+"/"+repo, *githubUsername, repo, "https", *goProxyServer))
+		http.Handle("/"+repo+"/", vanity.GitHubHandler(*domain+"/"+repo, *githubUsername, repo, "https", *goProxyServer))
 
 		ln.Log(ctx, ln.F{"github_repo": repo, "github_user": *githubUsername}, ln.Info("adding github repo"))
 	}
 
 	for _, repo := range *gogsRepos {
-		http.Handle("/"+repo, vanity.GogsHandler(*domain+"/"+repo, *gogsDomain, *gogsUsername, repo, "https"))
-		http.Handle("/"+repo+"/", vanity.GogsHandler(*domain+"/"+repo, *gogsDomain, *gogsUsername, repo, "https"))
+		http.Handle("/"+repo, vanity.GogsHandler(*domain+"/"+repo, *gogsDomain, *gogsUsername, repo, "https", *goProxyServer))
+		http.Handle("/"+repo+"/", vanity.GogsHandler(*domain+"/"+repo, *gogsDomain, *gogsUsername, repo, "https", *goProxyServer))
 
 		ln.Log(ctx, ln.F{"gogs_domain": *gogsDomain, "gogs_username": *gogsUsername, "gogs_repo": repo}, ln.Info("adding gogs repo"))
 	}
