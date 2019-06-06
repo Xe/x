@@ -169,22 +169,20 @@ func WithGogsStyleSource(importPath, repoPath, ref string) Option {
 }
 
 // Creates a Handler that serves a GitHub repository at a specific importPath.
-func GitHubHandler(importPath, user, repo, gitScheme, proxyServer string) http.Handler {
+func GitHubHandler(importPath, user, repo, gitScheme string) http.Handler {
 	ghImportPath := "github.com/" + user + "/" + repo
 	return Handler(
 		WithImport(importPath, "git", gitScheme+"://"+ghImportPath),
-		WithGoModProxy(importPath, proxyServer),
 		WithGitHubStyleSource(importPath, "https://"+ghImportPath, "master"),
 	)
 }
 
 // Creates a Handler that serves a repository hosted with Gogs at host at a
 // specific importPath.
-func GogsHandler(importPath, host, user, repo, gitScheme, proxyServer string) http.Handler {
+func GogsHandler(importPath, host, user, repo, gitScheme string) http.Handler {
 	gogsImportPath := host + "/" + user + "/" + repo
 	return Handler(
 		WithImport(importPath, "git", gitScheme+"://"+gogsImportPath),
-		WithGoModProxy(importPath, proxyServer),
 		WithGogsStyleSource(importPath, "https://"+gogsImportPath, "master"),
 	)
 }

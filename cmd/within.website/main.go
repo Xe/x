@@ -57,15 +57,15 @@ func main() {
 	}
 
 	for _, repo := range *githubRepos {
-		http.Handle("/"+repo, vanity.GitHubHandler(*domain+"/"+repo, *githubUsername, repo, "https", *goProxyServer))
-		http.Handle("/"+repo+"/", vanity.GitHubHandler(*domain+"/"+repo, *githubUsername, repo, "https", *goProxyServer))
+		http.Handle("/"+repo, vanity.GitHubHandler(*domain+"/"+repo, *githubUsername, repo, "https"))
+		http.Handle("/"+repo+"/", vanity.GitHubHandler(*domain+"/"+repo, *githubUsername, repo, "https"))
 
 		ln.Log(ctx, ln.F{"github_repo": repo, "github_user": *githubUsername}, ln.Info("adding github repo"))
 	}
 
 	for _, repo := range *gogsRepos {
-		http.Handle("/"+repo, vanity.GogsHandler(*domain+"/"+repo, *gogsDomain, *gogsUsername, repo, "https", *goProxyServer))
-		http.Handle("/"+repo+"/", vanity.GogsHandler(*domain+"/"+repo, *gogsDomain, *gogsUsername, repo, "https", *goProxyServer))
+		http.Handle("/"+repo, vanity.GogsHandler(*domain+"/"+repo, *gogsDomain, *gogsUsername, repo, "https"))
+		http.Handle("/"+repo+"/", vanity.GogsHandler(*domain+"/"+repo, *gogsDomain, *gogsUsername, repo, "https"))
 
 		ln.Log(ctx, ln.F{"gogs_domain": *gogsDomain, "gogs_username": *gogsUsername, "gogs_repo": repo}, ln.Info("adding gogs repo"))
 	}
