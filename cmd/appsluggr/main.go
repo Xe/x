@@ -13,6 +13,7 @@ import (
 	"strings"
 
 	"github.com/otiai10/copy"
+	"golang.org/x/mod/sumdb/dirhash"
 	"within.website/x/internal"
 )
 
@@ -76,6 +77,14 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	hash, err := dirhash.HashDir(dir, os.Args[0], dirhash.Hash1)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Printf("hash: %s", hash)
+	gzw.Comment = hash
 
 	filepath.Walk(dir, func(file string, fi os.FileInfo, err error) error {
 		// return on any error
