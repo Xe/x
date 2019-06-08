@@ -5,6 +5,10 @@ main {
   margin: auto;
 }
 
+::selection {
+  background: #d3869b;
+}
+
 body {
   background: #282828;
   color:      #ebdbb2;
