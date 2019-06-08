@@ -6,13 +6,14 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"log"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
 	"time"
 
-	"within.website/x/internal"
 	"golang.org/x/crypto/acme/autocert"
+	"within.website/x/internal"
 )
 
 func fwdhttps(w http.ResponseWriter, r *http.Request) {
@@ -47,6 +48,13 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
+	go func() {
+		err := http.ListenAndServe(*insecurePort, m.HTTPHandler(http.HandlerFunc(http.NotFound)))
+		if err != nil {
+			log.Fatal(err)
+		}
+	}()
 
 	rp := httputil.NewSingleHostReverseProxy(u)
 
