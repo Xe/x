@@ -19,7 +19,7 @@ import (
 var (
 	domain         = flag.String("domain", "within.website", "domain this is run on")
 	githubUsername = flag.String("github-user", "Xe", "GitHub username for GitHub repos")
-	gogsDomain     = flag.String("gogs-url", "https://git.xeserv.us", "Gogs domain to use")
+	gogsDomain     = flag.String("gogs-url", "git.xeserv.us", "Gogs domain to use")
 	gogsUsername   = flag.String("gogs-username", "xena", "Gogs username for above Gogs instance")
 	port           = flag.String("port", "2134", "HTTP port to listen on")
 	goProxyServer  = flag.String("go-proxy-server", "https://cache.greedo.xeserv.us", "go proxy server to point to for go module clients")
