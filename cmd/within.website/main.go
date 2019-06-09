@@ -118,7 +118,7 @@ const indexTemplate = `<!DOCTYPE html>
 				<li><a href="https://within.website/derpigo">derpigo</a> - A simple wrapper to the <a href="https://derpibooru.org">Derpibooru</a> API</li>
 				<li><a href="https://within.website/eclier">eclier</a> - A go+lua command line application framework</li>
 				<li><a href="https://within.website/gopher">gopher</a> - A simple Gopher client/server framework based on net/http</li>
-				<li><a href="https://within.website/gluanetrc">gluanetrc</a> - A GopherLua binding for <a href="https://github.com/dickeyxxx/netrc">github.com/dickeyxxx/netrc</a></li>
+				<li><a href="https://within.website/gluanetrc">gluanetrc</a> - A GopherLua binding for <a href="https://github.com/dickeyxxx/netrc">netrc</a> file management</li>
 				<li><a href="https://within.website/gorqlite">gorqlite</a> - A driver for <a href="https://github.com/rqlite/rqlite">rqlite</a></li>
 				<li><a href="https://within.website/johaus">johaus</a> - <a href="http://lojban.org">Lojban</a> parsing</li>
 				<li><a href="https://within.website/ln">ln</a> - Key->value based logging made context-aware and simple</li>
