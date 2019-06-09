@@ -8,6 +8,7 @@ import (
 	assetfs "github.com/elazarl/go-bindata-assetfs"
 	"github.com/mmikulicic/stringlist"
 	"within.website/ln"
+	"within.website/ln/ex"
 	"within.website/ln/opname"
 	"within.website/x/internal"
 	"within.website/x/vanity"
@@ -96,7 +97,7 @@ func main() {
 	})
 
 	ln.Log(ctx, ln.F{"port": *port}, ln.Info("Listening on HTTP"))
-	http.ListenAndServe(":"+*port, nil)
+	http.ListenAndServe(":"+*port, ex.HTTPLog(http.DefaultServeMux))
 
 }
 
