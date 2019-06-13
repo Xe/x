@@ -45,5 +45,5 @@ func handle(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
-	fmt.Fprintln(w, st.Front)
+	fmt.Fprint(w, st.Front)
 }
