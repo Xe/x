@@ -1,0 +1,7 @@
+front.akua:80 {
+	cgi {
+		match /front
+		exec /usr/local/bin/whoisfront
+		env SWITCH_COUNTER_URL=https://www.switchcounter.science/webhook/stuff
+	}
+}
