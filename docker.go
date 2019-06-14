@@ -22,6 +22,11 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	otherResTag, err := yeet.DockerTag(ctx, "docker.pkg.github.com/Xe/x", "xperimental", tag)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	gitTag, err := yeet.GitTag(ctx)
 	if err != nil {
 		log.Fatal(err)
@@ -33,6 +38,7 @@ func main() {
 
 	yeet.ShouldWork(ctx, nil, yeet.WD, "docker", "push", resTag)
 	yeet.ShouldWork(ctx, nil, yeet.WD, "docker", "push", dnsdTag)
+	yeet.ShouldWork(ctx, nil, yeet.WD, "docker", "push", otherResTag)
 
 	log.Printf("use %s", resTag)
 }
