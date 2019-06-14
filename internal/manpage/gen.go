@@ -1,3 +1,4 @@
+// Package manpage is a manpage generator based on command line flags from package flag.
 package manpage
 
 import (

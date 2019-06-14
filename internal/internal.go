@@ -1,3 +1,4 @@
+// Package internal centralizes a lot of other boring configuration and startup logic into a common place.
 package internal
 
 import (
@@ -6,12 +7,12 @@ import (
 	"fmt"
 	"os"
 
-	"within.website/x/internal/flagenv"
-	"within.website/x/internal/manpage"
 	"go4.org/legal"
 	"within.website/confyg/flagconfyg"
 	"within.website/ln"
 	"within.website/ln/opname"
+	"within.website/x/internal/flagenv"
+	"within.website/x/internal/manpage"
 
 	// Debug routes
 	_ "net/http/pprof"

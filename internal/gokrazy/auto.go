@@ -1,3 +1,4 @@
+// Package gokrazy makes it easier to adapt tools to https://gokrazy.org.
 package gokrazy
 
 import "time"
