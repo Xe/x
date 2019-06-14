@@ -1,3 +1,4 @@
+// Command quickserv serves a folder of files over HTTP quickly.
 package main
 
 import (

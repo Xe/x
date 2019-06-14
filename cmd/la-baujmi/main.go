@@ -1,3 +1,4 @@
+// Command la-baujmi is a simple language understander for Toki Pona.
 package main
 
 import (
@@ -5,11 +6,11 @@ import (
 	"os"
 	"strings"
 
+	"github.com/mndrix/golog"
+	line "github.com/peterh/liner"
 	"within.website/x/internal"
 	_ "within.website/x/internal/tokipona"
 	"within.website/x/web/tokiponatokens"
-	"github.com/mndrix/golog"
-	line "github.com/peterh/liner"
 )
 
 func main() {

@@ -1,3 +1,6 @@
+// Command appsluggr packages a standard web and worker slug for Heroku/Dokku.
+//
+// This hard assumes that the binaries put into the slug will work on the target hardware.
 package main
 
 import (

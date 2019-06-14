@@ -1,3 +1,4 @@
+// Command whoisfront is a simple CGI wrapper to switchcounter.science. This is used in some internal tooling.
 package main
 
 import (

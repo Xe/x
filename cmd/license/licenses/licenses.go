@@ -1,3 +1,4 @@
+// Package licenses is the list of licenses that this software supports.
 package licenses
 
 var List map[string]string
@@ -32,7 +33,7 @@ func init() {
 		"sqlite":            SQLiteBlessing,
 		"fair":              FairLicense,
 		"yolo":              YoloLicense,
-		"icu996": ICU996License,
+		"icu996":            ICU996License,
 	}
 }
 

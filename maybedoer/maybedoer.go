@@ -1,3 +1,6 @@
+// Package maybedoer contains a pipeline of actions that might fail. If any action
+// in the chain fails, no further actions take place and the error becomes the pipeline
+// error.
 package maybedoer
 
 // Impl sequences a set of actions to be performed via calls to
@@ -21,4 +24,3 @@ func (c *Impl) Maybe(f func() error) {
 func (c *Impl) Error() error {
 	return c.err
 }
-

@@ -1,3 +1,4 @@
+// Command relayd is a simple TLS terminator using let's encrypt.
 package main
 
 import (

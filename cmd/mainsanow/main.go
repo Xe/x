@@ -1,7 +1,7 @@
+// Command mainsanow shows the current time in ma insa.
 package main
 
 import (
-	"flag"
 	"log"
 	"time"
 
@@ -10,7 +10,6 @@ import (
 )
 
 func main() {
-	flag.Parse()
 	internal.HandleStartup()
 
 	tn, err := mainsa.At(time.Now())

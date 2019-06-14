@@ -1,3 +1,4 @@
+// Command ff-primitive takes farbfeld data from standard in and applies http://primitive.lol to it.
 package main
 
 import (
@@ -8,9 +9,9 @@ import (
 	"runtime"
 	"runtime/pprof"
 
-	"within.website/x/internal"
 	"github.com/fogleman/primitive/primitive"
 	farbfeld "github.com/hullerob/go.farbfeld"
+	"within.website/x/internal"
 )
 
 var (

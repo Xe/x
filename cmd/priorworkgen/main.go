@@ -1,3 +1,4 @@
+// Command priorworkgen generates the list of prior work (read: GitHub repositories) for contractual stuff.
 package main
 
 import (
@@ -7,10 +8,10 @@ import (
 	"log"
 	"os"
 
-	"within.website/x/internal"
 	"github.com/google/go-github/github"
 	_ "github.com/joho/godotenv/autoload"
 	"golang.org/x/oauth2"
+	"within.website/x/internal"
 )
 
 var (

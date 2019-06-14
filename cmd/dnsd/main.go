@@ -1,20 +1,21 @@
+// Command dnsd is a simple DNS server for my network. It has O(n) lookup times.
 package main
 
 import (
 	"bufio"
 	"flag"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
-	"fmt"
 
-	"within.website/x/web"
-	"within.website/x/internal"
 	"github.com/miekg/dns"
 	"github.com/mmikulicic/stringlist"
+	"within.website/x/internal"
+	"within.website/x/web"
 )
 
 var (

@@ -1,3 +1,4 @@
+// Command mkapp creates a mastodon app for a given -instance.
 package main
 
 import (

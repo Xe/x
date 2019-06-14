@@ -1,3 +1,4 @@
+// Command johaus wraps the lojban parser camxes and presents the results over HTTP.
 package main
 
 import (

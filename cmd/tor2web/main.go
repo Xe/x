@@ -1,3 +1,4 @@
+// Command tor2web is a simple caching proxy to tor onion sites.
 package main
 
 import (

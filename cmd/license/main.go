@@ -1,3 +1,4 @@
+// Command license is a simple software license generator.
 package main
 
 import (
@@ -10,8 +11,8 @@ import (
 	"text/template"
 	"time"
 
-	"within.website/x/internal"
 	"within.website/x/cmd/license/licenses"
+	"within.website/x/internal"
 )
 
 var (

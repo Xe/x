@@ -1,3 +1,4 @@
+// Package tor manages and automates starting a child tor process for exposing TCP services into onionland.
 package tor
 
 import (

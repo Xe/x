@@ -1,3 +1,4 @@
+// Command thumber creates 256x256 thumbnails for a folder/pile of them.
 package main
 
 import (
@@ -7,8 +8,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"within.website/x/internal"
 	"github.com/disintegration/imaging"
+	"within.website/x/internal"
 )
 
 var (

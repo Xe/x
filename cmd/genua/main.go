@@ -1,3 +1,4 @@
+// Command genua generates an example user agent.
 package main
 
 import (
