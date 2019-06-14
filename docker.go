@@ -45,5 +45,6 @@ func main() {
 	yeet.ShouldWork(ctx, nil, yeet.WD, "docker", "push", otherResTag)
 	yeet.ShouldWork(ctx, nil, yeet.WD, "docker", "push", dnsdGithubTag)
 
-	log.Printf("use %s", resTag)
+	log.Printf("xperimental: %s %s", resTag, otherResTag)
+	log.Printf("dnsd: %s %s", dnsdTag, dnsdGithubTag)
 }
