@@ -22,7 +22,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	otherResTag, err := yeet.DockerTag(ctx, "docker.pkg.github.com/Xe/x", "xperimental", tag)
+	otherResTag, err := yeet.DockerTag(ctx, "docker.pkg.github.com/xe/x", "xperimental", tag)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -35,10 +35,15 @@ func main() {
 	dnsdTag := "xena/dnsd:" + gitTag
 
 	yeet.ShouldWork(ctx, nil, filepath.Join(yeet.WD, "cmd", "dnsd"), "docker", "build", "-t", dnsdTag, "--build-arg", "X_VERSION="+gitTag, ".")
+	dnsdGithubTag, err := yeet.DockerTag(ctx, "docker.pkg.github.com/xe/x", "dnsd", dnsdTag)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	yeet.ShouldWork(ctx, nil, yeet.WD, "docker", "push", resTag)
 	yeet.ShouldWork(ctx, nil, yeet.WD, "docker", "push", dnsdTag)
 	yeet.ShouldWork(ctx, nil, yeet.WD, "docker", "push", otherResTag)
+	yeet.ShouldWork(ctx, nil, yeet.WD, "docker", "push", dnsdGithubTag)
 
 	log.Printf("use %s", resTag)
 }
