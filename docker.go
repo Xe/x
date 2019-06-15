@@ -16,16 +16,10 @@ func main() {
 	defer cancel()
 
 	tag := "xena/xperimental"
-	yeet.ShouldWork(ctx, nil, yeet.WD, "docker", "build", "-t", tag, ".")
+	yeet.DockerBuild(ctx, yeet.WD, tag)
 
-	resTag, err := yeet.DockerTag(ctx, "xena", "xperimental", tag)
-	if err != nil {
-		log.Fatal(err)
-	}
-	otherResTag, err := yeet.DockerTag(ctx, "docker.pkg.github.com/xe/x", "xperimental", tag)
-	if err != nil {
-		log.Fatal(err)
-	}
+	resTag := yeet.DockerTag(ctx, "xena", "xperimental", tag)
+	otherResTag := yeet.DockerTag(ctx, "docker.pkg.github.com/xe/x", "xperimental", tag)
 
 	gitTag, err := yeet.GitTag(ctx)
 	if err != nil {
@@ -34,11 +28,8 @@ func main() {
 
 	dnsdTag := "xena/dnsd:" + gitTag
 
-	yeet.ShouldWork(ctx, nil, filepath.Join(yeet.WD, "cmd", "dnsd"), "docker", "build", "-t", dnsdTag, "--build-arg", "X_VERSION="+gitTag, ".")
-	dnsdGithubTag, err := yeet.DockerTag(ctx, "docker.pkg.github.com/xe/x", "dnsd", dnsdTag)
-	if err != nil {
-		log.Fatal(err)
-	}
+	yeet.DockerBuild(ctx, filepath.Join(yeet.WD, "cmd", "dnsd"), dnsdTag, "--build-arg", "X_VERSION="+gitTag)
+	dnsdGithubTag := yeet.DockerTag(ctx, "docker.pkg.github.com/xe/x", "dnsd", dnsdTag)
 
 	yeet.ShouldWork(ctx, nil, yeet.WD, "docker", "push", resTag)
 	yeet.ShouldWork(ctx, nil, yeet.WD, "docker", "push", dnsdTag)

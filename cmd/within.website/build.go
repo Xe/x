@@ -18,6 +18,7 @@ func main() {
 	defer cancel()
 
 	env := append(os.Environ(), []string{"CGO_ENABLED=0", "GOOS=linux"}...)
+	yeet.ShouldWork(ctx, env, yeet.WD, "go", "generate")
 	yeet.ShouldWork(ctx, env, yeet.WD, "go", "build", "-o=web")
 	yeet.ShouldWork(ctx, env, yeet.WD, "appsluggr", "-web=web")
 	fin, err := os.Open("slug.tar.gz")

@@ -45,7 +45,7 @@ func ShouldWork(ctx context.Context, env []string, dir string, cmdName string, a
 	log.Printf("starting process, pwd: %s, cmd: %s, args: %v", dir, loc, args)
 	err = cmd.Run()
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 }
 
@@ -77,15 +77,21 @@ func GitTag(ctx context.Context) (string, error) {
 }
 
 // DockerTag tags a docker image
-func DockerTag(ctx context.Context, org, repo, image string) (string, error) {
+func DockerTag(ctx context.Context, org, repo, image string) string {
 	tag, err := GitTag(ctx)
 	if err != nil {
-		return "", err
+		panic(err)
 	}
 
 	repoTag := fmt.Sprintf("%s/%s:%s", org, repo, tag)
 
 	ShouldWork(ctx, nil, WD, "docker", "tag", image, repoTag)
 
-	return repoTag, nil
+	return repoTag
+}
+
+// DockerBuild builds a docker image with the given working directory and tag.
+func DockerBuild(ctx context.Context, dir, tag string, args ...string) {
+	args = append([]string{"build", "-t", tag}, args...)
+	ShouldWork(ctx, nil, dir, "docker", args...)
 }
