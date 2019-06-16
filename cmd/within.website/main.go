@@ -6,7 +6,6 @@ import (
 	"flag"
 	"net/http"
 
-	assetfs "github.com/elazarl/go-bindata-assetfs"
 	"github.com/mmikulicic/stringlist"
 	"within.website/ln"
 	"within.website/ln/ex"
@@ -76,12 +75,7 @@ func main() {
 		ln.Log(ctx, ln.F{"gogs_domain": *gogsDomain, "gogs_username": *gogsUsername, "gogs_repo": repo}, ln.Info("adding gogs repo"))
 	}
 
-	http.Handle("/static/", http.FileServer(
-		&assetfs.AssetFS{
-			Asset:    Asset,
-			AssetDir: AssetDir,
-		},
-	))
+	http.Handle("/static/", http.StripPrefix("/static", http.FileServer(assets)))
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/" {
