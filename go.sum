@@ -1,6 +1,8 @@
 bou.ke/monkey v1.0.1 h1:zEMLInw9xvNakzUUPjfS4Ds6jYPqCFx3m7bRmG5NH2U=
 bou.ke/monkey v1.0.1/go.mod h1:FgHuK96Rv2Nlf+0u1OOVDpCMdsWyOFmeeketDHE7LIg=
 cloud.google.com/go v0.34.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
+git.xeserv.us/xena/jvozba v0.0.0-20190616002803-f274e24d1e52 h1:MumuDSv8Ebsal1C98APrRRb8JyX+FpKiyGT/8fiMjaw=
+git.xeserv.us/xena/jvozba v0.0.0-20190616002803-f274e24d1e52/go.mod h1:lPdeNnexyxX+GQt62HV9UypJDg9enMwadWLXazGUUuc=
 github.com/McKael/madon/v2 v2.0.0-20180929094633-c679abc985d6 h1:9cJcTOeILzInNo+DCYmXKME1QfAP07FYdo3M9/9jyc4=
 github.com/McKael/madon/v2 v2.0.0-20180929094633-c679abc985d6/go.mod h1:mvlJhxZCchfiasx3XvN3hBu5RekGwTDm09dKlSM/dQQ=
 github.com/StackExchange/wmi v0.0.0-20170410192909-ea383cf3ba6e/go.mod h1:3eOhrUMpNV+6aFIbp5/iudMxNCF27Vw2OZgy4xEx0Fg=

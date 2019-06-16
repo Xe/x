@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"expvar"
-	_ "expvar"
 	"flag"
 	"fmt"
 	"log"
@@ -12,10 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"within.website/x/idp/idpmiddleware"
-	"within.website/x/internal"
-	_ "within.website/x/tokipona"
-	"within.website/x/web/tokiponatokens"
+	"git.xeserv.us/xena/jvozba"
 	_ "github.com/joho/godotenv/autoload"
 	tb "gopkg.in/tucnak/telebot.v2"
 	"within.website/johaus/parser"
@@ -23,6 +19,9 @@ import (
 	"within.website/johaus/pretty"
 	"within.website/ln"
 	"within.website/ln/opname"
+	"within.website/x/internal"
+	_ "within.website/x/tokipona"
+	"within.website/x/web/tokiponatokens"
 )
 
 const (
@@ -83,8 +82,20 @@ func main() {
 		b.Send(m.Sender, sb.String())
 	})
 
+	b.Handle("/lujvo", func(m *tb.Message) {
+		msg := m.Payload
+		jvo, err := jvozba.Jvozba(msg)
+		if err != nil {
+			b.Send(m.Sender, err.Error())
+			errCount.Add(1)
+			return
+		}
+
+		b.Send(m.Sender, jvo)
+	})
+
 	ln.Log(opname.With(context.Background(), "main"), ln.Info("starting HTTP server"), ln.F{"port": *port, "using": "idpmiddleware", "self_url": selfURL})
-	go http.ListenAndServe(":"+*port, idpmiddleware.XeProtect(selfURL)(http.DefaultServeMux))
+	go http.ListenAndServe(":"+*port, http.DefaultServeMux)
 
 	b.Start()
 }

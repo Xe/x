@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 
+	"git.xeserv.us/xena/jvozba"
 	"within.website/johaus/parser"
 	_ "within.website/johaus/parser/camxes"
 	"within.website/johaus/pretty"
@@ -24,10 +25,29 @@ func main() {
 
 	log.Printf("Listening on http://0.0.0.0:%s", *port)
 
-	http.DefaultServeMux.HandleFunc("/tree", tree)
-	http.DefaultServeMux.HandleFunc("/braces", braces)
+	http.HandleFunc("/tree", tree)
+	http.HandleFunc("/braces", braces)
+	http.HandleFunc("/lujvo", lujvo)
 
 	http.ListenAndServe(":"+*port, nil)
+}
+
+func lujvo(w http.ResponseWriter, r *http.Request) {
+	data, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, "can't read: "+err.Error(), http.StatusBadRequest)
+		return
+	}
+	defer r.Body.Close()
+
+	jvo, err := jvozba.Jvozba(string(data))
+	if err != nil {
+		http.Error(w, "can't read: "+err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	w.Header().Set("X-Content-Language", "jbo")
+	http.Error(w, jvo, http.StatusOK)
 }
 
 func braces(w http.ResponseWriter, r *http.Request) {
@@ -36,6 +56,7 @@ func braces(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "can't parse: "+err.Error(), http.StatusBadRequest)
 		return
 	}
+	defer r.Body.Close()
 
 	tree, err := parser.Parse(*dialect, string(data))
 	if err != nil {
@@ -57,6 +78,7 @@ func tree(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "can't parse: "+err.Error(), http.StatusBadRequest)
 		return
 	}
+	defer r.Body.Close()
 
 	tree, err := parser.Parse(*dialect, string(data))
 	if err != nil {

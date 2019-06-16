@@ -1,6 +1,7 @@
 module within.website/x
 
 require (
+	git.xeserv.us/xena/jvozba v0.0.0-20190616002803-f274e24d1e52
 	github.com/McKael/madon/v2 v2.0.0-20180929094633-c679abc985d6
 	github.com/Yawning/bulb v0.0.0-20170405033506-85d80d893c3d
 	github.com/aclements/go-moremath v0.0.0-20190506201756-286cc0be6f75 // indirect
