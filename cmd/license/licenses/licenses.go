@@ -5,6 +5,7 @@ var List map[string]string
 
 func init() {
 	List = map[string]string{
+		"anti-facist-mit":   AntiFacistMIT,
 		"zlib":              ZlibLicense,
 		"unlicense":         Unlicense,
 		"mit":               MitLicense,
@@ -37,7 +38,108 @@ func init() {
 	}
 }
 
-var ICU996License = `                   The 996ICU License (996ICU)
+const AntiFacistMIT = `Copyright (c) {{.Year}} {{.Name}} <{{.Email}}>
+
+The following license is modified from the MIT license.
+
+Anti-Fascist MIT License:
+
+The following conditions must be met by any person obtaining a copy of this
+software:
+
+- You MAY NOT be a fascist.
+- You MUST not financially support fascists.
+- You MUST not publicly voice support for fascists.
+- You MAY NOT be a member of any fascist organization, even if you are a member to infiltrate for anti-fascist purposes. 
+
+"Fascist" can be understood as any group or individual who promotes the political ideology of fascism.
+
+"Fascism" can be broken down into 11 ideological features as well as 8 tactics that can form a fascist system in varying combinations, 
+for the sake of simplicity and brevity the individual or organization in question must match to at least 5 features or tactics 
+or a combination of the two determined by the individual licencer. 
+
+Said licencer may provide a list if an individual or group matches to at least 5 features upon request from the individual 
+or group in question.
+
+
+
+The ideological features are listed below.
+
+1. Hyper-nationalism
+2. Militarism.
+3. Glorification of violence and readiness to use it in politics.
+4. Fetishization of youth.
+5. Fetishization of masculinity.
+6. Leader cult.
+7. Lost-golden-age syndrome.
+8. Self-definition by opposition.
+9. Mass mobilization and mass party.
+10. Hierarchical party structure and tendency to purge the disloyal. 
+11. Theatricality.
+
+Fascist tactics include
+
+1) Persecution of national minorities.
+2) Persecution of racial minorities.
+3) Persecution of religious minorities (Anti-Semitism, Islamophobia and others).
+4) Promotion of a type of national purity.
+5) Promotion of a state run by ideologically oriented corporate bodies.
+6) Persecution of gender or sexual minorities.
+7) Persecution of the disabled.
+8) Formation of extra-legal forces (brownshirts) to defend fascist values.
+
+Special criterea: Meeting only one point of the special criterea is enough to consider someone or a group to 
+be fascist for the purposes of this licence.
+
+1. Promotion of any theories that state members of the jewish ethnicity or faith control 
+or largely control the world, finance, or other global major power system.
+
+2. Denial of the holocaust or any other historically proven genocide.
+
+3. Promotion of ethnostates.
+
+4. Advocating for eugenics. Either positive or negative eugenics. Promotion for the rights of abortion are not considered eugenics.
+
+5. Advocating for the removal of rights or legal protections from a class or group of people.
+
+Former fascists: People or organizations who used to promote the political ideology of fascism but no longer do so 
+must meet the following criterea to be able to use this software.
+
+1. Publicly disavow past fascist deeds and ideologies.
+2. Expose any and all known fascists former allies to the public. 
+   A suggested route would be through the one peoples project (onepeoplesproject.com). 
+   If they can confirm you have done so that will count as meeting condition two.
+3. Publicly destroy any and all fascist paraphenelia you have in your posession including removal of tattoos and body markings              affiliated with fascist groups or gangs.
+
+
+
+ANTI-FASCIST-MIT LICENSE:
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+The above licence agreement conditions are met in full.
+
+The Anti-Fascist MIT License may only be used under the terms of the Anti-Fascist MIT License.
+
+Any modified versions of this software must also include the Anti-Fascist MIT Licence.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.`
+
+const ICU996License = `                   The 996ICU License (996ICU)
                      Version 0.1, March 2019
 
 PACKAGE is distributed under LICENSE with the following restriction:
@@ -51,7 +153,7 @@ observed:
 * The licensee must not, explicitly or implicitly, request or schedule
   their employees to be at work consecutively for 10 hours.`
 
-var YoloLicense = `                                  YOLO LICENSE
+const YoloLicense = `                                  YOLO LICENSE
                              Version 1, July 10 2015
 
 THIS SOFTWARE LICENSE IS PROVIDED "ALL CAPS" SO THAT YOU KNOW IT IS SUPER
@@ -65,7 +167,7 @@ THE FOLLOWING CONDITIONS:
 3. #blazeit
 `
 
-var FairLicense = `Copyright {{.Year}} {{.Name}} <{{.Email}}>
+const FairLicense = `Copyright {{.Year}} {{.Name}} <{{.Email}}>
 
 Usage of the works is permitted provided that this instrument is retained
 with the works, so that any entity that uses the works is notified of
@@ -73,14 +175,14 @@ this instrument.
 
 DISCLAIMER: THE WORKS ARE WITHOUT WARRANTY.`
 
-var SQLiteBlessing = `The author disclaims copyright to this source code.  In place of
+const SQLiteBlessing = `The author disclaims copyright to this source code.  In place of
 a legal notice, here is a blessing:
 
     May you do good and not evil.
     May you find forgiveness for yourself and forgive others.
     May you share freely, never taking more than you give.`
 
-var PftusLicense = `The P.F.T.U.S(Protected Free To Use Software) License
+const PftusLicense = `The P.F.T.U.S(Protected Free To Use Software) License
 Copyright {{.Year}} {{.Name}} <{{.Email}}>, see the bottom of the document.
 Version 1.1x
 
@@ -140,7 +242,7 @@ original software).
 Copyright {{.Year}} {{.Name}} <{{.Email}}>, changing is not permitted,
 redistribution is allowed. Some rights reserved.`
 
-var BOLALicense = `I don't like licenses, because I don't like having to worry about all this
+const BOLALicense = `I don't like licenses, because I don't like having to worry about all this
 legal stuff just for a simple piece of software I don't really mind anyone
 using. But I also believe that it's important that people share and give back;
 so I'm placing this work under the following license.
@@ -168,7 +270,7 @@ However, if you want to be "buena onda", you should:
    to replace them.
 6. Be tolerant. Everything that's good in nature comes from cooperation.`
 
-var DownloadMiiLicense = `DownloadMii License
+const DownloadMiiLicense = `DownloadMii License
     Version 1.0x
 
 Copyright (c) {{.Year}} {{.Name}} <{{.Email}}>
@@ -184,7 +286,7 @@ mirroring of code and produced binaries.
 [1] If you however are developing software that is not competing with this
 software you're allowed to make profit from it.`
 
-var TumblrLicense = `Copyright (c) {{.Year}} {{.Name}} <{{.Email}}>
+const TumblrLicense = `Copyright (c) {{.Year}} {{.Name}} <{{.Email}}>
 
 Non-White-Heterosexual-Male License
 
@@ -201,11 +303,11 @@ of a derivative.
 
 For additional details see http://nonwhiteheterosexualmalelicense.org`
 
-var AllRightsReserved = `Copyright (c) {{.Year}} {{.Name}} <{{.Email}}>
+const AllRightsReserved = `Copyright (c) {{.Year}} {{.Name}} <{{.Email}}>
 
 All rights reserved.`
 
-var LhaLicense = `Copyright (c) {{.Year}} {{.Name}} <{{.Email}}>
+const LhaLicense = `Copyright (c) {{.Year}} {{.Name}} <{{.Email}}>
 
 Original Authors License Statement (from man/lha.man, translated by
 Osamu Aoki <debian@aokiconsulting.com>):
@@ -273,7 +375,7 @@ GOTO Masanori <gotom@debian.org>):
    distribution. That's well where this software is appeard.
    If you cannot do, you must send me the E-Mail later.`
 
-var JsonLicense = `Copyright (c) {{.Year}} {{.Name}} <{{.Email}}>
+const JsonLicense = `Copyright (c) {{.Year}} {{.Name}} <{{.Email}}>
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
@@ -296,14 +398,14 @@ LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.`
 
-var AllPermissiveLicense = `Copyright (c) {{.Year}} {{.Name}} <{{.Email}}>
+const AllPermissiveLicense = `Copyright (c) {{.Year}} {{.Name}} <{{.Email}}>
 
 Copying and distribution of this file, with or without modification,
 are permitted in any medium without royalty provided the copyright
 notice and this notice are preserved.  This file is offered as-is,
 without any warranty.`
 
-var ZlibLicense = `Copyright (c) {{.Year}} {{.Name}} <{{.Email}}>
+const ZlibLicense = `Copyright (c) {{.Year}} {{.Name}} <{{.Email}}>
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -323,7 +425,7 @@ freely, subject to the following restrictions:
 
 3. This notice may not be removed or altered from any source distribution.`
 
-var Unlicense = `This is free and unencumbered software released into the public domain.
+const Unlicense = `This is free and unencumbered software released into the public domain.
 
 Anyone is free to copy, modify, publish, use, compile, sell, or
 distribute this software, either in source code form or as a compiled
@@ -348,7 +450,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 For more information, please refer to <http://unlicense.org/>`
 
-var MitLicense = `Copyright (c) {{.Year}} {{.Name}} <{{.Email}}>
+const MitLicense = `Copyright (c) {{.Year}} {{.Name}} <{{.Email}}>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -368,7 +470,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.`
 
-var ApacheLicense = `Copyright {{.Year}} {{.Name}} <{{.Email}}>
+const ApacheLicense = `Copyright {{.Year}} {{.Name}} <{{.Email}}>
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -382,7 +484,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.`
 
-var Bsd2Clause = `Copyright (c) {{.Year}} {{.Name}} <{{.Email}}>
+const Bsd2Clause = `Copyright (c) {{.Year}} {{.Name}} <{{.Email}}>
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -406,7 +508,7 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
 
-var Gpl2License = `Copyright (C) {{.Year}} {{.Name}} <{{.Email}}>
+const Gpl2License = `Copyright (C) {{.Year}} {{.Name}} <{{.Email}}>
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -422,7 +524,7 @@ You should have received a copy of the GNU General Public License along
 with this program; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.`
 
-var Gpl3License = `Copyright (C) {{.Year}} {{.Name}} <{{.Email}}>
+const Gpl3License = `Copyright (C) {{.Year}} {{.Name}} <{{.Email}}>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -437,7 +539,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.`
 
-var WTFPlLicense = `DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
+const WTFPlLicense = `DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
                   Version 2, December 2004
 
 Copyright (C) {{.Year}} {{.Name}} <{{.Email}}>
@@ -451,7 +553,7 @@ as the name is changed.
 
   0. You just DO WHAT THE FUCK YOU WANT TO.`
 
-var AfreeoLicense = `Copyright (C) {{.Year}} {{.Name}} <{{.Email}}>
+const AfreeoLicense = `Copyright (C) {{.Year}} {{.Name}} <{{.Email}}>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published
@@ -466,14 +568,14 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.`
 
-var HackMiiLicense = `Copyright (C) {{.Year}} {{.Name}} <{{.Email}}>
+const HackMiiLicense = `Copyright (C) {{.Year}} {{.Name}} <{{.Email}}>
 
 you are not allowed to in anyway use this material (including but is not
 limited to: source code, images, binaries, documents) for use in
 competeting purpuse in ANY WAY. You are also not allowed to redistribute
 NOR mirror the code & binarys in any way, link to us instead!`
 
-var ArtisticLicense = `               The Artistic License 2.0
+const ArtisticLicense = `               The Artistic License 2.0
 
            Copyright (c) {{.Year}} {{.Name}} <{{.Email}}>
 
@@ -675,7 +777,7 @@ BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR CONSEQUENTIAL
 DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE, EVEN IF
 ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
 
-var ISCLicense = `Copyright (C) {{.Year}} {{.Name}} <{{.Email}}>
+const ISCLicense = `Copyright (C) {{.Year}} {{.Name}} <{{.Email}}>
 
 Permission to use, copy, modify, and/or distribute this software for any
 purpose with or without fee is hereby granted, provided that the above
@@ -689,7 +791,7 @@ WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
 ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.`
 
-var Bsd3Clause = `Copyright (C) {{.Year}} {{.Name}} <{{.Email}}>
+const Bsd3Clause = `Copyright (C) {{.Year}} {{.Name}} <{{.Email}}>
 
 All rights reserved.
 
@@ -718,7 +820,7 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
 
-var LGPL2License = `Copyright (C) {{.Year}} {{.Name}} <{{.Email}}>
+const LGPL2License = `Copyright (C) {{.Year}} {{.Name}} <{{.Email}}>
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public
@@ -735,7 +837,7 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301
 USA`
 
-var BzipLicense = `Copyright (C) {{.Year}} {{.Name}} <{{.Email}}>
+const BzipLicense = `Copyright (C) {{.Year}} {{.Name}} <{{.Email}}>
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -768,7 +870,7 @@ WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
 
-var CC0License = `Creative Commons Legal Code
+const CC0License = `Creative Commons Legal Code
 
 CC0 1.0 Universal
 
@@ -890,7 +992,7 @@ express Statement of Purpose.
     party to this document and has no duty or obligation with respect to
     this CC0 or use of the Work.`
 
-var MinecraftMod = `Minecraft Mod Public License
+const MinecraftMod = `Minecraft Mod Public License
 ============================
 
 Version 1.0.1
