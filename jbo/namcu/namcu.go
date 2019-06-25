@@ -14,6 +14,10 @@ const (
 	Nine  = "so"
 )
 
+func Lerfu(i int) string {
+	return lojbanDigit(i)
+}
+
 func lojbanDigit(i int) string {
 	switch i {
 	case 0:

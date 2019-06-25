@@ -12,7 +12,7 @@ require (
 	github.com/dgryski/go-failure v0.0.0-20151001134759-4963dbd58fd0
 	github.com/dgryski/go-onlinestats v0.0.0-20170612111826-1c7d19468768 // indirect
 	github.com/disintegration/imaging v1.6.0
-	github.com/eaburns/peggy v0.0.0-20190420135231-b61cdde6efe6 // indirect
+	github.com/eaburns/peggy v0.0.0-20190420135231-b61cdde6efe6
 	github.com/eaburns/pretty v0.0.0-20190404101635-2e1d2550ef0b // indirect
 	github.com/elazarl/go-bindata-assetfs v1.0.0
 	github.com/facebookgo/ensure v0.0.0-20160127193407-b4ab57deab51
@@ -46,6 +46,7 @@ require (
 	github.com/otiai10/copy v1.0.1
 	github.com/otiai10/curr v0.0.0-20190513014714-f5a3d24e5776 // indirect
 	github.com/pborman/uuid v1.2.0
+	github.com/perlin-network/life v0.0.0-20190625155037-103174020946
 	github.com/peterh/liner v1.1.0
 	github.com/phayes/freeport v0.0.0-20180830031419-95f893ade6f2
 	github.com/pkg/errors v0.8.1
@@ -79,3 +80,5 @@ require (
 	within.website/johaus v1.1.0
 	within.website/ln v0.6.0
 )
+
+replace github.com/go-interpreter/wagon v0.0.0 => github.com/perlin-network/wagon v0.3.1-0.20180825141017-f8cb99b55a39

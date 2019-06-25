@@ -1,0 +1,12 @@
+{
+package h
+
+import (
+	"github.com/eaburns/peggy/peg"
+)
+}
+
+sep <- space+h
+space <- ' '
+h <- 'h' / "'"
+H <- h+sep+ / h
