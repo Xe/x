@@ -93,5 +93,6 @@ func DockerTag(ctx context.Context, org, repo, image string) string {
 // DockerBuild builds a docker image with the given working directory and tag.
 func DockerBuild(ctx context.Context, dir, tag string, args ...string) {
 	args = append([]string{"build", "-t", tag}, args...)
+	args = append(args, ".")
 	ShouldWork(ctx, nil, dir, "docker", args...)
 }

@@ -5,13 +5,19 @@ package main
 
 import (
 	"context"
+	"flag"
 	"log"
 	"path/filepath"
 
 	"within.website/x/internal/yeet"
 )
 
+var (
+	dontPush = flag.Bool("dont-push", false, "if set, don't push docker images")
+)
+
 func main() {
+	flag.Parse()
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
@@ -35,10 +41,12 @@ func main() {
 
 	yeet.DockerBuild(ctx, filepath.Join(yeet.WD, "cmd", "h"), hTag, "--build-arg", "X_VERSION="+gitTag)
 
-	yeet.ShouldWork(ctx, nil, yeet.WD, "docker", "push", resTag)
-	yeet.ShouldWork(ctx, nil, yeet.WD, "docker", "push", otherResTag)
-	yeet.ShouldWork(ctx, nil, yeet.WD, "docker", "push", dnsdGithubTag)
-	yeet.ShouldWork(ctx, nil, yeet.WD, "docker", "push", hTag)
+	if !*dontPush {
+		yeet.ShouldWork(ctx, nil, yeet.WD, "docker", "push", resTag)
+		yeet.ShouldWork(ctx, nil, yeet.WD, "docker", "push", otherResTag)
+		yeet.ShouldWork(ctx, nil, yeet.WD, "docker", "push", dnsdGithubTag)
+		yeet.ShouldWork(ctx, nil, yeet.WD, "docker", "push", hTag)
+	}
 
 	log.Printf("xperimental:\t%s", otherResTag)
 	log.Printf("dnsd:\t%s", dnsdGithubTag)
