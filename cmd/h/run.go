@@ -9,7 +9,6 @@ import (
 )
 
 type Process struct {
-	Source CompiledProgram
 	Output []byte
 }
 
@@ -40,26 +39,24 @@ func (p *Process) ResolveFunc(module, field string) exec.FunctionImport {
 }
 
 type ExecResult struct {
-	Output   string
-	GasUsed  uint64
-	ExecTime time.Duration
+	Output   string        `json:"out"`
+	GasUsed  uint64        `json:"gas"`
+	ExecTime time.Duration `json:"exec_duration"`
 }
 
-func run(cp CompiledProgram) (*ExecResult, error) {
-	p := &Process{
-		Source: cp,
-	}
+func run(bin []byte) (*ExecResult, error) {
+	p := &Process{}
 
 	var cfg exec.VMConfig
 	gp := &compiler.SimpleGasPolicy{GasPerInstruction: 1}
-	vm, err := exec.NewVirtualMachine(cp.Binary, cfg, p, gp)
+	vm, err := exec.NewVirtualMachine(bin, cfg, p, gp)
 	if err != nil {
 		return nil, err
 	}
 
-	mainFunc, ok := vm.GetFunctionExport("main")
+	mainFunc, ok := vm.GetFunctionExport("h")
 	if !ok {
-		return nil, errors.New("impossible state: no main function exposed")
+		return nil, errors.New("impossible state: no h function exposed")
 	}
 
 	t0 := time.Now()
