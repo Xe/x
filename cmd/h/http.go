@@ -132,6 +132,12 @@ const indexTemplate = `<html>
 
       <hr />
 
+      <h2>International Out of the Box</h2>
+
+      <p>h supports multiple written and spoken languages with true contextual awareness. It not only supports the Latin <code>h</code> as input, it also accepts the <a href="http://lojban.org">Lojbanic</a> <code>'</code> as well. This allows for full 100% internationalization into Lojban should your project needs require it.</p>
+
+      <hr />
+
       <h2>Testimonials</h2>
 
       <p>Not convinced? Take the word of people we probably didn't pay for their opinion.</p>
