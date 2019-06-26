@@ -171,6 +171,12 @@ h
       <h2>Open-Source</h2>
 
       <p>The h compiler and default runtime are <a href="https://github.com/Xe/x/tree/master/cmd/h">open-source</a> free software sent out into the <a href="https://creativecommons.org/choose/zero/">Public Domain</a>. You can use h for any purpose at all with no limitations or restrictions.</p>
+
+      <hr />
+
+      <footer>
+        <center><p><i>From <a href="https://christine.website">Within</a></i></p></center>
+      </footer>
     </main>
   </body>
 </html>`
@@ -204,6 +210,12 @@ const docsTemplate = `<html>
         date = date.addDays(1);
         document.getElementById("comingsoon").innerHTML = "Coming " + date.toDateString();
       </script>
+
+      <hr />
+
+      <footer>
+        <center><p><i>From <a href="https://christine.website">Within</a></i></p></center>
+      </footer>
     </main>
   </body>
 </html>`
@@ -291,14 +303,20 @@ Usage of h:
 
       <p>That's a good question. The following blogposts may help you understand this more:</p>
 
-      <h2>Who wrote h?</h2>
-
-      <p><a href="https://christine.website">Within</a></p>
-
       <ul>
         <li><a href="https://christine.website/blog/the-origin-of-h-2015-12-14">The Origin of h</a></li>
         <li><a href="https://christine.website/blog/formal-grammar-of-h-2019-05-19">A Formal Grammar of h</a></li>
       </ul>
+
+      <h2>Who wrote h?</h2>
+
+      <p><a href="https://christine.website">Within</a></p>
+
+      <hr />
+
+      <footer>
+        <center><p><i>From <a href="https://christine.website">Within</a></i></p></center>
+      </footer>
     </main>
   </body>
 </html>`
@@ -321,6 +339,12 @@ const playgroundTemplate = `<html>
       <h1>Playground</h1>
 
       <p><small>Unfortunately, Javascript is required to use this page, sorry.</small></p>
+
+      <hr />
+
+      <footer>
+        <center><p><i>From <a href="https://christine.website">Within</a></i></p></center>
+      </footer>
     </main>
   </body>
 </html>`
