@@ -31,11 +31,16 @@ func main() {
 	yeet.DockerBuild(ctx, filepath.Join(yeet.WD, "cmd", "dnsd"), dnsdTag, "--build-arg", "X_VERSION="+gitTag)
 	dnsdGithubTag := yeet.DockerTag(ctx, "docker.pkg.github.com/xe/x", "dnsd", dnsdTag)
 
+	hTag := "docker.pkg.github.com/xe/x/h:" + gitTag
+
+	yeet.DockerBuild(ctx, filepath.Join(yeet.WD, "cmd", "h"), hTag, "--build-arg", "X_VERSION="+gitTag)
+
 	yeet.ShouldWork(ctx, nil, yeet.WD, "docker", "push", resTag)
-	yeet.ShouldWork(ctx, nil, yeet.WD, "docker", "push", dnsdTag)
 	yeet.ShouldWork(ctx, nil, yeet.WD, "docker", "push", otherResTag)
 	yeet.ShouldWork(ctx, nil, yeet.WD, "docker", "push", dnsdGithubTag)
+	yeet.ShouldWork(ctx, nil, yeet.WD, "docker", "push", hTag)
 
-	log.Printf("xperimental: %s %s", resTag, otherResTag)
-	log.Printf("dnsd: %s %s", dnsdTag, dnsdGithubTag)
+	log.Printf("xperimental:\t%s", otherResTag)
+	log.Printf("dnsd:\t%s", dnsdGithubTag)
+	log.Printf("h:\t\t%s", hTag)
 }
