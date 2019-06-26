@@ -14,6 +14,7 @@ var (
 
 func doHTTP() error {
 	http.Handle("/", doTemplate(indexTemplate))
+	http.Handle("/docs", doTemplate(docsTemplate))
 	http.HandleFunc("/api/playground", runPlayground)
 
 	return http.ListenAndServe(":"+*port, nil)
@@ -79,11 +80,17 @@ const indexTemplate = `<html>
 
       <h1>The h Programming Language</h1>
 
-      <p>A simple, fast, complete and safe language for developing modern software for the web</p>
+      <p><big>A simple, fast, open-source, complete and safe language for developing modern software for the web</big></p>
 
       <hr />
 
       <h2>Example Program</h2>
+
+      <code>
+      h
+      </code>
+
+      <p>Outputs:</p>
 
       <code>
       h
@@ -118,6 +125,12 @@ const indexTemplate = `<html>
 
       <hr />
 
+      <h2>Simple</h2>
+
+      <p>h has a <a href="https://github.com/Xe/x/blob/master/h/h.peg">simple grammar</a> that gzips to 117 bytes. Creating a runtime environment for h is so trivial just about anyone can do it.</p>
+
+      <hr />
+
       <h2>Platform Support</h2>
 
       <p>h supports the following platforms:</p>
@@ -147,7 +160,48 @@ const indexTemplate = `<html>
         <li>This solves all my problems. All of them. Just not in the way I expected it to.</li>
         <li>Yes.</li>
         <li>Perfect.</li>
+        <li>h is the backbone of my startup.</li>
       </ul>
+
+      <hr />
+
+      <h2>Open-Source</h2>
+
+      <p>The h compiler and default runtime are <a href="https://github.com/Xe/x/tree/master/cmd/h">open-source</a> free software sent out into the <a href="https://creativecommons.org/choose/zero/">Public Domain</a>. You can use h for any purpose at all with no limitations or restrictions.</p>
     </main>
   </body>
 </html>`
+
+const docsTemplate = `<html>
+  <head>
+    <title>The h Programming Language - Docs</title>
+    <link rel="stylesheet" href="https://within.website/static/gruvbox.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  </head>
+  <body>
+    <main>
+      <nav>
+        <a href="/">The h Programming Language</a> -
+        <a href="/docs">Docs</a> -
+        <a href="/play">Playground</a> -
+        <a href="/faq">FAQ</a>
+      </nav>
+
+      <h1>Documentation</h1>
+
+      <p><big id="comingsoon">Coming out soon...</big></p>
+      <script>
+        Date.prototype.addDays = function(days) {
+          var date = new Date(this.valueOf());
+          date.setDate(date.getDate() + days);
+          return date;
+        }
+
+        var date = new Date();
+        date = date.addDays(1);
+        document.getElementById("comingsoon").innerHTML = "Coming " + date.toDateString();
+      </script>
+    </main>
+  </body>
+</html>
+`
