@@ -15,4 +15,5 @@ FROM xena/alpine
 COPY --from=build /usr/local/bin/wat2wasm /usr/local/bin/wat2wasm
 COPY --from=x /usr/local/bin/h /usr/local/bin/h
 ENV PORT 5000
+RUN apk --no-cache add libstdc++
 CMD /usr/local/bin/h
