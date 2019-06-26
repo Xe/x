@@ -7,9 +7,11 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"text/template"
 	"time"
 
+	"github.com/eaburns/peggy/peg"
 	"within.website/x/h"
 )
 
@@ -33,6 +35,7 @@ type CompiledProgram struct {
 	Source          string `json:"src"`
 	WebAssemblyText string `json:"wat"`
 	Binary          []byte `json:"bin"`
+	AST             string `json:"ast"`
 }
 
 func compile(source string) (*CompiledProgram, error) {
@@ -41,8 +44,12 @@ func compile(source string) (*CompiledProgram, error) {
 		return nil, err
 	}
 
+	var sb strings.Builder
+	err = peg.PrettyWrite(&sb, tree)
+
 	result := CompiledProgram{
 		Source: source,
+		AST:    sb.String(),
 	}
 
 	dir, err := ioutil.TempDir("", "h")

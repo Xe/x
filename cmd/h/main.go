@@ -11,14 +11,15 @@ import (
 )
 
 var (
-	program  = flag.String("p", "", "h program to compile/run")
-	outFname = flag.String("o", "", "if specified, write the webassembly binary created by -p here")
-	watFname = flag.String("o-wat", "", "if specified, write the uncompiled webassembly created by -p here")
-	port     = flag.String("port", "", "HTTP port to listen on")
-	writeTao = flag.Bool("koan", false, "if true, print the h koan and then exit")
+	program      = flag.String("p", "", "h program to compile/run")
+	outFname     = flag.String("o", "", "if specified, write the webassembly binary created by -p here")
+	watFname     = flag.String("o-wat", "", "if specified, write the uncompiled webassembly created by -p here")
+	port         = flag.String("port", "", "HTTP port to listen on")
+	writeTao     = flag.Bool("koan", false, "if true, print the h koan and then exit")
+	writeVersion = flag.Bool("v", false, "if true, print the version of h and then exit")
 )
 
-const koan = `And Jesus said unto the theologians, "Who do you say that I am?".
+const koan = `And Jesus said unto the theologians, "Who do you say that I am?"
 
 They replied: "You are the eschatological manifestation of the ground of our
 being, the kerygma of which we find the ultimate meaning in our interpersonal
@@ -78,6 +79,10 @@ func oneOff() error {
 
 func main() {
 	internal.HandleStartup()
+
+	if *writeVersion {
+		dumpVersion()
+	}
 
 	if *writeTao {
 		tao()

@@ -15,6 +15,8 @@ var (
 func doHTTP() error {
 	http.Handle("/", doTemplate(indexTemplate))
 	http.Handle("/docs", doTemplate(docsTemplate))
+	http.Handle("/faq", doTemplate(faqTemplate))
+	http.Handle("/play", doTemplate(playgroundTemplate))
 	http.HandleFunc("/api/playground", runPlayground)
 
 	return http.ListenAndServe(":"+*port, nil)
@@ -47,6 +49,7 @@ func runPlayground(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(struct {
 		Program *CompiledProgram `json:"prog"`
 		Results *ExecResult      `json:"res"`
@@ -86,15 +89,15 @@ const indexTemplate = `<html>
 
       <h2>Example Program</h2>
 
-      <code>
-      h
-      </code>
+      <code><pre>
+h
+      </pre></code>
 
       <p>Outputs:</p>
 
-      <code>
-      h
-      </code>
+      <code><pre>
+h
+      </pre></code>
 
       <hr />
 
@@ -189,7 +192,7 @@ const docsTemplate = `<html>
 
       <h1>Documentation</h1>
 
-      <p><big id="comingsoon">Coming out soon...</big></p>
+      <p><big id="comingsoon">Coming soon...</big></p>
       <script>
         Date.prototype.addDays = function(days) {
           var date = new Date(this.valueOf());
@@ -203,5 +206,121 @@ const docsTemplate = `<html>
       </script>
     </main>
   </body>
-</html>
-`
+</html>`
+
+const faqTemplate = `<html>
+  <head>
+    <title>The h Programming Language - FAQ</title>
+    <link rel="stylesheet" href="https://within.website/static/gruvbox.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  </head>
+  <body>
+    <main>
+      <nav>
+        <a href="/">The h Programming Language</a> -
+        <a href="/docs">Docs</a> -
+        <a href="/play">Playground</a> -
+        <a href="/faq">FAQ</a>
+      </nav>
+
+      <h1>Frequently Asked Questions</h1>
+
+      <h2>What are the instructions of h?</h2>
+
+      <p>h supports the following instructions:</p>
+      <ul>
+        <li><code>h</code></li>
+        <li><code>'</code></li>
+      </ul>
+
+      <p>All valid h instructions must be separated by a space (<code>\0x20</code> or the spacebar on your computer). No other forms of whitespace are permitted. Any other characters will render your program <a href="http://jbovlaste.lojban.org/dict/gentoldra">gentoldra</a>.</p>
+
+      <h2>How do I install and use h?</h2>
+
+      <p>With any computer running <a href="https://golang.org">Go</a> 1.11 or higher:</p>
+
+      <code><pre>
+go get -u -v within.website/x/cmd/h
+      </pre></code>
+
+      Usage is simple:
+
+      <code><pre>
+Usage of h:
+  -config string
+        configuration file, if set (see flagconfyg(4))
+  -koan
+        if true, print the h koan and then exit
+  -license
+        show software licenses?
+  -manpage
+        generate a manpage template?
+  -max-playground-bytes int
+        how many bytes of data should users be allowed to
+        post to the playground? (default 75)
+  -o string
+        if specified, write the webassembly binary created
+        by -p here
+  -o-wat string
+        if specified, write the uncompiled webassembly
+        created by -p here
+  -p string
+        h program to compile/run
+  -port string
+        HTTP port to listen on
+  -v    if true, print the version of h and then exit
+      </pre></code>
+
+      <h2>What version is h?</h2>
+
+      <p>Version 1.0, this will hopefully be the only release.</p>
+
+      <h2>What is the h koan?</h2>
+
+      <p>And Jesus said unto the theologians, "Who do you say that I am?"</p>
+
+      <p>They replied: "You are the eschatological manifestation of the ground of our being, the kerygma of which we find the ultimate meaning in our interpersonal relationships."</p>
+
+      <p>And Jesus said "...What?"</p>
+
+      <p>Some time passed and one of them spoke "h".</p>
+
+      <p>Jesus was enlightened.</p>
+
+      <h2>Why?</h2>
+
+      <p>That's a good question. The following blogposts may help you understand this more:</p>
+
+      <h2>Who wrote h?</h2>
+
+      <p><a href="https://christine.website">Within</a></p>
+
+      <ul>
+        <li><a href="https://christine.website/blog/the-origin-of-h-2015-12-14">The Origin of h</a></li>
+        <li><a href="https://christine.website/blog/formal-grammar-of-h-2019-05-19">A Formal Grammar of h</a></li>
+      </ul>
+    </main>
+  </body>
+</html>`
+
+const playgroundTemplate = `<html>
+  <head>
+    <title>The h Programming Language - Playground</title>
+    <link rel="stylesheet" href="https://within.website/static/gruvbox.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  </head>
+  <body>
+    <main>
+      <nav>
+        <a href="/">The h Programming Language</a> -
+        <a href="/docs">Docs</a> -
+        <a href="/play">Playground</a> -
+        <a href="/faq">FAQ</a>
+      </nav>
+
+      <h1>Playground</h1>
+
+      <p><small>Unfortunately, Javascript is required to use this page, sorry.</small></p>
+    </main>
+  </body>
+</html>`
