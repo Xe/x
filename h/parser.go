@@ -31,7 +31,7 @@ func (p *_Parser) ParseTree() *peg.Node {
 func Parse(text string) (*peg.Node, error) {
 	p := _NewParser(text)
 	if perr, ok := p.Parse(); !ok {
-		return nil, fmt.Errorf("h: gentoldra fi'o zvati zo %s", namcu.Lerfu(perr))
+		return nil, fmt.Errorf("h: gentoldra fi'o zvati fe li %s", namcu.Lerfu(perr))
 	}
 
 	tree := p.ParseTree()

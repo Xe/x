@@ -50,6 +50,7 @@ require (
 	github.com/peterh/liner v1.1.0
 	github.com/phayes/freeport v0.0.0-20180830031419-95f893ade6f2
 	github.com/pkg/errors v0.8.1
+	github.com/rs/cors v1.6.0
 	github.com/shurcooL/httpfs v0.0.0-20190527155220-6a4d4a70508b // indirect
 	github.com/shurcooL/vfsgen v0.0.0-20181202132449-6a9ea43bcacd // indirect
 	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect

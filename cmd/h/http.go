@@ -6,6 +6,9 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+
+	"github.com/rs/cors"
+	"within.website/ln/ex"
 )
 
 var (
@@ -19,7 +22,17 @@ func doHTTP() error {
 	http.Handle("/play", doTemplate(playgroundTemplate))
 	http.HandleFunc("/api/playground", runPlayground)
 
-	return http.ListenAndServe(":"+*port, nil)
+	return http.ListenAndServe(":"+*port, ex.HTTPLog(cors.Default().Handler(http.DefaultServeMux)))
+}
+
+func httpError(w http.ResponseWriter, err error, code int) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(code)
+	json.NewEncoder(w).Encode(struct {
+		Error string `json:"err"`
+	}{
+		Error: err.Error(),
+	})
 }
 
 func runPlayground(w http.ResponseWriter, r *http.Request) {
@@ -33,19 +46,19 @@ func runPlayground(w http.ResponseWriter, r *http.Request) {
 
 	data, err := ioutil.ReadAll(rc)
 	if err != nil {
-		http.Error(w, "too many bytes sent", http.StatusBadRequest)
+		httpError(w, err, http.StatusBadGateway)
 		return
 	}
 
 	comp, err := compile(string(data))
 	if err != nil {
-		http.Error(w, fmt.Sprintf("compilation error: %v", err), http.StatusBadRequest)
+		httpError(w, fmt.Errorf("compliation error: %v", err), http.StatusBadRequest)
 		return
 	}
 
 	er, err := run(comp.Binary)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("runtime error: %v", err), http.StatusInternalServerError)
+		httpError(w, fmt.Errorf("runtime error: %v", err), http.StatusInternalServerError)
 		return
 	}
 
@@ -89,15 +102,11 @@ const indexTemplate = `<html>
 
       <h2>Example Program</h2>
 
-      <code><pre>
-h
-      </pre></code>
+      <code><pre>h</pre></code>
 
       <p>Outputs:</p>
 
-      <code><pre>
-h
-      </pre></code>
+      <code><pre>h</pre></code>
 
       <hr />
 
@@ -206,7 +215,7 @@ const docsTemplate = `<html>
           return date;
         }
 
-        var date = new Date();
+        let date = new Date();
         date = date.addDays(1);
         document.getElementById("comingsoon").innerHTML = "Coming " + date.toDateString();
       </script>
@@ -251,14 +260,11 @@ const faqTemplate = `<html>
 
       <p>With any computer running <a href="https://golang.org">Go</a> 1.11 or higher:</p>
 
-      <code><pre>
-go get -u -v within.website/x/cmd/h
-      </pre></code>
+      <code><pre>go get -u -v within.website/x/cmd/h</pre></code>
 
       Usage is simple:
 
-      <code><pre>
-Usage of h:
+      <code><pre>Usage of h:
   -config string
         configuration file, if set (see flagconfyg(4))
   -koan
@@ -280,8 +286,7 @@ Usage of h:
         h program to compile/run
   -port string
         HTTP port to listen on
-  -v    if true, print the version of h and then exit
-      </pre></code>
+  -v    if true, print the version of h and then exit</pre></code>
 
       <h2>What version is h?</h2>
 
@@ -339,6 +344,74 @@ const playgroundTemplate = `<html>
       <h1>Playground</h1>
 
       <p><small>Unfortunately, Javascript is required to use this page, sorry.</small></p>
+
+      <h2>Program</h2>
+
+      <input id="program" type="text" value="h" />
+
+      <input onClick="runProgram()" type="button" value="Run">
+      <p id="status"></p>
+
+      <h3>Output</h3>
+
+      <code><pre id="output"></pre></code>
+
+      <h4>WebAssembly Text Format</h4>
+
+      <code><pre id="wat_box"></pre></code>
+
+      <p>Gas used: <span id="gas_used"></span></p>
+      <p>Execution time (nanoseconds): <span id="exec_time"></span></p>
+
+      <h4>AST</h4>
+
+      <code><pre id="ast_box"></pre></code>
+
+      <script>
+      function runProgram() {
+        const programData = document.getElementById("program").value;
+        const output = document.getElementById("output");
+        const watBox = document.getElementById("wat_box");
+        const astBox = document.getElementById("ast_box");
+        const gasUsed = document.getElementById("gas_used");
+        const execTime = document.getElementById("exec_time");
+        const status = document.getElementById("status");
+
+        status.innerHTML = "submitting to the server...";
+
+        postData("/api/playground", programData)
+          .then(function(data) {
+             if (data.err != null) {
+               status.innerHTML = data.err;
+               return;
+             }
+
+             status.innerHTML = "success";
+             watBox.innerHTML = data.prog.wat;
+             astBox.innerHTML = data.prog.ast;
+             output.innerHTML = data.res.out;
+             gasUsed.innerHTML = data.res.gas;
+             execTime.innerHTML = data.res.exec_duration;
+          })
+          .catch(function(error) {
+             console.log(error);
+             status.innerHTML = error + ". Please try again later?";
+          });
+      }
+
+      function postData(url = "", data = "h") {
+        return fetch(url, {
+          method: "POST",
+          mode: "cors",
+          cache: "no-cache",
+          headers: {
+            "Content-Type": "text/plain",
+          },
+          referrer: "no-referrer",
+          body: data,
+        }).then(response => response.json());
+      }
+      </script>
 
       <hr />
 
