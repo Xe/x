@@ -10,6 +10,8 @@ import (
 	"within.website/x/internal"
 )
 
+var _ = func() error { log.SetFlags(log.LstdFlags | log.Llongfile); return nil }()
+
 var (
 	program      = flag.String("p", "", "h program to compile/run")
 	outFname     = flag.String("o", "", "if specified, write the webassembly binary created by -p here")
@@ -113,7 +115,7 @@ const wasmTemplate = `(module
        (local i32 i32 i32)
        (local.set 0 (i32.const 10))
        (local.set 1 (i32.const 104))
-       (local.set 2 (i32.const 37))
+       (local.set 2 (i32.const 39))
        {{ range . -}}
        {{ if eq . 32 -}}
        (call $h (get_local 0))
