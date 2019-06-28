@@ -9,6 +9,7 @@ import (
 	"log"
 	"path/filepath"
 
+	"within.website/x/internal"
 	"within.website/x/internal/yeet"
 )
 
@@ -17,7 +18,7 @@ var (
 )
 
 func main() {
-	flag.Parse()
+	internal.HandleStartup()
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
