@@ -1,6 +1,7 @@
 package minipaas
 
 import (
+	"flag"
 	"net"
 	"os"
 
@@ -13,9 +14,9 @@ func getAgent() (agent.Agent, error) {
 	return agent.NewClient(agentConn), err
 }
 
-const (
-	minipaasAddr = `minipaas.xeserv.us:22`
-	minipaasUser = `dokku`
+var (
+	minipaasAddr = flag.String("minipaas-addr", "minipaas.xeserv.us:22", "address of minipaas")
+	minipaasUser = flag.String("minipaas-user", "dokku", "username on minipaas")
 )
 
 // Dial opens a SSH client to minipaas as the dokku user.
@@ -25,8 +26,8 @@ func Dial() (*ssh.Client, error) {
 		return nil, err
 	}
 
-	client, err := ssh.Dial("tcp", minipaasAddr, &ssh.ClientConfig{
-		User: minipaasUser,
+	client, err := ssh.Dial("tcp", *minipaasAddr, &ssh.ClientConfig{
+		User: *minipaasUser,
 		Auth: []ssh.AuthMethod{
 			ssh.PublicKeysCallback(agent.Signers),
 		},

@@ -2,6 +2,7 @@ package kahless
 
 import (
 	"bytes"
+	"flag"
 	"io"
 	"io/ioutil"
 	"log"
@@ -19,9 +20,9 @@ func getAgent() (agent.Agent, error) {
 	return agent.NewClient(agentConn), err
 }
 
-const (
-	greedoAddr = `kahless.cetacean.club:22`
-	greedoUser = `cadey`
+var (
+	greedoAddr = flag.String("kahless-addr", "kahless.cetacean.club:22", "address to use for kahless")
+	greedoUser = flag.String("kahless-user", "cadey", "username to use for kahless")
 )
 
 // Dial opens a SSH client to greedo.
@@ -31,8 +32,8 @@ func Dial() (*ssh.Client, error) {
 		return nil, err
 	}
 
-	client, err := ssh.Dial("tcp", greedoAddr, &ssh.ClientConfig{
-		User: greedoUser,
+	client, err := ssh.Dial("tcp", *greedoAddr, &ssh.ClientConfig{
+		User: *greedoUser,
 		Auth: []ssh.AuthMethod{
 			ssh.PublicKeysCallback(agent.Signers),
 		},
