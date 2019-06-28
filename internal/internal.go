@@ -5,6 +5,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"os"
 
 	"go4.org/legal"
@@ -27,6 +28,7 @@ import (
 var (
 	licenseShow = flag.Bool("license", false, "show software licenses?")
 	config      = flag.String("config", "", "configuration file, if set (see flagconfyg(4))")
+	writeConfig = flag.String("write-config", "", "if set, write flags to this file by name/path")
 	manpageGen  = flag.Bool("manpage", false, "generate a manpage template?")
 )
 
@@ -46,6 +48,16 @@ func HandleStartup() {
 	flagenv.Parse()
 
 	ctx := opname.With(context.Background(), "internal.HandleStartup")
+	if val := *writeConfig; val != "" {
+		ln.Log(ctx, ln.Info("writing flags to file, remember to remove write-config"), ln.F{"fname": val})
+		data := flagconfyg.Dump(flag.CommandLine)
+		err := ioutil.WriteFile(val, data, 0644)
+		if err != nil {
+			ln.FatalErr(ctx, err)
+		}
+		os.Exit(0)
+	}
+
 	if *config != "" {
 		ln.Log(ctx, ln.Info("loading config"), ln.F{"path": *config})
 
