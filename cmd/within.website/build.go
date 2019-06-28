@@ -11,6 +11,7 @@ import (
 	"os"
 
 	"github.com/shurcooL/vfsgen"
+	"within.website/x/internal"
 	"within.website/x/internal/kahless"
 	"within.website/x/internal/minipaas"
 	"within.website/x/internal/yeet"
@@ -22,7 +23,7 @@ var (
 )
 
 func main() {
-	flag.Parse()
+	internal.HandleStartup()
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 

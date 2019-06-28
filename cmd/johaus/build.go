@@ -8,12 +8,15 @@ import (
 	"log"
 	"os"
 
+	"within.website/x/internal"
 	"within.website/x/internal/kahless"
 	"within.website/x/internal/minipaas"
 	"within.website/x/internal/yeet"
 )
 
 func main() {
+	internal.HandleStartup()
+
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
