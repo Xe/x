@@ -14,7 +14,6 @@ require (
 	github.com/disintegration/imaging v1.6.0
 	github.com/eaburns/peggy v0.0.0-20190420135231-b61cdde6efe6
 	github.com/eaburns/pretty v0.0.0-20190404101635-2e1d2550ef0b // indirect
-	github.com/elazarl/go-bindata-assetfs v1.0.0
 	github.com/facebookgo/ensure v0.0.0-20160127193407-b4ab57deab51
 	github.com/facebookgo/stack v0.0.0-20160209184415-751773369052 // indirect
 	github.com/facebookgo/subset v0.0.0-20150612182917-8dac2c3c4870 // indirect
@@ -25,14 +24,12 @@ require (
 	github.com/golang/protobuf v1.3.1 // indirect
 	github.com/google/go-github v17.0.0+incompatible
 	github.com/google/go-querystring v1.0.0 // indirect
-	github.com/google/gops v0.3.6
 	github.com/google/uuid v1.1.1 // indirect
 	github.com/gregjones/httpcache v0.0.0-20190212212710-3befbb6ad0cc
 	github.com/hullerob/go.farbfeld v0.0.0-20181222022525-3661193c725f
 	github.com/jaytaylor/html2text v0.0.0-20190408195923-01ec452cbe43
 	github.com/joeshaw/envdecode v0.0.0-20180312135643-c9e015854467
 	github.com/joho/godotenv v1.3.0
-	github.com/kardianos/osext v0.0.0-20190222173326-2bc1f35cddc0 // indirect
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 // indirect
 	github.com/klauspost/cpuid v1.2.1 // indirect
 	github.com/klauspost/reedsolomon v1.9.2 // indirect
@@ -51,8 +48,6 @@ require (
 	github.com/phayes/freeport v0.0.0-20180830031419-95f893ade6f2
 	github.com/pkg/errors v0.8.1
 	github.com/rs/cors v1.6.0
-	github.com/shurcooL/httpfs v0.0.0-20190527155220-6a4d4a70508b // indirect
-	github.com/shurcooL/vfsgen v0.0.0-20181202132449-6a9ea43bcacd // indirect
 	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect
 	github.com/streamrail/concurrent-map v0.0.0-20160823150647-8bf1e9bacbf6
 	github.com/stretchr/testify v1.3.0 // indirect
@@ -63,6 +58,7 @@ require (
 	github.com/tmc/scp v0.0.0-20170824174625-f7b48647feef
 	github.com/xlzd/gotp v0.0.0-20181030022105-c8557ba2c119
 	github.com/xtaci/kcp-go v5.4.2+incompatible
+	github.com/xtaci/lossyconn v0.0.0-20190602105132-8df528c0c9ae // indirect
 	github.com/xtaci/smux v1.3.3
 	github.com/yawning/bulb v0.0.0-20170405033506-85d80d893c3d // indirect
 	go4.org v0.0.0-20190313082347-94abd6928b1d
@@ -76,8 +72,9 @@ require (
 	golang.org/x/sys v0.0.0-20190602015325-4c4f7f33c9ed // indirect
 	golang.org/x/text v0.3.2 // indirect
 	google.golang.org/appengine v1.6.0 // indirect
+	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
 	gopkg.in/tucnak/telebot.v2 v2.0.0-20190415090633-8c1c512262f2
-	within.website/confyg v0.3.0
+	within.website/confyg v0.4.0
 	within.website/johaus v1.1.0
 	within.website/ln v0.6.0
 )
