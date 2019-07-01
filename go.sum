@@ -84,6 +84,8 @@ github.com/mattn/go-runewidth v0.0.4 h1:2BvfKmzob6Bmd4YsL0zygOqfdFnK7GR4QL06Do4/
 github.com/mattn/go-runewidth v0.0.4/go.mod h1:LwmH8dsx7+W8Uxz3IHJYH5QSwggIsqBzpuz5H//U1FU=
 github.com/miekg/dns v1.1.14 h1:wkQWn9wIp4mZbwW8XV6Km6owkvRPbOiV004ZM2CkGvA=
 github.com/miekg/dns v1.1.14/go.mod h1:W1PPwlIAgtquWBMBEV9nkV9Cazfe8ScdGz/Lj7v3Nrg=
+github.com/miekg/dns v1.1.15 h1:CSSIDtllwGLMoA6zjdKnaE6Tx6eVUxQ29LUgGetiDCI=
+github.com/miekg/dns v1.1.15/go.mod h1:W1PPwlIAgtquWBMBEV9nkV9Cazfe8ScdGz/Lj7v3Nrg=
 github.com/mmikulicic/stringlist v1.0.0 h1:wVnVaZgihnfy/3gSepAp2pBO3VXYjuCUf4IAdWQzCOc=
 github.com/mmikulicic/stringlist v1.0.0/go.mod h1:19Brp+Rld8TLwZ2oCHvTE3xDhCMr0jSCWwzcc9ejZgQ=
 github.com/mndrix/golog v0.0.0-20170330170653-a28e2a269775 h1:KPqf9x/eMg3ZnHATLXcM1OgQMNVkPUv1QcGv6zTRMRg=
