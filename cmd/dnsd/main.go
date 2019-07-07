@@ -4,7 +4,6 @@ package main
 import (
 	"bufio"
 	"flag"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -15,7 +14,6 @@ import (
 	"github.com/miekg/dns"
 	"github.com/mmikulicic/stringlist"
 	"within.website/x/internal"
-	"within.website/x/web"
 )
 
 var (
@@ -80,11 +78,6 @@ func main() {
 	rrs := []dns.RR{}
 	ns := []dns.RR{}
 
-	txt, err := dns.NewRR("user-agent. 10 CH TXT " + fmt.Sprintf("%q", web.GenUserAgent()))
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	for _, zurl := range *zoneURLs {
 		resp, err := http.Get(zurl)
 		if err != nil {
@@ -142,7 +135,6 @@ func main() {
 				}
 			} else {
 				m.Ns = ns
-				m.Extra = []dns.RR{txt}
 			}
 			for _, a := range answers {
 				m.Answer = append(m.Answer, a)
