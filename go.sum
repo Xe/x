@@ -205,3 +205,5 @@ within.website/johaus v1.1.0 h1:j59k9LM5ue+CDwUZAJitYjek6i8ISMkkCFiVXKZLByw=
 within.website/johaus v1.1.0/go.mod h1:0RBs2TucQ3CZQiVoqNj9Wch7mtZY05uvNO14v0lKcM4=
 within.website/ln v0.6.0 h1:zn8vE9f0biSTNIpHFc7kOPH+SitLsWrU1MfrwMSS4cM=
 within.website/ln v0.6.0/go.mod h1:ifURKqsCJekcsdUE+hyCdcuhQqQ+9v9DfA++ZqYxZFE=
+within.website/ln v0.7.0 h1:cZUc53cZF/+hWuEAv1VbqlYJ5czuPFHKfH0hLKmlIUA=
+within.website/ln v0.7.0/go.mod h1:ifURKqsCJekcsdUE+hyCdcuhQqQ+9v9DfA++ZqYxZFE=
