@@ -76,7 +76,7 @@ require (
 	gopkg.in/tucnak/telebot.v2 v2.0.0-20190415090633-8c1c512262f2
 	within.website/confyg v0.4.0
 	within.website/johaus v1.1.0
-	within.website/ln v0.6.0
+	within.website/ln v0.7.0
 )
 
 replace github.com/go-interpreter/wagon v0.0.0 => github.com/perlin-network/wagon v0.3.1-0.20180825141017-f8cb99b55a39
