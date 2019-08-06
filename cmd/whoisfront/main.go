@@ -46,5 +46,6 @@ func handle(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
+	w.Header().Set("Content-Type", "text/plain")
 	fmt.Fprint(w, st.Front)
 }
