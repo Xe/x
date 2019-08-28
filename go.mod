@@ -11,7 +11,7 @@ require (
 	github.com/codahale/hdrhistogram v0.0.0-20161010025455-3a0bb77429bd
 	github.com/dgryski/go-failure v0.0.0-20151001134759-4963dbd58fd0
 	github.com/dgryski/go-onlinestats v0.0.0-20170612111826-1c7d19468768 // indirect
-	github.com/disintegration/imaging v1.6.0
+	github.com/disintegration/imaging v1.6.1
 	github.com/eaburns/peggy v0.0.0-20190420135231-b61cdde6efe6
 	github.com/eaburns/pretty v0.0.0-20190404101635-2e1d2550ef0b // indirect
 	github.com/facebookgo/ensure v0.0.0-20160127193407-b4ab57deab51
