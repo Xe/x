@@ -13,7 +13,6 @@ import (
 	"github.com/shurcooL/vfsgen"
 	"within.website/x/internal"
 	"within.website/x/internal/kahless"
-	"within.website/x/internal/minipaas"
 	"within.website/x/internal/yeet"
 )
 
@@ -54,9 +53,6 @@ func main() {
 			log.Fatal(err)
 		}
 
-		err = minipaas.Exec("tar:from within.website " + pubURL)
-		if err != nil {
-			log.Fatal(err)
-		}
+		log.Println(pubURL)
 	}
 }

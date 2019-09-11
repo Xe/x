@@ -48,6 +48,8 @@ require (
 	github.com/phayes/freeport v0.0.0-20180830031419-95f893ade6f2
 	github.com/pkg/errors v0.8.1
 	github.com/rs/cors v1.7.0
+	github.com/shurcooL/httpfs v0.0.0-20190707220628-8d4bc4ba7749 // indirect
+	github.com/shurcooL/vfsgen v0.0.0-20181202132449-6a9ea43bcacd // indirect
 	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect
 	github.com/streamrail/concurrent-map v0.0.0-20160823150647-8bf1e9bacbf6
 	github.com/stretchr/testify v1.3.0 // indirect
@@ -62,15 +64,12 @@ require (
 	github.com/xtaci/smux v1.3.6
 	github.com/yawning/bulb v0.0.0-20170405033506-85d80d893c3d // indirect
 	go4.org v0.0.0-20190313082347-94abd6928b1d
-	golang.org/x/crypto v0.0.0-20190513172903-22d7a77e9e5f
+	golang.org/x/crypto v0.0.0-20190829043050-9756ffdc2472
 	golang.org/x/exp/errors v0.0.0-20190510132918-efd6b22b2522
 	golang.org/x/image v0.0.0-20190523035834-f03afa92d3ff // indirect
 	golang.org/x/mod v0.1.0
-	golang.org/x/net v0.0.0-20190522155817-f3200d17e092
+	golang.org/x/net v0.0.0-20190827160401-ba9fcec4b297
 	golang.org/x/oauth2 v0.0.0-20190523182746-aaccbc9213b0
-	golang.org/x/sync v0.0.0-20190423024810-112230192c58 // indirect
-	golang.org/x/sys v0.0.0-20190602015325-4c4f7f33c9ed // indirect
-	golang.org/x/text v0.3.2 // indirect
 	google.golang.org/appengine v1.6.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
 	gopkg.in/tucnak/telebot.v2 v2.0.0-20190415090633-8c1c512262f2
