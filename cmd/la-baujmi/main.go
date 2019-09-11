@@ -2,8 +2,10 @@
 package main
 
 import (
+	"flag"
 	"log"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/mndrix/golog"
@@ -13,13 +15,23 @@ import (
 	"within.website/x/web/tokiponatokens"
 )
 
+var (
+	historyFname = flag.String("history-file", filepath.Join(os.Getenv("HOME"), ".la-baujmi-history"), "location of history file")
+)
+
 func main() {
 	internal.HandleStartup()
 	var m golog.Machine
 	m = golog.NewMachine()
+	l := line.NewLiner()
+
+	fin, err := os.Open(*historyFname)
+	if err == nil {
+		l.ReadHistory(fin)
+		fin.Close()
+	}
 
 	for {
-		l := line.NewLiner()
 		if inp, err := l.Prompt("|toki: "); err == nil {
 			if inp == "" {
 				return
@@ -34,7 +46,7 @@ func main() {
 			}
 
 			for _, sentence := range parts {
-				sbs, err := SentenceToSelbris(sentence)
+				sbs, err := SentenceToBridis(sentence)
 				if err != nil {
 					log.Printf("can't derive facts: %v", err)
 					continue
@@ -67,5 +79,10 @@ func main() {
 		}
 	}
 
-	os.Exit(0)
+	fout, err := os.Create(*historyFname)
+	if err != nil {
+		panic(err)
+	}
+	l.WriteHistory(fout)
+	fout.Close()
 }

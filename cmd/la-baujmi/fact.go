@@ -7,20 +7,20 @@ import (
 	"within.website/x/web/tokiponatokens"
 )
 
-// Selbri is a predicate relationship between its arguments. The name comes from
+// Bridi is a predicate relationship between its arguments. The name comes from
 // the lojban term selbri: http://jbovlaste.lojban.org/dict/selbri.
-type Selbri struct {
+type Bridi struct {
 	Predicate string
 	Arguments []string
 }
 
 // Fact converts a selbri into a prolog fact.
-func (s Selbri) Fact() string {
+func (s Bridi) Fact() string {
 	var sb strings.Builder
 
 	var varCount byte
 
-	sb.WriteString("selbri(verb(")
+	sb.WriteString("bridi(verb(")
 
 	if s.Predicate == "seme" {
 		sb.WriteByte(byte('A') + varCount)
@@ -61,9 +61,9 @@ var (
 	ErrNoPredicate = errors.New("la-baujmi: sentence must have a verb to function as the logical predicate")
 )
 
-// SentenceToSelbris creates logical facts derived from toki pona sentences.
+// SentenceToBridis creates logical facts derived from toki pona sentences.
 // This is intended to be the first step in loading them into prolog.
-func SentenceToSelbris(s tokiponatokens.Sentence) ([]Selbri, error) {
+func SentenceToBridis(s tokiponatokens.Sentence) ([]Bridi, error) {
 	var (
 		subjects []string
 		verbs    []string
@@ -167,7 +167,7 @@ func SentenceToSelbris(s tokiponatokens.Sentence) ([]Selbri, error) {
 		return nil, ErrNoPredicate
 	}
 
-	var result []Selbri
+	var result []Bridi
 
 	for _, v := range verbs {
 		for _, s := range subjects {
@@ -179,7 +179,7 @@ func SentenceToSelbris(s tokiponatokens.Sentence) ([]Selbri, error) {
 				}
 				sumti = append(sumti, s)
 
-				r := Selbri{
+				r := Bridi{
 					Predicate: v,
 					Arguments: sumti,
 				}
@@ -196,7 +196,7 @@ func SentenceToSelbris(s tokiponatokens.Sentence) ([]Selbri, error) {
 				sumti = append(sumti, s)
 				sumti = append(sumti, o)
 
-				r := Selbri{
+				r := Bridi{
 					Predicate: v,
 					Arguments: sumti,
 				}
