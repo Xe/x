@@ -59,7 +59,7 @@ require (
 	github.com/xlzd/gotp v0.0.0-20181030022105-c8557ba2c119
 	github.com/xtaci/kcp-go v5.4.5+incompatible
 	github.com/xtaci/lossyconn v0.0.0-20190602105132-8df528c0c9ae // indirect
-	github.com/xtaci/smux v1.3.5
+	github.com/xtaci/smux v1.3.6
 	github.com/yawning/bulb v0.0.0-20170405033506-85d80d893c3d // indirect
 	go4.org v0.0.0-20190313082347-94abd6928b1d
 	golang.org/x/crypto v0.0.0-20190513172903-22d7a77e9e5f
