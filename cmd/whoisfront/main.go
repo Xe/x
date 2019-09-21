@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"net/http/cgi"
@@ -31,6 +32,26 @@ func main() {
 }
 
 func handle(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodPost {
+		front, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			panic(err)
+		}
+		defer r.Body.Close()
+		req := sc.Switch(string(front))
+		resp, err := http.DefaultClient.Do(req)
+		if err != nil {
+			panic(err)
+		}
+		err = switchcounter.Validate(resp)
+		if err != nil {
+			panic(err)
+		}
+		w.Header().Set("Content-Type", "text/plain")
+		fmt.Fprint(w, string(front))
+		return
+	}
+
 	req := sc.Status()
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
