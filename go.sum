@@ -162,6 +162,8 @@ github.com/xtaci/kcp-go v5.4.4+incompatible h1:QIJ0a0Q0N1G20yLHL2+fpdzyy2v/Cb3PI
 github.com/xtaci/kcp-go v5.4.4+incompatible/go.mod h1:bN6vIwHQbfHaHtFpEssmWsN45a+AZwO7eyRCmEIbtvE=
 github.com/xtaci/kcp-go v5.4.5+incompatible h1:CdPonwNu3RKu7HcXSno5r0GXfTViDY2iFV2RDOao/4U=
 github.com/xtaci/kcp-go v5.4.5+incompatible/go.mod h1:bN6vIwHQbfHaHtFpEssmWsN45a+AZwO7eyRCmEIbtvE=
+github.com/xtaci/kcp-go v5.4.7+incompatible h1:0WXorSb87WBIVjXWv618klAeCh8H32NcDpWq+g04x2E=
+github.com/xtaci/kcp-go v5.4.7+incompatible/go.mod h1:bN6vIwHQbfHaHtFpEssmWsN45a+AZwO7eyRCmEIbtvE=
 github.com/xtaci/lossyconn v0.0.0-20190602105132-8df528c0c9ae h1:J0GxkO96kL4WF+AIT3M4mfUVinOCPgf2uUWYFUzN0sM=
 github.com/xtaci/lossyconn v0.0.0-20190602105132-8df528c0c9ae/go.mod h1:gXtu8J62kEgmN++bm9BVICuT/e8yiLI2KFobd/TRFsE=
 github.com/xtaci/smux v1.3.3 h1:+vnzZHTLGHrj+LzUZEkKmvu4KkG7fj4jwMPqhawvErg=
