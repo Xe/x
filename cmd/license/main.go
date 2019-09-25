@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"sort"
 	"text/template"
 	"time"
 
@@ -39,7 +40,14 @@ func main() {
 
 	if *showAll {
 		fmt.Println("Licenses available:")
-		for license, _ := range licenses.List {
+		var names []string
+		for license := range licenses.List {
+			names = append(names, license)
+		}
+
+		sort.Strings(names)
+
+		for _, license := range names {
 			fmt.Printf("  %s\n", license)
 		}
 
