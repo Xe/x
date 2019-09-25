@@ -39,8 +39,89 @@ func init() {
 		"hippocratic":       Hippocratic,
 		"blueoak":           BlueOak,
 		"bg-dc":             BeGayDoCrimes,
+		"hacky-as-fuck":     HackyAsFuck,
+		"lamison":           Lamison,
+		"lil":               Lil,
+		"dwtfywwi":          Dwtfywwi,
 	}
 }
+
+const Dwtfywwi = `                          DWTFYWWI LICENSE
+                       Version 1, January 2006
+
+ Copyright (C) {{.Year}} {{.Name}} <{{.Email}}>
+
+                            Preamble
+
+  The licenses for most software are designed to take away your
+freedom to share and change it.  By contrast, the DWTFYWWI or Do
+Whatever The Fuck You Want With It license is intended to guarantee
+your freedom to share and change the software--to make sure the
+software is free for all its users.
+
+                         DWTFYWWI LICENSE
+   TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
+0. The author grants everyone permission to do whatever the fuck they
+want with the software, whatever the fuck that may be.`
+
+const Lil = `The Lil License v1
+
+Copyright (c) {{.Year}} {{.Name}} <{{.Email}}>
+
+Permission is hereby granted by the authors of this software, to any person,
+to use the software for any purpose, free of charge, including the rights
+to run, read, copy, change, distribute and sell it, and including usage rights
+to any patents the authors may hold on it, subject to the following conditions:
+
+This license, or a link to its text, must be included with all copies of
+the software and any derivative works.
+
+Any modification to the software submitted to the authors may be incorporated
+into the software under the terms of this license.
+
+The software is provided "as is", without warranty of any kind, including
+but not limited to the warranties of title, fitness, merchantability and
+non-infringement. The authors have no obligation to provide support or updates
+for the software, and may not be held liable for any damages, claims or other
+liability arising from its use.`
+
+const Lamison = `Copyright (c) {{.Year}} {{.Name}} <{{.Email}}>
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice,
+this list of conditions and the following disclaimer in the documentation
+and/or other materials provided with the distribution.
+
+3. Neither the name of Zed A. Shaw or this project may be used to endorse or
+promote products derived from this software without specific prior written
+permission.
+
+4. Contributors agree that any contributions are owned by the copyright holder
+and that contributors have absolutely no rights to their contributions.
+
+5. The copyright holder reserves the right to revoke this license on anyone who
+uses this copyrighted work at any time for any reason.
+
+THIS SOFTWARE IS PROVIDED ''AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
+AUTHORS OF THIS SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT
+OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. `
+
+const HackyAsFuck = `This 'ere software is hacky as fuck. Use at your peril.
+I'd appreciate a mention if you do. But if you don't,
+I'm not going to lose sleep over it.
+{{.Name}} <{{.Email}}> in the year of {{.Year}}`
 
 const BeGayDoCrimes = `Copyright (c) {{.Year}} {{.Name}} <{{.Email}}>
 
