@@ -7,7 +7,12 @@ import (
 	"fmt"
 	"math/rand"
 	"strings"
+	"time"
 )
+
+func init() {
+	rand.Seed(time.Now().UnixNano())
+}
 
 // Names is the name of every Pokemon from Pokemon Vietnamese Crystal.
 var Names = []string{
