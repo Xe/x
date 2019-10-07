@@ -35,7 +35,7 @@ require (
 	github.com/klauspost/reedsolomon v1.9.2 // indirect
 	github.com/kr/pretty v0.1.0
 	github.com/mattn/go-runewidth v0.0.4 // indirect
-	github.com/miekg/dns v1.1.19
+	github.com/miekg/dns v1.1.22
 	github.com/mmikulicic/stringlist v1.0.0
 	github.com/mndrix/golog v0.0.0-20170330170653-a28e2a269775
 	github.com/mndrix/ps v0.0.0-20170330174427-18e65badd6ab // indirect
