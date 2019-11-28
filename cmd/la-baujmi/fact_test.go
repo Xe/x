@@ -5,8 +5,8 @@ import (
 	"log"
 	"testing"
 
-	"within.website/x/web/tokiponatokens"
 	"github.com/kr/pretty"
+	"within.website/x/web/tokiponatokens"
 )
 
 // equal tells whether a and b contain the same elements.
@@ -29,7 +29,7 @@ func equal(a, b []string) bool {
 	return true
 }
 
-func selbrisEqual(a, b []Selbri) bool {
+func bridisEqual(a, b []Bridi) bool {
 	if len(a) != len(b) {
 		return false
 	}
@@ -48,8 +48,8 @@ func selbrisEqual(a, b []Selbri) bool {
 	return true
 }
 
-// Eq checks two Selbri instances for equality.
-func (lhs Selbri) Eq(rhs Selbri) bool {
+// Eq checks two Bridi instances for equality.
+func (lhs Bridi) Eq(rhs Bridi) bool {
 	switch {
 	case lhs.Predicate != rhs.Predicate:
 		return false
@@ -62,61 +62,61 @@ func (lhs Selbri) Eq(rhs Selbri) bool {
 	return true
 }
 
-func TestSentenceToSelbris(t *testing.T) {
+func TestSentenceToBridis(t *testing.T) {
 	cases := []struct {
 		name      string
 		json      []byte
-		want      []Selbri
+		want      []Bridi
 		wantFacts []string
 	}{
 		{
 			name: "basic",
 			json: []byte(`[{"part":"subject","tokens":["ona"]},{"part":"verbMarker","sep":"li","tokens":["sona"]},{"part":"objectMarker","sep":"e","tokens":["mute"]},{"part":"punctuation","tokens":["period"]}]`),
-			want: []Selbri{
+			want: []Bridi{
 				{
 					Predicate: "sona",
 					Arguments: []string{"subject(ona)", "object(mute)"},
 				},
 			},
-			wantFacts: []string{"selbri(verb(sona), subject(ona), object(mute))."},
+			wantFacts: []string{"bridi(verb(sona), subject(ona), object(mute))."},
 		},
 		{
 			name: "zen",
 			json: []byte(`[{"part":"subject","tokens":["tenpo","ni"]},{"part":"punctuation","tokens":["la"]},{"part":"subject","tokens":["seme"]},{"part":"verbMarker","sep":"li","tokens":["ala"]}]`),
-			want: []Selbri{
+			want: []Bridi{
 				{
 					Predicate: "ala",
 					Arguments: []string{"context(subject(tenpo_ni))", "subject(seme)"},
 				},
 			},
-			wantFacts: []string{"selbri(verb(ala), context(subject(tenpo_ni)), subject(A))."},
+			wantFacts: []string{"bridi(verb(ala), context(subject(tenpo_ni)), subject(A))."},
 		},
 		{
 			name: "pi_subject",
 			json: []byte(`[{"part":"subject","parts":[{"part":"subject","tokens":["ilo","mi"]},{"part":"subject","sep":"pi","tokens":["kasi","nasa"]}]},{"part":"verbMarker","sep":"li","tokens":["pona","ale"]}]`),
-			want: []Selbri{
+			want: []Bridi{
 				{
 					Predicate: "pona_ale",
 					Arguments: []string{"subject(ilo_mi, pi(kasi, nasa))"},
 				},
 			},
-			wantFacts: []string{"selbri(verb(pona_ale), subject(ilo_mi, pi(kasi, nasa)))."},
+			wantFacts: []string{"bridi(verb(pona_ale), subject(ilo_mi, pi(kasi, nasa)))."},
 		},
 		{
 			name: "pi_object",
 			json: []byte(`[{"part":"subject","tokens":["mi"]},{"part":"verbMarker","sep":"li","tokens":["esun"]},{"part":"objectMarker","sep":"e","parts":[{"part":"objectMarker","tokens":["ilo"]},{"part":"objectMarker","sep":"pi","tokens":["kalama","musi"]}]},{"part":"punctuation","tokens":["period"]}]`),
-			want: []Selbri{
+			want: []Bridi{
 				{
 					Predicate: "esun",
 					Arguments: []string{"subject(mi)", "object(ilo, pi(kalama, musi))"},
 				},
 			},
-			wantFacts: []string{"selbri(verb(esun), subject(mi), object(ilo, pi(kalama, musi)))."},
+			wantFacts: []string{"bridi(verb(esun), subject(mi), object(ilo, pi(kalama, musi)))."},
 		},
 		{
 			name: "multiple verbs",
 			json: []byte(`[{"part":"subject","tokens":["ona"]},{"part":"verbMarker","sep":"li","tokens":["sona"]},{"part":"verbMarker","sep":"li","tokens":["pona"]},{"part":"objectMarker","sep":"e","tokens":["mute"]},{"part":"punctuation","tokens":["period"]}]`),
-			want: []Selbri{
+			want: []Bridi{
 				{
 					Predicate: "sona",
 					Arguments: []string{"subject(ona)", "object(mute)"},
@@ -127,14 +127,14 @@ func TestSentenceToSelbris(t *testing.T) {
 				},
 			},
 			wantFacts: []string{
-				"selbri(verb(sona), subject(ona), object(mute)).",
-				"selbri(verb(pona), subject(ona), object(mute)).",
+				"bridi(verb(sona), subject(ona), object(mute)).",
+				"bridi(verb(pona), subject(ona), object(mute)).",
 			},
 		},
 		{
 			name: "multiple subjects and verbs",
 			json: []byte(`[{"part":"subject","tokens":["ona","en","sina","en","mi"]},{"part":"verbMarker","sep":"li","tokens":["sona"]},{"part":"verbMarker","sep":"li","tokens":["pona"]},{"part":"objectMarker","sep":"e","tokens":["mute"]},{"part":"punctuation","tokens":["period"]}]`),
-			want: []Selbri{
+			want: []Bridi{
 				{
 					Predicate: "sona",
 					Arguments: []string{"subject(ona)", "object(mute)"},
@@ -161,18 +161,18 @@ func TestSentenceToSelbris(t *testing.T) {
 				},
 			},
 			wantFacts: []string{
-				"selbri(verb(sona), subject(ona), object(mute)).",
-				"selbri(verb(sona), subject(sina), object(mute)).",
-				"selbri(verb(sona), subject(mi), object(mute)).",
-				"selbri(verb(pona), subject(ona), object(mute)).",
-				"selbri(verb(pona), subject(sina), object(mute)).",
-				"selbri(verb(pona), subject(mi), object(mute)).",
+				"bridi(verb(sona), subject(ona), object(mute)).",
+				"bridi(verb(sona), subject(sina), object(mute)).",
+				"bridi(verb(sona), subject(mi), object(mute)).",
+				"bridi(verb(pona), subject(ona), object(mute)).",
+				"bridi(verb(pona), subject(sina), object(mute)).",
+				"bridi(verb(pona), subject(mi), object(mute)).",
 			},
 		},
 		{
 			name: "multiple subjects and verbs and objects",
 			json: []byte(`[{"part":"subject","tokens":["ona","en","sina","en","mi"]},{"part":"verbMarker","sep":"li","tokens":["sona"]},{"part":"verbMarker","sep":"li","tokens":["pona"]},{"part":"objectMarker","sep":"e","tokens":["ijo","mute"]},{"part":"objectMarker","sep":"e","tokens":["ilo","mute"]},{"part":"punctuation","tokens":["period"]}]`),
-			want: []Selbri{
+			want: []Bridi{
 				{
 					Predicate: "sona",
 					Arguments: []string{"subject(ona)", "object(ijo_mute)"},
@@ -223,18 +223,18 @@ func TestSentenceToSelbris(t *testing.T) {
 				},
 			},
 			wantFacts: []string{
-				"selbri(verb(sona), subject(ona), object(ijo_mute)).",
-				"selbri(verb(sona), subject(ona), object(ilo_mute)).",
-				"selbri(verb(sona), subject(sina), object(ijo_mute)).",
-				"selbri(verb(sona), subject(sina), object(ilo_mute)).",
-				"selbri(verb(sona), subject(mi), object(ijo_mute)).",
-				"selbri(verb(sona), subject(mi), object(ilo_mute)).",
-				"selbri(verb(pona), subject(ona), object(ijo_mute)).",
-				"selbri(verb(pona), subject(ona), object(ilo_mute)).",
-				"selbri(verb(pona), subject(sina), object(ijo_mute)).",
-				"selbri(verb(pona), subject(sina), object(ilo_mute)).",
-				"selbri(verb(pona), subject(mi), object(ijo_mute)).",
-				"selbri(verb(pona), subject(mi), object(ilo_mute)).",
+				"bridi(verb(sona), subject(ona), object(ijo_mute)).",
+				"bridi(verb(sona), subject(ona), object(ilo_mute)).",
+				"bridi(verb(sona), subject(sina), object(ijo_mute)).",
+				"bridi(verb(sona), subject(sina), object(ilo_mute)).",
+				"bridi(verb(sona), subject(mi), object(ijo_mute)).",
+				"bridi(verb(sona), subject(mi), object(ilo_mute)).",
+				"bridi(verb(pona), subject(ona), object(ijo_mute)).",
+				"bridi(verb(pona), subject(ona), object(ilo_mute)).",
+				"bridi(verb(pona), subject(sina), object(ijo_mute)).",
+				"bridi(verb(pona), subject(sina), object(ilo_mute)).",
+				"bridi(verb(pona), subject(mi), object(ijo_mute)).",
+				"bridi(verb(pona), subject(mi), object(ilo_mute)).",
 			},
 		},
 	}
@@ -247,12 +247,12 @@ func TestSentenceToSelbris(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			sb, err := SentenceToSelbris(s)
+			sb, err := SentenceToBridis(s)
 			if err != nil {
 				t.Fatal(err)
 			}
 
-			if !selbrisEqual(cs.want, sb) {
+			if !bridisEqual(cs.want, sb) {
 				log.Println("want:")
 				pretty.Println(cs.want)
 				log.Println("got:")
