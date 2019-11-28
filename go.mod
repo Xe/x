@@ -43,13 +43,9 @@ require (
 	github.com/otiai10/copy v1.0.2
 	github.com/otiai10/curr v0.0.0-20190513014714-f5a3d24e5776 // indirect
 	github.com/pborman/uuid v1.2.0
-	github.com/perlin-network/life v0.0.0-20190625155037-103174020946
 	github.com/peterh/liner v1.1.0
 	github.com/phayes/freeport v0.0.0-20180830031419-95f893ade6f2
 	github.com/pkg/errors v0.8.1
-	github.com/rs/cors v1.7.0
-	github.com/shurcooL/httpfs v0.0.0-20190707220628-8d4bc4ba7749 // indirect
-	github.com/shurcooL/vfsgen v0.0.0-20181202132449-6a9ea43bcacd // indirect
 	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect
 	github.com/streamrail/concurrent-map v0.0.0-20160823150647-8bf1e9bacbf6
 	github.com/stretchr/testify v1.3.0 // indirect
@@ -71,13 +67,10 @@ require (
 	golang.org/x/net v0.0.0-20190827160401-ba9fcec4b297
 	golang.org/x/oauth2 v0.0.0-20190523182746-aaccbc9213b0
 	google.golang.org/appengine v1.6.0 // indirect
-	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
 	gopkg.in/tucnak/telebot.v2 v2.0.0-20190415090633-8c1c512262f2
 	within.website/confyg v0.4.0
 	within.website/johaus v1.1.0
 	within.website/ln v0.7.0
 )
-
-replace github.com/go-interpreter/wagon v0.0.0 => github.com/perlin-network/wagon v0.3.1-0.20180825141017-f8cb99b55a39
 
 go 1.13
