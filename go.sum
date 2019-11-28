@@ -30,6 +30,8 @@ github.com/dgryski/go-onlinestats v0.0.0-20170612111826-1c7d19468768 h1:Xzl7CSuS
 github.com/dgryski/go-onlinestats v0.0.0-20170612111826-1c7d19468768/go.mod h1:alfmlCqcg4uw9jaoIU1nOp9RFdJLMuu8P07BCEgpgoo=
 github.com/disintegration/imaging v1.6.1 h1:JnBbK6ECIZb1NsWIikP9pd8gIlTIRx7fuDNpU9fsxOE=
 github.com/disintegration/imaging v1.6.1/go.mod h1:xuIt+sRxDFrHS0drzXUlCJthkJ8k7lkkUojDSR247MQ=
+github.com/disintegration/imaging v1.6.2 h1:w1LecBlG2Lnp8B3jk5zSuNqd7b4DXhcjwek1ei82L+c=
+github.com/disintegration/imaging v1.6.2/go.mod h1:44/5580QXChDfwIclfc/PCwrr44amcmDAg8hxG0Ewe4=
 github.com/eaburns/peggy v0.0.0-20180405011029-d685ddd3cbcb/go.mod h1:5tfPwI6ukiK3W5vJzkj5MBQKHHY9Gcy2y6k1FC/23Xk=
 github.com/eaburns/peggy v0.0.0-20190420135231-b61cdde6efe6 h1:KOwuGgdmM9s9HsVrIlvaCnD7QEuMzKSRmsTgWUScwDA=
 github.com/eaburns/peggy v0.0.0-20190420135231-b61cdde6efe6/go.mod h1:5tfPwI6ukiK3W5vJzkj5MBQKHHY9Gcy2y6k1FC/23Xk=
@@ -173,6 +175,8 @@ golang.org/x/exp/errors v0.0.0-20190510132918-efd6b22b2522/go.mod h1:YgqsNsAu4fT
 golang.org/x/image v0.0.0-20180708004352-c73c2afc3b81/go.mod h1:ux5Hcp/YLpHSI86hEcLt0YII63i6oz57MZXIpbrjZUs=
 golang.org/x/image v0.0.0-20190523035834-f03afa92d3ff h1:+2zgJKVDVAz/BWSsuniCmU1kLCjL88Z8/kv39xCI9NQ=
 golang.org/x/image v0.0.0-20190523035834-f03afa92d3ff/go.mod h1:kZ7UVZpmo3dzQBMxlp+ypCbDeSB+sBbTgSJuh5dn5js=
+golang.org/x/image v0.0.0-20191009234506-e7c1f5e7dbb8 h1:hVwzHzIUGRjiF7EcUjqNxk3NCfkPxbDKRdnNE1Rpg0U=
+golang.org/x/image v0.0.0-20191009234506-e7c1f5e7dbb8/go.mod h1:FeLwcggjj3mMvU+oOTbSwawSJRM1uh48EjtB4UJZlP0=
 golang.org/x/mod v0.1.0 h1:sfUMP1Gu8qASkorDVjnMuvgJzwFbTZSeXFiGBYAVdl4=
 golang.org/x/mod v0.1.0/go.mod h1:0QHyrYULN0/3qlju5TqG8bIK38QM8yzMo5ekMj3DlcY=
 golang.org/x/net v0.0.0-20180724234803-3673e40ba225/go.mod h1:mL1N/T3taQHkDXs73rZJwtUhF3w3ftmwwsq0BUmARs4=
