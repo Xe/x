@@ -12,6 +12,7 @@ import (
 	"text/template"
 	"time"
 
+	"github.com/posener/complete"
 	"within.website/x/cmd/license/licenses"
 	"within.website/x/internal"
 )
@@ -33,6 +34,15 @@ func init() {
 		fmt.Fprintln(os.Stderr, "\nBy default the name and email are scraped from `git config`")
 		os.Exit(2)
 	}
+
+	var names []string
+	for name := range licenses.List {
+		names = append(names, name)
+	}
+
+	sort.Strings(names)
+
+	internal.HandleCompletion(complete.PredictSet(names...), nil)
 }
 
 func main() {

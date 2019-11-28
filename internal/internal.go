@@ -7,7 +7,9 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 
+	"github.com/posener/complete"
 	"go4.org/legal"
 	"within.website/confyg/flagconfyg"
 	"within.website/ln"
@@ -82,4 +84,24 @@ func HandleStartup() {
 
 func init() {
 	http.DefaultTransport = useragent.Transport("within.website-x", "https://within.website/.x.botinfo", http.DefaultTransport)
+}
+
+func HandleCompletion(args complete.Predictor, subcommands complete.Commands) {
+	cmd := complete.Command{
+		Flags: map[string]complete.Predictor{},
+		Sub:   subcommands,
+		Args:  args,
+	}
+
+	flag.CommandLine.VisitAll(func(fl *flag.Flag) {
+		cmd.Flags["-"+fl.Name] = complete.PredictAnything
+
+		if fl.DefValue == "true" || fl.DefValue == "false" {
+			cmd.Flags["-"+fl.Name] = complete.PredictNothing
+		}
+	})
+
+	if complete.New(filepath.Base(os.Args[0]), cmd).Run() {
+		os.Exit(0)
+	}
 }
