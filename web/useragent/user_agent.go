@@ -38,6 +38,6 @@ type userAgentTransport struct {
 }
 
 func (uat userAgentTransport) RoundTrip(r *http.Request) (*http.Response, error) {
-	r.Header.Set("User-Agent", GenUserAgent(uat.prefix))
+	r.Header.Set("User-Agent", GenUserAgent(uat.prefix, uat.infoURL))
 	return uat.rt.RoundTrip(r)
 }

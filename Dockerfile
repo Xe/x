@@ -8,8 +8,6 @@ RUN go mod download
 COPY . .
 RUN go test ./...
 RUN GOBIN=/x/bin go install -v ./...
-RUN apk --no-cache add upx \
- && upx /x/bin/*
 
 FROM xena/alpine
 COPY --from=build /x/bin/ /usr/local/bin/
