@@ -14,15 +14,14 @@ import (
 	"within.website/ln/opname"
 	"within.website/x/internal/flagenv"
 	"within.website/x/internal/manpage"
+	"within.website/x/web/useragent"
 
 	// Debug routes
+	"net/http"
 	_ "net/http/pprof"
 
 	// Older projects use .env files, shim in compatibility
 	_ "github.com/joho/godotenv/autoload"
-
-	// User agent init hook
-	_ "within.website/x/web"
 )
 
 var (
@@ -79,4 +78,8 @@ func HandleStartup() {
 	if *manpageGen {
 		manpage.Spew()
 	}
+}
+
+func init() {
+	http.DefaultTransport = useragent.Transport("within.website-x", "https://within.website/.x.botinfo", http.DefaultTransport)
 }
