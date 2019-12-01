@@ -9,8 +9,6 @@ import (
 	"time"
 
 	"golang.org/x/crypto/acme/autocert"
-	"within.website/ln"
-	"within.website/ln/opname"
 )
 
 var (
@@ -60,8 +58,6 @@ func (m Manager) GetCertificate(hello *tls.ClientHelloInfo) (*tls.Certificate, e
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
 	defer cancel()
-	ctx = opname.With(ctx, "localca.Manager.GetCertificate")
-	ctx = ln.WithF(ctx, ln.F{"server_name": name})
 
 	data, err := m.Cache.Get(ctx, name)
 	if err != nil && err != autocert.ErrCacheMiss {
@@ -83,8 +79,6 @@ func (m Manager) GetCertificate(hello *tls.ClientHelloInfo) (*tls.Certificate, e
 	if err != nil {
 		return nil, err
 	}
-
-	ln.Log(ctx, ln.Info("returned cert successfully"))
 
 	return cert, nil
 }
