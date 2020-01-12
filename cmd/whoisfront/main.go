@@ -2,6 +2,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -16,6 +17,7 @@ import (
 
 var (
 	switchCounterURL = flag.String("switch-counter-url", "", "the webhook for switchcounter.science")
+	miToken          = flag.String("mi-token", "", "Mi token")
 
 	sc switchcounter.API
 )
@@ -29,6 +31,23 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func miSwitch(to string) error {
+	req, err := http.NewRequest(http.MethodGet, "https://mi.within.website/switches/switch", bytes.NewBuffer([]byte(to)))
+	if err != nil {
+		return err
+	}
+	req.Header.Add("Authorization", *miToken)
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return err
+	}
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("wanted %d, got: %s", http.StatusOK, resp.Status)
+	}
+	return nil
 }
 
 func handle(w http.ResponseWriter, r *http.Request) {
@@ -47,6 +66,12 @@ func handle(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			panic(err)
 		}
+
+		err = miSwitch(string(front))
+		if err != nil {
+			panic(err)
+		}
+
 		w.Header().Set("Content-Type", "text/plain")
 		fmt.Fprint(w, string(front))
 		return
