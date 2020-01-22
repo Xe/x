@@ -72,7 +72,7 @@ require (
 	gopkg.in/tucnak/telebot.v2 v2.0.0-20190415090633-8c1c512262f2
 	within.website/confyg v0.4.0
 	within.website/johaus v1.1.0
-	within.website/ln v0.7.0
+	within.website/ln v0.8.0
 )
 
 go 1.13

@@ -244,3 +244,5 @@ within.website/johaus v1.1.0 h1:j59k9LM5ue+CDwUZAJitYjek6i8ISMkkCFiVXKZLByw=
 within.website/johaus v1.1.0/go.mod h1:0RBs2TucQ3CZQiVoqNj9Wch7mtZY05uvNO14v0lKcM4=
 within.website/ln v0.7.0 h1:cZUc53cZF/+hWuEAv1VbqlYJ5czuPFHKfH0hLKmlIUA=
 within.website/ln v0.7.0/go.mod h1:ifURKqsCJekcsdUE+hyCdcuhQqQ+9v9DfA++ZqYxZFE=
+within.website/ln v0.8.0 h1:NX6Eo3LkM9RU8lLRbWpmR5/jQRYKtZ8zuiYi7mmKa6w=
+within.website/ln v0.8.0/go.mod h1:I+Apk8qxMStNXTZdyDMqDqe6CB8Hn6+W/Gyf5QbY+2E=
