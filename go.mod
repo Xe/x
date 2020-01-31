@@ -49,6 +49,8 @@ require (
 	github.com/pkg/errors v0.8.1
 	github.com/posener/complete v1.2.3
 	github.com/posener/complete/v2 v2.0.1-alpha.12
+	github.com/shurcooL/httpfs v0.0.0-20190707220628-8d4bc4ba7749 // indirect
+	github.com/shurcooL/vfsgen v0.0.0-20181202132449-6a9ea43bcacd // indirect
 	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect
 	github.com/streamrail/concurrent-map v0.0.0-20160823150647-8bf1e9bacbf6
 	github.com/sycamoreone/orc v0.0.0-20150204213357-1627eaec2699

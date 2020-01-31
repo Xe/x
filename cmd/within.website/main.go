@@ -43,6 +43,7 @@ var githubReposDefault = []string{
 var gogsReposDefault = []string{
 	"gorqlite",
 	"gopher",
+	"mi",
 }
 
 func main() {
@@ -117,6 +118,7 @@ const indexTemplate = `<!DOCTYPE html>
 				<li><a href="https://within.website/gorqlite">gorqlite</a> - A driver for <a href="https://github.com/rqlite/rqlite">rqlite</a></li>
 				<li><a href="https://within.website/johaus">johaus</a> - <a href="http://lojban.org">Lojban</a> parsing</li>
 				<li><a href="https://within.website/ln">ln</a> - Key->value based logging made context-aware and simple</li>
+                                <li><a href="https://within.website/mi">mi</a> - A personal API </li>
 				<li><a href="https://within.website/olin">olin</a> - WebAssembly on the server</li>
 				<li><a href="https://within.website/x">x</a> - Experiments, toys and tinkering (many subpackages)</li>
 			</ul>
