@@ -3,29 +3,23 @@ package main
 
 import (
 	"bytes"
-	"encoding/json"
 	"flag"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"net/http/cgi"
 
 	"within.website/x/internal"
-	"within.website/x/web/switchcounter"
 )
 
 var (
-	switchCounterURL = flag.String("switch-counter-url", "", "the webhook for switchcounter.science")
-	miToken          = flag.String("mi-token", "", "Mi token")
-
-	sc switchcounter.API
+	miToken = flag.String("mi-token", "", "Mi token")
 )
 
 func main() {
 	internal.HandleStartup()
-
-	sc = switchcounter.NewHTTPClient(*switchCounterURL)
 
 	err := cgi.Serve(http.HandlerFunc(handle))
 	if err != nil {
@@ -57,15 +51,6 @@ func handle(w http.ResponseWriter, r *http.Request) {
 			panic(err)
 		}
 		defer r.Body.Close()
-		req := sc.Switch(string(front))
-		resp, err := http.DefaultClient.Do(req)
-		if err != nil {
-			panic(err)
-		}
-		err = switchcounter.Validate(resp)
-		if err != nil {
-			panic(err)
-		}
 
 		err = miSwitch(string(front))
 		if err != nil {
@@ -77,21 +62,21 @@ func handle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	req := sc.Status()
+	req, err := http.NewRequest(http.MethodGet, "https://mi.within.website/switches/current", nil)
+	if err != nil {
+		panic(err)
+	}
+	req.Header.Add("Authorization", *miToken)
+	req.Header.Add("Accept", "text/plain")
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		panic(err)
 	}
-	err = switchcounter.Validate(resp)
-	if err != nil {
-		panic(err)
-	}
-	var st switchcounter.Status
-	err = json.NewDecoder(resp.Body).Decode(&st)
-	if err != nil {
-		panic(err)
+
+	if resp.StatusCode != http.StatusOK {
+		log.Panicf("bad status code: %d", resp.StatusCode)
 	}
 
 	w.Header().Set("Content-Type", "text/plain")
-	fmt.Fprint(w, st.Front)
+	io.Copy(w, resp.Body)
 }
