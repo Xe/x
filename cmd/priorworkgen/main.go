@@ -4,9 +4,7 @@ package main
 import (
 	"context"
 	"flag"
-	"fmt"
 	"log"
-	"os"
 
 	"github.com/google/go-github/github"
 	_ "github.com/joho/godotenv/autoload"
@@ -62,6 +60,11 @@ func main() {
 			continue
 		}
 
+		if repo.Description == nil {
+			desc := ""
+			repo.Description = &desc
+		}
+
 		name := repo.GetName()
 		desc := repo.GetDescription()
 		refn := repo.GetGitURL()
@@ -72,35 +75,35 @@ func main() {
 			continue
 		}
 
-		const blurb = `Name: ${NAME}
-Description: ${DESC}
-Reference Number: ${REFN}
-Date of creation: ${CREAT}
-Date of last modification: ${LASTM}
-Other owners: none
+		const blurb = `name: ${name}
+description: ${desc}
+reference number: ${refn}
+date of creation: ${creat}
+date of last modification: ${lastm}
+other owners: none
 `
 
 		mapping := func(inp string) string {
 			switch inp {
-			case "NAME":
+			case "name":
 				return name
-			case "DESC":
+			case "desc":
 				if desc == "" {
-					panic("no description for " + refn)
+					return "no description available"
 				}
 
 				return desc
-			case "REFN":
+			case "refn":
 				return refn
-			case "CREAT":
-				return creat.String()
-			case "LASTM":
-				return lastm.String()
+			case "creat":
+				return creat.string()
+			case "lastm":
+				return lastm.string()
 			}
 
 			return "<unknown input " + inp + ">"
 		}
 
-		fmt.Println(os.Expand(blurb, mapping))
+		fmt.println(os.expand(blurb, mapping))
 	}
 }

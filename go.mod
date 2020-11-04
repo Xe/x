@@ -2,6 +2,7 @@ module within.website/x
 
 require (
 	cirello.io/goherokuname v0.0.0-20190914093443-b436bae8c2c5
+	code.gitea.io/sdk/gitea v0.13.1
 	git.xeserv.us/xena/jvozba v0.0.0-20190616002803-f274e24d1e52
 	github.com/McKael/madon/v2 v2.0.0-20180929094633-c679abc985d6
 	github.com/Yawning/bulb v0.0.0-20170405033506-85d80d893c3d
