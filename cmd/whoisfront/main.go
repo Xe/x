@@ -28,7 +28,7 @@ func main() {
 }
 
 func miSwitch(to string) error {
-	req, err := http.NewRequest(http.MethodGet, "https://mi.within.website/switches/switch", bytes.NewBuffer([]byte(to)))
+	req, err := http.NewRequest(http.MethodGet, "https://mi.within.website/api/switches/switch", bytes.NewBuffer([]byte(to)))
 	if err != nil {
 		return err
 	}
@@ -62,7 +62,7 @@ func handle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	req, err := http.NewRequest(http.MethodGet, "https://mi.within.website/switches/current", nil)
+	req, err := http.NewRequest(http.MethodGet, "https://mi.within.website/api/switches/current/text", nil)
 	if err != nil {
 		panic(err)
 	}
