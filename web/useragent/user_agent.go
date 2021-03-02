@@ -29,7 +29,7 @@ func GenUserAgent(prefix, infoURL string) string {
 
 // Transport wraps a http transport with user agent information.
 func Transport(prefix, infoURL string, rt http.RoundTripper) http.RoundTripper {
-	return userAgentTransport{prefix: prefix, rt: rt}
+	return userAgentTransport{prefix: prefix, infoURL: infoURL, rt: rt}
 }
 
 type userAgentTransport struct {
