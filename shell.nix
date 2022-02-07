@@ -5,9 +5,11 @@ pkgs.mkShell {
   buildInputs = with pkgs; [
     go
     golint
-    gometalinter
+    golangci-lint
     goimports
     vgo2nix
+
+    python310
 
     niv
   ];
