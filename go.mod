@@ -2,14 +2,12 @@ module within.website/x
 
 require (
 	cirello.io/goherokuname v0.0.0-20190914093443-b436bae8c2c5
-	code.gitea.io/sdk/gitea v0.13.1
 	git.xeserv.us/xena/jvozba v0.0.0-20190616002803-f274e24d1e52
 	github.com/McKael/madon/v2 v2.0.0-20180929094633-c679abc985d6
 	github.com/Yawning/bulb v0.0.0-20170405033506-85d80d893c3d
 	github.com/aclements/go-moremath v0.0.0-20190506201756-286cc0be6f75 // indirect
 	github.com/birkelund/boltdbcache v1.0.0
 	github.com/bwmarrin/discordgo v0.20.2
-	github.com/celrenheit/sandflake v0.0.0-20190410195419-50a943690bc2
 	github.com/codahale/hdrhistogram v0.0.0-20161010025455-3a0bb77429bd
 	github.com/dgryski/go-failure v0.0.0-20151001134759-4963dbd58fd0
 	github.com/dgryski/go-onlinestats v0.0.0-20170612111826-1c7d19468768 // indirect
@@ -49,9 +47,6 @@ require (
 	github.com/phayes/freeport v0.0.0-20180830031419-95f893ade6f2
 	github.com/pkg/errors v0.8.1
 	github.com/posener/complete v1.2.3
-	github.com/posener/complete/v2 v2.0.1-alpha.12
-	github.com/shurcooL/httpfs v0.0.0-20190707220628-8d4bc4ba7749 // indirect
-	github.com/shurcooL/vfsgen v0.0.0-20181202132449-6a9ea43bcacd // indirect
 	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect
 	github.com/streamrail/concurrent-map v0.0.0-20160823150647-8bf1e9bacbf6
 	github.com/sycamoreone/orc v0.0.0-20150204213357-1627eaec2699

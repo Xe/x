@@ -96,9 +96,9 @@ other owners: none
 			case "refn":
 				return refn
 			case "creat":
-				return creat.string()
+				return creat.String()
 			case "lastm":
-				return lastm.string()
+				return lastm.String()
 			}
 
 			return "<unknown input " + inp + ">"
