@@ -70,15 +70,21 @@
 
           robocadey = copyFile { pname = "robocadey"; };
           robocadey-psvc = let
+            preflight = pkgs.writeShellApplication {
+              name = "cadeybot-preflight";
+              runtimeInputs = with pkgs; [ jq coreutils gnugrep gnused ];
+              text = builtins.readFile ./run/robocadey.preflight.sh;
+            };
             service = pkgs.substituteAll {
               name = "robocadey.service";
               src = ./run/robocadey.service.in;
+              inherit preflight;
               robocadey = self.packages.${system}.robocadey;
             };
           in pkgs.portableService {
             inherit (self.packages.${system}.robocadey) version;
-            name = "printerfacts";
-            description = "Printer facts";
+            name = "robocadey";
+            description = "Robotic twitter shitposting bot";
             units = [ service ];
             symlinks = [{
               object = "${pkgs.cacert}/etc/ssl";

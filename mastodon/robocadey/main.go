@@ -32,6 +32,7 @@ func main() {
 	defer cancel()
 
 	if *readFrom != "" {
+		os.Remove(*state)
 		fin, err := os.Open(*readFrom)
 		if err != nil {
 			ln.FatalErr(ctx, err)
