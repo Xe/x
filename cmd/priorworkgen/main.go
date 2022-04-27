@@ -5,6 +5,8 @@ import (
 	"context"
 	"flag"
 	"log"
+	"fmt"
+	"os"
 
 	"github.com/google/go-github/github"
 	_ "github.com/joho/godotenv/autoload"
@@ -104,6 +106,6 @@ other owners: none
 			return "<unknown input " + inp + ">"
 		}
 
-		fmt.println(os.expand(blurb, mapping))
+		fmt.Println(os.Expand(blurb, mapping))
 	}
 }

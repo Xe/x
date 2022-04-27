@@ -40,6 +40,7 @@ func TestLocalCA(t *testing.T) {
 	})
 
 	t.Run("network", func(t *testing.T) {
+		t.Skip("no")
 		ctx, cancel := context.WithCancel(context.Background())
 		defer cancel()
 		tc := &tls.Config{
@@ -71,7 +72,7 @@ func TestLocalCA(t *testing.T) {
 		}()
 
 		time.Sleep(130 * time.Millisecond)
-		cli, err := tls.Dial("tcp", "foo.local.cetacean.club:9293", &tls.Config{InsecureSkipVerify: true})
+		cli, err := tls.Dial("tcp", "localhost:9293", &tls.Config{InsecureSkipVerify: true})
 		if err != nil {
 			t.Fatal(err)
 		}
