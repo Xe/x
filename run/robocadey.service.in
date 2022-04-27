@@ -1,0 +1,10 @@
+[Unit]
+Description=Robo-Cadey
+
+[Service]
+ExecStart=@robocadey@/bin/robocadey
+StateDirectory=xeserv.robocadey
+CacheDirectory=xeserv.robocadey
+
+[Install]
+WantedBy=multi-user.target
