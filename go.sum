@@ -2,8 +2,6 @@ bou.ke/monkey v1.0.1/go.mod h1:FgHuK96Rv2Nlf+0u1OOVDpCMdsWyOFmeeketDHE7LIg=
 cirello.io/goherokuname v0.0.0-20190914093443-b436bae8c2c5 h1:W1xHfkFJ/G3/KGsRFV1S9DPFM6yB+ndu4Tbnvp7Ec1E=
 cirello.io/goherokuname v0.0.0-20190914093443-b436bae8c2c5/go.mod h1:lfp+7qXdkiHbLqAvsA4v2Cyll5djTKZTiNi+iDfPJcw=
 cloud.google.com/go v0.34.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
-git.xeserv.us/xena/jvozba v0.0.0-20190616002803-f274e24d1e52 h1:MumuDSv8Ebsal1C98APrRRb8JyX+FpKiyGT/8fiMjaw=
-git.xeserv.us/xena/jvozba v0.0.0-20190616002803-f274e24d1e52/go.mod h1:lPdeNnexyxX+GQt62HV9UypJDg9enMwadWLXazGUUuc=
 github.com/McKael/madon/v2 v2.0.0-20180929094633-c679abc985d6 h1:9cJcTOeILzInNo+DCYmXKME1QfAP07FYdo3M9/9jyc4=
 github.com/McKael/madon/v2 v2.0.0-20180929094633-c679abc985d6/go.mod h1:mvlJhxZCchfiasx3XvN3hBu5RekGwTDm09dKlSM/dQQ=
 github.com/Yawning/bulb v0.0.0-20170405033506-85d80d893c3d h1:ASfbc4vPGK69qbMO5qqRtGxfPvUmfbaK1ryEBv9WnQQ=
@@ -196,6 +194,8 @@ gopkg.in/tucnak/telebot.v2 v2.0.0-20190415090633-8c1c512262f2 h1:wGFU+pn16CuaCt4
 gopkg.in/tucnak/telebot.v2 v2.0.0-20190415090633-8c1c512262f2/go.mod h1:+//wyPtHTeW2kfyEBwB05Hqnxev7AGrsLIyylSH++KU=
 gopkg.in/yaml.v2 v2.2.2 h1:ZCJp+EgiOT7lHqUV2J862kp8Qj64Jo6az82+3Td9dZw=
 gopkg.in/yaml.v2 v2.2.2/go.mod h1:hI93XBmqTisBFMUTm0b8Fm+jr3Dg1NNxqwp+5A1VGuI=
+tulpa.dev/cadey/jvozba v0.0.0-20200326200349-f0ebe310be06 h1:va9TfLrDow17NpRPkZW9rwrEecY8lko/99rtBOS0AEE=
+tulpa.dev/cadey/jvozba v0.0.0-20200326200349-f0ebe310be06/go.mod h1:24Hynxow485ZwxAmn0yO1ATKApVnOB2dFM3zrtrGla0=
 within.website/confyg v0.4.0 h1:FklkpJyMLYBxECCI4RS4R2c/x7PblOvbX0qBjk8Wkjs=
 within.website/confyg v0.4.0/go.mod h1:KD5rDgkE3B+vbDiH/usiuK+CfiOkCiuD87NEF3/budk=
 within.website/johaus v1.1.0 h1:j59k9LM5ue+CDwUZAJitYjek6i8ISMkkCFiVXKZLByw=

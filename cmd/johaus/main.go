@@ -8,7 +8,7 @@ import (
 	"log"
 	"net/http"
 
-	"git.xeserv.us/xena/jvozba"
+	"tulpa.dev/cadey/jvozba"
 	"within.website/johaus/parser"
 	_ "within.website/johaus/parser/camxes"
 	"within.website/johaus/pretty"

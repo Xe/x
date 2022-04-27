@@ -2,7 +2,6 @@ module within.website/x
 
 require (
 	cirello.io/goherokuname v0.0.0-20190914093443-b436bae8c2c5
-	git.xeserv.us/xena/jvozba v0.0.0-20190616002803-f274e24d1e52
 	github.com/McKael/madon/v2 v2.0.0-20180929094633-c679abc985d6
 	github.com/Yawning/bulb v0.0.0-20170405033506-85d80d893c3d
 	github.com/aclements/go-moremath v0.0.0-20190506201756-286cc0be6f75 // indirect
@@ -68,6 +67,7 @@ require (
 	golang.org/x/oauth2 v0.0.0-20190523182746-aaccbc9213b0
 	google.golang.org/appengine v1.6.0 // indirect
 	gopkg.in/tucnak/telebot.v2 v2.0.0-20190415090633-8c1c512262f2
+	tulpa.dev/cadey/jvozba v0.0.0-20200326200349-f0ebe310be06
 	within.website/confyg v0.4.0
 	within.website/johaus v1.1.0
 	within.website/ln v0.7.0

@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"git.xeserv.us/xena/jvozba"
+	"tulpa.dev/cadey/jvozba"
 	_ "github.com/joho/godotenv/autoload"
 	tb "gopkg.in/tucnak/telebot.v2"
 	"within.website/johaus/parser"
