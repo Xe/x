@@ -6,7 +6,7 @@ require (
 	github.com/Yawning/bulb v0.0.0-20170405033506-85d80d893c3d
 	github.com/aclements/go-moremath v0.0.0-20190506201756-286cc0be6f75 // indirect
 	github.com/birkelund/boltdbcache v1.0.0
-	github.com/bwmarrin/discordgo v0.20.2
+	github.com/bwmarrin/discordgo v0.25.0
 	github.com/codahale/hdrhistogram v0.0.0-20161010025455-3a0bb77429bd
 	github.com/dgryski/go-failure v0.0.0-20151001134759-4963dbd58fd0
 	github.com/dgryski/go-onlinestats v0.0.0-20170612111826-1c7d19468768 // indirect
@@ -59,11 +59,11 @@ require (
 	github.com/xtaci/smux v1.5.12
 	github.com/yawning/bulb v0.0.0-20170405033506-85d80d893c3d // indirect
 	go4.org v0.0.0-20190313082347-94abd6928b1d
-	golang.org/x/crypto v0.0.0-20191011191535-87dc89f01550
+	golang.org/x/crypto v0.0.0-20210421170649-83a5a9bb288b
 	golang.org/x/exp/errors v0.0.0-20190510132918-efd6b22b2522
 	golang.org/x/image v0.0.0-20190523035834-f03afa92d3ff // indirect
 	golang.org/x/mod v0.1.1-0.20191105210325-c90efee705ee
-	golang.org/x/net v0.0.0-20190923162816-aa69164e4478
+	golang.org/x/net v0.0.0-20210226172049-e18ecbb05110
 	golang.org/x/oauth2 v0.0.0-20190523182746-aaccbc9213b0
 	google.golang.org/appengine v1.6.0 // indirect
 	gopkg.in/tucnak/telebot.v2 v2.0.0-20190415090633-8c1c512262f2
