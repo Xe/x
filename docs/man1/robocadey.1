@@ -1,0 +1,64 @@
+.Dd April 27, 2022
+.Dt ROBOCADEY 1 URM
+
+
+.Sh NAME
+.Nm robocadey
+.Nd A markov chain bot for Mastodon that is fed on someone's Twitter data export
+
+
+.Sh SYNOPSIS
+.Nm
+
+.Op Fl -app-id
+.Op Fl -app-secret
+.Op Fl -instance
+.Op Fl -read-from
+.Op Fl -state
+.Op Fl -token
+
+.Sh DESCRIPTION
+
+.Bl -tag -width " " -offset indent -compact
+
+.It Fl -app-id
+oauth2 app id
+
+.It Fl -app-secret
+oauth2 app secret
+
+.It Fl -config
+configuration file, uses
+.Xr flagconfyg 4
+to format values.
+
+.It Fl -instance
+mastodon instance with https://
+
+.It Fl -read-from
+if set, read from this JSON file
+
+The default value for this is 
+
+.It Fl -state
+The markov chain brain file. This is where all of the tweet data will be stored
+so that the bot can make "art" out of it.
+
+.It Fl -token
+oauth2 bot token
+
+.El
+
+.Sh DIAGNOSTICS
+
+.Ex -std robocadey
+
+
+.Sh SEE ALSO
+
+.Bl -bullet
+
+.It
+.Lk hyperlink: https://github.com/Xe/x/tree/master/mastodon/robocadey within.website/x/mastodon/robocadey
+
+.El
