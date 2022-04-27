@@ -68,7 +68,7 @@ require (
 	google.golang.org/appengine v1.6.0 // indirect
 	gopkg.in/tucnak/telebot.v2 v2.0.0-20190415090633-8c1c512262f2
 	tulpa.dev/cadey/jvozba v0.0.0-20200326200349-f0ebe310be06
-	within.website/confyg v0.4.0
+	within.website/confyg v1.1.0
 	within.website/johaus v1.1.0
 	within.website/ln v0.9.1
 )
