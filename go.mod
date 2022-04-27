@@ -70,7 +70,7 @@ require (
 	tulpa.dev/cadey/jvozba v0.0.0-20200326200349-f0ebe310be06
 	within.website/confyg v0.4.0
 	within.website/johaus v1.1.0
-	within.website/ln v0.7.0
+	within.website/ln v0.9.1
 )
 
 go 1.13
