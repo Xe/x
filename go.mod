@@ -32,7 +32,7 @@ require (
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 // indirect
 	github.com/klauspost/cpuid v1.2.1 // indirect
 	github.com/klauspost/reedsolomon v1.9.2 // indirect
-	github.com/kr/pretty v0.2.0
+	github.com/kr/pretty v0.3.0
 	github.com/mattn/go-runewidth v0.0.4 // indirect
 	github.com/miekg/dns v1.1.28
 	github.com/mmikulicic/stringlist v1.0.0
