@@ -4,15 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"flag"
-	"fmt"
 	"math/rand"
-	"os"
+	"net"
 	"time"
 
 	"github.com/McKael/madon/v2"
 	"within.website/ln"
 	"within.website/x/internal"
-	"within.website/x/markov"
 )
 
 var (
@@ -20,44 +18,46 @@ var (
 	appID     = flag.String("app-id", "", "oauth2 app id")
 	appSecret = flag.String("app-secret", "", "oauth2 app secret")
 	token     = flag.String("token", "", "oauth2 token")
-	state     = flag.String("state", "./robocadey.gob", "state file")
-	readFrom  = flag.String("read-from", "", "if set, read from this JSON file")
+	sockPath  = flag.String("gpt2-sock", "/run/robocadey-gpt2.sock", "path to unix socket for robocadey-gpt2")
 )
 
 var scopes = []string{"read", "write", "follow"}
+
+func getShitposts(sockPath string) ([]string, error) {
+	var conn net.Conn
+	var err error
+	if sockPath != "" {
+		conn, err = net.Dial("unix", sockPath)
+	} else {
+		conn, err = net.Dial("tcp", "[::1]:9999")
+	}
+
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+	var result []string
+	err = json.NewDecoder(conn).Decode(&result)
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+func getShitpost(ctx context.Context) string {
+	shitposts, err := getShitposts(*sockPath)
+	if err != nil {
+		ln.FatalErr(ctx, err)
+	}
+
+	return shitposts[rand.Intn(len(shitposts))]
+}
 
 func main() {
 	internal.HandleStartup()
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-
-	if *readFrom != "" {
-		os.Remove(*state)
-		fin, err := os.Open(*readFrom)
-		if err != nil {
-			ln.FatalErr(ctx, err)
-		}
-		defer fin.Close()
-
-		var lines []string
-		c := markov.NewChain(3)
-		err = json.NewDecoder(fin).Decode(&lines)
-		if err != nil {
-			ln.FatalErr(ctx, err)
-		}
-
-		for _, line := range lines {
-			c.Write(line)
-		}
-
-		err = c.Save(*state)
-		if err != nil {
-			ln.FatalErr(ctx, err)
-		}
-
-		fmt.Println("data imported successfully")
-		return
-	}
 
 	c, err := madon.RestoreApp("furry boost bot", *instance, *appID, *appSecret, &madon.UserToken{AccessToken: *token})
 	if err != nil {
@@ -65,16 +65,10 @@ func main() {
 	}
 	_ = c
 
-	chain := markov.NewChain(3)
-	err = chain.Load(*state)
-	if err != nil {
-		ln.FatalErr(ctx, err)
-	}
-
 	rand.Seed(time.Now().UnixMicro())
 
 	if _, err := c.PostStatus(madon.PostStatusParams{
-		Text: chain.Generate(150),
+		Text: getShitpost(ctx),
 	}); err != nil {
 		ln.FatalErr(ctx, err)
 	}
@@ -102,7 +96,7 @@ func main() {
 
 		case <-t:
 			if _, err := c.PostStatus(madon.PostStatusParams{
-				Text: chain.Generate(150),
+				Text: getShitpost(ctx),
 			}); err != nil {
 				ln.FatalErr(ctx, err)
 			}
@@ -120,7 +114,7 @@ func main() {
 						"target": n.Account.Acct,
 					})
 					if _, err := c.PostStatus(madon.PostStatusParams{
-						Text:      "@" + n.Account.Acct + " " + chain.Generate(150),
+						Text:      "@" + n.Account.Acct + " " + getShitpost(ctx),
 						InReplyTo: n.Status.ID,
 					}); err != nil {
 						ln.FatalErr(ctx, err)
