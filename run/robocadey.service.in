@@ -2,7 +2,6 @@
 Description=Robo-Cadey
 
 [Service]
-ExecStartPre=@preflight@/bin/preflight
 ExecStartPre=@robocadey@/bin/robocadey --read-from=./robocadey.gob
 ExecStart=@robocadey@/bin/robocadey
 StateDirectory=xeserv.robocadey

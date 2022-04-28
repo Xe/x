@@ -78,15 +78,9 @@
             ${python}/bin/python3 ${./mastodon/robocadey/gpt2/main.py}
           '';
           robocadey-psvc = let
-            preflight = pkgs.writeShellApplication {
-              name = "cadeybot-preflight";
-              runtimeInputs = with pkgs; [ jq coreutils gnugrep gnused ];
-              text = builtins.readFile ./run/robocadey.preflight.sh;
-            };
             service = pkgs.substituteAll {
               name = "robocadey.service";
               src = ./run/robocadey.service.in;
-              inherit preflight;
               robocadey = self.packages.${system}.robocadey;
             };
             gpt2-service = pkgs.substituteAll {

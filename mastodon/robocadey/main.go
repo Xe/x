@@ -109,7 +109,6 @@ func main() {
 				n := ev.Data.(madon.Notification)
 
 				if n.Type == "mention" {
-					time.Sleep(5 * time.Second)
 					ln.Log(ctx, ln.F{
 						"target": n.Account.Acct,
 					})
