@@ -6,9 +6,10 @@
     utils.url = "github:numtide/flake-utils";
     gomod2nix.url = "github:tweag/gomod2nix";
     portable-svc.url = "git+https://tulpa.dev/cadey/portable-svc.git?ref=main";
+    ckiee.url = "github:ckiee/nixpkgs?ref=gpt2simple-py-init";
   };
 
-  outputs = { self, nixpkgs, utils, gomod2nix, portable-svc }:
+  outputs = { self, nixpkgs, utils, gomod2nix, portable-svc, ckiee }:
     utils.lib.eachSystem [
       "x86_64-linux"
       "aarch64-linux"
@@ -27,6 +28,7 @@
             portable-svc.overlay
           ];
         };
+        ckieepkgs = import ckiee { inherit system; };
 
         everything = pkgs.buildGoApplication {
           pname = "xe-x-composite";
@@ -46,6 +48,8 @@
               cp $src/bin/$pname $out/bin/$path
             '';
           };
+
+        python = (ckieepkgs.python310.withPackages(ps: with ps; [ gpt-2-simple ]));
       in {
         packages = rec {
           default = everything;
@@ -69,6 +73,9 @@
           };
 
           robocadey = copyFile { pname = "robocadey"; };
+          robocadey-gpt2 = pkgs.writeShellScriptBin "robocadey-gpt2" ''
+            ${python}/bin/python3 ${./mastodon/robocadey/gpt2/main.py}
+          '';
           robocadey-psvc = let
             preflight = pkgs.writeShellApplication {
               name = "cadeybot-preflight";
@@ -81,11 +88,17 @@
               inherit preflight;
               robocadey = self.packages.${system}.robocadey;
             };
+            gpt2-service = pkgs.substituteAll {
+              name = "robocadey-gpt2.service";
+              src = ./run/robocadey-gpt2.service.in;
+              inherit python;
+              main = ./mastodon/robocadey/gpt2/main.py;
+            };
           in pkgs.portableService {
             inherit (self.packages.${system}.robocadey) version;
             name = "robocadey";
             description = "Robotic twitter shitposting bot";
-            units = [ service ];
+            units = [ service gpt2-service ./run/robocadey-gpt2.socket ];
             symlinks = [{
               object = "${pkgs.cacert}/etc/ssl";
               symlink = "/etc/ssl";
@@ -100,6 +113,7 @@
             gotools
             go-tools
             gomod2nix.defaultPackage.${system}
+            python
           ];
         };
       });

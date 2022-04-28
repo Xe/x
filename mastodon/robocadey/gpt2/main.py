@@ -39,4 +39,4 @@ while True:
         connection.close()
 
 server.close()
-os.remove("/xe/gpt2/checkpoint/server.sock")
+os.remove(sockpath)

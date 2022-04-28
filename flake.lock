@@ -1,5 +1,21 @@
 {
   "nodes": {
+    "ckiee": {
+      "locked": {
+        "lastModified": 1651110803,
+        "narHash": "sha256-je/Q14AwFYRbkQP9vC7Kl3lJOkCHBkq+hDDSXaeq9/M=",
+        "owner": "ckiee",
+        "repo": "nixpkgs",
+        "rev": "c052ad4d9c567930223b52f638d0e03b17d9d744",
+        "type": "github"
+      },
+      "original": {
+        "owner": "ckiee",
+        "ref": "gpt2simple-py-init",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
     "gomod2nix": {
       "inputs": {
         "nixpkgs": "nixpkgs",
@@ -86,6 +102,7 @@
     },
     "root": {
       "inputs": {
+        "ckiee": "ckiee",
         "gomod2nix": "gomod2nix",
         "nixpkgs": "nixpkgs_2",
         "portable-svc": "portable-svc",

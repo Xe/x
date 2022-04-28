@@ -1,0 +1,10 @@
+[Unit]
+Description=Robo-Cadey GPT2 sidecar
+
+[Service]
+ExecStart=@python@/bin/python3 @main@
+StateDirectory=xeserv.robocadey-gpt2
+CacheDirectory=xeserv.robocadey-gpt2
+
+[Install]
+WantedBy=multi-user.target
