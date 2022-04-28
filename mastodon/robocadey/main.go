@@ -73,50 +73,58 @@ func main() {
 		ln.FatalErr(ctx, err)
 	}
 
-	evChan := make(chan madon.StreamEvent, 10)
-	stop := make(chan bool)
-	done := make(chan bool)
 	t := time.Tick(4 * time.Hour)
 
-	err = c.StreamListener("user", "", evChan, stop, done)
-	if err != nil {
-		ln.FatalErr(ctx, err)
-	}
-
-	ln.Log(ctx, ln.F{
-		"action": "streaming.toots",
-	})
-
 	for {
-		select {
-		case _, ok := <-done:
-			if !ok {
-				ln.Fatal(ctx, ln.F{"action": "stream.dead"})
-			}
+		evChan := make(chan madon.StreamEvent, 10)
+		stop := make(chan bool)
+		done := make(chan bool)
 
-		case <-t:
-			if _, err := c.PostStatus(madon.PostStatusParams{
-				Text: getShitpost(ctx),
-			}); err != nil {
-				ln.FatalErr(ctx, err)
-			}
+		err = c.StreamListener("user", "", evChan, stop, done)
+		if err != nil {
+			ln.FatalErr(ctx, err)
+		}
 
-		case ev := <-evChan:
-			switch ev.Event {
-			case "error":
-				ln.Fatal(ctx, ln.F{"err": ev.Error, "action": "processing.event"})
-			case "notification":
-				n := ev.Data.(madon.Notification)
+		ln.Log(ctx, ln.F{
+			"action": "streaming.toots",
+		})
 
-				if n.Type == "mention" {
-					ln.Log(ctx, ln.F{
-						"target": n.Account.Acct,
-					})
-					if _, err := c.PostStatus(madon.PostStatusParams{
-						Text:      "@" + n.Account.Acct + " " + getShitpost(ctx),
-						InReplyTo: n.Status.ID,
-					}); err != nil {
-						ln.FatalErr(ctx, err)
+	outer:
+		for {
+			select {
+			case _, ok := <-done:
+				if !ok {
+					ln.Fatal(ctx, ln.F{"action": "stream.dead"})
+				}
+
+			case <-t:
+				if _, err := c.PostStatus(madon.PostStatusParams{
+					Text: getShitpost(ctx),
+				}); err != nil {
+				}
+
+			case ev := <-evChan:
+				switch ev.Event {
+				case "error":
+					ln.Log(ctx, ln.F{"err": ev.Error, "action": "processing.event"})
+					stop <- true
+					close(evChan)
+					close(stop)
+					close(done)
+					break outer
+				case "notification":
+					n := ev.Data.(madon.Notification)
+
+					if n.Type == "mention" {
+						ln.Log(ctx, ln.F{
+							"target": n.Account.Acct,
+						})
+						if _, err := c.PostStatus(madon.PostStatusParams{
+							Text:      "@" + n.Account.Acct + " " + getShitpost(ctx),
+							InReplyTo: n.Status.ID,
+						}); err != nil {
+							ln.FatalErr(ctx, err)
+						}
 					}
 				}
 			}
