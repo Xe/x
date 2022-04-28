@@ -26,6 +26,7 @@
             })
             gomod2nix.overlay
             portable-svc.overlay
+            (final: prev: self.packages.${system})
           ];
         };
         ckieepkgs = import ckiee { inherit system; };
