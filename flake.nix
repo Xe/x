@@ -159,7 +159,7 @@
               };
               systemd.sockets."robocadey-gpt2" = {
                 description = "RoboCadey GPT-2 activation socket";
-                partOf = "robocadey-gpt2.service";
+                partOf = [ "robocadey-gpt2.service" ];
                 listenStreams = [ "/run/robocadey-gpt2.sock" ];
               };
             };
