@@ -9,7 +9,7 @@
     ckiee.url = "github:ckiee/nixpkgs?ref=gpt2simple-py-init";
   };
 
-  outputs = { self, nixpkgs, utils, gomod2nix, portable-svc, ckiee }:
+  outputs = { self, nixpkgs, utils, gomod2nix, portable-svc, ckiee }@attrs:
     utils.lib.eachSystem [
       "x86_64-linux"
       "aarch64-linux"
@@ -50,7 +50,8 @@
             '';
           };
 
-        python = (ckieepkgs.python310.withPackages(ps: with ps; [ gpt-2-simple ]));
+        python =
+          (ckieepkgs.python310.withPackages (ps: with ps; [ gpt-2-simple ]));
       in {
         packages = rec {
           default = everything;
@@ -100,6 +101,65 @@
             }];
           };
         };
+
+        nixosModules.robocadey = { config, lib, pkgs, ... }:
+
+          with lib;
+          let
+            system = pkgs.system;
+            cfg = config.xeserv.services.robocadey;
+            selfpkgs = self.packages.${system};
+          in {
+            options.xeserv.services.robocadey = {
+              enable = mkEnableOption "Activates the printerfacts server";
+
+              pathToModel = mkOption {
+                type = types.str;
+                default = "/srv/models/robocadey_gpt2.raw";
+                description = "model squashfs volume location";
+              };
+            };
+
+            config = mkIf cfg.enable {
+              systemd.mounts."robocadey-gpt2-model" = {
+                type = "squashfs";
+                what = cfg.pathToModel;
+                where = "/var/lib/private/xeserv.robocadey-gpt2/checkpoint";
+                options = "ro,relatime,errors=continue";
+              };
+              systemd.services = {
+                "xeserv.robocadey" = {
+                  wantedBy = [ "multi-user.target" ];
+                  description = "RoboCadey";
+
+                  serviceConfig = {
+                    DynamicUser = "true";
+                    ExecStart = "${selfpkgs.robocadey}/bin/robocadey";
+                    WorkingDirectory = "/var/lib/private/xeserv.robocadey";
+                    StateDirectory = "xeserv.robocadey";
+                    CacheDirectory = "xeserv.robocadey";
+                  };
+                };
+                "xeserv.robocadey-gpt2" = {
+                  wantedBy = [ "multi-user.target" ];
+                  description = "RoboCadey GPT2 sidecar";
+
+                  serviceConfig = {
+                    DynamicUser = "true";
+                    ExecStart = "${selfpkgs.robocadey-gpt2}/bin/robocadey-gpt2";
+                    WorkingDirectory = "/var/lib/private/xeserv.robocadey-gpt2";
+                    StateDirectory = "xeserv.robocadey-gpt2";
+                    CacheDirectory = "xeserv.robocadey-gpt2";
+                  };
+                };
+              };
+              systemd.sockets."xeserv.robocadey-gpt2" = {
+                description = "RoboCadey GPT-2 activation socket";
+                partOf = "xeserv.robocadey-gpt2.service";
+                listenStreams = [ "/run/robocadey-gpt2.sock" ];
+              };
+            };
+          };
 
         devShells.default = pkgs.mkShell {
           buildInputs = with pkgs; [

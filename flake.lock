@@ -2,11 +2,11 @@
   "nodes": {
     "ckiee": {
       "locked": {
-        "lastModified": 1651110803,
-        "narHash": "sha256-je/Q14AwFYRbkQP9vC7Kl3lJOkCHBkq+hDDSXaeq9/M=",
+        "lastModified": 1651228769,
+        "narHash": "sha256-7aO7XxunWR5FUdwZBrNgXWt1xD6posMo7nLubIEbh50=",
         "owner": "ckiee",
         "repo": "nixpkgs",
-        "rev": "c052ad4d9c567930223b52f638d0e03b17d9d744",
+        "rev": "b123419b91b91afce08491861a6dd7069e2ba949",
         "type": "github"
       },
       "original": {
@@ -53,11 +53,11 @@
     },
     "nixpkgs_2": {
       "locked": {
-        "lastModified": 1650920067,
-        "narHash": "sha256-iV+7zkBZsHiy4epfcyoiW8lRXdjZXq6h8RfNcaua4Fc=",
+        "lastModified": 1651007983,
+        "narHash": "sha256-GNay7yDPtLcRcKCNHldug85AhAvBpTtPEJWSSDYBw8U=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "6a323903ad07de6680169bb0423c5cea9db41d82",
+        "rev": "e10da1c7f542515b609f8dfbcf788f3d85b14936",
         "type": "github"
       },
       "original": {
