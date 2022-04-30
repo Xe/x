@@ -103,7 +103,6 @@
         };
 
         nixosModules.robocadey = { config, lib, pkgs, ... }:
-
           with lib;
           let
             system = pkgs.system;
@@ -121,12 +120,12 @@
             };
 
             config = mkIf cfg.enable {
-              systemd.mounts."robocadey-gpt2-model" = {
+              systemd.mounts = [{
                 type = "squashfs";
                 what = cfg.pathToModel;
                 where = "/var/lib/private/xeserv.robocadey-gpt2/checkpoint";
                 options = "ro,relatime,errors=continue";
-              };
+              }];
               systemd.services = {
                 "xeserv.robocadey" = {
                   wantedBy = [ "multi-user.target" ];
