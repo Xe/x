@@ -11,7 +11,7 @@
       url = "github:tweag/gomod2nix";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.utils.follows = "utils";
-      };
+    };
   };
 
   outputs = { self, nixpkgs, utils, gomod2nix, portable-svc, ckiee }@attrs:
@@ -135,6 +135,7 @@
                 "robocadey" = {
                   wantedBy = [ "multi-user.target" ];
                   description = "RoboCadey";
+                  after = [ "robocadey-gpt2.socket" ];
 
                   serviceConfig = {
                     Restart = "always";
