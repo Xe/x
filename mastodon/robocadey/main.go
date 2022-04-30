@@ -66,6 +66,7 @@ func main() {
 	_ = c
 
 	rand.Seed(time.Now().UnixMicro())
+	time.Sleep(5 * time.Second)
 
 	if _, err := c.PostStatus(madon.PostStatusParams{
 		Text: getShitpost(ctx),
