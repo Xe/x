@@ -137,6 +137,7 @@
                   description = "RoboCadey";
 
                   serviceConfig = {
+                    Restart = "always";
                     DynamicUser = "true";
                     ExecStart = "${selfpkgs.robocadey}/bin/robocadey";
                     WorkingDirectory = "/var/lib/private/xeserv.robocadey";
@@ -149,6 +150,7 @@
                   description = "RoboCadey GPT2 sidecar";
 
                   serviceConfig = {
+                    Restart = "always";
                     DynamicUser = "true";
                     ExecStart = "${selfpkgs.robocadey-gpt2}/bin/robocadey-gpt2";
                     WorkingDirectory = "/var/lib/private/xeserv.robocadey-gpt2";
