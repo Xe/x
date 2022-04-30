@@ -108,20 +108,20 @@ func main() {
 				case "error":
 					ln.Log(ctx, ln.F{"err": ev.Error, "action": "processing.event"})
 					stop <- true
-					close(evChan)
-					close(stop)
-					close(done)
 					break outer
 				case "notification":
 					n := ev.Data.(madon.Notification)
 
 					if n.Type == "mention" {
 						ln.Log(ctx, ln.F{
-							"target": n.Account.Acct,
+							"target":  n.Account.Acct,
+							"link":    n.Status.URL,
+							"privacy": n.Status.Visibility,
 						})
 						if _, err := c.PostStatus(madon.PostStatusParams{
-							Text:      "@" + n.Account.Acct + " " + getShitpost(ctx),
-							InReplyTo: n.Status.ID,
+							Text:       "@" + n.Account.Acct + " " + getShitpost(ctx),
+							InReplyTo:  n.Status.ID,
+							Visibility: n.Status.Visibility,
 						}); err != nil {
 							ln.FatalErr(ctx, err)
 						}
