@@ -4,9 +4,14 @@
   inputs = {
     nixpkgs.url = "nixpkgs/nixos-unstable";
     utils.url = "github:numtide/flake-utils";
-    gomod2nix.url = "github:tweag/gomod2nix";
     portable-svc.url = "git+https://tulpa.dev/cadey/portable-svc.git?ref=main";
     ckiee.url = "github:ckiee/nixpkgs?ref=gpt2simple-py-init";
+
+    gomod2nix = {
+      url = "github:tweag/gomod2nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.utils.follows = "utils";
+      };
   };
 
   outputs = { self, nixpkgs, utils, gomod2nix, portable-svc, ckiee }@attrs:
@@ -127,7 +132,7 @@
                 options = "ro,relatime,errors=continue";
               }];
               systemd.services = {
-                "xeserv.robocadey" = {
+                "robocadey" = {
                   wantedBy = [ "multi-user.target" ];
                   description = "RoboCadey";
 
@@ -139,7 +144,7 @@
                     CacheDirectory = "xeserv.robocadey";
                   };
                 };
-                "xeserv.robocadey-gpt2" = {
+                "robocadey-gpt2" = {
                   wantedBy = [ "multi-user.target" ];
                   description = "RoboCadey GPT2 sidecar";
 
@@ -152,9 +157,9 @@
                   };
                 };
               };
-              systemd.sockets."xeserv.robocadey-gpt2" = {
+              systemd.sockets."robocadey-gpt2" = {
                 description = "RoboCadey GPT-2 activation socket";
-                partOf = "xeserv.robocadey-gpt2.service";
+                partOf = "robocadey-gpt2.service";
                 listenStreams = [ "/run/robocadey-gpt2.sock" ];
               };
             };
