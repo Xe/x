@@ -9,8 +9,8 @@ github.com/aclements/go-moremath v0.0.0-20190506201756-286cc0be6f75 h1:OMm3VB/wr
 github.com/aclements/go-moremath v0.0.0-20190506201756-286cc0be6f75/go.mod h1:idZL3yvz4kzx1dsBOAC+oYv6L92P1oFEhUXUB1A/lwQ=
 github.com/birkelund/boltdbcache v1.0.0 h1:9DlhGw3Gp0DenvEQ7qNVYvz0b4Oi/zAJin+cR0ubpOA=
 github.com/birkelund/boltdbcache v1.0.0/go.mod h1:WgJWF40tV+4K0Q7MxAPbWEIkgs4AVUB7EyKVds0EgfQ=
-github.com/bwmarrin/discordgo v0.25.0 h1:NXhdfHRNxtwso6FPdzW2i3uBvvU7UIQTghmV2T4nqAs=
-github.com/bwmarrin/discordgo v0.25.0/go.mod h1:NJZpH+1AfhIcyQsPeuBKsUtYrRnjkyu0kIVMCHkZtRY=
+github.com/bwmarrin/discordgo v0.26.0 h1:/AdFmxHXSHInYAZ7K0O3VEIXlVjGpztk/nuCr9o+JCs=
+github.com/bwmarrin/discordgo v0.26.0/go.mod h1:NJZpH+1AfhIcyQsPeuBKsUtYrRnjkyu0kIVMCHkZtRY=
 github.com/codahale/hdrhistogram v0.0.0-20161010025455-3a0bb77429bd h1:qMd81Ts1T2OTKmB4acZcyKaMtRnY5Y44NuXGX2GFJ1w=
 github.com/codahale/hdrhistogram v0.0.0-20161010025455-3a0bb77429bd/go.mod h1:sE/e/2PUdi/liOCUjSTXgM1o87ZssimdTWN964YiIeI=
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
