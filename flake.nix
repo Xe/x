@@ -26,10 +26,10 @@
           inherit system;
           overlays = [
             (final: prev: {
-              go = prev.go_1_18;
+              go = prev.go_1_19;
               buildGoModule = prev.buildGo118Module;
             })
-            gomod2nix.overlay
+            gomod2nix.overlays.default
             portable-svc.overlay
             (final: prev: self.packages.${system})
           ];
@@ -174,7 +174,7 @@
             gopls
             gotools
             go-tools
-            gomod2nix.defaultPackage.${system}
+            gomod2nix.packages.${system}.default
             python
           ];
         };

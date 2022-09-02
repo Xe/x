@@ -16,10 +16,9 @@ import (
 	"within.website/ln/opname"
 	"within.website/x/internal/flagenv"
 	"within.website/x/internal/manpage"
-	"within.website/x/web/useragent"
 
 	// Debug routes
-	"net/http"
+	_ "expvar"
 	_ "net/http/pprof"
 
 	// Older projects use .env files, shim in compatibility
@@ -80,10 +79,6 @@ func HandleStartup() {
 	if *manpageGen {
 		manpage.Spew()
 	}
-}
-
-func init() {
-	http.DefaultTransport = useragent.Transport("within.website-x", "https://within.website/.x.botinfo", http.DefaultTransport)
 }
 
 func HandleCompletion(args complete.Predictor, subcommands complete.Commands) {
