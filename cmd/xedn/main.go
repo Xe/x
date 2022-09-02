@@ -5,21 +5,17 @@ import (
 	"bytes"
 	"context"
 	"encoding/gob"
-	"errors"
 	"flag"
 	"fmt"
 	"io"
 	"log"
-	"net"
 	"net/http"
-	"net/netip"
-	"net/url"
 	"os"
-	"strings"
 
 	"github.com/golang/groupcache"
 	"github.com/sebest/xff"
 	"tailscale.com/tsnet"
+	"tailscale.com/tsweb"
 	"within.website/ln"
 	"within.website/ln/ex"
 	"within.website/ln/opname"
@@ -75,60 +71,6 @@ var Group = groupcache.NewGroup("b2-bucket", cacheSize, groupcache.GetterFunc(
 	},
 ))
 
-func findLocalPeer(peers []string) (string, error) {
-	var addrs []net.Addr
-	ifaces, err := net.Interfaces()
-	if err != nil {
-		return "", err
-	}
-
-	for _, iface := range ifaces {
-		ifaceAddrs, err := iface.Addrs()
-		if err != nil {
-			return "", err
-		}
-
-		addrs = append(addrs, ifaceAddrs...)
-	}
-
-	for _, addr := range addrs {
-		prefix, err := netip.ParsePrefix(addr.String())
-		if err != nil {
-			return "", err
-		}
-
-		for _, peer := range peers {
-			ln.Log(context.Background(), ln.F{"peer": peer, "addr": prefix.Addr().String()})
-			if strings.Contains(peer, prefix.Addr().String()) {
-				return peer, nil
-			}
-		}
-	}
-
-	return "", errors.New("can't find local peer somehow")
-}
-
-func discoverPeers() ([]string, error) {
-	ips, err := net.LookupIP("xedn.internal")
-	if err != nil {
-return nil, err
-	}
-
-	var result []string
-
-	for _, ip := range ips {
-		nip, _ := netip.AddrFromSlice(ip)
-		ipp := netip.AddrPortFrom(nip, 8081)
-		u, err := url.Parse("http://" + ipp.String())
-		if err != nil {
-			return nil, err
-		}
-		result = append(result, u.String())
-	}
-
-	return result, nil
-}
-
 func main() {
 	internal.HandleStartup()
 	ctx := opname.With(context.Background(), "startup")
@@ -144,6 +86,8 @@ func main() {
 		if err != nil {
 			ln.FatalErr(ctx, err, ln.Action("tsnet listening"))
 		}
+
+		http.DefaultServeMux.HandleFunc("/debug/varz", tsweb.VarzHandler)
 
 		defer srv.Close()
 		defer lis.Close()
