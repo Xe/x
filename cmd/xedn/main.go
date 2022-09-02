@@ -5,12 +5,14 @@ import (
 	"bytes"
 	"context"
 	"encoding/gob"
+	"expvar"
 	"flag"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/golang/groupcache"
 	"github.com/sebest/xff"
@@ -71,9 +73,30 @@ var Group = groupcache.NewGroup("b2-bucket", cacheSize, groupcache.GetterFunc(
 	},
 ))
 
+var (
+	cacheGets = expvar.NewInt("cache_gets")
+	cacheHits = expvar.NewInt("cache_hits")
+	cacheErrors = expvar.NewInt("cache_errors")
+	cacheLoads = expvar.NewInt("cache_loads")
+)
+
+func refreshMetrics () {
+	t := time.NewTicker(10 * time.Second)
+	defer t.Stop()
+
+	for range t.C {
+		cacheGets.Set(Group.Stats.Gets.Get())
+		cacheHits.Set(Group.Stats.CacheHits.Get())
+		cacheErrors.Set(int64(Group.Stats.LocalLoadErrs))
+		cacheLoads.Set(int64(Group.Stats.LocalLoads))
+	}
+}
+
 func main() {
 	internal.HandleStartup()
 	ctx := opname.With(context.Background(), "startup")
+
+	go refreshMetrics()
 
 	go func () {
 		srv := &tsnet.Server{
@@ -100,6 +123,7 @@ func main() {
 	}
 
 	mux := http.NewServeMux()
+	mux.HandleFunc("/.within/metrics", tsweb.VarzHandler)
 	mux.HandleFunc("/file/christine-static/", func(w http.ResponseWriter, r *http.Request) {
 		var b []byte
 		err := Group.Get(nil, r.URL.Path, groupcache.AllocatingByteSliceSink(&b))
