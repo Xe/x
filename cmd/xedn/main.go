@@ -5,11 +5,15 @@ import (
 	"bytes"
 	"context"
 	"encoding/gob"
+	"errors"
 	"flag"
 	"fmt"
 	"io"
 	"log"
+	"net"
 	"net/http"
+	"net/netip"
+	"net/url"
 	"os"
 	"strings"
 
@@ -26,7 +30,6 @@ import (
 var (
 	b2Backend = flag.String("b2-backend", "https://f001.backblazeb2.com", "Backblaze B2 base URL")
 	addr      = flag.String("addr", ":8080", "server address")
-	peers     = flag.String("peers", "http://localhost:8080", "server pool list")
 )
 
 const cacheSize = 128 * 1024 * 1024 // 128 mebibytes
@@ -71,6 +74,60 @@ var Group = groupcache.NewGroup("b2-bucket", cacheSize, groupcache.GetterFunc(
 		return nil
 	},
 ))
+
+func findLocalPeer(peers []string) (string, error) {
+	var addrs []net.Addr
+	ifaces, err := net.Interfaces()
+	if err != nil {
+		return "", err
+	}
+
+	for _, iface := range ifaces {
+		ifaceAddrs, err := iface.Addrs()
+		if err != nil {
+			return "", err
+		}
+
+		addrs = append(addrs, ifaceAddrs...)
+	}
+
+	for _, addr := range addrs {
+		prefix, err := netip.ParsePrefix(addr.String())
+		if err != nil {
+			return "", err
+		}
+
+		for _, peer := range peers {
+			ln.Log(context.Background(), ln.F{"peer": peer, "addr": prefix.Addr().String()})
+			if strings.Contains(peer, prefix.Addr().String()) {
+				return peer, nil
+			}
+		}
+	}
+
+	return "", errors.New("can't find local peer somehow")
+}
+
+func discoverPeers() ([]string, error) {
+	ips, err := net.LookupIP("xedn.internal")
+	if err != nil {
+return nil, err
+	}
+
+	var result []string
+
+	for _, ip := range ips {
+		nip, _ := netip.AddrFromSlice(ip)
+		ipp := netip.AddrPortFrom(nip, 8081)
+		u, err := url.Parse("http://" + ipp.String())
+		if err != nil {
+			return nil, err
+		}
+		result = append(result, u.String())
+	}
+
+	return result, nil
+}
 
 func main() {
 	internal.HandleStartup()
@@ -123,9 +180,7 @@ func main() {
 		w.WriteHeader(http.StatusOK)
 		w.Write(result.Body)
 	})
-	p := strings.Split(*peers, ",")
-	pool := groupcache.NewHTTPPool(p[0])
-	pool.Set(p...)
+
 	ln.Log(context.Background(), ln.F{"addr": *addr})
 	http.ListenAndServe(*addr, xffMW.Handler(ex.HTTPLog(mux)))
 }
