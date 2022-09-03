@@ -12,6 +12,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"sync"
 	"time"
 
 	"github.com/golang/groupcache"
@@ -51,6 +52,16 @@ var Group = groupcache.NewGroup("b2-bucket", cacheSize, groupcache.GetterFunc(
 			return web.NewError(http.StatusOK, resp)
 		}
 
+		etag := fmt.Sprintf("%q", resp.Header.Get("x-bz-content-sha1"))
+		resp.Header.Set("ETag", etag)
+		etagLock.Lock()
+		etags[key] = etag
+		etagLock.Unlock()
+
+		// cache control headers
+		resp.Header.Set("Cache-Control", "max-age:604800")
+		resp.Header.Set("Expires", time.Now().Add(604800 * time.Second).Format(http.TimeFormat))
+
 		body, err := io.ReadAll(resp.Body)
 		if err != nil {
 			return fmt.Errorf("can't read from b2: %v", err)
@@ -78,7 +89,16 @@ var (
 	cacheHits = expvar.NewInt("cache_hits")
 	cacheErrors = expvar.NewInt("cache_errors")
 	cacheLoads = expvar.NewInt("cache_loads")
+
+	etagMatches = expvar.NewInt("etag_matches")
+
+	etags map[string]string
+	etagLock sync.RWMutex
 )
+
+func init() {
+	etags = map[string]string{}
+}
 
 func refreshMetrics () {
 	t := time.NewTicker(10 * time.Second)
@@ -125,6 +145,16 @@ func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/.within/metrics", tsweb.VarzHandler)
 	mux.HandleFunc("/file/christine-static/", func(w http.ResponseWriter, r *http.Request) {
+		etagLock.RLock()
+		etag, ok := etags[r.URL.Path]
+		etagLock.RUnlock()
+
+		if r.Header.Get("If-None-Match") == etag && ok {
+			etagMatches.Add(1)
+			w.WriteHeader(http.StatusNotModified)
+			return
+		}
+
 		var b []byte
 		err := Group.Get(nil, r.URL.Path, groupcache.AllocatingByteSliceSink(&b))
 		if err != nil {
