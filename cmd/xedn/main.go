@@ -4,6 +4,7 @@ package main
 import (
 	"bytes"
 	"context"
+	_ "embed"
 	"encoding/gob"
 	"expvar"
 	"flag"
@@ -12,6 +13,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"sync"
 	"time"
 
@@ -29,6 +31,9 @@ import (
 var (
 	b2Backend = flag.String("b2-backend", "https://f001.backblazeb2.com", "Backblaze B2 base URL")
 	addr      = flag.String("addr", ":8080", "server address")
+
+	//go:embed index.html
+	indexHTML []byte
 )
 
 const cacheSize = 128 * 1024 * 1024 // 128 mebibytes
@@ -41,6 +46,8 @@ type CacheData struct {
 var Group = groupcache.NewGroup("b2-bucket", cacheSize, groupcache.GetterFunc(
 	func(ctx groupcache.Context, key string, dest groupcache.Sink) error {
 		ln.Log(context.Background(), ln.F{"key": key})
+
+		fileHits.Add(key, 1)
 
 		resp, err := http.Get(*b2Backend + key)
 		if err != nil {
@@ -91,6 +98,9 @@ var (
 	cacheLoads = expvar.NewInt("cache_loads")
 
 	etagMatches = expvar.NewInt("etag_matches")
+
+	fileHits = expvar.NewMap("file_hits")
+	referers = expvar.NewMap("referers")
 
 	etags map[string]string
 	etagLock sync.RWMutex
@@ -144,6 +154,18 @@ func main() {
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/.within/metrics", tsweb.VarzHandler)
+
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/" {
+			http.NotFound(w, r)
+			return
+		}
+
+		w.Header().Set("Content-Length", strconv.Itoa(len(indexHTML)))
+		w.WriteHeader(http.StatusOK)
+		w.Write(indexHTML)
+	})
+
 	mux.HandleFunc("/file/christine-static/", func(w http.ResponseWriter, r *http.Request) {
 		etagLock.RLock()
 		etag, ok := etags[r.URL.Path]
@@ -154,6 +176,8 @@ func main() {
 			w.WriteHeader(http.StatusNotModified)
 			return
 		}
+
+		referers.Add(r.Header.Get("Referer"), 1)
 
 		var b []byte
 		err := Group.Get(nil, r.URL.Path, groupcache.AllocatingByteSliceSink(&b))
