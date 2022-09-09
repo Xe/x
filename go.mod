@@ -5,6 +5,7 @@ require (
 	github.com/Kagami/go-avif v0.1.0
 	github.com/McKael/madon/v2 v2.0.0-20180929094633-c679abc985d6
 	github.com/Yawning/bulb v0.0.0-20170405033506-85d80d893c3d
+	github.com/aws/aws-sdk-go v1.44.93
 	github.com/birkelund/boltdbcache v1.0.0
 	github.com/bwmarrin/discordgo v0.25.0
 	github.com/chai2010/webp v1.1.1
@@ -44,9 +45,8 @@ require (
 	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4
 	golang.org/x/net v0.0.0-20220607020251-c690dde0001d
 	golang.org/x/oauth2 v0.0.0-20220411215720-9780585627b5
-	gopkg.in/kothar/go-backblaze.v0 v0.0.0-20210124194846-35409b867216
 	gopkg.in/tucnak/telebot.v2 v2.0.0-20190415090633-8c1c512262f2
-	tailscale.com v1.30.0
+	tailscale.com v1.30.1
 	tulpa.dev/cadey/jvozba v0.0.0-20200326200349-f0ebe310be06
 	within.website/confyg v1.1.0
 	within.website/johaus v1.1.0
@@ -58,7 +58,6 @@ require (
 	github.com/aclements/go-moremath v0.0.0-20190506201756-286cc0be6f75 // indirect
 	github.com/akutz/memconn v0.1.0 // indirect
 	github.com/alexbrainman/sspi v0.0.0-20210105120005-909beea2cc74 // indirect
-	github.com/aws/aws-sdk-go v1.44.93 // indirect
 	github.com/aws/aws-sdk-go-v2 v1.16.14 // indirect
 	github.com/aws/aws-sdk-go-v2/config v1.11.0 // indirect
 	github.com/aws/aws-sdk-go-v2/credentials v1.6.4 // indirect
@@ -83,18 +82,15 @@ require (
 	github.com/go-ole/go-ole v1.2.6 // indirect
 	github.com/godbus/dbus/v5 v5.0.6 // indirect
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
-	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/btree v1.0.1 // indirect
 	github.com/google/go-cmp v0.5.8 // indirect
 	github.com/google/go-querystring v1.0.0 // indirect
-	github.com/google/readahead v0.0.0-20161222183148-eaceba169032 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/hdevalence/ed25519consensus v0.0.0-20220222234857-c00d1f31bab3 // indirect
-	github.com/ifo/b2 v0.0.0-20160508130746-6ff097c9b020 // indirect
 	github.com/insomniacslk/dhcp v0.0.0-20211209223715-7d93572ebe8e // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/josharian/native v1.0.0 // indirect
@@ -113,7 +109,6 @@ require (
 	github.com/mitchellh/go-ps v1.0.0 // indirect
 	github.com/mndrix/ps v0.0.0-20170330174427-18e65badd6ab // indirect
 	github.com/olekukonko/tablewriter v0.0.5 // indirect
-	github.com/pquerna/ffjson v0.0.0-20190930134022-aa0246cd15f7 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/rogpeppe/go-internal v1.8.1-0.20211023094830-115ce09fd6b4 // indirect
 	github.com/sendgrid/rest v2.4.1+incompatible // indirect
