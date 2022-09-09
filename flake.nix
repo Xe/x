@@ -176,6 +176,9 @@
             go-tools
             gomod2nix.packages.${system}.default
             python
+
+            pkg-config
+            libaom
           ];
         };
       });
