@@ -11,13 +11,13 @@ import (
 	"path/filepath"
 	"runtime"
 
-	"github.com/Kagami/go-avif"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/chai2010/webp"
 	"github.com/disintegration/imaging"
+	"tulpa.dev/cadey/avif"
 )
 
 var (
@@ -124,7 +124,6 @@ func processImage(fname, tempDir string) error {
 	}
 
 	if err := doAVIF(src, filepath.Join(tempDir, fnameBase+".avif")); err != nil {
-		log.Fatal(err)
 		return err
 	}
 
@@ -194,14 +193,22 @@ func main() {
 		defer fin.Close()
 
 		_, err = s3c.PutObject(&s3.PutObjectInput{
-			Body:   fin,
-			Bucket: b2Bucket,
-			Key:    aws.String(flag.Arg(1) + "/" + finfo.Name()),
+			Body:        fin,
+			Bucket:      b2Bucket,
+			Key:         aws.String(flag.Arg(1) + "/" + finfo.Name()),
+			ContentType: aws.String(mimeTypes[filepath.Ext(finfo.Name())]),
 		})
 		if err != nil {
 			log.Fatal(err)
 		}
 	}
+}
+
+var mimeTypes = map[string]string{
+	".avif": "image/avif",
+	".webp": "image/webp",
+	".jpg":  "image/jpeg",
+	".png":  "image/png",
 }
 
 func mkS3Client() *s3.S3 {
