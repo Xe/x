@@ -17,7 +17,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/chai2010/webp"
 	"github.com/disintegration/imaging"
-	"tulpa.dev/cadey/avif"
+	"within.website/x/internal/avif"
 )
 
 var (
