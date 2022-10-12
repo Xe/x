@@ -18,6 +18,7 @@ import (
 	"time"
 
 	"github.com/golang/groupcache"
+	"github.com/rs/cors"
 	"github.com/sebest/xff"
 	"tailscale.com/tsnet"
 	"tailscale.com/tsweb"
@@ -36,7 +37,7 @@ var (
 	indexHTML []byte
 )
 
-const cacheSize = 128 * 1024 * 1024 // 128 mebibytes
+const cacheSize = 386 * 1024 * 1024 // 386 mebibytes
 
 type CacheData struct {
 	Headers http.Header
@@ -67,7 +68,7 @@ var Group = groupcache.NewGroup("b2-bucket", cacheSize, groupcache.GetterFunc(
 
 		// cache control headers
 		resp.Header.Set("Cache-Control", "max-age:604800")
-		resp.Header.Set("Expires", time.Now().Add(604800 * time.Second).Format(http.TimeFormat))
+		resp.Header.Set("Expires", time.Now().Add(604800*time.Second).Format(http.TimeFormat))
 
 		body, err := io.ReadAll(resp.Body)
 		if err != nil {
@@ -92,17 +93,17 @@ var Group = groupcache.NewGroup("b2-bucket", cacheSize, groupcache.GetterFunc(
 ))
 
 var (
-	cacheGets = expvar.NewInt("cache_gets")
-	cacheHits = expvar.NewInt("cache_hits")
+	cacheGets   = expvar.NewInt("cache_gets")
+	cacheHits   = expvar.NewInt("cache_hits")
 	cacheErrors = expvar.NewInt("cache_errors")
-	cacheLoads = expvar.NewInt("cache_loads")
+	cacheLoads  = expvar.NewInt("cache_loads")
 
 	etagMatches = expvar.NewInt("etag_matches")
 
 	fileHits = expvar.NewMap("file_hits")
 	referers = expvar.NewMap("referers")
 
-	etags map[string]string
+	etags    map[string]string
 	etagLock sync.RWMutex
 )
 
@@ -110,7 +111,7 @@ func init() {
 	etags = map[string]string{}
 }
 
-func refreshMetrics () {
+func refreshMetrics() {
 	t := time.NewTicker(10 * time.Second)
 	defer t.Stop()
 
@@ -128,11 +129,11 @@ func main() {
 
 	go refreshMetrics()
 
-	go func () {
+	go func() {
 		srv := &tsnet.Server{
 			Hostname: "xedn-" + os.Getenv("FLY_REGION"),
-			Logf: log.New(io.Discard, "", 0).Printf,
-			AuthKey:   os.Getenv("TS_AUTHKEY"),
+			Logf:     log.New(io.Discard, "", 0).Printf,
+			AuthKey:  os.Getenv("TS_AUTHKEY"),
 		}
 
 		lis, err := srv.Listen("tcp", ":80")
@@ -145,7 +146,7 @@ func main() {
 		defer srv.Close()
 		defer lis.Close()
 		ln.FatalErr(opname.With(ctx, "metrics-tsnet"), http.Serve(lis, ex.HTTPLog(http.DefaultServeMux)))
-	} ()
+	}()
 
 	xffMW, err := xff.Default()
 	if err != nil {
@@ -204,5 +205,5 @@ func main() {
 	})
 
 	ln.Log(context.Background(), ln.F{"addr": *addr})
-	http.ListenAndServe(*addr, xffMW.Handler(ex.HTTPLog(mux)))
+	http.ListenAndServe(*addr, cors.Default().Handler(xffMW.Handler(ex.HTTPLog(mux))))
 }

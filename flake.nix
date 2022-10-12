@@ -179,6 +179,7 @@
 
             pkg-config
             libaom
+            libavif
           ];
         };
       });
