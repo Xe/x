@@ -31,6 +31,7 @@ require (
 	github.com/phayes/freeport v0.0.0-20180830031419-95f893ade6f2
 	github.com/pkg/errors v0.9.1
 	github.com/posener/complete v1.2.3
+	github.com/rs/cors v1.8.2
 	github.com/sebest/xff v0.0.0-20210106013422-671bd2870b3a
 	github.com/streamrail/concurrent-map v0.0.0-20160823150647-8bf1e9bacbf6
 	github.com/sycamoreone/orc v0.0.0-20150204213357-1627eaec2699
@@ -42,10 +43,10 @@ require (
 	golang.org/x/crypto v0.0.0-20220427172511-eb4f295cb31f
 	golang.org/x/exp/errors v0.0.0-20190510132918-efd6b22b2522
 	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4
-	golang.org/x/net v0.0.0-20220607020251-c690dde0001d
+	golang.org/x/net v0.0.0-20221002022538-bcab6841153b
 	golang.org/x/oauth2 v0.0.0-20220411215720-9780585627b5
 	gopkg.in/tucnak/telebot.v2 v2.0.0-20190415090633-8c1c512262f2
-	tailscale.com v1.30.0
+	tailscale.com v1.32.0
 	tulpa.dev/cadey/jvozba v0.0.0-20200326200349-f0ebe310be06
 	within.website/confyg v1.1.0
 	within.website/johaus v1.1.0
@@ -110,11 +111,10 @@ require (
 	github.com/olekukonko/tablewriter v0.0.5 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/rogpeppe/go-internal v1.8.1-0.20211023094830-115ce09fd6b4 // indirect
-	github.com/rs/cors v1.8.2 // indirect
 	github.com/sendgrid/rest v2.4.1+incompatible // indirect
 	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect
 	github.com/tailscale/certstore v0.1.1-0.20220316223106-78d6e1c49d8d // indirect
-	github.com/tailscale/golang-x-crypto v0.0.0-20220428210705-0b941c09a5e1 // indirect
+	github.com/tailscale/golang-x-crypto v0.0.0-20221009170451-62f465106986 // indirect
 	github.com/tailscale/goupnp v1.0.1-0.20210804011211-c64d0f06ea05 // indirect
 	github.com/tailscale/netlink v1.1.1-0.20211101221916-cabfb018fe85 // indirect
 	github.com/tcnksm/go-httpstat v0.2.0 // indirect
@@ -133,17 +133,17 @@ require (
 	golang.org/x/exp v0.0.0-20220722155223-a9213eeb770e // indirect
 	golang.org/x/image v0.0.0-20211028202545-6944b10bf410 // indirect
 	golang.org/x/sync v0.0.0-20220601150217-0de741cfad7f // indirect
-	golang.org/x/sys v0.0.0-20220715151400-c0bba94af5f8 // indirect
+	golang.org/x/sys v0.0.0-20220728004956-3c1f35247d10 // indirect
 	golang.org/x/term v0.0.0-20210927222741-03fcf44c2211 // indirect
-	golang.org/x/text v0.3.7 // indirect
+	golang.org/x/text v0.3.8-0.20211105212822-18b340fc7af2 // indirect
 	golang.org/x/time v0.0.0-20211116232009-f0f3c7e86c11 // indirect
 	golang.org/x/tools v0.1.11 // indirect
 	golang.zx2c4.com/wintun v0.0.0-20211104114900-415007cec224 // indirect
-	golang.zx2c4.com/wireguard v0.0.0-20220703234212-c31a7b1ab478 // indirect
-	golang.zx2c4.com/wireguard/windows v0.4.10 // indirect
+	golang.zx2c4.com/wireguard v0.0.0-20220904105730-b51010ba13f0 // indirect
+	golang.zx2c4.com/wireguard/windows v0.5.3 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/protobuf v1.28.0 // indirect
-	gvisor.dev/gvisor v0.0.0-20220801230058-850e42eb4444 // indirect
+	gvisor.dev/gvisor v0.0.0-20220817001344-846276b3dbc5 // indirect
 	nhooyr.io/websocket v1.8.7 // indirect
 )
 
