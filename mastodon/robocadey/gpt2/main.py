@@ -27,6 +27,7 @@ while True:
                 top_p=0.9,
                 )[0].split("\n")[1:][:-1]
     print("shitpost generated")
+    print(json.dumps(result))
     connection.send(json.dumps(result).encode())
     connection.close()
 
