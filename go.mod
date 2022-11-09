@@ -25,7 +25,7 @@ require (
 	github.com/miekg/dns v1.1.50
 	github.com/mmikulicic/stringlist v1.0.0
 	github.com/mndrix/golog v0.0.0-20170330170653-a28e2a269775
-	github.com/otiai10/copy v1.7.0
+	github.com/otiai10/copy v1.9.0
 	github.com/pborman/uuid v1.2.1
 	github.com/peterh/liner v1.2.2
 	github.com/phayes/freeport v0.0.0-20180830031419-95f893ade6f2
