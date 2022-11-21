@@ -1,5 +1,7 @@
 module within.website/x
 
+go 1.19
+
 require (
 	cirello.io/goherokuname v0.0.0-20190914093443-b436bae8c2c5
 	github.com/McKael/madon/v2 v2.0.0-20180929094633-c679abc985d6
@@ -146,7 +148,3 @@ require (
 	gvisor.dev/gvisor v0.0.0-20220817001344-846276b3dbc5 // indirect
 	nhooyr.io/websocket v1.8.7 // indirect
 )
-
-go 1.18
-
-replace github.com/McKael/madon/v2 => /home/cadey/gohack/github.com/McKael/madon/v2
