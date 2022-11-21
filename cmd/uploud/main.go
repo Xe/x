@@ -17,11 +17,14 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/chai2010/webp"
 	"github.com/disintegration/imaging"
+	"within.website/x/internal"
 	"within.website/x/internal/avif"
 )
 
 var (
-	b2Bucket = flag.String("b2-bucket", "christine-static", "Backblaze B2 bucket to dump things to")
+	b2Bucket    = flag.String("b2-bucket", "christine-static", "Backblaze B2 bucket to dump things to")
+	b2KeyID     = flag.String("b2-key-id", "", "Backblaze B2 application key ID")
+	b2KeySecret = flag.String("b2-application-key", "", "Backblaze B2 application secret")
 
 	avifQuality      = flag.Int("avif-quality", 24, "AVIF quality (higher is worse quality)")
 	avifEncoderSpeed = flag.Int("avif-encoder-speed", 0, "AVIF encoder speed (higher is faster)")
@@ -143,7 +146,7 @@ func processImage(fname, tempDir string) error {
 }
 
 func main() {
-	flag.Parse()
+	internal.HandleStartup()
 
 	if flag.NArg() != 2 {
 		log.Fatalf("usage: %s <filename/folder> <b2 path>", os.Args[0])
@@ -213,7 +216,7 @@ var mimeTypes = map[string]string{
 
 func mkS3Client() *s3.S3 {
 	s3Config := &aws.Config{
-		Credentials:      credentials.NewStaticCredentials(os.Getenv("B2_KEY_ID"), os.Getenv("B2_APPLICATION_KEY"), ""),
+		Credentials:      credentials.NewStaticCredentials(*b2KeyID, *b2KeySecret, ""),
 		Endpoint:         aws.String("https://s3.us-west-001.backblazeb2.com"),
 		Region:           aws.String("us-west-001"),
 		S3ForcePathStyle: aws.Bool(true),
