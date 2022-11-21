@@ -15,6 +15,10 @@ processes = []
   allowed_public_ports = []
   auto_rollback = true
 
+[mounts]
+  source="xedn_cache"
+  destination="/data"
+
 [[services]]
   http_checks = []
   internal_port = 8080

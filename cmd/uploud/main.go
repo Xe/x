@@ -23,12 +23,12 @@ import (
 var (
 	b2Bucket = flag.String("b2-bucket", "christine-static", "Backblaze B2 bucket to dump things to")
 
-	avifQuality      = flag.Int("avif-quality", 48, "AVIF quality (higher is worse quality)")
+	avifQuality      = flag.Int("avif-quality", 24, "AVIF quality (higher is worse quality)")
 	avifEncoderSpeed = flag.Int("avif-encoder-speed", 0, "AVIF encoder speed (higher is faster)")
 
 	jpegQuality = flag.Int("jpeg-quality", 85, "JPEG quality (lower means lower file size)")
 
-	webpQuality = flag.Int("webp-quality", 75, "WEBP quality (higher is worse quality)")
+	webpQuality = flag.Int("webp-quality", 50, "WEBP quality (higher is worse quality)")
 )
 
 func doAVIF(src image.Image, dstPath string) error {
