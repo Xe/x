@@ -9,8 +9,8 @@ import (
 	"io/ioutil"
 	"strings"
 
-	"within.website/confyg"
 	"within.website/ln"
+	"within.website/x/internal/confyg"
 )
 
 // CmdParse is a quick wrapper for command usage. It explodes on errors.
