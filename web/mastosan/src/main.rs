@@ -22,7 +22,9 @@ fn main() -> io::Result<()> {
                 }),
                 element!("a[href]", |el| {
                     let href = el.get_attribute("href").unwrap();
-                    el.prepend(&format!("<{href}|"), ContentType::Html);
+                    el.prepend("|", ContentType::Html);
+                    el.prepend(&href, ContentType::Html);
+                    el.prepend("<", ContentType::Html);
                     el.append(">", ContentType::Html);
                     el.remove_and_keep_content();
 

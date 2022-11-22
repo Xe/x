@@ -13,7 +13,7 @@
 //     cargo install wasm-snip
 //     cargo build --release
 //     wasm-opt -Oz -o ./testdata/mastosan-pre-snip.wasm
-//     wasm-snip --skip-producers-section --snip-rust-panicking-code -i ./testdata/mastosan-pre-snip.wasm ./testdata/mastosan.wasm
+//     wasm-snip --skip-producers-section --snip-rust-panicking-code --snip-rust-fmt-code -i ./testdata/mastosan-pre-snip.wasm ./testdata/mastosan.wasm
 //     rm ./testdata/mastosan-pre-snip.wasm
 //
 // This adds about two megabytes to the resulting binary, including the AOT
