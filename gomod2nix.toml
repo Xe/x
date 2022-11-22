@@ -301,6 +301,9 @@ schema = 3
   [mod."github.com/templexxx/xor"]
     version = "v0.0.0-20181023030647-4e92f724b73b"
     hash = "sha256-baRoM5CqX8DwzxrxjhTe0XPX31szJL8c5gjCevPnYPw="
+  [mod."github.com/tetratelabs/wazero"]
+    version = "v1.0.0-pre.3"
+    hash = "sha256-Sj5Uy3jDRSGue9aF/UEyvdyN7IOt1y5JDdQoB/CW84E="
   [mod."github.com/tjfoc/gmsm"]
     version = "v1.0.1"
     hash = "sha256-AyuYHHf3+ZDR+2bJxf1q/xeoXNgl4TwMtiDzZtppL98="
