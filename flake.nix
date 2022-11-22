@@ -7,6 +7,12 @@
     portable-svc.url = "git+https://tulpa.dev/cadey/portable-svc.git?ref=main";
     ckiee.url = "github:ckiee/nixpkgs?ref=gpt2simple-py-init";
 
+    rust-overlay = {
+      url = "github:oxalica/rust-overlay";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-utils.follows = "utils";
+    };
+
     gomod2nix = {
       url = "github:tweag/gomod2nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -14,7 +20,7 @@
     };
   };
 
-  outputs = { self, nixpkgs, utils, gomod2nix, portable-svc, ckiee }@attrs:
+  outputs = { self, nixpkgs, utils, gomod2nix, portable-svc, ckiee, rust-overlay }@attrs:
     utils.lib.eachSystem [
       "x86_64-linux"
       "aarch64-linux"
@@ -31,7 +37,8 @@
             })
             gomod2nix.overlays.default
             portable-svc.overlay
-            (final: prev: self.packages.${system})
+            rust-overlay.overlays.default
+            #(final: prev: self.packages.${system})
           ];
         };
         ckieepkgs = import ckiee { inherit system; };
@@ -182,6 +189,17 @@
             pkg-config
             libaom
             libavif
+
+            cargo
+            cargo-watch
+            rustfmt
+            rust-analyzer
+            wasmtime
+            binaryen
+            (rust-bin.stable.latest.default.override {
+              extensions = [ "rust-src" ];
+              targets = [ "wasm32-wasi" ];
+            })
           ];
         };
       });

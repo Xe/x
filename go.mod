@@ -122,6 +122,7 @@ require (
 	github.com/tcnksm/go-httpstat v0.2.0 // indirect
 	github.com/templexxx/cpufeat v0.0.0-20180724012125-cef66df7f161 // indirect
 	github.com/templexxx/xor v0.0.0-20181023030647-4e92f724b73b // indirect
+	github.com/tetratelabs/wazero v1.0.0-pre.3 // indirect
 	github.com/tjfoc/gmsm v1.0.1 // indirect
 	github.com/u-root/uio v0.0.0-20220204230159-dac05f7d2cb4 // indirect
 	github.com/vishvananda/netlink v1.1.1-0.20211118161826-650dca95af54 // indirect

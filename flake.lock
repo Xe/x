@@ -94,7 +94,31 @@
         "gomod2nix": "gomod2nix",
         "nixpkgs": "nixpkgs",
         "portable-svc": "portable-svc",
+        "rust-overlay": "rust-overlay",
         "utils": "utils"
+      }
+    },
+    "rust-overlay": {
+      "inputs": {
+        "flake-utils": [
+          "utils"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1669084742,
+        "narHash": "sha256-aLYwYVnrmEE1LVqd17v99CuqVmAZQrlgi2DVTAs4wFg=",
+        "owner": "oxalica",
+        "repo": "rust-overlay",
+        "rev": "9652ef34c7439eca9f86cee11e94dbef5c9adb09",
+        "type": "github"
+      },
+      "original": {
+        "owner": "oxalica",
+        "repo": "rust-overlay",
+        "type": "github"
       }
     },
     "utils": {
