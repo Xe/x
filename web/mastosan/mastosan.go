@@ -25,14 +25,34 @@ import (
 	"context"
 	_ "embed"
 	"log"
+	"math/rand"
+	"strconv"
 	"strings"
 
 	"github.com/tetratelabs/wazero"
 	"github.com/tetratelabs/wazero/imports/wasi_snapshot_preview1"
 )
 
-//go:embed testdata/mastosan.wasm
-var mastosanWasm []byte
+var (
+	//go:embed testdata/mastosan.wasm
+	mastosanWasm []byte
+
+	r    wazero.Runtime
+	code wazero.CompiledModule
+)
+
+func init() {
+	ctx := context.Background()
+	r = wazero.NewRuntime(ctx)
+
+	wasi_snapshot_preview1.MustInstantiate(ctx, r)
+
+	var err error
+	code, err = r.CompileModule(ctx, mastosanWasm)
+	if err != nil {
+		log.Panicln(err)
+	}
+}
 
 // HTML2Slackdown converts a string full of HTML text to slack-flavored markdown.
 //
@@ -41,24 +61,17 @@ var mastosanWasm []byte
 // This has an added latency of about 0.2 seconds per invocation, but this is as
 // fast as I can make it for now.
 func HTML2Slackdown(ctx context.Context, text string) (string, error) {
-	r := wazero.NewRuntime(ctx)
-	defer r.Close(ctx)
-
 	fout := &bytes.Buffer{}
 	fin := bytes.NewBufferString(text)
 
-	config := wazero.NewModuleConfig().WithStdout(fout).WithStdin(fin).WithArgs("mastosan")
+	name := strconv.Itoa(rand.Int())
+	config := wazero.NewModuleConfig().WithStdout(fout).WithStdin(fin).WithArgs("mastosan").WithName(name)
 
-	wasi_snapshot_preview1.MustInstantiate(ctx, r)
-
-	code, err := r.CompileModule(ctx, mastosanWasm)
+	mod, err := r.InstantiateModule(ctx, code, config)
 	if err != nil {
-		log.Panicln(err)
-	}
-
-	if _, err = r.InstantiateModule(ctx, code, config); err != nil {
 		return "", err
 	}
+	defer mod.Close(ctx)
 
 	return strings.TrimSpace(fout.String()), nil
 }
