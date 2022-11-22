@@ -22,10 +22,7 @@ func NewError(wantStatusCode int, resp *http.Response) error {
 	}
 	resp.Body.Close()
 
-	loc, err := resp.Location()
-	if err != nil {
-		return err
-	}
+	loc := resp.Request.URL
 
 	return &Error{
 		WantStatus:   wantStatusCode,
