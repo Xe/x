@@ -44,37 +44,3 @@ func Parse(name string, data []byte, fs *flag.FlagSet) error {
 func allower(verb string, block bool) bool {
 	return true
 }
-
-// Dump turns a flagset's values into a configuration file.
-func Dump(fs *flag.FlagSet) []byte {
-	result := &confyg.FileSyntax{
-		Name: fs.Name(),
-		Comments: confyg.Comments{
-			Before: []confyg.Comment{
-				{
-					Token: "// generated from " + fs.Name() + " flags",
-				}, {},
-			},
-		},
-		Stmt: []confyg.Expr{},
-	}
-
-	fs.Visit(func(fl *flag.Flag) {
-		commentTokens := []string{"//", fl.Usage}
-
-		l := &confyg.Line{
-			Comments: confyg.Comments{
-				Suffix: []confyg.Comment{
-					{
-						Token: strings.Join(commentTokens, " "),
-					},
-				},
-			},
-			Token: []string{fl.Name, fl.Value.String()},
-		}
-
-		result.Stmt = append(result.Stmt, l)
-	})
-
-	return confyg.Format(result)
-}

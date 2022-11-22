@@ -29,21 +29,3 @@ unsubscribe (
 		t.Errorf("wanted unsubscribe->t-series, got: %s", *us)
 	}
 }
-
-func TestDump(t *testing.T) {
-	fs := flag.NewFlagSet("h", flag.PanicOnError)
-	fs.String("test-string", "some value", "fill this in pls")
-	fs.Bool("test-bool", false, "also fill this in pls")
-
-	err := fs.Parse([]string{"-test-string=foo", "-test-bool"})
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	data := Dump(fs)
-
-	err = Parse("h.cfg", data, fs)
-	if err != nil {
-		t.Fatal(err)
-	}
-}

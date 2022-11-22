@@ -41,6 +41,8 @@
           version = "1.0.0";
           src = ./.;
           modules = ./gomod2nix.toml;
+
+          buildInputs = with pkgs; [ pkg-config libaom libavif ];
         };
 
         copyFile = { pname, path ? pname }:
