@@ -196,6 +196,8 @@
             rust-analyzer
             wasmtime
             binaryen
+            wabt
+            bloaty
             (rust-bin.stable.latest.default.override {
               extensions = [ "rust-src" ];
               targets = [ "wasm32-wasi" ];

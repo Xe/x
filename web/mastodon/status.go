@@ -3,7 +3,9 @@ package mastodon
 import (
 	"context"
 	"encoding/json"
-	"fmt"
+	"io"
+	"log"
+	"net/http"
 	"net/url"
 	"time"
 )
@@ -18,7 +20,6 @@ type CreateStatusParams struct {
 }
 
 func (csp CreateStatusParams) Values() url.Values {
-
 	result := url.Values{}
 
 	result.Set("status", csp.Status)
@@ -35,10 +36,11 @@ func (csp CreateStatusParams) Values() url.Values {
 		result.Set("spoiler_text", csp.SpoilerText)
 	}
 
-	for i, id := range csp.MediaIDs {
-		qID := fmt.Sprintf("[%d]media_ids", i)
-		result.Set(qID, id)
+	for _, id := range csp.MediaIDs {
+		result.Add("media_ids[]", id)
 	}
+
+	log.Println(result.Encode())
 
 	return result
 }
@@ -61,6 +63,31 @@ func (c *Client) CreateStatus(ctx context.Context, csp CreateStatusParams) (*Sta
 	var result Status
 	err = json.NewDecoder(resp.Body).Decode(&result)
 	if err != nil {
+		return nil, err
+	}
+
+	return &result, nil
+}
+
+// FetchStatus fetches a Mastodon status over the internet using the federation protocol.
+//
+// This will not work if the target server has "secure" mode enabled.
+func FetchStatus(ctx context.Context, statusURL string) (*Status, error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, statusURL, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Set("Accept", "application/json")
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var result Status
+	if err := json.NewDecoder(io.LimitReader(resp.Body, 1024*1024*2)).Decode(&result); err != nil {
 		return nil, err
 	}
 

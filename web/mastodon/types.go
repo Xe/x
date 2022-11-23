@@ -1,10 +1,13 @@
 package mastodon
 
 import (
+	"context"
 	"fmt"
 	"strconv"
 	"strings"
 	"time"
+
+	"within.website/x/web/mastosan"
 )
 
 // types copied from here: https://github.com/McKael/madon/blob/master/types.go
@@ -261,6 +264,12 @@ type Status struct {
 	Emojis             []Emoji      `json:"emojis"`
 	Application        *Application `json:"application"`
 	Language           *string      `json:"language"`
+}
+
+// ContentText attempts to convert the Status content to plain text using package
+// mastosan.
+func (s Status) ContentText(ctx context.Context) (string, error) {
+	return mastosan.Text(ctx, s.Content)
 }
 
 // Tag represents a Mastodon tag entity
