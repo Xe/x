@@ -18,7 +18,7 @@ func TestHTML2Slackdown(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 			defer cancel()
-			result, err := HTML2Slackdown(ctx, tt.inp)
+			result, err := Slackdown(ctx, tt.inp)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -41,7 +41,7 @@ func BenchmarkHTML2Slackdown(b *testing.B) {
 
 func benchStep(pb *testing.PB) {
 	for pb.Next() {
-		result, err := HTML2Slackdown(context.Background(), msg)
+		result, err := Slackdown(context.Background(), msg)
 		if err != nil {
 			panic(err)
 		}
