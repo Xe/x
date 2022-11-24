@@ -8,7 +8,7 @@ require (
 	github.com/Yawning/bulb v0.0.0-20170405033506-85d80d893c3d
 	github.com/aws/aws-sdk-go v1.44.144
 	github.com/birkelund/boltdbcache v1.0.0
-	github.com/bwmarrin/discordgo v0.25.0
+	github.com/bwmarrin/discordgo v0.26.1
 	github.com/chai2010/webp v1.1.1
 	github.com/codahale/hdrhistogram v0.0.0-20161010025455-3a0bb77429bd
 	github.com/dgryski/go-failure v0.0.0-20151001134759-4963dbd58fd0
