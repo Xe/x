@@ -13,9 +13,6 @@ schema = 3
   [mod."github.com/Yawning/bulb"]
     version = "v0.0.0-20170405033506-85d80d893c3d"
     hash = "sha256-GEFdZJl/T0khRN6me0hBMxD8Dirmc/agr62tsuxh8GQ="
-  [mod."github.com/aclements/go-moremath"]
-    version = "v0.0.0-20190506201756-286cc0be6f75"
-    hash = "sha256-eHnSUgrdMZrcJITle8v2qvKSTEfjtFV3+UIeY3tbdvA="
   [mod."github.com/akutz/memconn"]
     version = "v0.1.0"
     hash = "sha256-WOs/RQYjQbn41ui8ztHgWSd4jxydE+fvIrl/0dmHD9Y="
@@ -79,12 +76,6 @@ schema = 3
   [mod."github.com/davecgh/go-spew"]
     version = "v1.1.1"
     hash = "sha256-nhzSUrE1fCkN0+RL04N4h8jWmRFPPPWbCuDc7Ss0akI="
-  [mod."github.com/dgryski/go-failure"]
-    version = "v0.0.0-20151001134759-4963dbd58fd0"
-    hash = "sha256-wHs8m9sxmCmvZuzIngtO9X8blthbE6jCgUIOirv1Ro0="
-  [mod."github.com/dgryski/go-onlinestats"]
-    version = "v0.0.0-20170612111826-1c7d19468768"
-    hash = "sha256-ABQ0XYHbeIA666j4u0Q/hEobgQggFaHmpacdavlGqbk="
   [mod."github.com/disintegration/imaging"]
     version = "v1.6.1"
     hash = "sha256-3IWhzlxuMQIQzhTYUT6SiToBjOzR9kfyoDCh1EetqgQ="
@@ -190,12 +181,6 @@ schema = 3
   [mod."github.com/klauspost/compress"]
     version = "v1.15.4"
     hash = "sha256-U6v9tYD16Tep9PuqRwCjrzXfj1IfV3KB54Qwnzko+xY="
-  [mod."github.com/klauspost/cpuid"]
-    version = "v1.2.1"
-    hash = "sha256-PZG2qUuB1LglFF7EG7Hy4N8sXQqOu5TW3esMnSHj4YA="
-  [mod."github.com/klauspost/reedsolomon"]
-    version = "v1.9.2"
-    hash = "sha256-Ft/TCFGpgoVaKtryT6DNHK4rMotEg6EsslM3hy0VPVg="
   [mod."github.com/kortschak/wol"]
     version = "v0.0.0-20200729010619-da482cc4850a"
     hash = "sha256-lnr9r/KNv4EeeNohFImC3Vd5E9nJ0N+4ZZ0VHFjwHps="
@@ -274,9 +259,6 @@ schema = 3
   [mod."github.com/ssor/bom"]
     version = "v0.0.0-20170718123548-6386211fdfcf"
     hash = "sha256-jYYzaIOaUFv575h3Sz/T4DPO6EWFRwEpwx1zF00i5SU="
-  [mod."github.com/streamrail/concurrent-map"]
-    version = "v0.0.0-20160823150647-8bf1e9bacbf6"
-    hash = "sha256-rcYSZVaw5TkO3o5d/MGwatT1Rzrcnvfjx1SPGDr/fnU="
   [mod."github.com/sycamoreone/orc"]
     version = "v0.0.0-20150204213357-1627eaec2699"
     hash = "sha256-59mtIQXtEBKaRNriFiHdOrTqxIbZOGdXW2HLkIXCAVw="
@@ -295,18 +277,9 @@ schema = 3
   [mod."github.com/tcnksm/go-httpstat"]
     version = "v0.2.0"
     hash = "sha256-bCWn8E+DcZY6+yPu07AF3hCcDZx3CFdD74qfpDIgVqI="
-  [mod."github.com/templexxx/cpufeat"]
-    version = "v0.0.0-20180724012125-cef66df7f161"
-    hash = "sha256-M11hmgWYZXdmtbK0smFIyYjGxPhJXfjipxrg11TcaqA="
-  [mod."github.com/templexxx/xor"]
-    version = "v0.0.0-20181023030647-4e92f724b73b"
-    hash = "sha256-baRoM5CqX8DwzxrxjhTe0XPX31szJL8c5gjCevPnYPw="
   [mod."github.com/tetratelabs/wazero"]
     version = "v1.0.0-pre.3"
     hash = "sha256-Sj5Uy3jDRSGue9aF/UEyvdyN7IOt1y5JDdQoB/CW84E="
-  [mod."github.com/tjfoc/gmsm"]
-    version = "v1.0.1"
-    hash = "sha256-AyuYHHf3+ZDR+2bJxf1q/xeoXNgl4TwMtiDzZtppL98="
   [mod."github.com/tmc/scp"]
     version = "v0.0.0-20170824174625-f7b48647feef"
     hash = "sha256-qHwQb3JA43VVhJdB18/2zXbxqW/bgw1yvr8YhqFyd74="
@@ -325,15 +298,6 @@ schema = 3
   [mod."github.com/xlzd/gotp"]
     version = "v0.0.0-20181030022105-c8557ba2c119"
     hash = "sha256-NVXamx9Z3l52ZHkyh/b3wdIzaQvtgkxhjoM2uypVv/I="
-  [mod."github.com/xtaci/kcp-go"]
-    version = "v5.4.20+incompatible"
-    hash = "sha256-SBnMuGcLdp0g9D363qtSXvAQGdmkany7ZKRDOuHCkko="
-  [mod."github.com/xtaci/lossyconn"]
-    version = "v0.0.0-20190602105132-8df528c0c9ae"
-    hash = "sha256-hNwfcn/x6i8t2FVhqsMyqklh024JFnP/lH7f7KgpcGk="
-  [mod."github.com/xtaci/smux"]
-    version = "v2.0.1+incompatible"
-    hash = "sha256-3ogbwpvGrJmXrtXA29QHHcw6/yCvMeTuc2szHpJvdIQ="
   [mod."github.com/yawning/bulb"]
     version = "v0.0.0-20170405033506-85d80d893c3d"
     hash = "sha256-GEFdZJl/T0khRN6me0hBMxD8Dirmc/agr62tsuxh8GQ="
