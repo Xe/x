@@ -15,7 +15,7 @@ require (
 	github.com/disintegration/imaging v1.6.1
 	github.com/facebookgo/ensure v0.0.0-20160127193407-b4ab57deab51
 	github.com/fogleman/primitive v0.0.0-20190214200932-673f57e7b1b5
-	github.com/garyburd/redigo v1.6.3
+	github.com/garyburd/redigo v1.6.4
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da
 	github.com/google/go-github v17.0.0+incompatible
 	github.com/gregjones/httpcache v0.0.0-20190611155906-901d90724c79
