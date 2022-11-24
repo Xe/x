@@ -65,8 +65,8 @@ schema = 3
     version = "v1.0.0"
     hash = "sha256-/xW4VJNiwhCPM8AMmhuN457SqGxpn9qRXAPET7Ca26M="
   [mod."github.com/bwmarrin/discordgo"]
-    version = "v0.25.0"
-    hash = "sha256-GKaTov5xrWZwdOyfGAtzJ84+Fbmd5bBHli/nMazTkjs="
+    version = "v0.26.1"
+    hash = "sha256-edRoAQ9JDD0voR91Ncw2df6V+i+sgVQUqrPxTvG9UAM="
   [mod."github.com/chai2010/webp"]
     version = "v1.1.1"
     hash = "sha256-fgqfaEmrjMRcUC6WXVISIujzGYauZTKDDrJGLodn70c="
@@ -113,8 +113,8 @@ schema = 3
     version = "v2.4.0"
     hash = "sha256-LwOrfDN5fx/R2lgaD90RIu2NxcJDpyqYEURLc9Kgxgw="
   [mod."github.com/garyburd/redigo"]
-    version = "v1.6.3"
-    hash = "sha256-2qQxyJWnVyqjenLzwIkCcJAvhGuwCgsmnUteseiDYco="
+    version = "v1.6.4"
+    hash = "sha256-CHBFW/M79U58cq/NldC0Hk3a6uNNqNzCQ2X8RMLJAXc="
   [mod."github.com/go-ole/go-ole"]
     version = "v1.2.6"
     hash = "sha256-+oxitLeJxYF19Z6g+6CgmCHJ1Y5D8raMi2Cb3M6nXCs="
@@ -239,8 +239,8 @@ schema = 3
     version = "v0.0.5"
     hash = "sha256-/5i70IkH/qSW5KjGzv8aQNKh9tHoz98tqtL0K2DMFn4="
   [mod."github.com/otiai10/copy"]
-    version = "v1.7.0"
-    hash = "sha256-hnSIo6tNLhxXVE8WGfivIhnuwxvQYAg7oa1b6TNpTsc="
+    version = "v1.9.0"
+    hash = "sha256-JKRqb4hfnYjglrsF9WikEZup8zIcV7Au854Sn+nJagU="
   [mod."github.com/pborman/uuid"]
     version = "v1.2.1"
     hash = "sha256-mwbymphWEvqBdxgLk3kU43JOSoGD3P9eDPV9k4Z5Nlg="

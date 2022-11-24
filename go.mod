@@ -8,14 +8,14 @@ require (
 	github.com/Yawning/bulb v0.0.0-20170405033506-85d80d893c3d
 	github.com/aws/aws-sdk-go v1.44.144
 	github.com/birkelund/boltdbcache v1.0.0
-	github.com/bwmarrin/discordgo v0.25.0
+	github.com/bwmarrin/discordgo v0.26.1
 	github.com/chai2010/webp v1.1.1
 	github.com/codahale/hdrhistogram v0.0.0-20161010025455-3a0bb77429bd
 	github.com/dgryski/go-failure v0.0.0-20151001134759-4963dbd58fd0
 	github.com/disintegration/imaging v1.6.1
 	github.com/facebookgo/ensure v0.0.0-20160127193407-b4ab57deab51
 	github.com/fogleman/primitive v0.0.0-20190214200932-673f57e7b1b5
-	github.com/garyburd/redigo v1.6.3
+	github.com/garyburd/redigo v1.6.4
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da
 	github.com/google/go-github v17.0.0+incompatible
 	github.com/gregjones/httpcache v0.0.0-20190611155906-901d90724c79
@@ -27,7 +27,7 @@ require (
 	github.com/miekg/dns v1.1.50
 	github.com/mmikulicic/stringlist v1.0.0
 	github.com/mndrix/golog v0.0.0-20170330170653-a28e2a269775
-	github.com/otiai10/copy v1.7.0
+	github.com/otiai10/copy v1.9.0
 	github.com/pborman/uuid v1.2.1
 	github.com/peterh/liner v1.2.2
 	github.com/phayes/freeport v0.0.0-20180830031419-95f893ade6f2
