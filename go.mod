@@ -118,7 +118,7 @@ require (
 	github.com/vishvananda/netns v0.0.0-20211101163701-50045581ed74 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
 	github.com/yawning/bulb v0.0.0-20170405033506-85d80d893c3d // indirect
-	go.etcd.io/bbolt v1.3.2 // indirect
+	go.etcd.io/bbolt v1.3.6 // indirect
 	go4.org/mem v0.0.0-20210711025021-927187094b94 // indirect
 	go4.org/netipx v0.0.0-20220725152314-7e7bdc8411bf // indirect
 	golang.org/x/exp v0.0.0-20220722155223-a9213eeb770e // indirect

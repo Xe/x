@@ -10,6 +10,7 @@ processes = []
   dockerfile = "./Dockerfile"
 
 [env]
+  XEDN_STATE = "/data/xedn"
 
 [experimental]
   allowed_public_ports = []
