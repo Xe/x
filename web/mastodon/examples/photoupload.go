@@ -61,12 +61,12 @@ func main() {
 	}
 	defer fin.Close()
 
-	descripiton, err := promptInput("description of image")
+	description, err := promptInput("description of image")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	att, err := cli.UploadMedia(context.Background(), fin, fname, descripiton, "")
+	att, err := cli.UploadMedia(context.Background(), fin, fname, description, "")
 	if err != nil {
 		log.Fatal(err)
 	}
