@@ -34,7 +34,7 @@ require (
 	github.com/rs/cors v1.8.2
 	github.com/sebest/xff v0.0.0-20210106013422-671bd2870b3a
 	github.com/sycamoreone/orc v0.0.0-20150204213357-1627eaec2699
-	github.com/tetratelabs/wazero v1.0.0-pre.3
+	github.com/tetratelabs/wazero v1.0.0-pre.4
 	github.com/tmc/scp v0.0.0-20170824174625-f7b48647feef
 	github.com/xlzd/gotp v0.0.0-20181030022105-c8557ba2c119
 	go.etcd.io/bbolt v1.3.6
