@@ -15,7 +15,6 @@ require (
 	github.com/facebookgo/ensure v0.0.0-20160127193407-b4ab57deab51
 	github.com/fogleman/primitive v0.0.0-20190214200932-673f57e7b1b5
 	github.com/garyburd/redigo v1.6.4
-	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da
 	github.com/google/go-github v17.0.0+incompatible
 	github.com/gregjones/httpcache v0.0.0-20190611155906-901d90724c79
 	github.com/hullerob/go.farbfeld v0.0.0-20181222022525-3661193c725f
@@ -35,9 +34,10 @@ require (
 	github.com/rs/cors v1.8.2
 	github.com/sebest/xff v0.0.0-20210106013422-671bd2870b3a
 	github.com/sycamoreone/orc v0.0.0-20150204213357-1627eaec2699
-	github.com/tetratelabs/wazero v1.0.0-pre.3
+	github.com/tetratelabs/wazero v1.0.0-pre.4
 	github.com/tmc/scp v0.0.0-20170824174625-f7b48647feef
 	github.com/xlzd/gotp v0.0.0-20181030022105-c8557ba2c119
+	go.etcd.io/bbolt v1.3.6
 	go4.org v0.0.0-20190313082347-94abd6928b1d
 	golang.org/x/crypto v0.0.0-20220427172511-eb4f295cb31f
 	golang.org/x/exp/errors v0.0.0-20190510132918-efd6b22b2522
@@ -79,6 +79,7 @@ require (
 	github.com/go-ole/go-ole v1.2.6 // indirect
 	github.com/godbus/dbus/v5 v5.0.6 // indirect
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
+	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/btree v1.0.1 // indirect
 	github.com/google/go-cmp v0.5.8 // indirect
@@ -118,7 +119,6 @@ require (
 	github.com/vishvananda/netns v0.0.0-20211101163701-50045581ed74 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
 	github.com/yawning/bulb v0.0.0-20170405033506-85d80d893c3d // indirect
-	go.etcd.io/bbolt v1.3.6 // indirect
 	go4.org/mem v0.0.0-20210711025021-927187094b94 // indirect
 	go4.org/netipx v0.0.0-20220725152314-7e7bdc8411bf // indirect
 	golang.org/x/exp v0.0.0-20220722155223-a9213eeb770e // indirect
