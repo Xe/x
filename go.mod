@@ -6,7 +6,7 @@ require (
 	cirello.io/goherokuname v0.0.0-20190914093443-b436bae8c2c5
 	github.com/McKael/madon/v2 v2.0.0-20180929094633-c679abc985d6
 	github.com/Yawning/bulb v0.0.0-20170405033506-85d80d893c3d
-	github.com/aws/aws-sdk-go v1.44.151
+	github.com/aws/aws-sdk-go v1.44.153
 	github.com/birkelund/boltdbcache v1.0.0
 	github.com/bwmarrin/discordgo v0.26.1
 	github.com/chai2010/webp v1.1.1
