@@ -3,9 +3,11 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"image"
 	"image/jpeg"
 	"image/png"
+	"io"
 	"log"
 	"os"
 	"path/filepath"
@@ -32,6 +34,8 @@ var (
 	jpegQuality = flag.Int("jpeg-quality", 85, "JPEG quality (lower means lower file size)")
 
 	webpQuality = flag.Int("webp-quality", 50, "WEBP quality (higher is worse quality)")
+
+	noEncode = flag.Bool("no-encode", false, "if set, just upload the file directly without encoding")
 )
 
 func doAVIF(src image.Image, dstPath string) error {
@@ -145,6 +149,31 @@ func processImage(fname, tempDir string) error {
 	return nil
 }
 
+func copyFile(src, dst string) (int64, error) {
+	sourceFileStat, err := os.Stat(src)
+	if err != nil {
+		return 0, err
+	}
+
+	if !sourceFileStat.Mode().IsRegular() {
+		return 0, fmt.Errorf("%s is not a regular file", src)
+	}
+
+	source, err := os.Open(src)
+	if err != nil {
+		return 0, err
+	}
+	defer source.Close()
+
+	destination, err := os.Create(dst)
+	if err != nil {
+		return 0, err
+	}
+	defer destination.Close()
+	nBytes, err := io.Copy(destination, source)
+	return nBytes, err
+}
+
 func main() {
 	internal.HandleStartup()
 
@@ -170,13 +199,25 @@ func main() {
 		}
 
 		for _, finfo := range files {
-			if err := processImage(filepath.Join(flag.Arg(0), finfo.Name()), td); err != nil {
-				log.Fatal(err)
+			if !*noEncode {
+				if err := processImage(filepath.Join(flag.Arg(0), finfo.Name()), td); err != nil {
+					log.Fatal(err)
+				}
+			} else {
+				if _, err := copyFile(filepath.Join(flag.Arg(0), finfo.Name()), filepath.Join(td, finfo.Name())); err != nil {
+					log.Fatal(err)
+				}
 			}
 		}
 	} else {
-		if err := processImage(flag.Arg(0), td); err != nil {
-			log.Fatal(err)
+		if !*noEncode {
+			if err := processImage(flag.Arg(0), td); err != nil {
+				log.Fatal(err)
+			}
+		} else {
+			if _, err := copyFile(flag.Arg(0), filepath.Join(td, filepath.Base(flag.Arg(0)))); err != nil {
+				log.Fatal(err)
+			}
 		}
 	}
 
@@ -212,6 +253,8 @@ var mimeTypes = map[string]string{
 	".webp": "image/webp",
 	".jpg":  "image/jpeg",
 	".png":  "image/png",
+	".wasm": "application/wasm",
+	".css":  "text/css",
 }
 
 func mkS3Client() *s3.S3 {
