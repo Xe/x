@@ -14,7 +14,7 @@
     };
 
     gomod2nix = {
-      url = "github:tweag/gomod2nix";
+      url = "github:nix-community/gomod2nix";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.utils.follows = "utils";
     };

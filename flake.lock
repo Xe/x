@@ -28,13 +28,13 @@
       "locked": {
         "lastModified": 1662501203,
         "narHash": "sha256-4BKeqCX2zwgBiTdlc2DjGQ0CttKm0vSw0r/bdFdM/PQ=",
-        "owner": "tweag",
+        "owner": "nix-community",
         "repo": "gomod2nix",
         "rev": "89cd0675b96775aa3ee86e7c0cf5bc238dd27976",
         "type": "github"
       },
       "original": {
-        "owner": "tweag",
+        "owner": "nix-community",
         "repo": "gomod2nix",
         "type": "github"
       }
