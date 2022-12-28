@@ -31,7 +31,7 @@ require (
 	github.com/phayes/freeport v0.0.0-20180830031419-95f893ade6f2
 	github.com/pkg/errors v0.9.1
 	github.com/posener/complete v1.2.3
-	github.com/rs/cors v1.8.2
+	github.com/rs/cors v1.8.3
 	github.com/sebest/xff v0.0.0-20210106013422-671bd2870b3a
 	github.com/sycamoreone/orc v0.0.0-20150204213357-1627eaec2699
 	github.com/tetratelabs/wazero v1.0.0-pre.4
