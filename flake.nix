@@ -19,8 +19,7 @@
     };
   };
 
-  outputs = { self, nixpkgs, utils, gomod2nix, ckiee, rust-overlay
-    }@attrs:
+  outputs = { self, nixpkgs, utils, gomod2nix, ckiee, rust-overlay }@attrs:
     utils.lib.eachSystem [
       "x86_64-linux"
       "aarch64-linux"
@@ -73,6 +72,7 @@
       in {
         packages = rec {
           default = everything;
+
           license = copyFile {
             pname = "license";
             path = "xlicense";
@@ -82,17 +82,14 @@
             path = "make-mastodon-app";
           };
           aegis = copyFile { pname = "aegis"; };
+          cadeybot = copyFile { pname = "cadeybot"; };
+          johaus = copyFile { pname = "johaus"; };
+          mainsanow = copyFile { pname = "mainsanow"; };
           prefix = copyFile { pname = "prefix"; };
           quickserv = copyFile { pname = "quickserv"; };
-          within-website = copyFile { pname = "within.website"; };
-          johaus = copyFile { pname = "johaus"; };
-          cadeybot = copyFile { pname = "cadeybot"; };
-          mainsanow = copyFile { pname = "mainsanow"; };
+          todayinmarch2020 = copyFile { pname = "todayinmarch2020"; };
           uploud = copyFile { pname = "uploud"; };
-          importer = copyFile {
-            pname = "importer";
-            path = "cadeybot-importer";
-          };
+          within-website = copyFile { pname = "within.website"; };
         };
 
         nixosModules = {
@@ -150,65 +147,69 @@
               };
             };
 
-          robocadey = { config, lib, pkgs, ... }:
+          todayinmarch2020 = { config, pkgs, lib, ... }:
             with lib;
             let
               system = pkgs.system;
-              cfg = config.xeserv.services.robocadey;
               selfpkgs = self.packages.${system};
+              cfg = config.xeserv.services.todayinmarch2020;
             in {
-              options.xeserv.services.robocadey = {
-                enable = mkEnableOption "Activates the printerfacts server";
+              options.xeserv.services.todayinmarch2020 = {
+                enable =
+                  mkEnableOption "Lets you find out what day in 2020 today is";
+                useACME = mkEnableOption "Enables ACME for cert stuff";
 
-                pathToModel = mkOption {
+                domain = mkOption {
                   type = types.str;
-                  default = "/srv/models/robocadey_gpt2.raw";
-                  description = "model squashfs volume location";
+                  default = "todayinmarch2020.xn--sz8hf6d.ws";
+                  example = "todayinmarch2020.xn--sz8hf6d.ws";
+                  description =
+                    "The domain name that nginx should check against for HTTP hostnames";
+                };
+
+                sockPath = mkOption rec {
+                  type = types.str;
+                  default = "/srv/within/run/todayinmarch2020.sock";
+                  example = default;
+                  description =
+                    "The unix domain socket that printerfacts should listen on";
                 };
               };
 
               config = mkIf cfg.enable {
-                systemd.mounts = [{
-                  type = "squashfs";
-                  what = cfg.pathToModel;
-                  where = "/var/lib/private/xeserv.robocadey-gpt2/checkpoint";
-                  options = "ro,relatime,errors=continue";
-                }];
-                systemd.services = {
-                  "robocadey" = {
-                    wantedBy = [ "multi-user.target" ];
-                    description = "RoboCadey";
-                    after = [ "robocadey-gpt2.socket" ];
-
-                    serviceConfig = {
-                      Restart = "always";
-                      DynamicUser = "true";
-                      ExecStart = "${selfpkgs.robocadey}/bin/robocadey";
-                      WorkingDirectory = "/var/lib/private/xeserv.robocadey";
-                      StateDirectory = "xeserv.robocadey";
-                      CacheDirectory = "xeserv.robocadey";
-                    };
-                  };
-                  "robocadey-gpt2" = {
-                    wantedBy = [ "multi-user.target" ];
-                    description = "RoboCadey GPT2 sidecar";
-
-                    serviceConfig = {
-                      Restart = "always";
-                      DynamicUser = "true";
-                      ExecStart =
-                        "${selfpkgs.robocadey-gpt2}/bin/robocadey-gpt2";
-                      WorkingDirectory =
-                        "/var/lib/private/xeserv.robocadey-gpt2";
-                      StateDirectory = "xeserv.robocadey-gpt2";
-                      CacheDirectory = "xeserv.robocadey-gpt2";
-                    };
-                  };
+                users.users.todayinmarch2020 = {
+                  createHome = true;
+                  description = "tulpa.dev/cadey/todayinmarch2020";
+                  isSystemUser = true;
+                  group = "within";
+                  home = "/srv/within/todayinmarch2020";
                 };
-                systemd.sockets."robocadey-gpt2" = {
-                  description = "RoboCadey GPT-2 activation socket";
-                  partOf = [ "robocadey-gpt2.service" ];
-                  listenStreams = [ "/run/robocadey-gpt2.sock" ];
+
+                systemd.services.todayinmarch2020 = {
+                  wantedBy = [ "multi-user.target" ];
+                  after = [ "within-homedir.service" ];
+
+                  serviceConfig = {
+                    User = "todayinmarch2020";
+                    Group = "within";
+                    Restart = "on-failure";
+                    WorkingDirectory = "/srv/within/todayinmarch2020";
+                    RestartSec = "30s";
+                    UMask = "007";
+                  };
+
+                  script = ''
+                    exec ${selfpkgs.todayinmarch2020}/bin/todayinmarch2020 -socket=${cfg.sockPath}
+                  '';
+                };
+
+                services.nginx.virtualHosts."todayinmarch2020" = {
+                  serverName = "${cfg.domain}";
+                  locations."/".proxyPass = "http://unix:${cfg.sockPath}";
+                  enableACME = true;
+                  extraConfig = ''
+                    access_log /var/log/nginx/todayinmarch2020.access.log;
+                  '';
                 };
               };
             };
