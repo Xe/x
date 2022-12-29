@@ -22,6 +22,7 @@ import (
 	"github.com/rs/cors"
 	"github.com/sebest/xff"
 	"go.etcd.io/bbolt"
+	"tailscale.com/metrics"
 	"tailscale.com/tsnet"
 	"tailscale.com/tsweb"
 	"within.website/ln"
@@ -162,6 +163,7 @@ func (dc *Cache) Load(dir string, w http.ResponseWriter) error {
 
 		if t.Before(time.Now()) {
 			tx.DeleteBucket([]byte(dir))
+			fileDeaths.Get(dir).Add(1)
 			return ErrNotCached
 		}
 
@@ -239,8 +241,9 @@ var (
 
 	etagMatches = expvar.NewInt("etag_matches")
 
-	referers = expvar.NewMap("referers")
-	fileHits = expvar.NewMap("filehits")
+	referers   = metrics.LabelMap{Label: "url"}
+	fileHits   = metrics.LabelMap{Label: "path"}
+	fileDeaths = metrics.LabelMap{Label: "path"}
 
 	etags    map[string]string
 	etagLock sync.RWMutex
@@ -322,13 +325,17 @@ func main() {
 			return
 		}
 
-		referers.Add(r.Header.Get("Referer"), 1)
+		referers.Get(r.Header.Get("Referer")).Add(1)
 
 		if err := dc.GetFile(w, r); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 	}
+
+	expvar.Publish("referers", &referers)
+	expvar.Publish("file_hits", &fileHits)
+	expvar.Publish("file_deaths", &fileDeaths)
 
 	mux.HandleFunc("/file/christine-static/", hdlr)
 	mux.HandleFunc("/file/xeserv-akko/", hdlr)
