@@ -26,7 +26,6 @@ require (
 	github.com/mmikulicic/stringlist v1.0.0
 	github.com/mndrix/golog v0.0.0-20170330170653-a28e2a269775
 	github.com/otiai10/copy v1.9.0
-	github.com/pborman/uuid v1.2.1
 	github.com/peterh/liner v1.2.2
 	github.com/phayes/freeport v0.0.0-20180830031419-95f893ade6f2
 	github.com/pkg/errors v0.9.1
@@ -36,7 +35,6 @@ require (
 	github.com/sycamoreone/orc v0.0.0-20150204213357-1627eaec2699
 	github.com/tetratelabs/wazero v1.0.0-pre.4
 	github.com/tmc/scp v0.0.0-20170824174625-f7b48647feef
-	github.com/xlzd/gotp v0.0.0-20181030022105-c8557ba2c119
 	go.etcd.io/bbolt v1.3.6
 	go4.org v0.0.0-20190313082347-94abd6928b1d
 	golang.org/x/crypto v0.0.0-20220427172511-eb4f295cb31f
@@ -85,7 +83,6 @@ require (
 	github.com/google/btree v1.0.1 // indirect
 	github.com/google/go-cmp v0.5.8 // indirect
 	github.com/google/go-querystring v1.0.0 // indirect
-	github.com/google/uuid v1.3.0 // indirect
 	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect

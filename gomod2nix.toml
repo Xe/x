@@ -136,9 +136,6 @@ schema = 3
   [mod."github.com/google/go-querystring"]
     version = "v1.0.0"
     hash = "sha256-n0ewWuB/JYt8bfrefQHRJ9uak9QzXeQs68TW7fESgXY="
-  [mod."github.com/google/uuid"]
-    version = "v1.3.0"
-    hash = "sha256-QoR55eBtA94T2tBszyxfDtO7/pjZZSGb5vm7U0Xhs0Y="
   [mod."github.com/gorilla/websocket"]
     version = "v1.4.2"
     hash = "sha256-GhBLM/XTm2lFCyDvJbnCLAI2OyYXQV6W+jRPOQ1PdVY="
@@ -232,9 +229,6 @@ schema = 3
   [mod."github.com/otiai10/copy"]
     version = "v1.9.0"
     hash = "sha256-JKRqb4hfnYjglrsF9WikEZup8zIcV7Au854Sn+nJagU="
-  [mod."github.com/pborman/uuid"]
-    version = "v1.2.1"
-    hash = "sha256-mwbymphWEvqBdxgLk3kU43JOSoGD3P9eDPV9k4Z5Nlg="
   [mod."github.com/peterh/liner"]
     version = "v1.2.2"
     hash = "sha256-F+cIfbpR/xQ3ODf5srpfJxLYIdgSHVc6YK16oKSqAEM="
@@ -301,9 +295,6 @@ schema = 3
   [mod."github.com/x448/float16"]
     version = "v0.8.4"
     hash = "sha256-VKzMTMS9pIB/cwe17xPftCSK9Mf4Y6EuBEJlB4by5mE="
-  [mod."github.com/xlzd/gotp"]
-    version = "v0.0.0-20181030022105-c8557ba2c119"
-    hash = "sha256-NVXamx9Z3l52ZHkyh/b3wdIzaQvtgkxhjoM2uypVv/I="
   [mod."github.com/yawning/bulb"]
     version = "v0.0.0-20170405033506-85d80d893c3d"
     hash = "sha256-GEFdZJl/T0khRN6me0hBMxD8Dirmc/agr62tsuxh8GQ="
