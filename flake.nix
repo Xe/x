@@ -20,7 +20,8 @@
     };
   };
 
-  outputs = { self, nixpkgs, utils, gomod2nix, portable-svc, ckiee, rust-overlay }@attrs:
+  outputs = { self, nixpkgs, utils, gomod2nix, portable-svc, ckiee, rust-overlay
+    }@attrs:
     utils.lib.eachSystem [
       "x86_64-linux"
       "aarch64-linux"
@@ -49,7 +50,12 @@
           src = ./.;
           modules = ./gomod2nix.toml;
 
-          buildInputs = with pkgs; [ pkg-config libaom libavif ];
+          buildInputs = with pkgs; [
+            pkg-config
+            libaom
+            libavif
+            sqlite-interactive
+          ];
         };
 
         copyFile = { pname, path ? pname }:
@@ -83,6 +89,7 @@
           johaus = copyFile { pname = "johaus"; };
           cadeybot = copyFile { pname = "cadeybot"; };
           mainsanow = copyFile { pname = "mainsanow"; };
+          uploud = copyFile { pname = "uploud"; };
           importer = copyFile {
             pname = "importer";
             path = "cadeybot-importer";
