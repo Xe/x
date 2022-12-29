@@ -235,15 +235,16 @@ func (dc *Cache) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 var (
-	cacheHits   = expvar.NewInt("cache_hits")
-	cacheErrors = expvar.NewInt("cache_errors")
-	cacheLoads  = expvar.NewInt("cache_loads")
+	cacheHits   = expvar.NewInt("counter_xedn_cache_hits")
+	cacheErrors = expvar.NewInt("counter_xedn_cache_errors")
+	cacheLoads  = expvar.NewInt("counter_xedn_cache_loads")
 
-	etagMatches = expvar.NewInt("etag_matches")
+	etagMatches = expvar.NewInt("counter_xedn_etag_matches")
 
 	referers   = metrics.LabelMap{Label: "url"}
 	fileHits   = metrics.LabelMap{Label: "path"}
 	fileDeaths = metrics.LabelMap{Label: "path"}
+	fileMimeTypes = metrics.LabelMap{Label: "type"}
 
 	etags    map[string]string
 	etagLock sync.RWMutex
@@ -326,6 +327,7 @@ func main() {
 		}
 
 		referers.Get(r.Header.Get("Referer")).Add(1)
+		fileMimeTypes.Get(r.Header.Get("Content-Type")).Add(1)
 
 		if err := dc.GetFile(w, r); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -333,9 +335,10 @@ func main() {
 		}
 	}
 
-	expvar.Publish("referers", &referers)
-	expvar.Publish("file_hits", &fileHits)
-	expvar.Publish("file_deaths", &fileDeaths)
+	expvar.Publish("gauge_xedn_referers", &referers)
+	expvar.Publish("gauge_xedn_file_hits", &fileHits)
+	expvar.Publish("gauge_xedn_file_deaths", &fileDeaths)
+	expvar.Publish("gauge_xedn_file_mime_type", &fileMimeTypes)
 
 	mux.HandleFunc("/file/christine-static/", hdlr)
 	mux.HandleFunc("/file/xeserv-akko/", hdlr)
