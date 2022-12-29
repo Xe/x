@@ -189,6 +189,7 @@
             pkg-config
             libaom
             libavif
+            sqlite-interactive
 
             cargo
             cargo-watch
