@@ -54,46 +54,11 @@
         "type": "indirect"
       }
     },
-    "nixpkgs_2": {
-      "locked": {
-        "lastModified": 1662019588,
-        "narHash": "sha256-oPEjHKGGVbBXqwwL+UjsveJzghWiWV0n9ogo1X6l4cw=",
-        "owner": "NixOS",
-        "repo": "nixpkgs",
-        "rev": "2da64a81275b68fdad38af669afeda43d401e94b",
-        "type": "github"
-      },
-      "original": {
-        "id": "nixpkgs",
-        "ref": "nixos-unstable",
-        "type": "indirect"
-      }
-    },
-    "portable-svc": {
-      "inputs": {
-        "nixpkgs": "nixpkgs_2"
-      },
-      "locked": {
-        "lastModified": 1662398951,
-        "narHash": "sha256-E6kcB8SZQB+N37/AVxmMrUXzt/i/Herqp8DH7pBAmWw=",
-        "ref": "main",
-        "rev": "e2683a1c4ca5c42f47956c0ab46331d8a0f3be3d",
-        "revCount": 7,
-        "type": "git",
-        "url": "https://tulpa.dev/cadey/portable-svc.git"
-      },
-      "original": {
-        "ref": "main",
-        "type": "git",
-        "url": "https://tulpa.dev/cadey/portable-svc.git"
-      }
-    },
     "root": {
       "inputs": {
         "ckiee": "ckiee",
         "gomod2nix": "gomod2nix",
         "nixpkgs": "nixpkgs",
-        "portable-svc": "portable-svc",
         "rust-overlay": "rust-overlay",
         "utils": "utils"
       }

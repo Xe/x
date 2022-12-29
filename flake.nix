@@ -4,7 +4,6 @@
   inputs = {
     nixpkgs.url = "nixpkgs/nixos-unstable";
     utils.url = "github:numtide/flake-utils";
-    portable-svc.url = "git+https://tulpa.dev/cadey/portable-svc.git?ref=main";
     ckiee.url = "github:ckiee/nixpkgs?ref=gpt2simple-py-init";
 
     rust-overlay = {
@@ -20,7 +19,7 @@
     };
   };
 
-  outputs = { self, nixpkgs, utils, gomod2nix, portable-svc, ckiee, rust-overlay
+  outputs = { self, nixpkgs, utils, gomod2nix, ckiee, rust-overlay
     }@attrs:
     utils.lib.eachSystem [
       "x86_64-linux"
@@ -37,7 +36,6 @@
               buildGoModule = prev.buildGo118Module;
             })
             gomod2nix.overlays.default
-            portable-svc.overlay
             rust-overlay.overlays.default
             #(final: prev: self.packages.${system})
           ];
@@ -83,6 +81,7 @@
             pname = "mkapp";
             path = "make-mastodon-app";
           };
+          aegis = copyFile { pname = "aegis"; };
           prefix = copyFile { pname = "prefix"; };
           quickserv = copyFile { pname = "quickserv"; };
           within-website = copyFile { pname = "within.website"; };
@@ -94,95 +93,186 @@
             pname = "importer";
             path = "cadeybot-importer";
           };
-
-          robocadey = copyFile { pname = "robocadey"; };
-          robocadey-gpt2 = pkgs.writeShellScriptBin "robocadey-gpt2" ''
-            ${python}/bin/python3 ${./mastodon/robocadey/gpt2/main.py}
-          '';
-          robocadey-psvc = let
-            service = pkgs.substituteAll {
-              name = "robocadey.service";
-              src = ./run/robocadey.service.in;
-              robocadey = self.packages.${system}.robocadey;
-            };
-            gpt2-service = pkgs.substituteAll {
-              name = "robocadey-gpt2.service";
-              src = ./run/robocadey-gpt2.service.in;
-              inherit python;
-              main = ./mastodon/robocadey/gpt2/main.py;
-            };
-          in pkgs.portableService {
-            inherit (self.packages.${system}.robocadey) version;
-            name = "robocadey";
-            description = "Robotic twitter shitposting bot";
-            units = [ service gpt2-service ./run/robocadey-gpt2.socket ];
-            symlinks = [{
-              object = "${pkgs.cacert}/etc/ssl";
-              symlink = "/etc/ssl";
-            }];
-          };
         };
 
-        nixosModules.robocadey = { config, lib, pkgs, ... }:
-          with lib;
-          let
-            system = pkgs.system;
-            cfg = config.xeserv.services.robocadey;
-            selfpkgs = self.packages.${system};
-          in {
-            options.xeserv.services.robocadey = {
-              enable = mkEnableOption "Activates the printerfacts server";
+        nixosModules = {
+          aegis = { config, lib, pkgs, ... }:
+            with lib;
+            let
+              system = pkgs.system;
+              cfg = config.xeserv.services.robocadey;
+              selfpkgs = self.packages.${system};
+            in {
+              options.within.services.aegis = {
+                enable = mkEnableOption
+                  "Activates Aegis (unix socket prometheus proxy)";
 
-              pathToModel = mkOption {
-                type = types.str;
-                default = "/srv/models/robocadey_gpt2.raw";
-                description = "model squashfs volume location";
+                hostport = mkOption {
+                  type = types.str;
+                  default = "[::1]:31337";
+                  description =
+                    "The host:port that aegis should listen for traffic on";
+                };
+
+                sockdir = mkOption {
+                  type = types.str;
+                  default = "/srv/within/run";
+                  example = "/srv/within/run";
+                  description = "The folder that aegis will read from";
+                };
+              };
+
+              config = mkIf cfg.enable {
+                users.users.aegis = {
+                  createHome = true;
+                  description = "tulpa.dev/cadey/aegis";
+                  isSystemUser = true;
+                  group = "within";
+                  home = "/srv/within/aegis";
+                };
+
+                systemd.services.aegis = {
+                  wantedBy = [ "multi-user.target" ];
+
+                  serviceConfig = {
+                    User = "aegis";
+                    Group = "within";
+                    Restart = "on-failure";
+                    WorkingDirectory = "/srv/within/aegis";
+                    RestartSec = "30s";
+                  };
+
+                  script = let aegis = selfpkgs.aegis;
+                  in ''
+                    exec ${aegis}/bin/aegis -sockdir="${cfg.sockdir}" -hostport="${cfg.hostport}"
+                  '';
+                };
               };
             };
 
-            config = mkIf cfg.enable {
-              systemd.mounts = [{
-                type = "squashfs";
-                what = cfg.pathToModel;
-                where = "/var/lib/private/xeserv.robocadey-gpt2/checkpoint";
-                options = "ro,relatime,errors=continue";
-              }];
-              systemd.services = {
-                "robocadey" = {
-                  wantedBy = [ "multi-user.target" ];
-                  description = "RoboCadey";
-                  after = [ "robocadey-gpt2.socket" ];
+          robocadey = { config, lib, pkgs, ... }:
+            with lib;
+            let
+              system = pkgs.system;
+              cfg = config.xeserv.services.robocadey;
+              selfpkgs = self.packages.${system};
+            in {
+              options.xeserv.services.robocadey = {
+                enable = mkEnableOption "Activates the printerfacts server";
 
-                  serviceConfig = {
-                    Restart = "always";
-                    DynamicUser = "true";
-                    ExecStart = "${selfpkgs.robocadey}/bin/robocadey";
-                    WorkingDirectory = "/var/lib/private/xeserv.robocadey";
-                    StateDirectory = "xeserv.robocadey";
-                    CacheDirectory = "xeserv.robocadey";
-                  };
-                };
-                "robocadey-gpt2" = {
-                  wantedBy = [ "multi-user.target" ];
-                  description = "RoboCadey GPT2 sidecar";
-
-                  serviceConfig = {
-                    Restart = "always";
-                    DynamicUser = "true";
-                    ExecStart = "${selfpkgs.robocadey-gpt2}/bin/robocadey-gpt2";
-                    WorkingDirectory = "/var/lib/private/xeserv.robocadey-gpt2";
-                    StateDirectory = "xeserv.robocadey-gpt2";
-                    CacheDirectory = "xeserv.robocadey-gpt2";
-                  };
+                pathToModel = mkOption {
+                  type = types.str;
+                  default = "/srv/models/robocadey_gpt2.raw";
+                  description = "model squashfs volume location";
                 };
               };
-              systemd.sockets."robocadey-gpt2" = {
-                description = "RoboCadey GPT-2 activation socket";
-                partOf = [ "robocadey-gpt2.service" ];
-                listenStreams = [ "/run/robocadey-gpt2.sock" ];
+
+              config = mkIf cfg.enable {
+                systemd.mounts = [{
+                  type = "squashfs";
+                  what = cfg.pathToModel;
+                  where = "/var/lib/private/xeserv.robocadey-gpt2/checkpoint";
+                  options = "ro,relatime,errors=continue";
+                }];
+                systemd.services = {
+                  "robocadey" = {
+                    wantedBy = [ "multi-user.target" ];
+                    description = "RoboCadey";
+                    after = [ "robocadey-gpt2.socket" ];
+
+                    serviceConfig = {
+                      Restart = "always";
+                      DynamicUser = "true";
+                      ExecStart = "${selfpkgs.robocadey}/bin/robocadey";
+                      WorkingDirectory = "/var/lib/private/xeserv.robocadey";
+                      StateDirectory = "xeserv.robocadey";
+                      CacheDirectory = "xeserv.robocadey";
+                    };
+                  };
+                  "robocadey-gpt2" = {
+                    wantedBy = [ "multi-user.target" ];
+                    description = "RoboCadey GPT2 sidecar";
+
+                    serviceConfig = {
+                      Restart = "always";
+                      DynamicUser = "true";
+                      ExecStart =
+                        "${selfpkgs.robocadey-gpt2}/bin/robocadey-gpt2";
+                      WorkingDirectory =
+                        "/var/lib/private/xeserv.robocadey-gpt2";
+                      StateDirectory = "xeserv.robocadey-gpt2";
+                      CacheDirectory = "xeserv.robocadey-gpt2";
+                    };
+                  };
+                };
+                systemd.sockets."robocadey-gpt2" = {
+                  description = "RoboCadey GPT-2 activation socket";
+                  partOf = [ "robocadey-gpt2.service" ];
+                  listenStreams = [ "/run/robocadey-gpt2.sock" ];
+                };
               };
             };
-          };
+
+          "within.website" = { config, lib, pkgs, ... }:
+            with lib;
+            let
+              system = pkgs.system;
+              cfg = config.xeserv.services.within-website;
+              selfpkgs = self.packages.${system};
+            in {
+              options.xeserv.services.withinwebsite = {
+                enable =
+                  mkEnableOption "Enables the within.website import redirector";
+
+                domain = mkOption {
+                  type = types.str;
+                  default = "within.website";
+                  example = "within.website";
+                  description =
+                    "The domain name that nginx should check against for HTTP hostnames";
+                };
+
+                port = mkOption {
+                  type = types.int;
+                  default = 52838;
+                  example = 9001;
+                  description =
+                    "The port number withinwebsite should listen on for HTTP traffic";
+                };
+
+                package = mkOption {
+                  type = types.package;
+                  default = selfpkgs.within-website;
+                  description =
+                    "the package containing the within.website binary";
+                };
+              };
+              config = mkIf cfg.enable {
+                systemd.services.within-website = {
+                  serviceConfig = {
+                    DynamicUser = "true";
+                    DynamicGroup = "true";
+                    Restart = "always";
+                    RestartSec = "30s";
+                    ExecStart = "${cfg.package}/bin/within.website --port=${
+                        toString cfg.port
+                      }";
+                  };
+                };
+
+                services.nginx.virtualHosts."withinwebsite" = {
+                  serverName = "${cfg.domain}";
+                  locations."/".proxyPass =
+                    "http://127.0.0.1:${toString cfg.port}";
+                  forceSSL = true;
+                  useACMEHost = "${cfg.domain}";
+                  extraConfig = ''
+                    access_log /var/log/nginx/withinwebsite.access.log;
+                  '';
+                };
+              };
+            };
+        };
 
         devShells.default = pkgs.mkShell {
           buildInputs = with pkgs; [
