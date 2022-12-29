@@ -4,7 +4,6 @@
   inputs = {
     nixpkgs.url = "nixpkgs/nixos-unstable";
     utils.url = "github:numtide/flake-utils";
-    ckiee.url = "github:ckiee/nixpkgs?ref=gpt2simple-py-init";
 
     rust-overlay = {
       url = "github:oxalica/rust-overlay";
@@ -19,7 +18,7 @@
     };
   };
 
-  outputs = { self, nixpkgs, utils, gomod2nix, ckiee, rust-overlay }@attrs:
+  outputs = { self, nixpkgs, utils, gomod2nix, rust-overlay }@attrs:
     utils.lib.eachSystem [
       "x86_64-linux"
       "aarch64-linux"
@@ -39,7 +38,6 @@
             #(final: prev: self.packages.${system})
           ];
         };
-        ckieepkgs = import ckiee { inherit system; };
 
         everything = pkgs.buildGoApplication {
           pname = "xe-x-composite";
@@ -66,9 +64,6 @@
               cp $src/bin/$pname $out/bin/$path
             '';
           };
-
-        python =
-          (ckieepkgs.python310.withPackages (ps: with ps; [ gpt-2-simple ]));
       in {
         packages = rec {
           default = everything;
@@ -122,6 +117,10 @@
         };
       }) // {
         nixosModules = {
+          default = { ... }: {
+            imports = with self.nixosModules; [ aegis todayinmarch2020 "within.website" ];
+          };
+
           aegis = { config, lib, pkgs, ... }:
             with lib;
             let

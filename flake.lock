@@ -1,21 +1,5 @@
 {
   "nodes": {
-    "ckiee": {
-      "locked": {
-        "lastModified": 1651228769,
-        "narHash": "sha256-7aO7XxunWR5FUdwZBrNgXWt1xD6posMo7nLubIEbh50=",
-        "owner": "ckiee",
-        "repo": "nixpkgs",
-        "rev": "b123419b91b91afce08491861a6dd7069e2ba949",
-        "type": "github"
-      },
-      "original": {
-        "owner": "ckiee",
-        "ref": "gpt2simple-py-init",
-        "repo": "nixpkgs",
-        "type": "github"
-      }
-    },
     "gomod2nix": {
       "inputs": {
         "nixpkgs": [
@@ -56,7 +40,6 @@
     },
     "root": {
       "inputs": {
-        "ckiee": "ckiee",
         "gomod2nix": "gomod2nix",
         "nixpkgs": "nixpkgs",
         "rust-overlay": "rust-overlay",
