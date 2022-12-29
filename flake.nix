@@ -92,6 +92,35 @@
           within-website = copyFile { pname = "within.website"; };
         };
 
+        devShells.default = pkgs.mkShell {
+          buildInputs = with pkgs; [
+            go
+            gopls
+            gotools
+            go-tools
+            gomod2nix.packages.${system}.default
+            python
+
+            pkg-config
+            libaom
+            libavif
+            sqlite-interactive
+
+            cargo
+            cargo-watch
+            rustfmt
+            rust-analyzer
+            wasmtime
+            binaryen
+            wabt
+            bloaty
+            (rust-bin.stable.latest.default.override {
+              extensions = [ "rust-src" ];
+              targets = [ "wasm32-wasi" ];
+            })
+          ];
+        };
+      }) // {
         nixosModules = {
           aegis = { config, lib, pkgs, ... }:
             with lib;
@@ -274,34 +303,5 @@
               };
             };
         };
-
-        devShells.default = pkgs.mkShell {
-          buildInputs = with pkgs; [
-            go
-            gopls
-            gotools
-            go-tools
-            gomod2nix.packages.${system}.default
-            python
-
-            pkg-config
-            libaom
-            libavif
-            sqlite-interactive
-
-            cargo
-            cargo-watch
-            rustfmt
-            rust-analyzer
-            wasmtime
-            binaryen
-            wabt
-            bloaty
-            (rust-bin.stable.latest.default.override {
-              extensions = [ "rust-src" ];
-              targets = [ "wasm32-wasi" ];
-            })
-          ];
-        };
-      });
+      };
 }
