@@ -128,7 +128,7 @@
               cfg = config.xeserv.services.aegis;
               selfpkgs = self.packages.${system};
             in {
-              options.within.services.aegis = {
+              options.xeserv.services.aegis = {
                 enable = mkEnableOption
                   "Activates Aegis (unix socket prometheus proxy)";
 
