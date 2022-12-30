@@ -249,7 +249,7 @@
               cfg = config.xeserv.services.within-website;
               selfpkgs = self.packages.${system};
             in {
-              options.xeserv.services.withinwebsite = {
+              options.xeserv.services.within-website = {
                 enable =
                   mkEnableOption "Enables the within.website import redirector";
 
