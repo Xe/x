@@ -18,7 +18,8 @@
     };
   };
 
-  outputs = { self, nixpkgs, utils, gomod2nix, rust-overlay }@attrs:
+  outputs =
+    { self, nixpkgs, utils, gomod2nix, rust-overlay }@attrs:
     utils.lib.eachSystem [
       "x86_64-linux"
       "aarch64-linux"
@@ -76,6 +77,7 @@
             pname = "mkapp";
             path = "make-mastodon-app";
           };
+
           aegis = copyFile { pname = "aegis"; };
           cadeybot = copyFile { pname = "cadeybot"; };
           hlang = copyFile { pname = "hlang"; };
@@ -132,14 +134,79 @@
             imports = with self.nixosModules; [
               overlay
               aegis
+              hlang
               todayinmarch2020
               within-website
             ];
           };
 
           aegis = import ./nix/aegis.nix self;
+          hlang = import ./nix/hlang.nix self;
           todayinmarch2020 = import ./nix/todayinmarch2020.nix self;
           within-website = import ./nix/within-website.nix self;
+        };
+
+        checks.x86_64-linux = let
+          pkgs = nixpkgs.legacyPackages.x86_64-linux;
+          common = { pkgs, ... }: {
+            users.groups.within = { };
+            systemd.services.within-homedir-setup = {
+              description = "Creates homedirs for /srv/within services";
+              wantedBy = [ "multi-user.target" ];
+
+              serviceConfig.Type = "oneshot";
+
+              script = with pkgs; ''
+                ${coreutils}/bin/mkdir -p /srv/within
+                ${coreutils}/bin/chown root:within /srv/within
+                ${coreutils}/bin/chmod 775 /srv/within
+                ${coreutils}/bin/mkdir -p /srv/within/run
+                ${coreutils}/bin/chown root:within /srv/within/run
+                ${coreutils}/bin/chmod 770 /srv/within/run
+              '';
+            };
+          };
+        in {
+          basic = pkgs.nixosTest ({
+            name = "basic-tests";
+            nodes.default = { config, pkgs, ... }: {
+              imports = [ common self.nixosModules.default];
+
+              xeserv.services = {
+                aegis.enable = true;
+                hlang.enable = true;
+                todayinmarch2020.enable = true;
+                within-website.enable = true;
+              };
+            };
+
+            testScript = ''
+              start_all()
+
+              default.wait_for_unit("hlang.service")
+              print(
+                  default.wait_until_succeeds(
+                      "curl --unix-socket /srv/within/run/hlang.sock http://foo/"
+                  )
+              )
+
+              default.wait_for_unit("todayinmarch2020.service")
+              print(
+                  default.wait_until_succeeds(
+                      "curl --unix-socket /srv/within/run/todayinmarch2020.sock http://foo/"
+                  )
+              )
+
+              default.wait_for_unit("within-website.service")
+              print(
+                  default.wait_until_succeeds(
+                      "curl http://127.0.0.1:52838/"
+                  )
+              )
+
+              default.wait_for_unit("aegis.service")
+            '';
+          });
         };
       };
 }

@@ -33,9 +33,10 @@ in {
   };
   config = mkIf cfg.enable {
     systemd.services.within-website = {
+      wantedBy = [ "multi-user.target" ];
+      after = [ "within-homedir.service" ];
       serviceConfig = {
         DynamicUser = "true";
-        DynamicGroup = "true";
         Restart = "always";
         RestartSec = "30s";
         ExecStart =
