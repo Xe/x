@@ -78,6 +78,7 @@
           };
           aegis = copyFile { pname = "aegis"; };
           cadeybot = copyFile { pname = "cadeybot"; };
+          hlang = copyFile { pname = "hlang"; };
           johaus = copyFile { pname = "johaus"; };
           mainsanow = copyFile { pname = "mainsanow"; };
           prefix = copyFile { pname = "prefix"; };

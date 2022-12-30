@@ -109,6 +109,9 @@ schema = 3
   [mod."github.com/garyburd/redigo"]
     version = "v1.6.4"
     hash = "sha256-CHBFW/M79U58cq/NldC0Hk3a6uNNqNzCQ2X8RMLJAXc="
+  [mod."github.com/go-interpreter/wagon"]
+    version = "v0.6.0"
+    hash = "sha256-FjHbE3POzCuIYThN7VPtTnG67JVCic6NIYjRjYRy0Gc="
   [mod."github.com/go-ole/go-ole"]
     version = "v1.2.6"
     hash = "sha256-+oxitLeJxYF19Z6g+6CgmCHJ1Y5D8raMi2Cb3M6nXCs="
@@ -229,6 +232,9 @@ schema = 3
   [mod."github.com/otiai10/copy"]
     version = "v1.9.0"
     hash = "sha256-JKRqb4hfnYjglrsF9WikEZup8zIcV7Au854Sn+nJagU="
+  [mod."github.com/perlin-network/life"]
+    version = "v0.0.0-20191203030451-05c0e0f7eaea"
+    hash = "sha256-xgHmt0kiHNKag5Hxa+b/Q+8Vy78Nq23r80c80pmbFd8="
   [mod."github.com/peterh/liner"]
     version = "v1.2.2"
     hash = "sha256-F+cIfbpR/xQ3ODf5srpfJxLYIdgSHVc6YK16oKSqAEM="
@@ -292,6 +298,9 @@ schema = 3
   [mod."github.com/vishvananda/netns"]
     version = "v0.0.0-20211101163701-50045581ed74"
     hash = "sha256-B5BcBbKh/XD0baExSidXZZGPzQccsOrOmdUMUAE6VU0="
+  [mod."github.com/vmihailenco/msgpack"]
+    version = "v4.0.4+incompatible"
+    hash = "sha256-gA3l8Ma1XVja+C8XJzgRTQVb1htbsh4yrbnOu6cuw9U="
   [mod."github.com/x448/float16"]
     version = "v0.8.4"
     hash = "sha256-VKzMTMS9pIB/cwe17xPftCSK9Mf4Y6EuBEJlB4by5mE="
