@@ -118,7 +118,7 @@
       }) // {
         nixosModules = {
           default = { ... }: {
-            imports = with self.nixosModules; [ aegis todayinmarch2020 "within.website" ];
+            imports = with self.nixosModules; [ aegis todayinmarch2020 within-website ];
           };
 
           aegis = { config, lib, pkgs, ... }:
@@ -242,7 +242,7 @@
               };
             };
 
-          "within.website" = { config, lib, pkgs, ... }:
+          within-website = { config, lib, pkgs, ... }:
             with lib;
             let
               system = pkgs.system;
