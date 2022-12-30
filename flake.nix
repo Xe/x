@@ -125,7 +125,7 @@
             with lib;
             let
               system = pkgs.system;
-              cfg = config.xeserv.services.robocadey;
+              cfg = config.xeserv.services.aegis;
               selfpkgs = self.packages.${system};
             in {
               options.within.services.aegis = {
