@@ -67,7 +67,6 @@ in {
       serverName = "${cfg.domain}";
       locations."/".proxyPass = "http://unix:${cfg.sockPath}";
       forceSSL = cfg.useACME;
-      useACMEHost = "christine.website";
       extraConfig = ''
         access_log /var/log/nginx/hlang.access.log;
       '';
