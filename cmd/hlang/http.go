@@ -203,7 +203,7 @@ const indexTemplate = `<html>
       <hr />
 
       <footer>
-        <center><p><i>From <a href="https://christine.website">Within</a></i></p></center>
+        <center><p><i>From <a href="https://xeiaso.net">Within</a></i></p></center>
       </footer>
     </main>
   </body>
@@ -242,7 +242,7 @@ const docsTemplate = `<html>
       <hr />
 
       <footer>
-        <center><p><i>From <a href="https://christine.website">Within</a></i></p></center>
+        <center><p><i>From <a href="https://xeiaso.net">Within</a></i></p></center>
       </footer>
     </main>
   </body>
@@ -279,7 +279,7 @@ const faqTemplate = `<html>
 
       <p>With any computer running <a href="https://golang.org">Go</a> 1.11 or higher:</p>
 
-      <code><pre>go get -u -v within.website/x/cmd/h</pre></code>
+      <code><pre>go get -u -v within.website/x/cmd/hlang</pre></code>
 
       Usage is simple:
 
@@ -309,7 +309,7 @@ const faqTemplate = `<html>
 
       <h2>What version is h?</h2>
 
-      <p>Version 1.0, this will hopefully be the only release.</p>
+      <p>Version 1.0.1, this will hopefully be the only release.</p>
 
       <h2>What is the h koan?</h2>
 
@@ -328,18 +328,18 @@ const faqTemplate = `<html>
       <p>That's a good question. The following blogposts may help you understand this more:</p>
 
       <ul>
-        <li><a href="https://christine.website/blog/the-origin-of-h-2015-12-14">The Origin of h</a></li>
-        <li><a href="https://christine.website/blog/formal-grammar-of-h-2019-05-19">A Formal Grammar of h</a></li>
+        <li><a href="https://xeiaso.net/blog/the-origin-of-h-2015-12-14">The Origin of h</a></li>
+        <li><a href="https://xeiaso.net/blog/formal-grammar-of-h-2019-05-19">A Formal Grammar of h</a></li>
       </ul>
 
       <h2>Who wrote h?</h2>
 
-      <p><a href="https://christine.website">Within</a></p>
+      <p><a href="https://xeiaso.net">Within</a></p>
 
       <hr />
 
       <footer>
-        <center><p><i>From <a href="https://christine.website">Within</a></i></p></center>
+        <center><p><i>From <a href="https://xeiaso.net">Within</a></i></p></center>
       </footer>
     </main>
   </body>
@@ -382,16 +382,11 @@ const playgroundTemplate = `<html>
       <p>Gas used: <span id="gas_used"></span></p>
       <p>Execution time (nanoseconds): <span id="exec_time"></span></p>
 
-      <h4>AST</h4>
-
-      <code><pre id="ast_box"></pre></code>
-
       <script>
       function runProgram() {
         const programData = document.getElementById("program").value;
         const output = document.getElementById("output");
         const watBox = document.getElementById("wat_box");
-        const astBox = document.getElementById("ast_box");
         const gasUsed = document.getElementById("gas_used");
         const execTime = document.getElementById("exec_time");
         const status = document.getElementById("status");
@@ -407,7 +402,6 @@ const playgroundTemplate = `<html>
 
              status.innerHTML = "success";
              watBox.innerHTML = data.prog.wat;
-             astBox.innerHTML = data.prog.ast;
              output.innerHTML = data.res.out;
              gasUsed.innerHTML = data.res.gas;
              execTime.innerHTML = data.res.exec_duration;
@@ -435,7 +429,7 @@ const playgroundTemplate = `<html>
       <hr />
 
       <footer>
-        <center><p><i>From <a href="https://christine.website">Within</a></i></p></center>
+        <center><p><i>From <a href="https://xeiaso.net">Within</a></i></p></center>
       </footer>
     </main>
   </body>
