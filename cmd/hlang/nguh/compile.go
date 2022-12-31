@@ -135,6 +135,7 @@ func Compile(tree *peg.Node) ([]byte, error) {
 	funcBuf.Write([]byte{
 		0x20, 0x00, // local.get 0
 		0x10, 0x00, // call 0
+		0x01, 0x01, // two padding NOPs to get a single `h` binary to be 69 bytes.
 		0x0b, // end of function
 	})
 

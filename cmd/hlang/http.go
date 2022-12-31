@@ -298,9 +298,6 @@ const faqTemplate = `<html>
   -o string
         if specified, write the webassembly binary created
         by -p here
-  -o-wat string
-        if specified, write the uncompiled webassembly
-        created by -p here
   -p string
         h program to compile/run
   -port string
@@ -375,9 +372,9 @@ const playgroundTemplate = `<html>
 
       <code><pre id="output"></pre></code>
 
-      <h4>WebAssembly Text Format</h4>
+      <h4>AST</h4>
 
-      <code><pre id="wat_box"></pre></code>
+      <code><pre id="ast_box"></pre></code>
 
       <p>Gas used: <span id="gas_used"></span></p>
       <p>Execution time (nanoseconds): <span id="exec_time"></span></p>
@@ -386,7 +383,7 @@ const playgroundTemplate = `<html>
       function runProgram() {
         const programData = document.getElementById("program").value;
         const output = document.getElementById("output");
-        const watBox = document.getElementById("wat_box");
+        const astBox = document.getElementById("ast_box");
         const gasUsed = document.getElementById("gas_used");
         const execTime = document.getElementById("exec_time");
         const status = document.getElementById("status");
@@ -401,7 +398,7 @@ const playgroundTemplate = `<html>
              }
 
              status.innerHTML = "success";
-             watBox.innerHTML = data.prog.wat;
+             astBox.innerHTML = data.prog.ast;
              output.innerHTML = data.res.out;
              gasUsed.innerHTML = data.res.gas;
              execTime.innerHTML = data.res.exec_duration;
