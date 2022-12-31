@@ -13,9 +13,6 @@ schema = 3
   [mod."github.com/Microsoft/go-winio"]
     version = "v0.6.0"
     hash = "sha256-TQ0AvXZfuT3PDnb4p/h5zmyT8m9VPcwxlXMJuVD6ltE="
-  [mod."github.com/Yawning/bulb"]
-    version = "v0.0.0-20170405033506-85d80d893c3d"
-    hash = "sha256-GEFdZJl/T0khRN6me0hBMxD8Dirmc/agr62tsuxh8GQ="
   [mod."github.com/akutz/memconn"]
     version = "v0.1.0"
     hash = "sha256-WOs/RQYjQbn41ui8ztHgWSd4jxydE+fvIrl/0dmHD9Y="
@@ -61,9 +58,6 @@ schema = 3
   [mod."github.com/aws/smithy-go"]
     version = "v1.13.2"
     hash = "sha256-YH8hSeBNAbQr2vIBbzR6QKn4Wk4op/pwA3zN/vkf2ns="
-  [mod."github.com/birkelund/boltdbcache"]
-    version = "v1.0.0"
-    hash = "sha256-/xW4VJNiwhCPM8AMmhuN457SqGxpn9qRXAPET7Ca26M="
   [mod."github.com/bwmarrin/discordgo"]
     version = "v0.26.1"
     hash = "sha256-edRoAQ9JDD0voR91Ncw2df6V+i+sgVQUqrPxTvG9UAM="
@@ -142,9 +136,6 @@ schema = 3
   [mod."github.com/gorilla/websocket"]
     version = "v1.4.2"
     hash = "sha256-GhBLM/XTm2lFCyDvJbnCLAI2OyYXQV6W+jRPOQ1PdVY="
-  [mod."github.com/gregjones/httpcache"]
-    version = "v0.0.0-20190611155906-901d90724c79"
-    hash = "sha256-AEfenLNBYwZjwHsMG48bpwUyUtjx1BBiK2W5HQruIBc="
   [mod."github.com/hashicorp/errwrap"]
     version = "v1.1.0"
     hash = "sha256-6lwuMQOfBq+McrViN3maJTIeh4f8jbEqvLy2c9FvvFw="
@@ -238,9 +229,6 @@ schema = 3
   [mod."github.com/peterh/liner"]
     version = "v1.2.2"
     hash = "sha256-F+cIfbpR/xQ3ODf5srpfJxLYIdgSHVc6YK16oKSqAEM="
-  [mod."github.com/phayes/freeport"]
-    version = "v0.0.0-20180830031419-95f893ade6f2"
-    hash = "sha256-IFnzbGrbzRn8BrHk7E4UyP48XdEZOySxoR09mMqocyY="
   [mod."github.com/pkg/errors"]
     version = "v0.9.1"
     hash = "sha256-mNfQtcrQmu3sNg/7IwiieKWOgFQOVVe2yXgKBpe/wZw="
@@ -265,9 +253,6 @@ schema = 3
   [mod."github.com/ssor/bom"]
     version = "v0.0.0-20170718123548-6386211fdfcf"
     hash = "sha256-jYYzaIOaUFv575h3Sz/T4DPO6EWFRwEpwx1zF00i5SU="
-  [mod."github.com/sycamoreone/orc"]
-    version = "v0.0.0-20150204213357-1627eaec2699"
-    hash = "sha256-59mtIQXtEBKaRNriFiHdOrTqxIbZOGdXW2HLkIXCAVw="
   [mod."github.com/tailscale/certstore"]
     version = "v0.1.1-0.20220316223106-78d6e1c49d8d"
     hash = "sha256-qBlCkpHp8t+XNwMOJRO+YpvXn0nOJMABjUZKH70b/Y0="
@@ -304,9 +289,6 @@ schema = 3
   [mod."github.com/x448/float16"]
     version = "v0.8.4"
     hash = "sha256-VKzMTMS9pIB/cwe17xPftCSK9Mf4Y6EuBEJlB4by5mE="
-  [mod."github.com/yawning/bulb"]
-    version = "v0.0.0-20170405033506-85d80d893c3d"
-    hash = "sha256-GEFdZJl/T0khRN6me0hBMxD8Dirmc/agr62tsuxh8GQ="
   [mod."go.etcd.io/bbolt"]
     version = "v1.3.6"
     hash = "sha256-DenVAmyN22xUiivk6fdJp4C9ZnUJXCMDUf8E0goRRV4="
