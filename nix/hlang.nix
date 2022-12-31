@@ -63,7 +63,7 @@ in {
 
     services.cfdyndns = mkIf cfg.useACME { records = [ "${cfg.domain}" ]; };
 
-    services.nginx.virtualHosts."hlang" = {
+    services.nginx.virtualHosts."${cfg.domain}" = {
       serverName = "${cfg.domain}";
       locations."/".proxyPass = "http://unix:${cfg.sockPath}";
       forceSSL = cfg.useACME;
