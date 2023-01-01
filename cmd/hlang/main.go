@@ -53,7 +53,6 @@ func oneOff() error {
 
 	log.Println("success!")
 
-	log.Printf("gas used:\t%d", er.GasUsed)
 	log.Printf("exec time:\t%s", er.ExecTime)
 	log.Println("output:")
 	fmt.Print(er.Output)

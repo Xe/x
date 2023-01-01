@@ -1,8 +1,6 @@
 package nguh
 
 import (
-	"encoding/json"
-	"os"
 	"testing"
 
 	"github.com/eaburns/peggy/peg"
@@ -11,10 +9,23 @@ import (
 func TestCompile(t *testing.T) {
 	inp := &peg.Node{Text: "h"}
 
-	result, err := Compile(inp)
+	_, err := Compile(inp)
 	if err != nil {
 		t.Fatal(err)
 	}
+}
 
-	json.NewEncoder(os.Stdout).Encode(result)
+func BenchmarkCompile(b *testing.B) {
+	inp := &peg.Node{Kids: []*peg.Node{
+		{Text: "h"},
+		{Text: "h"},
+		{Text: "h"},
+	},
+	}
+
+	for i := 0; i < b.N; i++ {
+		if _, err := Compile(inp); err != nil {
+			b.Fatal(err)
+		}
+	}
 }

@@ -384,7 +384,6 @@ const playgroundTemplate = `<html>
         const programData = document.getElementById("program").value;
         const output = document.getElementById("output");
         const astBox = document.getElementById("ast_box");
-        const gasUsed = document.getElementById("gas_used");
         const execTime = document.getElementById("exec_time");
         const status = document.getElementById("status");
 
@@ -400,7 +399,6 @@ const playgroundTemplate = `<html>
              status.innerHTML = "success";
              astBox.innerHTML = data.prog.ast;
              output.innerHTML = data.res.out;
-             gasUsed.innerHTML = data.res.gas;
              execTime.innerHTML = data.res.exec_duration;
           })
           .catch(function(error) {
