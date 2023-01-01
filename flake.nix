@@ -18,8 +18,7 @@
     };
   };
 
-  outputs =
-    { self, nixpkgs, utils, gomod2nix, rust-overlay }@attrs:
+  outputs = { self, nixpkgs, utils, gomod2nix, rust-overlay }@attrs:
     utils.lib.eachSystem [
       "x86_64-linux"
       "aarch64-linux"
@@ -87,6 +86,7 @@
           quickserv = copyFile { pname = "quickserv"; };
           todayinmarch2020 = copyFile { pname = "todayinmarch2020"; };
           uploud = copyFile { pname = "uploud"; };
+          whoisfront = copyFile { pname = "whoisfront"; };
           within-website = copyFile { pname = "within.website"; };
         };
 
@@ -170,7 +170,7 @@
           basic = pkgs.nixosTest ({
             name = "basic-tests";
             nodes.default = { config, pkgs, ... }: {
-              imports = [ common self.nixosModules.default];
+              imports = [ common self.nixosModules.default ];
 
               xeserv.services = {
                 aegis.enable = true;
