@@ -65,6 +65,12 @@
             '';
           };
       in {
+        overlays.default = final: prev:
+          let
+            system = prev.system;
+            selfpkgs = self.packages.${system};
+          in { xeserv = selfpkgs; };
+
         packages = rec {
           default = everything;
 
