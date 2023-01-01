@@ -20,8 +20,8 @@ schema = 3
     version = "v0.0.0-20210105120005-909beea2cc74"
     hash = "sha256-sMY9gSeRWqKE0JwY4HbUF1KO9eaL/hQ/A/uoyr0hrQI="
   [mod."github.com/aws/aws-sdk-go"]
-    version = "v1.44.170"
-    hash = "sha256-NkPpPf2K8VY44I0dOXlssbUSppB7e5T/da/h4dOx+No="
+    version = "v1.44.171"
+    hash = "sha256-EGsBtIrlCoE5L8p0XiZ/WhGChwZSlWm/5ERHB2iSpS0="
   [mod."github.com/aws/aws-sdk-go-v2"]
     version = "v1.16.14"
     hash = "sha256-mvbpyDqBROwQFrnmqW5QieIxlg0HVpb1ImqiPJujRxo="
@@ -266,8 +266,8 @@ schema = 3
     version = "v0.2.0"
     hash = "sha256-bCWn8E+DcZY6+yPu07AF3hCcDZx3CFdD74qfpDIgVqI="
   [mod."github.com/tetratelabs/wazero"]
-    version = "v1.0.0-pre.5"
-    hash = "sha256-0ITECCWiw9uMWQLiucqYUwq0HLTW/qv6gpq+P0e7DG4="
+    version = "v1.0.0-pre.6"
+    hash = "sha256-wlnMfgvwijdLZogBfpZ4/mAfAbhSauWHCD5BhgMSncg="
   [mod."github.com/tmc/scp"]
     version = "v0.0.0-20170824174625-f7b48647feef"
     hash = "sha256-qHwQb3JA43VVhJdB18/2zXbxqW/bgw1yvr8YhqFyd74="
