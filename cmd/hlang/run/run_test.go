@@ -1,4 +1,4 @@
-package main
+package run
 
 import (
 	_ "embed"
@@ -10,7 +10,7 @@ var bin []byte
 
 func BenchmarkRun(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		if _, err := run(bin); err != nil {
+		if _, err := Run(bin); err != nil {
 			b.Fatal(err)
 		}
 	}

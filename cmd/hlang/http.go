@@ -11,6 +11,7 @@ import (
 
 	"github.com/rs/cors"
 	"within.website/ln/ex"
+	"within.website/x/cmd/hlang/run"
 )
 
 var (
@@ -75,7 +76,7 @@ func runPlayground(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	er, err := run(comp.Binary)
+	er, err := run.Run(comp.Binary)
 	if err != nil {
 		httpError(w, fmt.Errorf("runtime error: %v", err), http.StatusInternalServerError)
 		return
@@ -84,7 +85,7 @@ func runPlayground(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(struct {
 		Program *CompiledProgram `json:"prog"`
-		Results *ExecResult      `json:"res"`
+		Results *run.ExecResult  `json:"res"`
 	}{
 		Program: comp,
 		Results: er,

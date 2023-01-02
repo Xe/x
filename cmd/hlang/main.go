@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 
+	"within.website/x/cmd/hlang/run"
 	"within.website/x/internal"
 )
 
@@ -46,7 +47,7 @@ func oneOff() error {
 	}
 
 	log.Println("running...")
-	er, err := run(comp.Binary)
+	er, err := run.Run(comp.Binary)
 	if err != nil {
 		return err
 	}
