@@ -578,8 +578,8 @@ golang.org/x/sys v0.0.0-20220520151302-bc2c85ada10a/go.mod h1:oPkhp1MJrh7nUepCBc
 golang.org/x/sys v0.0.0-20220715151400-c0bba94af5f8/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.0.0-20220722155257-8c9f86f7a55f/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.1.0/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
-golang.org/x/sys v0.3.0 h1:w8ZOecv6NaNa/zC8944JTU3vz4u6Lagfk4RPQxv92NQ=
-golang.org/x/sys v0.3.0/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
+golang.org/x/sys v0.3.1-0.20221220025402-2204b6615fb8 h1:/VqMvhQCyzfuc826eNrpWmMb3AwD2Sxz/HMsYIhwcIs=
+golang.org/x/sys v0.3.1-0.20221220025402-2204b6615fb8/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/term v0.0.0-20201126162022-7de9c90e9dd1/go.mod h1:bj7SfCRtBDWHUb9snDiAeCFNEtKQo2Wmx5Cou7ajbmo=
 golang.org/x/term v0.0.0-20210927222741-03fcf44c2211/go.mod h1:jbD1KX2456YbFQfuXm/mYQcufACuNUgVhRMnK/tPxf8=
 golang.org/x/term v0.1.0/go.mod h1:jbD1KX2456YbFQfuXm/mYQcufACuNUgVhRMnK/tPxf8=
@@ -763,8 +763,8 @@ rsc.io/binaryregexp v0.2.0/go.mod h1:qTv7/COck+e2FymRvadv62gMdZztPaShugOCi3I+8D8
 rsc.io/quote/v3 v3.1.0/go.mod h1:yEA65RcK8LyAZtP9Kv3t0HmxON59tX3rD+tICJqUlj0=
 rsc.io/sampler v1.3.0/go.mod h1:T1hPZKmBbMNahiBKFy5HrXp6adAjACjK9JXDnKaTXpA=
 software.sslmate.com/src/go-pkcs12 v0.2.0 h1:nlFkj7bTysH6VkC4fGphtjXRbezREPgrHuJG20hBGPE=
-tailscale.com v1.34.1 h1:tqm9Ww4ltyYp3IPe7vCGch6tT6j5G/WXPQ6BrVZ6pdI=
-tailscale.com v1.34.1/go.mod h1:ZsBP7rjzzB2rp+UCOumr9DAe0EQ6OPivwSXcz/BrekQ=
+tailscale.com v1.34.2 h1:g6n9HEZjQfTQfXyeiGeuxPPqSQKhtdmXIbyUxd76O9U=
+tailscale.com v1.34.2/go.mod h1:xA1XYcaHK0BIyCETEkTuaj3M3uOe/zNJ5G/Sb9oNU3k=
 tulpa.dev/cadey/jvozba v0.0.0-20200326200349-f0ebe310be06 h1:va9TfLrDow17NpRPkZW9rwrEecY8lko/99rtBOS0AEE=
 tulpa.dev/cadey/jvozba v0.0.0-20200326200349-f0ebe310be06/go.mod h1:24Hynxow485ZwxAmn0yO1ATKApVnOB2dFM3zrtrGla0=
 within.website/johaus v1.1.0 h1:j59k9LM5ue+CDwUZAJitYjek6i8ISMkkCFiVXKZLByw=
