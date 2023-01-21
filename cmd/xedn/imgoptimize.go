@@ -1,0 +1,158 @@
+package main
+
+import (
+	"bytes"
+	"errors"
+	"fmt"
+	"image"
+	"image/png"
+	"net/http"
+	"os"
+	"path/filepath"
+	"strconv"
+	"strings"
+	"time"
+
+	"github.com/chai2010/webp"
+	"github.com/disintegration/imaging"
+	"go.etcd.io/bbolt"
+	"within.website/ln"
+	"within.website/x/internal/avif"
+)
+
+type OptimizedImageServer struct {
+	DB     *bbolt.DB
+	Cache  *Cache
+	PNGEnc *png.Encoder
+}
+
+func (ois *OptimizedImageServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	// /sticker/character/mood/width
+	acc := strings.Split(r.Header.Get("Accept"), ",")
+	var format = "png"
+	for _, acceptFormat := range acc {
+		_, theirFormat, ok := strings.Cut(acceptFormat, "image/")
+		if !ok {
+			continue
+		}
+
+		switch theirFormat {
+		case "avif", "webp", "png":
+			format = theirFormat
+		}
+	}
+
+	pathParts := strings.Split(r.URL.Path, "/")
+	if len(pathParts) != 5 {
+		http.Error(w, "usage: /sticker/:character/:mood/:width", http.StatusBadRequest)
+		return
+	}
+
+	character := pathParts[2]
+	mood := pathParts[3]
+	widthStr := pathParts[4]
+
+	width, err := strconv.Atoi(widthStr)
+	if err != nil {
+		http.Error(w, "width must be an int", http.StatusBadRequest)
+		return
+	}
+
+	if width > 256 {
+		http.Error(w, "width must be less than 257", http.StatusBadRequest)
+		return
+	}
+
+	data, err := ois.ResizeTo(width, character, mood, format)
+	if err != nil {
+		ln.Error(r.Context(), err)
+		http.Error(w, "can't convert image", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "image/"+format)
+	w.Header().Set("Content-Length", strconv.Itoa(len(data)))
+	w.Header().Set("Cache-Control", "max-age:604800")
+	w.Header().Set("Expires", time.Now().Add(604800*time.Second).Format(http.TimeFormat))
+	w.Header().Set("Etag", fmt.Sprintf(`W/"%s"`, Hash(r.URL.Path)))
+	w.WriteHeader(http.StatusOK)
+	w.Write(data)
+}
+
+func (ois *OptimizedImageServer) ResizeTo(widthPixels int, character, mood, format string) ([]byte, error) {
+	if widthPixels <= 0 {
+		return nil, errors.New("widthPixels must be greater than 0")
+	}
+
+	var result bytes.Buffer
+	boltPath := []byte(filepath.Join(character, mood, strconv.Itoa(widthPixels), format))
+
+	err := ois.DB.Update(func(tx *bbolt.Tx) error {
+		bkt, err := tx.CreateBucketIfNotExists([]byte("sticker_cache"))
+		if err != nil {
+			return err
+		}
+
+		(&result).Write(bkt.Get(boltPath))
+
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	if result.Len() != 0 /* because found in boltdb */ {
+		return result.Bytes(), nil
+	}
+
+	// /file/christine-static/stickers/aoi/yawn.png
+	path := fmt.Sprintf("/file/christine-static/stickers/%s/%s.png", character, mood)
+	data, err := ois.Cache.LoadBytesOrFetch(path)
+	if err != nil {
+		return nil, fmt.Errorf("can't fetch: %w", err)
+	}
+
+	os.WriteFile("foo.png", data, 0666)
+
+	img, _, err := image.Decode(bytes.NewBuffer(data))
+	if err != nil {
+		return nil, fmt.Errorf("can't decode image: %w", err)
+	}
+
+	dstImg := imaging.Resize(img, widthPixels, 0, imaging.Lanczos)
+
+	switch format {
+	case "png":
+		if err := ois.PNGEnc.Encode(&result, dstImg); err != nil {
+			return nil, err
+		}
+	case "webp":
+		if err := webp.Encode(&result, dstImg, &webp.Options{Quality: 70}); err != nil {
+			return nil, err
+		}
+	case "avif":
+		if err := avif.Encode(&result, dstImg, &avif.Options{Quality: 48, Speed: avif.MaxSpeed}); err != nil {
+			return nil, err
+		}
+	default:
+		return nil, fmt.Errorf("I don't know how to render to %s yet, sorry", format)
+	}
+
+	err = ois.DB.Update(func(tx *bbolt.Tx) error {
+		bkt, err := tx.CreateBucketIfNotExists([]byte("sticker_cache"))
+		if err != nil {
+			return err
+		}
+
+		if err := bkt.Put(boltPath, result.Bytes()); err != nil {
+			return err
+		}
+
+		return nil
+	})
+	if err != nil {
+		return nil, fmt.Errorf("can't write to database: %w", err)
+	}
+
+	return result.Bytes(), nil
+}

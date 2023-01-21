@@ -7,7 +7,7 @@ kill_timeout = 5
 processes = []
 
 [build]
-  dockerfile = "./Dockerfile"
+  image = "registry.fly.io/xedn:latest"
 
 [env]
   XEDN_STATE = "/data/xedn"

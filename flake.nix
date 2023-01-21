@@ -93,7 +93,18 @@
           todayinmarch2020 = copyFile { pname = "todayinmarch2020"; };
           uploud = copyFile { pname = "uploud"; };
           whoisfront = copyFile { pname = "whoisfront"; };
+          xedn = copyFile { pname = "xedn"; };
           within-website = copyFile { pname = "within.website"; };
+
+          xedn-docker = pkgs.dockerTools.buildLayeredImage {
+            name = "registry.fly.io/xedn";
+            tag = "latest";
+            contents = [ default ];
+            config = {
+              Cmd = [ "${xedn}/bin/xedn" ];
+              WorkingDir = default;
+            };
+          };
         };
 
         devShells.default = pkgs.mkShell {
@@ -104,6 +115,8 @@
             go-tools
             gomod2nix.packages.${system}.default
             python
+            strace
+            hey
 
             pkg-config
             libaom

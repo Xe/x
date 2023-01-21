@@ -96,3 +96,24 @@ func DockerBuild(ctx context.Context, dir, tag string, args ...string) {
 	args = append(args, ".")
 	ShouldWork(ctx, nil, dir, "docker", args...)
 }
+
+// DockerLoadResult loads a nix-built docker image
+func DockerLoadResult(ctx context.Context, at string) {
+	c := exec.CommandContext(ctx, "docker", "load")
+	c.Env = os.Environ()
+	fin, err := os.Open(at)
+	if err != nil {
+		panic(err)
+	}
+	defer fin.Close()
+	c.Stdin = fin
+
+	if err := c.Run(); err != nil {
+		panic(err)
+	}
+}
+
+// DockerPush pushes a docker image to a given host
+func DockerPush(ctx context.Context, image string) {
+	ShouldWork(ctx, nil, WD, "docker", "push", image)
+}

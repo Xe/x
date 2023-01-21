@@ -2,6 +2,7 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"crypto/md5"
 	_ "embed"
@@ -10,6 +11,7 @@ import (
 	"expvar"
 	"flag"
 	"fmt"
+	"image/png"
 	"io"
 	"log"
 	"net/http"
@@ -144,7 +146,7 @@ func (dc *Cache) Save(dir string, resp *http.Response) error {
 
 var ErrNotCached = errors.New("data is not cached")
 
-func (dc *Cache) Load(dir string, w http.ResponseWriter) error {
+func (dc *Cache) Load(dir string, w io.Writer) error {
 	return dc.DB.View(func(tx *bbolt.Tx) error {
 		bkt := tx.Bucket([]byte(dir))
 		if bkt == nil {
@@ -182,9 +184,11 @@ func (dc *Cache) Load(dir string, w http.ResponseWriter) error {
 			return ErrNotCached
 		}
 
-		for k, vs := range h {
-			for _, v := range vs {
-				w.Header().Add(k, v)
+		if rw, ok := w.(http.ResponseWriter); ok {
+			for k, vs := range h {
+				for _, v := range vs {
+					rw.Header().Add(k, v)
+				}
 			}
 		}
 
@@ -194,6 +198,35 @@ func (dc *Cache) Load(dir string, w http.ResponseWriter) error {
 
 		return nil
 	})
+}
+
+func (dc *Cache) LoadBytesOrFetch(path string) ([]byte, error) {
+	buf := bytes.NewBuffer(nil)
+	err := dc.Load(path, buf)
+	if err != nil {
+		if err == ErrNotCached {
+			resp, err := dc.Client.Get(fmt.Sprintf("https://%s%s", dc.ActualHost, path))
+			if err != nil {
+				cacheErrors.Add(1)
+				return nil, err
+			}
+
+			if resp.StatusCode != http.StatusOK {
+				cacheErrors.Add(1)
+				return nil, web.NewError(http.StatusOK, resp)
+			}
+
+			err = dc.Save(path, resp)
+			if err != nil {
+				cacheErrors.Add(1)
+				return nil, err
+			}
+
+			return dc.LoadBytesOrFetch(path)
+		}
+		return nil, err
+	}
+	return buf.Bytes(), nil
 }
 
 func (dc *Cache) GetFile(w http.ResponseWriter, r *http.Request) error {
@@ -241,9 +274,9 @@ var (
 
 	etagMatches = expvar.NewInt("counter_xedn_etag_matches")
 
-	referers   = metrics.LabelMap{Label: "url"}
-	fileHits   = metrics.LabelMap{Label: "path"}
-	fileDeaths = metrics.LabelMap{Label: "path"}
+	referers      = metrics.LabelMap{Label: "url"}
+	fileHits      = metrics.LabelMap{Label: "path"}
+	fileDeaths    = metrics.LabelMap{Label: "path"}
 	fileMimeTypes = metrics.LabelMap{Label: "type"}
 
 	etags    map[string]string
@@ -269,6 +302,12 @@ func main() {
 		ActualHost: *b2Backend,
 		Client:     &http.Client{},
 		DB:         db,
+	}
+
+	ois := &OptimizedImageServer{
+		DB:     db,
+		Cache:  dc,
+		PNGEnc: &png.Encoder{CompressionLevel: png.BestCompression},
 	}
 
 	go func() {
@@ -314,6 +353,8 @@ func main() {
 		w.WriteHeader(http.StatusOK)
 		w.Write(indexHTML)
 	})
+
+	mux.Handle("/sticker/", ois)
 
 	hdlr := func(w http.ResponseWriter, r *http.Request) {
 		etagLock.RLock()
