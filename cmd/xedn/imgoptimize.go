@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"image"
@@ -16,6 +17,7 @@ import (
 	"github.com/chai2010/webp"
 	"github.com/disintegration/imaging"
 	"go.etcd.io/bbolt"
+	"tailscale.com/metrics"
 	"within.website/ln"
 	"within.website/x/internal/avif"
 )
@@ -25,6 +27,11 @@ type OptimizedImageServer struct {
 	Cache  *Cache
 	PNGEnc *png.Encoder
 }
+
+var (
+	OISFileConversions = metrics.LabelMap{Label: "format"}
+	OISFileHits        = metrics.LabelMap{Label: "path"}
+)
 
 func (ois *OptimizedImageServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// /sticker/character/mood/width
@@ -77,6 +84,7 @@ func (ois *OptimizedImageServer) ServeHTTP(w http.ResponseWriter, r *http.Reques
 	w.Header().Set("Etag", fmt.Sprintf(`W/"%s"`, Hash(r.URL.Path)))
 	w.WriteHeader(http.StatusOK)
 	w.Write(data)
+	OISFileHits.Add(r.URL.Path, 1)
 }
 
 func (ois *OptimizedImageServer) ResizeTo(widthPixels int, character, mood, format string) ([]byte, error) {
@@ -138,6 +146,8 @@ func (ois *OptimizedImageServer) ResizeTo(widthPixels int, character, mood, form
 		return nil, fmt.Errorf("I don't know how to render to %s yet, sorry", format)
 	}
 
+	OISFileConversions.Add(format, 1)
+
 	err = ois.DB.Update(func(tx *bbolt.Tx) error {
 		bkt, err := tx.CreateBucketIfNotExists([]byte("sticker_cache"))
 		if err != nil {
@@ -155,4 +165,64 @@ func (ois *OptimizedImageServer) ResizeTo(widthPixels int, character, mood, form
 	}
 
 	return result.Bytes(), nil
+}
+
+func (ois *OptimizedImageServer) ListFiles(w http.ResponseWriter, r *http.Request) {
+	var data []string
+
+	err := ois.DB.Update(func(tx *bbolt.Tx) error {
+		bkt, err := tx.CreateBucketIfNotExists([]byte("sticker_cache"))
+		if err != nil {
+			return err
+		}
+
+		err = bkt.ForEach(func(key, _ []byte) error {
+			data = append(data, string(key))
+			return nil
+		})
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	json.NewEncoder(w).Encode(data)
+}
+
+func (ois *OptimizedImageServer) Purge(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "must POST", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var data []string
+
+	if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
+		http.Error(w, "must be JSON", http.StatusBadRequest)
+		return
+	}
+
+	err := ois.DB.Update(func(tx *bbolt.Tx) error {
+		bkt, err := tx.CreateBucketIfNotExists([]byte("sticker_cache"))
+		if err != nil {
+			return err
+		}
+
+		for _, key := range data {
+			if err := bkt.Delete([]byte(key)); err != nil {
+				return err
+			}
+		}
+
+		return nil
+	})
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }

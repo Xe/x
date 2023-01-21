@@ -326,6 +326,8 @@ func main() {
 		http.DefaultServeMux.HandleFunc("/debug/varz", tsweb.VarzHandler)
 		http.DefaultServeMux.HandleFunc("/xedn/files", dc.ListFiles)
 		http.DefaultServeMux.HandleFunc("/xedn/purge", dc.Purge)
+		http.DefaultServeMux.HandleFunc("/sticker/files", ois.ListFiles)
+		http.DefaultServeMux.HandleFunc("/sticker/purge", ois.Purge)
 
 		defer srv.Close()
 		defer lis.Close()
@@ -380,6 +382,8 @@ func main() {
 	expvar.Publish("gauge_xedn_file_hits", &fileHits)
 	expvar.Publish("gauge_xedn_file_deaths", &fileDeaths)
 	expvar.Publish("gauge_xedn_file_mime_type", &fileMimeTypes)
+	expvar.Publish("gauge_xedn_ois_file_conversions", &OISFileConversions)
+	expvar.Publish("gauge_xedn_ois_file_hits", &OISFileHits)
 
 	mux.HandleFunc("/file/christine-static/", hdlr)
 	mux.HandleFunc("/file/xeserv-akko/", hdlr)
