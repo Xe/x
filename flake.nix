@@ -99,7 +99,7 @@
           xedn-docker = pkgs.dockerTools.buildLayeredImage {
             name = "registry.fly.io/xedn";
             tag = "latest";
-            contents = [ default ];
+            contents = [ default pkgs.cacert ];
             config = {
               Cmd = [ "${xedn}/bin/xedn" ];
               WorkingDir = default;
