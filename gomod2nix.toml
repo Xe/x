@@ -20,8 +20,8 @@ schema = 3
     version = "v0.0.0-20210105120005-909beea2cc74"
     hash = "sha256-sMY9gSeRWqKE0JwY4HbUF1KO9eaL/hQ/A/uoyr0hrQI="
   [mod."github.com/aws/aws-sdk-go"]
-    version = "v1.44.177"
-    hash = "sha256-MjsU8eKtoosmDg7/3Cpl6GUXBBX+msNbMdlDdeVJi+8="
+    version = "v1.44.180"
+    hash = "sha256-Czcd7sG0Ql056jUct2UUIpe/H+vc5nX8eCetXYhJwD8="
   [mod."github.com/aws/aws-sdk-go-v2"]
     version = "v1.16.14"
     hash = "sha256-mvbpyDqBROwQFrnmqW5QieIxlg0HVpb1ImqiPJujRxo="
@@ -59,8 +59,8 @@ schema = 3
     version = "v1.13.2"
     hash = "sha256-YH8hSeBNAbQr2vIBbzR6QKn4Wk4op/pwA3zN/vkf2ns="
   [mod."github.com/bwmarrin/discordgo"]
-    version = "v0.26.1"
-    hash = "sha256-edRoAQ9JDD0voR91Ncw2df6V+i+sgVQUqrPxTvG9UAM="
+    version = "v0.27.0"
+    hash = "sha256-MP3FbpM2v+fYKzxMYF1A9uwfs6E3LBu+7bYoiVzZirY="
   [mod."github.com/chai2010/webp"]
     version = "v1.1.1"
     hash = "sha256-fgqfaEmrjMRcUC6WXVISIujzGYauZTKDDrJGLodn70c="
