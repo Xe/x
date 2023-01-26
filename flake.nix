@@ -53,6 +53,20 @@
           ];
         };
 
+        xedn = pkgs.buildGoApplication {
+          pname = "xedn";
+          version = "1.2.3";
+          src = ./.;
+          modules = ./gomod2nix.toml;
+          subPackages = [ "./cmd/xedn" ];
+
+          buildInputs = with pkgs; [
+            pkg-config
+            libaom
+            libavif
+          ];
+        };
+
         copyFile = { pname, path ? pname }:
           pkgs.stdenv.mkDerivation {
             inherit pname;
@@ -83,6 +97,8 @@
             path = "make-mastodon-app";
           };
 
+          inherit xedn;
+
           aegis = copyFile { pname = "aegis"; };
           cadeybot = copyFile { pname = "cadeybot"; };
           hlang = copyFile { pname = "hlang"; };
@@ -93,16 +109,15 @@
           todayinmarch2020 = copyFile { pname = "todayinmarch2020"; };
           uploud = copyFile { pname = "uploud"; };
           whoisfront = copyFile { pname = "whoisfront"; };
-          xedn = copyFile { pname = "xedn"; };
           within-website = copyFile { pname = "within.website"; };
 
           xedn-docker = pkgs.dockerTools.buildLayeredImage {
             name = "registry.fly.io/xedn";
             tag = "latest";
-            contents = [ default pkgs.cacert ];
+            contents = [ pkgs.cacert ];
             config = {
               Cmd = [ "${xedn}/bin/xedn" ];
-              WorkingDir = default;
+              WorkingDir = "${xedn}";
             };
           };
         };
@@ -117,6 +132,7 @@
             python
             strace
             hey
+            boltbrowser
 
             pkg-config
             libaom

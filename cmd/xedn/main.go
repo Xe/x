@@ -264,7 +264,49 @@ func (dc *Cache) GetFile(w http.ResponseWriter, r *http.Request) error {
 	return dc.Load(dir, w)
 }
 
-func (dc *Cache) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (dc *Cache) CronPurgeDead() {
+	ctx := opname.With(context.Background(), "cronpurgedead")
+
+	for range time.Tick(30 * time.Minute) {
+		ln.Log(ctx, ln.Action("starting"))
+
+		if err := dc.DB.Update(func(tx *bbolt.Tx) error {
+			if err := tx.ForEach(func(name []byte, b *bbolt.Bucket) error {
+				if string(name) == "sticker_cache" {
+					return nil
+				}
+
+				ctx := ln.WithF(ctx, ln.F{"path": string(name)})
+				diesAtBytes := b.Get([]byte("diesAt"))
+				if diesAtBytes == nil {
+					ln.Log(ctx, ln.Info("no diesAt key"))
+					return nil
+				}
+
+				diesAt, err := time.Parse(http.TimeFormat, string(diesAtBytes))
+				if err != nil {
+					return fmt.Errorf("when parsing diesAt for %s (%q): %w", string(name), string(diesAtBytes), err)
+				}
+
+				if diesAt.Before(time.Now()) {
+					if err := tx.DeleteBucket(name); err != nil {
+						return fmt.Errorf("when trying to delete bucket %s: %w", string(name), err)
+					}
+
+					fileDeaths.Add(string(name), 1)
+					ln.Log(ctx, ln.Info("deleted"), ln.F{"diesAt": diesAt.Format(time.RFC3339)})
+				}
+
+				return nil
+			}); err != nil {
+				return err
+			}
+
+			return nil
+		}); err != nil {
+			ln.Error(ctx, err)
+		}
+	}
 }
 
 var (
@@ -303,6 +345,8 @@ func main() {
 		Client:     &http.Client{},
 		DB:         db,
 	}
+
+	go dc.CronPurgeDead()
 
 	ois := &OptimizedImageServer{
 		DB:     db,
