@@ -3,13 +3,13 @@ package yeet
 import (
 	"context"
 	"fmt"
-	"log"
 	"os"
 	"os/exec"
 	"strings"
 	"time"
 
 	"github.com/pkg/errors"
+	"within.website/ln"
 )
 
 // current working directory and date:time tag of app boot (useful for tagging slugs)
@@ -21,7 +21,7 @@ var (
 func init() {
 	lwd, err := os.Getwd()
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
 	WD = lwd
@@ -32,7 +32,7 @@ func init() {
 func ShouldWork(ctx context.Context, env []string, dir string, cmdName string, args ...string) {
 	loc, err := exec.LookPath(cmdName)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
 	cmd := exec.CommandContext(ctx, loc, args...)
@@ -42,7 +42,12 @@ func ShouldWork(ctx context.Context, env []string, dir string, cmdName string, a
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
-	log.Printf("starting process, pwd: %s, cmd: %s, args: %v", dir, loc, args)
+	ln.Log(ctx, ln.Info("starting process"), ln.F{
+		"pwd":     dir,
+		"cmdName": cmdName,
+		"args":    args,
+	})
+
 	err = cmd.Run()
 	if err != nil {
 		panic(err)
