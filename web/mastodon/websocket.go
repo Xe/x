@@ -30,9 +30,16 @@ func (c *Client) StreamMessages(ctx context.Context, subreq ...WSSubscribeReques
 	result := make(chan WSMessage, 10)
 	ctx = opname.With(ctx, "websocket-streaming")
 
-	u, err := c.server.Parse("/api/vi/streaming/")
+	u, err := c.server.Parse("/api/v1/streaming")
 	if err != nil {
 		return nil, err
+	}
+
+	switch u.Scheme {
+	case "http":
+		u.Scheme = "ws"
+	case "https":
+		u.Scheme = "wss"
 	}
 
 	q := u.Query()
