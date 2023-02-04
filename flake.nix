@@ -58,13 +58,21 @@
           version = "1.2.3";
           src = ./.;
           modules = ./gomod2nix.toml;
-          subPackages = [ "./cmd/xedn" ];
+          subPackages = [ "cmd/xedn" ];
 
           buildInputs = with pkgs; [
             pkg-config
             libaom
             libavif
           ];
+        };
+
+        robocadey2 = pkgs.buildGoApplication {
+          pname = "robocadey2";
+          version = "1.2.3";
+          src = ./.;
+          modules = ./gomod2nix.toml;
+          subPackages = [ "mastodon/robocadey2" ];
         };
 
         copyFile = { pname, path ? pname }:
@@ -97,7 +105,7 @@
             path = "make-mastodon-app";
           };
 
-          inherit xedn;
+          inherit xedn robocadey2;
 
           aegis = copyFile { pname = "aegis"; };
           cadeybot = copyFile { pname = "cadeybot"; };
@@ -110,6 +118,16 @@
           uploud = copyFile { pname = "uploud"; };
           whoisfront = copyFile { pname = "whoisfront"; };
           within-website = copyFile { pname = "within.website"; };
+
+          robocadey2-docker = pkgs.dockerTools.buildLayeredImage {
+            name = "registry.fly.io/xe-robocadey2";
+            tag = "latest";
+            contents = [ pkgs.cacert ];
+            config = {
+              Cmd = [ "${robocadey2}/bin/robocadey2" ];
+              WorkingDir = "${robocadey2}";
+            };
+          };
 
           xedn-docker = pkgs.dockerTools.buildLayeredImage {
             name = "registry.fly.io/xedn";

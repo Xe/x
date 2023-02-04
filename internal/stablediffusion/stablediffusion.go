@@ -83,7 +83,21 @@ type ImageInfo struct {
 	IsUsingInpaintingConditioning bool          `json:"is_using_inpainting_conditioning"`
 }
 
+var (
+	Default *Client = &Client{
+		HTTP: http.DefaultClient,
+	}
+)
+
 func Generate(ctx context.Context, inp SimpleImageRequest) (*ImageResponse, error) {
+	return Default.Generate(ctx, inp)
+}
+
+type Client struct {
+	HTTP *http.Client
+}
+
+func (c *Client) Generate(ctx context.Context, inp SimpleImageRequest) (*ImageResponse, error) {
 	u, err := buildURL("/sdapi/v1/txt2img")
 	if err != nil {
 		return nil, fmt.Errorf("error building URL: %w", err)
@@ -99,7 +113,7 @@ func Generate(ctx context.Context, inp SimpleImageRequest) (*ImageResponse, erro
 		return nil, fmt.Errorf("error making request: %w", err)
 	}
 
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := c.HTTP.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("error fetching response: %w", err)
 	}

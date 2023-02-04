@@ -4,16 +4,24 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"expvar"
 	"flag"
 	"fmt"
+	"io"
+	"log"
 	"math/rand"
+	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
 	"time"
 
 	"github.com/jaytaylor/html2text"
+	"tailscale.com/metrics"
+	"tailscale.com/tsnet"
+	"tailscale.com/tsweb"
 	"within.website/ln"
+	"within.website/ln/ex"
 	"within.website/ln/opname"
 	"within.website/x/internal"
 	"within.website/x/internal/stablediffusion"
@@ -21,12 +29,39 @@ import (
 )
 
 var (
+	hostname = flag.String("hostname", "robocadey2", "hostname to use on tailnet")
+	dataDir  = flag.String("dir", dataLocation(), "stateful data directory")
 	instance = flag.String("instance", "", "mastodon instance")
 	token    = flag.String("token", "", "oauth2 token")
+
+	uploads = expvar.NewInt("gauge_robocadey2_uploads")
+	retries = expvar.NewInt("gauge_robocadey2_retries")
+
+	usageCount = metrics.LabelMap{Label: "user"}
 )
+
+func envOr(key, defaultVal string) string {
+	if result, ok := os.LookupEnv(key); ok {
+		return result
+	}
+	return defaultVal
+}
+
+func dataLocation() string {
+	if dir, ok := os.LookupEnv("STATE"); ok {
+		return dir
+	}
+	dir, err := os.UserConfigDir()
+	if err != nil {
+		return os.Getenv("STATE")
+	}
+	return filepath.Join(dir, "within.website", "x", "robocadey2")
+}
 
 func main() {
 	internal.HandleStartup()
+
+	os.MkdirAll(*dataDir, 0777)
 
 	ctx := opname.With(context.Background(), "main")
 	rand.Seed(time.Now().Unix())
@@ -36,7 +71,43 @@ func main() {
 		ln.FatalErr(ctx, err)
 	}
 
+	expvar.Publish("gauge_robocadey_usage_by_user", &usageCount)
+	os.MkdirAll(filepath.Join(*dataDir, "tsnet"), 0777)
+	srv := &tsnet.Server{
+		Hostname: *hostname,
+		Logf:     log.New(io.Discard, "", 0).Printf,
+		AuthKey:  os.Getenv("TS_AUTHKEY"),
+		Dir:      filepath.Join(*dataDir, "tsnet"),
+	}
+
+	if err := srv.Start(); err != nil {
+		ln.FatalErr(ctx, err)
+	}
+
+	httpCli := srv.HTTPClient()
+	if err != nil {
+		ln.FatalErr(ctx, err)
+	}
+
 	ln.Log(ctx, ln.Info("waiting for messages"))
+
+	b := &Bot{
+		cli: cli,
+		sd:  &stablediffusion.Client{HTTP: httpCli},
+	}
+
+	go func() {
+		lis, err := srv.Listen("tcp", ":80")
+		if err != nil {
+			ln.FatalErr(ctx, err, ln.Action("tsnet listening"))
+		}
+
+		http.DefaultServeMux.HandleFunc("/debug/varz", tsweb.VarzHandler)
+
+		defer srv.Close()
+		defer lis.Close()
+		ln.FatalErr(opname.With(ctx, "metrics-tsnet"), http.Serve(lis, ex.HTTPLog(http.DefaultServeMux)))
+	}()
 
 	for {
 		ctx, cancel := context.WithCancel(ctx)
@@ -54,7 +125,11 @@ func main() {
 					continue
 				}
 
-				if err := handleNotification(cli, n); err != nil {
+				if n.Type != "mention" {
+					continue
+				}
+
+				if err := b.handleNotification(n); err != nil {
 					ln.Error(ctx, err, ln.F{"content": n.Status.Content})
 					continue
 				}
@@ -64,7 +139,12 @@ func main() {
 	}
 }
 
-func handleNotification(c *mastodon.Client, n mastodon.Notification) error {
+type Bot struct {
+	cli *mastodon.Client
+	sd  *stablediffusion.Client
+}
+
+func (b *Bot) handleNotification(n mastodon.Notification) error {
 	text, err := html2text.FromString(n.Status.Content, html2text.Options{OmitLinks: true})
 	if err != nil {
 		return nil
@@ -77,14 +157,6 @@ func handleNotification(c *mastodon.Client, n mastodon.Notification) error {
 
 	text = strings.TrimSpace(text)
 
-	fmt.Printf("text: %q\n", text)
-
-	dir, err := os.MkdirTemp("", "robocadey2")
-	if err != nil {
-		return err
-	}
-	defer os.RemoveAll(dir)
-
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
 	defer cancel()
 
@@ -96,7 +168,7 @@ func handleNotification(c *mastodon.Client, n mastodon.Notification) error {
 		extra = ", <lora:cdi:1>"
 	}
 
-	imgs, err := stablediffusion.Generate(ctx, stablediffusion.SimpleImageRequest{
+	imgs, err := b.sd.Generate(ctx, stablediffusion.SimpleImageRequest{
 		Prompt:         "masterpiece, best quality, " + text + extra,
 		NegativePrompt: "person in distance, worst quality, low quality, medium quality, deleted, lowres, comic, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, jpeg artifacts, signature, watermark, username, blurry",
 		Seed:           seed,
@@ -114,10 +186,7 @@ func handleNotification(c *mastodon.Client, n mastodon.Notification) error {
 	if err != nil {
 		return err
 	}
-
-	if err := os.WriteFile(filepath.Join(dir, "result.png"), imgs.Images[0], 0600); err != nil {
-		return err
-	}
+	usageCount.Add(n.Status.Account.Acct, 1)
 
 	response := &strings.Builder{}
 
@@ -139,18 +208,21 @@ func handleNotification(c *mastodon.Client, n mastodon.Notification) error {
 	tries := 4
 
 	for tries != 0 {
-		att, err = c.UploadMedia(ctx, bytes.NewBuffer(imgs.Images[0]), "result.png", "prompt: "+text, "")
+		att, err = b.cli.UploadMedia(ctx, bytes.NewBuffer(imgs.Images[0]), "result.png", "prompt: "+text, "")
 		if err != nil {
 			ln.Error(ctx, err, ln.F{"tries": tries})
 			time.Sleep(time.Second)
+			tries--
+			retries.Add(1)
 			continue
 		}
+		uploads.Add(1)
 		break
 	}
 
 	if tries == 0 {
-		c.CreateStatus(ctx, mastodon.CreateStatusParams{
-			Status:     response.String() + " @cadey please help: " + err.Error(),
+		b.cli.CreateStatus(ctx, mastodon.CreateStatusParams{
+			Status:     response.String() + " @cadey please help: " + err.Error() + " (tried 4 times)",
 			Visibility: n.Status.Visibility,
 			InReplyTo:  n.Status.ID,
 		})
@@ -161,7 +233,7 @@ func handleNotification(c *mastodon.Client, n mastodon.Notification) error {
 	fmt.Fprintf(response, "seed: %d\n", seed)
 	fmt.Fprintln(response, "Generated with #xediffusion early alpha")
 
-	if _, err := c.CreateStatus(ctx, mastodon.CreateStatusParams{
+	if st, err := b.cli.CreateStatus(ctx, mastodon.CreateStatusParams{
 		Status:      response.String(),
 		MediaIDs:    []string{att.ID},
 		SpoilerText: "AI generated image (can be NSFW)",
@@ -169,6 +241,8 @@ func handleNotification(c *mastodon.Client, n mastodon.Notification) error {
 		InReplyTo:   n.Status.ID,
 	}); err != nil {
 		return err
+	} else {
+		ln.Log(ctx, ln.F{"url": st.URL, "responsible_party": n.Status.Account.Acct, "visibility": n.Status.Visibility})
 	}
 
 	return nil

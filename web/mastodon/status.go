@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"io"
-	"log"
 	"net/http"
 	"net/url"
 	"time"
@@ -39,8 +38,6 @@ func (csp CreateStatusParams) Values() url.Values {
 	for _, id := range csp.MediaIDs {
 		result.Add("media_ids[]", id)
 	}
-
-	log.Println(result.Encode())
 
 	return result
 }
