@@ -19,7 +19,7 @@ require (
 	github.com/hullerob/go.farbfeld v0.0.0-20181222022525-3661193c725f
 	github.com/jaytaylor/html2text v0.0.0-20190408195923-01ec452cbe43
 	github.com/joeshaw/envdecode v0.0.0-20180312135643-c9e015854467
-	github.com/joho/godotenv v1.4.0
+	github.com/joho/godotenv v1.5.1
 	github.com/kr/pretty v0.3.1
 	github.com/mmikulicic/stringlist v1.0.0
 	github.com/mndrix/golog v0.0.0-20170330170653-a28e2a269775
