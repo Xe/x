@@ -163,10 +163,16 @@ func (dc *Cache) Load(dir string, w io.Writer) error {
 			return err
 		}
 
-		if t.Before(time.Now()) {
+		now := time.Now()
+
+		if t.Before(now) {
 			tx.DeleteBucket([]byte(dir))
 			fileDeaths.Get(dir).Add(1)
 			return ErrNotCached
+		}
+
+		if err := bkt.Put([]byte("diesAt"), []byte(now.AddDate(0, 0, 7).Format(http.TimeFormat))); err != nil {
+			return err
 		}
 
 		h := http.Header{}
