@@ -32,7 +32,7 @@ func Run(bin []byte) (*ExecResult, error) {
 		NewFunctionBuilder().
 		WithGoFunction(api.GoFunc(p.Putchar), []api.ValueType{api.ValueTypeI32}, nil).
 		Export("h").
-		Instantiate(ctx, r)
+		Instantiate(ctx)
 	if err != nil {
 		return nil, err
 	}
