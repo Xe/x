@@ -5,6 +5,11 @@
     nixpkgs.url = "nixpkgs/nixos-unstable";
     utils.url = "github:numtide/flake-utils";
 
+    naersk = {
+      url = "github:nix-community/naersk";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     rust-overlay = {
       url = "github:oxalica/rust-overlay";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -18,7 +23,7 @@
     };
   };
 
-  outputs = { self, nixpkgs, utils, gomod2nix, rust-overlay }@attrs:
+  outputs = { self, nixpkgs, utils, gomod2nix, rust-overlay, naersk }@inputs:
     utils.lib.eachSystem [
       "x86_64-linux"
       "aarch64-linux"
@@ -37,6 +42,16 @@
             rust-overlay.overlays.default
             #(final: prev: self.packages.${system})
           ];
+        };
+
+        rust = pkgs.rust-bin.stable.latest.default.override {
+              extensions = [ "rust-src" ];
+              targets = [ "wasm32-wasi" ];
+            };
+
+        naersk' = pkgs.callPackage naersk {
+          cargo = rust;
+          rustc = rust;
         };
 
         everything = pkgs.buildGoApplication {
@@ -95,6 +110,11 @@
 
         packages = rec {
           default = everything;
+
+          mastosan-wasm = naersk'.buildPackage {
+            src = ./web/mastosan;
+            targets = ["wasm32-wasi"];
+          };
 
           license = copyFile {
             pname = "license";
@@ -165,10 +185,7 @@
             binaryen
             wabt
             bloaty
-            (rust-bin.stable.latest.default.override {
-              extensions = [ "rust-src" ];
-              targets = [ "wasm32-wasi" ];
-            })
+            rust
           ];
         };
       }) // {
