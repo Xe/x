@@ -167,7 +167,7 @@
             gotools
             go-tools
             gomod2nix.packages.${system}.default
-            python
+            python3
             strace
             hey
             boltbrowser
