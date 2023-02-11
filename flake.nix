@@ -34,10 +34,6 @@
         pkgs = import nixpkgs {
           inherit system;
           overlays = [
-            (final: prev: {
-              go = prev.go_1_19;
-              buildGoModule = prev.buildGo118Module;
-            })
             gomod2nix.overlays.default
             rust-overlay.overlays.default
             #(final: prev: self.packages.${system})
