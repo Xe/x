@@ -147,7 +147,7 @@ func (dc *Cache) Save(dir string, resp *http.Response) error {
 var ErrNotCached = errors.New("data is not cached")
 
 func (dc *Cache) Load(dir string, w io.Writer) error {
-	return dc.DB.View(func(tx *bbolt.Tx) error {
+	return dc.DB.Update(func(tx *bbolt.Tx) error {
 		bkt := tx.Bucket([]byte(dir))
 		if bkt == nil {
 			return ErrNotCached
