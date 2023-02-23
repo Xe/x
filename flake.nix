@@ -41,9 +41,9 @@
         };
 
         rust = pkgs.rust-bin.stable.latest.default.override {
-              extensions = [ "rust-src" ];
-              targets = [ "wasm32-wasi" ];
-            };
+          extensions = [ "rust-src" ];
+          targets = [ "wasm32-wasi" ];
+        };
 
         naersk' = pkgs.callPackage naersk {
           cargo = rust;
@@ -71,11 +71,7 @@
           modules = ./gomod2nix.toml;
           subPackages = [ "cmd/xedn" ];
 
-          buildInputs = with pkgs; [
-            pkg-config
-            libaom
-            libavif
-          ];
+          buildInputs = with pkgs; [ pkg-config libaom libavif ];
         };
 
         robocadey2 = pkgs.buildGoApplication {
@@ -109,7 +105,7 @@
 
           mastosan-wasm = naersk'.buildPackage {
             src = ./web/mastosan;
-            targets = ["wasm32-wasi"];
+            targets = [ "wasm32-wasi" ];
           };
 
           license = copyFile {
@@ -134,24 +130,49 @@
           uploud = copyFile { pname = "uploud"; };
           whoisfront = copyFile { pname = "whoisfront"; };
           within-website = copyFile { pname = "within.website"; };
+        };
 
-          robocadey2-docker = pkgs.dockerTools.buildLayeredImage {
-            name = "registry.fly.io/xe-robocadey2";
-            tag = "latest";
-            contents = [ pkgs.cacert ];
-            config = {
-              Cmd = [ "${robocadey2}/bin/robocadey2" ];
-              WorkingDir = "${robocadey2}";
+        legacyPackages = {
+          docker = let
+            robocadey2 = self.packages.${system}.robocadey2;
+            xedn = self.packages.${system}.xedn;
+          in {
+            robocadey2 = pkgs.dockerTools.buildLayeredImage {
+              name = "registry.fly.io/xe-robocadey2";
+              tag = "latest";
+              contents = [ pkgs.cacert ];
+              config = {
+                Cmd = [ "${robocadey2}/bin/robocadey2" ];
+                WorkingDir = "${robocadey2}";
+              };
+            };
+            xedn = pkgs.dockerTools.buildLayeredImage {
+              name = "registry.fly.io/xedn";
+              tag = "latest";
+              contents = [ pkgs.cacert ];
+              config = {
+                Cmd = [ "${xedn}/bin/xedn" ];
+                WorkingDir = "${xedn}";
+              };
             };
           };
-
-          xedn-docker = pkgs.dockerTools.buildLayeredImage {
-            name = "registry.fly.io/xedn";
-            tag = "latest";
-            contents = [ pkgs.cacert ];
-            config = {
-              Cmd = [ "${xedn}/bin/xedn" ];
-              WorkingDir = "${xedn}";
+          portable = {
+            xedn = let
+              service = pkgs.substituteAll {
+                name = "xedn.service";
+                src = ./run/xedn.service.in;
+                xedn = self.packages.${system}.xedn;
+              };
+            in pkgs.portableService {
+              inherit (self.packages.${system}.xedn) version;
+              pname = "xedn";
+              description = "Xe's CDN service";
+              homepage = "https://xeiaso.net";
+              units = [ service ];
+              symlinks = [{
+                object = "${pkgs.cacert}/etc/ssl";
+                symlink = "/etc/ssl";
+              }];
             };
           };
         };

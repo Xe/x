@@ -1,9 +1,0 @@
-[Unit]
-Description=RoboCadey activation socket
-PartOf=robocadey-gpt2.service
-
-[Socket]
-ListenStream=/run/robocadey-gpt2.sock
-
-[Install]
-WantedBy=sockets.target

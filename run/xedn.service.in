@@ -1,0 +1,14 @@
+[Unit]
+Description=XeDN
+Documentation=https://cdn.xeiaso.net
+
+[Service]
+DynamicUser=yes
+StateDirectory=xedn
+Environment=XEDN_STATE=/var/lib/private/xedn
+ExecStart=@xedn@/bin/xedn
+Restart=always
+RestartSec=30s
+
+[Install]
+WantedBy=multi-user.target

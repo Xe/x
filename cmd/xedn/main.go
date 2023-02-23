@@ -130,14 +130,14 @@ func (dc *Cache) Save(dir string, resp *http.Response) error {
 			return err
 		}
 
-		diesAt := time.Now().Add(604800 * time.Second).Format(http.TimeFormat)
+		diesAt := time.Now().AddDate(0, 0, 7).Format(http.TimeFormat)
 
 		if err := bkt.Put([]byte("diesAt"), []byte(diesAt)); err != nil {
 			return err
 		}
 
 		// cache control headers
-		resp.Header.Set("Cache-Control", "max-age:604800")
+		resp.Header.Set("Cache-Control", "max-age:604800") // one week
 		resp.Header.Set("Expires", diesAt)
 
 		return nil
