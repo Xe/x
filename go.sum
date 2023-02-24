@@ -100,11 +100,11 @@ github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSs
 github.com/disintegration/imaging v1.6.1 h1:JnBbK6ECIZb1NsWIikP9pd8gIlTIRx7fuDNpU9fsxOE=
 github.com/disintegration/imaging v1.6.1/go.mod h1:xuIt+sRxDFrHS0drzXUlCJthkJ8k7lkkUojDSR247MQ=
 github.com/eaburns/peggy v0.0.0-20180405011029-d685ddd3cbcb/go.mod h1:5tfPwI6ukiK3W5vJzkj5MBQKHHY9Gcy2y6k1FC/23Xk=
-github.com/eaburns/peggy v0.0.0-20190420135231-b61cdde6efe6 h1:KOwuGgdmM9s9HsVrIlvaCnD7QEuMzKSRmsTgWUScwDA=
-github.com/eaburns/peggy v0.0.0-20190420135231-b61cdde6efe6/go.mod h1:5tfPwI6ukiK3W5vJzkj5MBQKHHY9Gcy2y6k1FC/23Xk=
+github.com/eaburns/peggy v1.0.2 h1:RJwNVF4cvzLGiKInHGBT8sVwP5HDuVP/PaBU9tHO9Rk=
+github.com/eaburns/peggy v1.0.2/go.mod h1:X2pbl0EV5erfnK8kSGwo0lBCgMGokvR1E6KerAoDKXg=
 github.com/eaburns/pretty v0.0.0-20170305202417-362524b72369/go.mod h1:iW/TU1T4mA4w2KzqNbBCjacPFdJ9PfGvNSxr8ajT/iM=
-github.com/eaburns/pretty v0.0.0-20190404101635-2e1d2550ef0b h1:R9nfsvxwt5wAfutYAJykrIpxPvUX9n5LUit05E2E6vA=
-github.com/eaburns/pretty v0.0.0-20190404101635-2e1d2550ef0b/go.mod h1:iW/TU1T4mA4w2KzqNbBCjacPFdJ9PfGvNSxr8ajT/iM=
+github.com/eaburns/pretty v1.0.0 h1:00W1wrrtMXUSqLPN0txS8j7g9qFXy6nA5vZVqVQOo6w=
+github.com/eaburns/pretty v1.0.0/go.mod h1:retcK8A0KEgdmb0nuxhvyxixwCmEPO7SKlK0IJhjg8A=
 github.com/edsrzf/mmap-go v1.0.0/go.mod h1:YO35OhQPt3KJa3ryjFM5Bs14WD66h8eGKpfaBNrHW5M=
 github.com/envoyproxy/go-control-plane v0.9.0/go.mod h1:YTl/9mNaCwkRvm6d1a2C3ymFceY/DCBVvsKhRF0iEA4=
 github.com/envoyproxy/go-control-plane v0.9.1-0.20191026205805-5f8ba28d4473/go.mod h1:YTl/9mNaCwkRvm6d1a2C3ymFceY/DCBVvsKhRF0iEA4=

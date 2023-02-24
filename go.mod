@@ -10,7 +10,7 @@ require (
 	github.com/chai2010/webp v1.1.1
 	github.com/codahale/hdrhistogram v0.0.0-20161010025455-3a0bb77429bd
 	github.com/disintegration/imaging v1.6.1
-	github.com/eaburns/peggy v0.0.0-20190420135231-b61cdde6efe6
+	github.com/eaburns/peggy v1.0.2
 	github.com/facebookgo/ensure v0.0.0-20160127193407-b4ab57deab51
 	github.com/fogleman/primitive v0.0.0-20190214200932-673f57e7b1b5
 	github.com/garyburd/redigo v1.6.4
@@ -64,7 +64,6 @@ require (
 	github.com/aws/smithy-go v1.13.5 // indirect
 	github.com/coreos/go-iptables v0.6.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/eaburns/pretty v0.0.0-20190404101635-2e1d2550ef0b // indirect
 	github.com/facebookgo/stack v0.0.0-20160209184415-751773369052 // indirect
 	github.com/facebookgo/subset v0.0.0-20150612182917-8dac2c3c4870 // indirect
 	github.com/fogleman/gg v1.3.0 // indirect
