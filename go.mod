@@ -39,7 +39,7 @@ require (
 	golang.org/x/oauth2 v0.0.0-20220411215720-9780585627b5
 	gopkg.in/tucnak/telebot.v2 v2.0.0-20190415090633-8c1c512262f2
 	nhooyr.io/websocket v1.8.7
-	tailscale.com v1.36.1
+	tailscale.com v1.36.2
 	tulpa.dev/cadey/jvozba v0.0.0-20200326200349-f0ebe310be06
 	within.website/johaus v1.1.0
 	within.website/ln v0.9.1
