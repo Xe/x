@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	cirello.io/goherokuname v0.0.0-20190914093443-b436bae8c2c5
-	github.com/McKael/madon/v2 v2.0.0-20180929094633-c679abc985d6
+	github.com/McKael/madon/v2 v2.4.0
 	github.com/aws/aws-sdk-go v1.44.198
 	github.com/bwmarrin/discordgo v0.27.0
 	github.com/chai2010/webp v1.1.1
@@ -36,7 +36,7 @@ require (
 	go4.org v0.0.0-20190313082347-94abd6928b1d
 	golang.org/x/crypto v0.6.0
 	golang.org/x/exp/errors v0.0.0-20190510132918-efd6b22b2522
-	golang.org/x/oauth2 v0.0.0-20220411215720-9780585627b5
+	golang.org/x/oauth2 v0.0.0-20220909003341-f21342109be1
 	gopkg.in/tucnak/telebot.v2 v2.0.0-20190415090633-8c1c512262f2
 	nhooyr.io/websocket v1.8.7
 	tailscale.com v1.36.1
@@ -77,7 +77,7 @@ require (
 	github.com/google/btree v1.0.1 // indirect
 	github.com/google/go-cmp v0.5.8 // indirect
 	github.com/google/go-querystring v1.0.0 // indirect
-	github.com/gorilla/websocket v1.4.2 // indirect
+	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/hdevalence/ed25519consensus v0.0.0-20220222234857-c00d1f31bab3 // indirect
@@ -100,7 +100,7 @@ require (
 	github.com/mndrix/ps v0.0.0-20170330174427-18e65badd6ab // indirect
 	github.com/olekukonko/tablewriter v0.0.5 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
-	github.com/sendgrid/rest v2.4.1+incompatible // indirect
+	github.com/sendgrid/rest v2.6.9+incompatible // indirect
 	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect
 	github.com/tailscale/certstore v0.1.1-0.20220316223106-78d6e1c49d8d // indirect
 	github.com/tailscale/golang-x-crypto v0.0.0-20221102133106-bc99ab8c2d17 // indirect
@@ -127,7 +127,7 @@ require (
 	golang.zx2c4.com/wintun v0.0.0-20230126152724-0fa3db229ce2 // indirect
 	golang.zx2c4.com/wireguard/windows v0.5.3 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/protobuf v1.28.0 // indirect
+	google.golang.org/protobuf v1.28.1 // indirect
 	gvisor.dev/gvisor v0.0.0-20221203005347-703fd9b7fbc0 // indirect
 	inet.af/peercred v0.0.0-20210906144145-0893ea02156a // indirect
 )
