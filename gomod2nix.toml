@@ -20,8 +20,8 @@ schema = 3
     version = "v0.0.0-20210105120005-909beea2cc74"
     hash = "sha256-sMY9gSeRWqKE0JwY4HbUF1KO9eaL/hQ/A/uoyr0hrQI="
   [mod."github.com/aws/aws-sdk-go"]
-    version = "v1.44.198"
-    hash = "sha256-Rh4O/PcDXSSo9Co5Sls6EmMPv8BWvyuLThFP1Q8OWgY="
+    version = "v1.44.209"
+    hash = "sha256-tc5jWLjuko2QdGTkkwUroW4s9OIyi+RkacHEMpRdJbc="
   [mod."github.com/aws/aws-sdk-go-v2"]
     version = "v1.17.3"
     hash = "sha256-xIrnSX6lC4i5bhTGZ5clKabpUhDTLMLTN5rLH1YIjM8="
@@ -77,11 +77,8 @@ schema = 3
     version = "v1.6.1"
     hash = "sha256-3IWhzlxuMQIQzhTYUT6SiToBjOzR9kfyoDCh1EetqgQ="
   [mod."github.com/eaburns/peggy"]
-    version = "v0.0.0-20190420135231-b61cdde6efe6"
-    hash = "sha256-qw1BOwQb4JOqmAZ1IYcKE/QxRUed6S9HeqH0rBRTmUI="
-  [mod."github.com/eaburns/pretty"]
-    version = "v0.0.0-20190404101635-2e1d2550ef0b"
-    hash = "sha256-WIringh6P74e97dxJtR9XEmcPWZLpfISwfTiMvY6xhQ="
+    version = "v1.0.2"
+    hash = "sha256-toux6NpVog1DW+zEWX8dAj+hCZaeMG6z2fe4cAz2LDw="
   [mod."github.com/facebookgo/ensure"]
     version = "v0.0.0-20160127193407-b4ab57deab51"
     hash = "sha256-jdCvva9KDH6KTTAtW0fBNw67xd0DhxLQbxU8PdhWLKY="
@@ -308,17 +305,17 @@ schema = 3
     version = "v0.0.0-20190510132918-efd6b22b2522"
     hash = "sha256-o7NXNX8GJhkjUEiHzTBmDthOL83GUs3oGFjRx4bLi9M="
   [mod."golang.org/x/image"]
-    version = "v0.0.0-20211028202545-6944b10bf410"
-    hash = "sha256-NblRNocJ+PrKVyU+nBS8eac3jRPx8MT17Jfv3kxrS2o="
+    version = "v0.5.0"
+    hash = "sha256-PTniH58HjHyON59XkayAW1B13LCmBaVMNzR+mYDkNBc="
   [mod."golang.org/x/mod"]
     version = "v0.6.0"
     hash = "sha256-qaHIt9MYuTTfaKtbeVqBVI+Pcv60SMQuhkkjFQObx48="
   [mod."golang.org/x/net"]
-    version = "v0.6.0"
-    hash = "sha256-e8F4kMogxT392mmimvcAmkUtD/5vcQRPWDwH238m8FU="
+    version = "v0.7.0"
+    hash = "sha256-LgZYZRwtMqm+soNh+esxDSeRuIDxRGb9OEfYaFJHCDI="
   [mod."golang.org/x/oauth2"]
-    version = "v0.0.0-20220909003341-f21342109be1"
-    hash = "sha256-c+jWUXyCr6YJLRSQmA4GiuGqQaC88ZeiGCLpWOoSsyo="
+    version = "v0.5.0"
+    hash = "sha256-+ns+lPELOJdb1YpIxQRBVQeSEsn0VhnKPnHg5Q0NOH4="
   [mod."golang.org/x/sync"]
     version = "v0.1.0"
     hash = "sha256-Hygjq9euZ0qz6TvHYQwOZEjNiTbTh1nSLRAWZ6KFGR8="
