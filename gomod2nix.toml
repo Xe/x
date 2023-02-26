@@ -8,8 +8,8 @@ schema = 3
     version = "v1.0.0-rc.1"
     hash = "sha256-3DboBqby2ejRU33FG96Z8JF5AJ8HP2rC/v++VyoQ2LQ="
   [mod."github.com/McKael/madon/v2"]
-    version = "v2.0.0-20180929094633-c679abc985d6"
-    hash = "sha256-cU5f+sKEVjNSu3gJgp7H2r6VIzhouKNRPeWYih1pdAg="
+    version = "v2.4.0"
+    hash = "sha256-bEkpnDMyJtzU5epFNrjLhgJW+cp5Tf4YL7lk99q0ymM="
   [mod."github.com/Microsoft/go-winio"]
     version = "v0.6.0"
     hash = "sha256-TQ0AvXZfuT3PDnb4p/h5zmyT8m9VPcwxlXMJuVD6ltE="
@@ -134,8 +134,8 @@ schema = 3
     version = "v1.0.0"
     hash = "sha256-n0ewWuB/JYt8bfrefQHRJ9uak9QzXeQs68TW7fESgXY="
   [mod."github.com/gorilla/websocket"]
-    version = "v1.4.2"
-    hash = "sha256-GhBLM/XTm2lFCyDvJbnCLAI2OyYXQV6W+jRPOQ1PdVY="
+    version = "v1.5.0"
+    hash = "sha256-EYVgkSEMo4HaVrsWKqnsYRp8SSS8gNf7t+Elva02Ofc="
   [mod."github.com/hashicorp/errwrap"]
     version = "v1.1.0"
     hash = "sha256-6lwuMQOfBq+McrViN3maJTIeh4f8jbEqvLy2c9FvvFw="
@@ -245,8 +245,8 @@ schema = 3
     version = "v0.0.0-20210106013422-671bd2870b3a"
     hash = "sha256-t7Gdp7S71Koej5Njg3jOo5vwyj02tJCbJjrq/vZGOho="
   [mod."github.com/sendgrid/rest"]
-    version = "v2.4.1+incompatible"
-    hash = "sha256-tV8BIe7lmGRI0gIuviJnXq2G2HGZBDrvHbGtHW5/bMs="
+    version = "v2.6.9+incompatible"
+    hash = "sha256-zWb2bF2zB3bEiUaVvGyvewExhvXcZ63hvUa7YUYdKUs="
   [mod."github.com/ssor/bom"]
     version = "v0.0.0-20170718123548-6386211fdfcf"
     hash = "sha256-jYYzaIOaUFv575h3Sz/T4DPO6EWFRwEpwx1zF00i5SU="
@@ -269,8 +269,8 @@ schema = 3
     version = "v0.2.0"
     hash = "sha256-bCWn8E+DcZY6+yPu07AF3hCcDZx3CFdD74qfpDIgVqI="
   [mod."github.com/tetratelabs/wazero"]
-    version = "v1.0.0-pre.8"
-    hash = "sha256-ZpXkr6PorWEKirxmFtUBF50ylv9XWiwUF8L9zPY8+Pk="
+    version = "v1.0.0-pre.9"
+    hash = "sha256-FWAQOW/tq/MLj3EpA1zDAf+8PxQ5IpiuAwQbjE829uo="
   [mod."github.com/tmc/scp"]
     version = "v0.0.0-20170824174625-f7b48647feef"
     hash = "sha256-qHwQb3JA43VVhJdB18/2zXbxqW/bgw1yvr8YhqFyd74="
@@ -317,8 +317,8 @@ schema = 3
     version = "v0.6.0"
     hash = "sha256-e8F4kMogxT392mmimvcAmkUtD/5vcQRPWDwH238m8FU="
   [mod."golang.org/x/oauth2"]
-    version = "v0.0.0-20220411215720-9780585627b5"
-    hash = "sha256-PubcNZWej7Pb8TnHNfXPkRo3Gj91YfePvvN5ImftEbs="
+    version = "v0.0.0-20220909003341-f21342109be1"
+    hash = "sha256-c+jWUXyCr6YJLRSQmA4GiuGqQaC88ZeiGCLpWOoSsyo="
   [mod."golang.org/x/sync"]
     version = "v0.1.0"
     hash = "sha256-Hygjq9euZ0qz6TvHYQwOZEjNiTbTh1nSLRAWZ6KFGR8="
@@ -347,8 +347,8 @@ schema = 3
     version = "v1.6.7"
     hash = "sha256-zIxGRHiq4QBvRqkrhMGMGCaVL4iM4TtlYpAi/hrivS4="
   [mod."google.golang.org/protobuf"]
-    version = "v1.28.0"
-    hash = "sha256-p1cVM3OeEErh1WeNRAg4n3zYm/0qPTPmIiWNjRmJiMQ="
+    version = "v1.28.1"
+    hash = "sha256-sTJYgvlv5is7vHNxcuigF2lNASp0QonhUgnrguhfHSU="
   [mod."gopkg.in/tucnak/telebot.v2"]
     version = "v2.0.0-20190415090633-8c1c512262f2"
     hash = "sha256-Z5toFOhdxupU6Y88pdw5qP8uh2eO3v8WPp4ttPMZhIs="
@@ -362,8 +362,8 @@ schema = 3
     version = "v1.8.7"
     hash = "sha256-6pQ35gFvbyMhNo0gv4bPxYDUrwDF/ok1GMA+BHfsRRM="
   [mod."tailscale.com"]
-    version = "v1.36.1"
-    hash = "sha256-3B2dwCwbV9RnDs6FHhb0Wrro72bdwEPOs+s+1wdkxzU="
+    version = "v1.36.2"
+    hash = "sha256-yqIhl86iIoqAqEBRtqnv49uzFsalGIyYfvyKanaj9l0="
   [mod."tulpa.dev/cadey/jvozba"]
     version = "v0.0.0-20200326200349-f0ebe310be06"
     hash = "sha256-0rP0rdwDp8C+hHlM/Cgp+4YGZRm2y7jgRKFOsWYRKUQ="
