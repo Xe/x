@@ -17,6 +17,7 @@ import (
 	"github.com/chai2010/webp"
 	"github.com/disintegration/imaging"
 	"go.etcd.io/bbolt"
+	"golang.org/x/sync/singleflight"
 	"tailscale.com/metrics"
 	"within.website/ln"
 	"within.website/x/internal/avif"
@@ -26,6 +27,7 @@ type OptimizedImageServer struct {
 	DB     *bbolt.DB
 	Cache  *Cache
 	PNGEnc *png.Encoder
+	group  *singleflight.Group
 }
 
 var (
@@ -113,58 +115,65 @@ func (ois *OptimizedImageServer) ResizeTo(widthPixels int, character, mood, form
 		return result.Bytes(), nil
 	}
 
-	// /file/christine-static/stickers/aoi/yawn.png
-	path := fmt.Sprintf("/file/christine-static/stickers/%s/%s.png", character, mood)
-	data, err := ois.Cache.LoadBytesOrFetch(path)
-	if err != nil {
-		return nil, fmt.Errorf("can't fetch: %w", err)
-	}
-
-	os.WriteFile("foo.png", data, 0666)
-
-	img, _, err := image.Decode(bytes.NewBuffer(data))
-	if err != nil {
-		return nil, fmt.Errorf("can't decode image: %w", err)
-	}
-
-	dstImg := imaging.Resize(img, widthPixels, 0, imaging.Lanczos)
-
-	switch format {
-	case "png":
-		if err := ois.PNGEnc.Encode(&result, dstImg); err != nil {
-			return nil, err
-		}
-	case "webp":
-		if err := webp.Encode(&result, dstImg, &webp.Options{Quality: 70}); err != nil {
-			return nil, err
-		}
-	case "avif":
-		if err := avif.Encode(&result, dstImg, &avif.Options{Quality: 48, Speed: avif.MaxSpeed}); err != nil {
-			return nil, err
-		}
-	default:
-		return nil, fmt.Errorf("I don't know how to render to %s yet, sorry", format)
-	}
-
-	OISFileConversions.Add(format, 1)
-
-	err = ois.DB.Update(func(tx *bbolt.Tx) error {
-		bkt, err := tx.CreateBucketIfNotExists([]byte("sticker_cache"))
+	data, err, _ := ois.group.Do(string(boltPath), func() (interface{}, error) {
+		// /file/christine-static/stickers/aoi/yawn.png
+		path := fmt.Sprintf("/file/christine-static/stickers/%s/%s.png", character, mood)
+		data, err := ois.Cache.LoadBytesOrFetch(path)
 		if err != nil {
-			return err
+			return nil, fmt.Errorf("can't fetch: %w", err)
 		}
 
-		if err := bkt.Put(boltPath, result.Bytes()); err != nil {
-			return err
+		os.WriteFile("foo.png", data, 0666)
+
+		img, _, err := image.Decode(bytes.NewBuffer(data))
+		if err != nil {
+			return nil, fmt.Errorf("can't decode image: %w", err)
 		}
 
-		return nil
+		dstImg := imaging.Resize(img, widthPixels, 0, imaging.Lanczos)
+
+		switch format {
+		case "png":
+			if err := ois.PNGEnc.Encode(&result, dstImg); err != nil {
+				return nil, err
+			}
+		case "webp":
+			if err := webp.Encode(&result, dstImg, &webp.Options{Quality: 70}); err != nil {
+				return nil, err
+			}
+		case "avif":
+			if err := avif.Encode(&result, dstImg, &avif.Options{Quality: 48, Speed: avif.MaxSpeed}); err != nil {
+				return nil, err
+			}
+		default:
+			return nil, fmt.Errorf("I don't know how to render to %s yet, sorry", format)
+		}
+
+		OISFileConversions.Add(format, 1)
+
+		err = ois.DB.Update(func(tx *bbolt.Tx) error {
+			bkt, err := tx.CreateBucketIfNotExists([]byte("sticker_cache"))
+			if err != nil {
+				return err
+			}
+
+			if err := bkt.Put(boltPath, result.Bytes()); err != nil {
+				return err
+			}
+
+			return nil
+		})
+		if err != nil {
+			return nil, fmt.Errorf("can't write to database: %w", err)
+		}
+
+		return result.Bytes(), nil
 	})
 	if err != nil {
-		return nil, fmt.Errorf("can't write to database: %w", err)
+		return nil, err
 	}
 
-	return result.Bytes(), nil
+	return data.([]byte), nil
 }
 
 func (ois *OptimizedImageServer) ListFiles(w http.ResponseWriter, r *http.Request) {

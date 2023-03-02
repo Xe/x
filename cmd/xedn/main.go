@@ -24,6 +24,7 @@ import (
 	"github.com/rs/cors"
 	"github.com/sebest/xff"
 	"go.etcd.io/bbolt"
+	"golang.org/x/sync/singleflight"
 	"tailscale.com/metrics"
 	"tailscale.com/tsnet"
 	"tailscale.com/tsweb"
@@ -47,6 +48,7 @@ type Cache struct {
 	ActualHost string
 	Client     *http.Client
 	DB         *bbolt.DB
+	cacheGroup *singleflight.Group
 }
 
 func Hash(data string) string {
@@ -211,20 +213,27 @@ func (dc *Cache) LoadBytesOrFetch(path string) ([]byte, error) {
 	err := dc.Load(path, buf)
 	if err != nil {
 		if err == ErrNotCached {
-			resp, err := dc.Client.Get(fmt.Sprintf("https://%s%s", dc.ActualHost, path))
-			if err != nil {
-				cacheErrors.Add(1)
-				return nil, err
-			}
+			_, err, _ := dc.cacheGroup.Do(path, func() (interface{}, error) {
+				resp, err := dc.Client.Get(fmt.Sprintf("https://%s%s", dc.ActualHost, path))
+				if err != nil {
+					cacheErrors.Add(1)
+					return nil, err
+				}
 
-			if resp.StatusCode != http.StatusOK {
-				cacheErrors.Add(1)
-				return nil, web.NewError(http.StatusOK, resp)
-			}
+				if resp.StatusCode != http.StatusOK {
+					cacheErrors.Add(1)
+					return nil, web.NewError(http.StatusOK, resp)
+				}
 
-			err = dc.Save(path, resp)
+				err = dc.Save(path, resp)
+				if err != nil {
+					cacheErrors.Add(1)
+					return nil, err
+				}
+
+				return nil, nil
+			})
 			if err != nil {
-				cacheErrors.Add(1)
 				return nil, err
 			}
 
@@ -241,26 +250,31 @@ func (dc *Cache) GetFile(w http.ResponseWriter, r *http.Request) error {
 	err := dc.Load(dir, w)
 	if err != nil {
 		if err == ErrNotCached {
-			r.URL.Host = dc.ActualHost
-			r.URL.Scheme = "https"
-			resp, err := dc.Client.Get(r.URL.String())
+			_, err, _ := dc.cacheGroup.Do(r.URL.Path, func() (interface{}, error) {
+				r.URL.Host = dc.ActualHost
+				r.URL.Scheme = "https"
+				resp, err := dc.Client.Get(r.URL.String())
+				if err != nil {
+					cacheErrors.Add(1)
+					return nil, err
+				}
+
+				if resp.StatusCode != http.StatusOK {
+					cacheErrors.Add(1)
+					return nil, web.NewError(http.StatusOK, resp)
+				}
+
+				err = dc.Save(dir, resp)
+				if err != nil {
+					cacheErrors.Add(1)
+					return nil, err
+				}
+				cacheLoads.Add(1)
+				return nil, nil
+			})
 			if err != nil {
-				cacheErrors.Add(1)
 				return err
 			}
-
-			if resp.StatusCode != http.StatusOK {
-				cacheErrors.Add(1)
-				return web.NewError(http.StatusOK, resp)
-			}
-
-			err = dc.Save(dir, resp)
-			if err != nil {
-				cacheErrors.Add(1)
-				return err
-			}
-
-			cacheLoads.Add(1)
 		} else {
 			cacheErrors.Add(1)
 			return err
@@ -350,6 +364,7 @@ func main() {
 		ActualHost: *b2Backend,
 		Client:     &http.Client{},
 		DB:         db,
+		cacheGroup: &singleflight.Group{},
 	}
 
 	go dc.CronPurgeDead()
@@ -358,6 +373,7 @@ func main() {
 		DB:     db,
 		Cache:  dc,
 		PNGEnc: &png.Encoder{CompressionLevel: png.BestCompression},
+		group:  &singleflight.Group{},
 	}
 
 	go func() {
