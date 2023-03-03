@@ -5,7 +5,7 @@ go 1.19
 require (
 	cirello.io/goherokuname v0.0.0-20190914093443-b436bae8c2c5
 	github.com/McKael/madon/v2 v2.4.0
-	github.com/aws/aws-sdk-go v1.44.209
+	github.com/aws/aws-sdk-go v1.44.213
 	github.com/bwmarrin/discordgo v0.27.0
 	github.com/chai2010/webp v1.1.1
 	github.com/codahale/hdrhistogram v0.0.0-20161010025455-3a0bb77429bd
@@ -37,6 +37,7 @@ require (
 	golang.org/x/crypto v0.6.0
 	golang.org/x/exp/errors v0.0.0-20190510132918-efd6b22b2522
 	golang.org/x/oauth2 v0.5.0
+	golang.org/x/sync v0.1.0
 	gopkg.in/tucnak/telebot.v2 v2.0.0-20190415090633-8c1c512262f2
 	nhooyr.io/websocket v1.8.7
 	tailscale.com v1.36.2
@@ -117,7 +118,6 @@ require (
 	golang.org/x/image v0.5.0 // indirect
 	golang.org/x/mod v0.6.0 // indirect
 	golang.org/x/net v0.7.0 // indirect
-	golang.org/x/sync v0.1.0 // indirect
 	golang.org/x/sys v0.5.0 // indirect
 	golang.org/x/term v0.5.0 // indirect
 	golang.org/x/text v0.7.0 // indirect
