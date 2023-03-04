@@ -32,6 +32,7 @@ import (
 	"within.website/ln/ex"
 	"within.website/ln/opname"
 	"within.website/x/internal"
+	"within.website/x/internal/stablediffusion"
 	"within.website/x/web"
 )
 
@@ -376,14 +377,22 @@ func main() {
 		group:  &singleflight.Group{},
 	}
 
-	go func() {
-		srv := &tsnet.Server{
-			Hostname: "xedn-" + os.Getenv("FLY_REGION"),
-			Logf:     log.New(io.Discard, "", 0).Printf,
-			AuthKey:  os.Getenv("TS_AUTHKEY"),
-			Dir:      filepath.Join(*dir, "tsnet"),
-		}
+	srv := &tsnet.Server{
+		Hostname: "xedn-" + os.Getenv("FLY_REGION"),
+		Logf:     log.New(io.Discard, "", 0).Printf,
+		AuthKey:  os.Getenv("TS_AUTHKEY"),
+		Dir:      filepath.Join(*dir, "tsnet"),
+	}
 
+	cli := srv.HTTPClient()
+
+	sd := &StableDiffusion{
+		db:     db,
+		client: &stablediffusion.Client{HTTP: cli},
+		group:  &singleflight.Group{},
+	}
+
+	go func() {
 		lis, err := srv.Listen("tcp", ":80")
 		if err != nil {
 			ln.FatalErr(ctx, err, ln.Action("tsnet listening"))
@@ -423,6 +432,7 @@ func main() {
 	})
 
 	mux.Handle("/sticker/", ois)
+	mux.Handle("/avatar/", sd)
 
 	hdlr := func(w http.ResponseWriter, r *http.Request) {
 		etagLock.RLock()
