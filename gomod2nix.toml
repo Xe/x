@@ -20,8 +20,8 @@ schema = 3
     version = "v0.0.0-20210105120005-909beea2cc74"
     hash = "sha256-sMY9gSeRWqKE0JwY4HbUF1KO9eaL/hQ/A/uoyr0hrQI="
   [mod."github.com/aws/aws-sdk-go"]
-    version = "v1.44.209"
-    hash = "sha256-tc5jWLjuko2QdGTkkwUroW4s9OIyi+RkacHEMpRdJbc="
+    version = "v1.44.213"
+    hash = "sha256-jOL9CIvFtq43cqsHKtzdseoRoTxtroqnTtik1fLf/Kc="
   [mod."github.com/aws/aws-sdk-go-v2"]
     version = "v1.17.3"
     hash = "sha256-xIrnSX6lC4i5bhTGZ5clKabpUhDTLMLTN5rLH1YIjM8="
@@ -266,8 +266,8 @@ schema = 3
     version = "v0.2.0"
     hash = "sha256-bCWn8E+DcZY6+yPu07AF3hCcDZx3CFdD74qfpDIgVqI="
   [mod."github.com/tetratelabs/wazero"]
-    version = "v1.0.0-pre.9"
-    hash = "sha256-FWAQOW/tq/MLj3EpA1zDAf+8PxQ5IpiuAwQbjE829uo="
+    version = "v1.0.0-rc.1"
+    hash = "sha256-meyE6cwkVKnrKVlZrJcsr5cfTgxVNks9V+uoWGbjVuE="
   [mod."github.com/tmc/scp"]
     version = "v0.0.0-20170824174625-f7b48647feef"
     hash = "sha256-qHwQb3JA43VVhJdB18/2zXbxqW/bgw1yvr8YhqFyd74="
@@ -347,8 +347,8 @@ schema = 3
     version = "v1.28.1"
     hash = "sha256-sTJYgvlv5is7vHNxcuigF2lNASp0QonhUgnrguhfHSU="
   [mod."gopkg.in/tucnak/telebot.v2"]
-    version = "v2.0.0-20190415090633-8c1c512262f2"
-    hash = "sha256-Z5toFOhdxupU6Y88pdw5qP8uh2eO3v8WPp4ttPMZhIs="
+    version = "v2.5.0"
+    hash = "sha256-lo3FZnCVbUk6RgMzxdOWp55ZExEXzzkWIRX/zgkXjKk="
   [mod."gvisor.dev/gvisor"]
     version = "v0.0.0-20221203005347-703fd9b7fbc0"
     hash = "sha256-XB0g1a3IJzmM+R3BUCIA/C3wGUQGoBhGZxEcU6JGqqI="
