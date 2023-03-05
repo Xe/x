@@ -38,7 +38,7 @@ require (
 	golang.org/x/exp/errors v0.0.0-20190510132918-efd6b22b2522
 	golang.org/x/oauth2 v0.5.0
 	golang.org/x/sync v0.1.0
-	gopkg.in/tucnak/telebot.v2 v2.0.0-20190415090633-8c1c512262f2
+	gopkg.in/tucnak/telebot.v2 v2.5.0
 	nhooyr.io/websocket v1.8.7
 	tailscale.com v1.36.2
 	tulpa.dev/cadey/jvozba v0.0.0-20200326200349-f0ebe310be06
