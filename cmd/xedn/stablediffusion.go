@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"context"
+	"expvar"
 	"fmt"
 	"image"
 	"image/jpeg"
@@ -18,6 +19,11 @@ import (
 	"golang.org/x/sync/singleflight"
 	"within.website/ln"
 	"within.website/x/internal/stablediffusion"
+)
+
+var (
+	stableDiffusionHits     = expvar.NewInt("xedn_avatar_hits")
+	stableDiffusionCreation = expvar.NewInt("xedn_avatar_creation")
 )
 
 type StableDiffusion struct {
@@ -54,6 +60,8 @@ func (sd *StableDiffusion) RenderImage(ctx context.Context, w http.ResponseWrite
 		if err != nil {
 			return nil, err
 		}
+
+		stableDiffusionCreation.Add(1)
 
 		img, _, err := image.Decode(bytes.NewBuffer(imgs.Images[0]))
 		if err != nil {
@@ -139,6 +147,8 @@ func (sd *StableDiffusion) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusOK)
 			w.Write(data)
 		}
+
+		stableDiffusionHits.Add(1)
 
 		return nil
 	})

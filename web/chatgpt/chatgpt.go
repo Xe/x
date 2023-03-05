@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"within.website/x/web"
 )
@@ -19,6 +20,10 @@ type Request struct {
 type Message struct {
 	Role    string `json:"role"`
 	Content string `json:"content"`
+}
+
+func (m Message) ProxyFormat() string {
+	return fmt.Sprintf("%s\\ %s", strings.Title(m.Role), m.Content)
 }
 
 type Usage struct {
@@ -80,6 +85,7 @@ func (c Client) Complete(ctx context.Context, r Request) (*Response, error) {
 	if resp.StatusCode != http.StatusOK {
 		return nil, web.NewError(http.StatusOK, resp)
 	}
+	defer resp.Body.Close()
 
 	var result Response
 	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
