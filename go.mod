@@ -36,7 +36,7 @@ require (
 	go4.org v0.0.0-20190313082347-94abd6928b1d
 	golang.org/x/crypto v0.7.0
 	golang.org/x/exp/errors v0.0.0-20190510132918-efd6b22b2522
-	golang.org/x/oauth2 v0.5.0
+	golang.org/x/oauth2 v0.6.0
 	golang.org/x/sync v0.1.0
 	gopkg.in/tucnak/telebot.v2 v2.5.0
 	nhooyr.io/websocket v1.8.7
