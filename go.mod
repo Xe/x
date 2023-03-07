@@ -5,20 +5,17 @@ go 1.19
 require (
 	cirello.io/goherokuname v0.0.0-20190914093443-b436bae8c2c5
 	github.com/McKael/madon/v2 v2.4.0
-	github.com/aws/aws-sdk-go v1.44.213
+	github.com/aws/aws-sdk-go v1.44.215
 	github.com/bwmarrin/discordgo v0.27.0
 	github.com/chai2010/webp v1.1.1
-	github.com/codahale/hdrhistogram v0.0.0-20161010025455-3a0bb77429bd
 	github.com/disintegration/imaging v1.6.1
 	github.com/eaburns/peggy v1.0.2
 	github.com/facebookgo/ensure v0.0.0-20160127193407-b4ab57deab51
 	github.com/fogleman/primitive v0.0.0-20190214200932-673f57e7b1b5
-	github.com/garyburd/redigo v1.6.4
 	github.com/go-interpreter/wagon v0.6.0
 	github.com/google/go-github v17.0.0+incompatible
 	github.com/hullerob/go.farbfeld v0.0.0-20181222022525-3661193c725f
 	github.com/jaytaylor/html2text v0.0.0-20190408195923-01ec452cbe43
-	github.com/joeshaw/envdecode v0.0.0-20180312135643-c9e015854467
 	github.com/joho/godotenv v1.5.1
 	github.com/kr/pretty v0.3.1
 	github.com/mmikulicic/stringlist v1.0.0
@@ -35,10 +32,8 @@ require (
 	go.etcd.io/bbolt v1.3.7
 	go4.org v0.0.0-20190313082347-94abd6928b1d
 	golang.org/x/crypto v0.7.0
-	golang.org/x/exp/errors v0.0.0-20190510132918-efd6b22b2522
 	golang.org/x/oauth2 v0.6.0
 	golang.org/x/sync v0.1.0
-	gopkg.in/tucnak/telebot.v2 v2.5.0
 	nhooyr.io/websocket v1.8.7
 	tailscale.com v1.36.2
 	tulpa.dev/cadey/jvozba v0.0.0-20200326200349-f0ebe310be06
