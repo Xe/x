@@ -21,9 +21,17 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.utils.follows = "utils";
     };
+
+    xess = {
+      url = "github:Xe/Xess";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.utils.follows = "utils";
+    };
+
+    iaso-fonts.url = "github:Xe/iosevka";
   };
 
-  outputs = { self, nixpkgs, utils, gomod2nix, rust-overlay, naersk }@inputs:
+  outputs = { self, nixpkgs, utils, gomod2nix, rust-overlay, naersk, xess, iaso-fonts }@inputs:
     utils.lib.eachSystem [
       "x86_64-linux"
       "aarch64-linux"
@@ -74,6 +82,21 @@
           buildInputs = with pkgs; [ pkg-config libaom libavif ];
         };
 
+        xedn-static = pkgs.stdenvNoCC.mkDerivation {
+          dontUnpack = true;
+          pname = "xedn-static";
+          version = xedn.version;
+
+          buildPhase = ''
+            mkdir -p $out/static/css/iosevka
+
+            ln -s ${xess.packages.${system}.aoi}/static/css/xess.css $out/static/css/xess.css
+            for file in ${iaso-fonts.packages.${system}.default}/*; do
+              ln -s $file $out/static/css/iosevka
+            done
+          '';
+        };
+
         robocadey2 = pkgs.buildGoApplication {
           pname = "robocadey2";
           version = "1.2.3";
@@ -117,7 +140,7 @@
             path = "make-mastodon-app";
           };
 
-          inherit xedn robocadey2;
+          inherit xedn xedn-static robocadey2;
 
           aegis = copyFile { pname = "aegis"; };
           cadeybot = copyFile { pname = "cadeybot"; };
@@ -153,11 +176,12 @@
               config = {
                 Cmd = [ "${xedn}/bin/xedn" ];
                 WorkingDir = "${xedn}";
+                Env = [ "XEDN_STATIC=${self.packages.${system}.xedn-static}" ];
               };
             };
           };
           portable = {
-            xedn = let
+           xedn = let
               service = pkgs.substituteAll {
                 name = "xedn.service";
                 src = ./run/xedn.service.in;
@@ -204,6 +228,8 @@
             bloaty
             rust
           ];
+
+          XEDN_STATIC = self.packages.${system}.xedn-static;
         };
       }) // {
         nixosModules = {

@@ -40,10 +40,19 @@ var (
 	b2Backend = flag.String("b2-backend", "f001.backblazeb2.com", "Backblaze B2 base host")
 	addr      = flag.String("addr", ":8080", "server address")
 	dir       = flag.String("dir", os.Getenv("XEDN_STATE"), "where XeDN should store cached data")
+	staticDir = flag.String("static-dir", envOr("XEDN_STATIC", "./static"), "where XeDN should look for static assets")
 
 	//go:embed index.html
 	indexHTML []byte
 )
+
+func envOr(name, def string) string {
+	if val, ok := os.LookupEnv(name); ok {
+		return val
+	}
+
+	return def
+}
 
 type Cache struct {
 	ActualHost string
@@ -433,6 +442,7 @@ func main() {
 
 	mux.Handle("/sticker/", ois)
 	mux.Handle("/avatar/", sd)
+	mux.Handle("/static/", http.FileServer(http.Dir(*staticDir)))
 
 	hdlr := func(w http.ResponseWriter, r *http.Request) {
 		etagLock.RLock()
