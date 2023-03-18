@@ -29,11 +29,11 @@
         "utils": "utils"
       },
       "locked": {
-        "lastModified": 1679172980,
-        "narHash": "sha256-B9RMXNbKk6ZY1Xom/3j/psIW7xJIaWTy1hSOplvDjps=",
+        "lastModified": 1679180430,
+        "narHash": "sha256-RX2D6XErWW0zo12gAaX8K+tISfn5Q7We3HG0uDYnQ3E=",
         "owner": "Xe",
         "repo": "iosevka",
-        "rev": "7ff508fdc3b00f822d4b8dcd14f0ed2a5eb302fd",
+        "rev": "8f9905558ccd87d685a91c100068db314f9e16e8",
         "type": "github"
       },
       "original": {
@@ -166,11 +166,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1679175127,
-        "narHash": "sha256-mTqGRswUjVQRL/k1KT9ofIcBSoF/WpJBplO6YSf4X0Y=",
+        "lastModified": 1679176529,
+        "narHash": "sha256-ELLAVkhGpFGsH0VUaEOJkaUIz9MsWo8xLXVsgFlFRNc=",
         "owner": "Xe",
         "repo": "Xess",
-        "rev": "8f91c6d7d9af16e9241138c49a587b64e9340915",
+        "rev": "f34b9d3b55dfa92e54632e8a33463f2f1c015259",
         "type": "github"
       },
       "original": {
