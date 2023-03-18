@@ -52,7 +52,7 @@
 
         everything = pkgs.buildGoApplication {
           pname = "xe-x-composite";
-          version = "1.0.0";
+          version = "1.4.0";
           src = ./.;
           modules = ./gomod2nix.toml;
 
