@@ -134,13 +134,20 @@
             echo "go-wasip1-dev-${wasigo.shortRev}" > $out/VERSION
             cp -vrf ${wasigo}/* $out
           '';
-        });
+        }) // {
+          GOOS = "wasip1";
+          GOARCH = "wasm";
+        };
 
         gowasi = pkgs.writeShellScriptBin "gowasi" ''
           export GOOS=wasip1
           export GOARCH=wasm
           exec ${wasigo'}/bin/go $*
         '';
+
+        buildGoWasiModule = pkgs.callPackage "${nixpkgs}/pkgs/build-support/go/module.nix" {
+          go = wasigo';
+        };
       in {
         overlays.default = final: prev:
           let
@@ -152,6 +159,13 @@
           default = everything;
 
           wasigo = wasigo';
+
+          wasigoExample = buildGoWasiModule {
+            pname = "wasigo-example";
+            version = "latest";
+            src = ./wasm;
+            vendorHash = null;
+          };
 
           mastosan-wasm = naersk'.buildPackage {
             src = ./web/mastosan;
