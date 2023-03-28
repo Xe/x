@@ -160,13 +160,6 @@
 
           wasigo = wasigo';
 
-          wasigoExample = buildGoWasiModule {
-            pname = "wasigo-example";
-            version = "latest";
-            src = ./wasm;
-            vendorHash = null;
-          };
-
           mastosan-wasm = naersk'.buildPackage {
             src = ./web/mastosan;
             targets = [ "wasm32-wasi" ];
