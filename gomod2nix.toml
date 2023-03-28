@@ -20,8 +20,8 @@ schema = 3
     version = "v0.0.0-20210105120005-909beea2cc74"
     hash = "sha256-sMY9gSeRWqKE0JwY4HbUF1KO9eaL/hQ/A/uoyr0hrQI="
   [mod."github.com/aws/aws-sdk-go"]
-    version = "v1.44.229"
-    hash = "sha256-HGef3pf+C47Lj1EaUQXmNU1mYeaIsRtZk15texjabY0="
+    version = "v1.44.230"
+    hash = "sha256-lUbpZcHuhFfV0hvD17lq7ZajnLD/4+kn92Z4Jkbpx6o="
   [mod."github.com/aws/aws-sdk-go-v2"]
     version = "v1.17.3"
     hash = "sha256-xIrnSX6lC4i5bhTGZ5clKabpUhDTLMLTN5rLH1YIjM8="
