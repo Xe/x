@@ -29,9 +29,18 @@
     };
 
     iaso-fonts.url = "github:Xe/iosevka";
+
+    ## other things
+    # go + wasip1
+    wasigo = {
+      # https://github.com/Pryz/go/archive/refs/heads/wasip1-wasm.zip
+      url = "github:Xe/go/wasip1-wasm";
+      flake = false;
+    };
   };
 
-  outputs = { self, nixpkgs, utils, gomod2nix, rust-overlay, naersk, xess, iaso-fonts }@inputs:
+  outputs = { self, nixpkgs, utils, gomod2nix, rust-overlay, naersk, xess
+    , iaso-fonts, wasigo }@inputs:
     utils.lib.eachSystem [
       "x86_64-linux"
       "aarch64-linux"
@@ -90,7 +99,9 @@
           buildPhase = ''
             mkdir -p $out/static/css/iosevka
 
-            ln -s ${xess.packages.${system}.aoi}/static/css/xess.css $out/static/css/xess.css
+            ln -s ${
+              xess.packages.${system}.aoi
+            }/static/css/xess.css $out/static/css/xess.css
             for file in ${iaso-fonts.packages.${system}.default}/*; do
               ln -s $file $out/static/css/iosevka
             done
@@ -116,6 +127,20 @@
               cp $src/bin/$pname $out/bin/$path
             '';
           };
+
+        wasigo' = pkgs.go_1_20.overrideAttrs (old: {
+          src = pkgs.runCommand "gowasi-version-hack" { } ''
+            mkdir -p $out
+            echo "go-wasip1-dev-${wasigo.shortRev}" > $out/VERSION
+            cp -vrf ${wasigo}/* $out
+          '';
+        });
+
+        gowasi = pkgs.writeShellScriptBin "gowasi" ''
+          export GOOS=wasip1
+          export GOARCH=wasm
+          exec ${wasigo'}/bin/go $*
+        '';
       in {
         overlays.default = final: prev:
           let
@@ -125,6 +150,8 @@
 
         packages = rec {
           default = everything;
+
+          wasigo = wasigo';
 
           mastosan-wasm = naersk'.buildPackage {
             src = ./web/mastosan;
@@ -181,7 +208,7 @@
             };
           };
           portable = {
-           xedn = let
+            xedn = let
               service = pkgs.substituteAll {
                 name = "xedn.service";
                 src = ./run/xedn.service.in;
@@ -212,6 +239,7 @@
             strace
             hey
             boltbrowser
+            gowasi
 
             pkg-config
             libaom

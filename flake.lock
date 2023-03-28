@@ -100,6 +100,7 @@
         "nixpkgs": "nixpkgs_2",
         "rust-overlay": "rust-overlay",
         "utils": "utils_2",
+        "wasigo": "wasigo",
         "xess": "xess"
       }
     },
@@ -153,6 +154,23 @@
       "original": {
         "owner": "numtide",
         "repo": "flake-utils",
+        "type": "github"
+      }
+    },
+    "wasigo": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1680023486,
+        "narHash": "sha256-LRCzxbowBykYSJnaffPqwVpckPRmFcHG6UsWxjfPxQ4=",
+        "owner": "Xe",
+        "repo": "go",
+        "rev": "b558380c7a1c8976c8eeacde716be3d4ccd409f2",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Xe",
+        "ref": "wasip1-wasm",
+        "repo": "go",
         "type": "github"
       }
     },
