@@ -101,7 +101,7 @@ func cron() {
 }
 
 func check(ctx context.Context) error {
-	dataStr, err := yeet.Output(ctx, "docker", "run", "--rm", "-it", *dockerImage, "wget", "-T", "30", "-q", "-O-", *checkURL)
+	dataStr, err := yeet.Output(ctx, "docker", "run", "--rm", *dockerImage, "wget", "-T", "30", "-q", "-O-", *checkURL)
 	if err != nil {
 		return fmt.Errorf("vest-pit-near: can't run docker command: %w", err)
 	}
