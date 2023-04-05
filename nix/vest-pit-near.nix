@@ -34,7 +34,7 @@ in {
         Restart = "always";
         RestartSec = "30s";
         ExecStart =
-          "${cfg.package}/bin/vest-pit-near --port=${toString cfg.port}";
+          "${cfg.package}/bin/vest-pit-near";
         RuntimeDirectory = "vest-pit-near";
         RuntimeDirectoryMode = "0755";
         StateDirectory = "vest-pit-near";
