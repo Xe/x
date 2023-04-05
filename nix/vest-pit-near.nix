@@ -26,21 +26,23 @@ in {
   config = mkIf cfg.enable {
     systemd.services.vest-pit-near = {
       wantedBy = [ "multi-user.target" ];
-      after = [ "within-homedir.service" ];
-      environment.STATE_DIR = "/var/lib/private/vest-pit-near";
+      environment = {
+        HOME = "/var/lib/private/vest-pit-near";
+        STATE_DIR = "/var/lib/private/vest-pit-near";
+      };
       serviceConfig = {
         DynamicUser = "true";
         SupplementaryGroups = [ "docker" ];
         Restart = "always";
         RestartSec = "30s";
-        ExecStart =
-          "${cfg.package}/bin/vest-pit-near";
+        ExecStart = "${cfg.package}/bin/vest-pit-near";
         RuntimeDirectory = "vest-pit-near";
         RuntimeDirectoryMode = "0755";
         StateDirectory = "vest-pit-near";
         StateDirectoryMode = "0700";
         CacheDirectory = "vest-pit-near";
         CacheDirectoryMode = "0750";
+        WorkingDirectory = "/var/lib/private/vest-pit-near";
       };
     };
   };
