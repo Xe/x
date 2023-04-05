@@ -185,6 +185,7 @@
           quickserv = copyFile { pname = "quickserv"; };
           todayinmarch2020 = copyFile { pname = "todayinmarch2020"; };
           uploud = copyFile { pname = "uploud"; };
+          vest-pit-near = copyFile { pname = "vest-pit-near"; };
           whoisfront = copyFile { pname = "whoisfront"; };
           within-website = copyFile { pname = "within.website"; };
         };
@@ -284,6 +285,7 @@
               aegis
               hlang
               todayinmarch2020
+              vest-pit-near
               within-website
             ];
           };
@@ -291,6 +293,7 @@
           aegis = import ./nix/aegis.nix self;
           hlang = import ./nix/hlang.nix self;
           todayinmarch2020 = import ./nix/todayinmarch2020.nix self;
+          vest-pit-near = import ./nix/vest-pit-near.nix self;
           within-website = import ./nix/within-website.nix self;
         };
 
