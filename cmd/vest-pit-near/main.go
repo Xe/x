@@ -77,7 +77,9 @@ func cron() {
 
 				if failureCount.Value() == 0 {
 					resp, err := http.DefaultClient.Do(discordwebhook.Send(*webhook, discordwebhook.Webhook{
-						Content: "VPN is down: " + checkErr.Error(),
+						Content:   "VPN is down: " + checkErr.Error(),
+						Username:  "vest-pit-near",
+						AvatarURL: "https://cdn.discordapp.com/attachments/262330174140448768/1093162451341684736/04401-1288759123-flat_color_limited_palette_low_contrast_high_contrast_chromatic_aberration_1girl_hoodie_green_hair_coffee_onsen_green.png",
 					}))
 					if err != nil {
 						ln.Error(ctx, err)
