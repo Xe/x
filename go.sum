@@ -1013,8 +1013,8 @@ rsc.io/binaryregexp v0.2.0/go.mod h1:qTv7/COck+e2FymRvadv62gMdZztPaShugOCi3I+8D8
 rsc.io/quote/v3 v3.1.0/go.mod h1:yEA65RcK8LyAZtP9Kv3t0HmxON59tX3rD+tICJqUlj0=
 rsc.io/sampler v1.3.0/go.mod h1:T1hPZKmBbMNahiBKFy5HrXp6adAjACjK9JXDnKaTXpA=
 software.sslmate.com/src/go-pkcs12 v0.2.0 h1:nlFkj7bTysH6VkC4fGphtjXRbezREPgrHuJG20hBGPE=
-tailscale.com v1.38.3 h1:2aX3+u0Re8QcN6nq7zf9Aa4ZCR2Nf6Imv3isqdQrb58=
-tailscale.com v1.38.3/go.mod h1:UWLQxcd8dz+lds2I+HpfXSruHrvXM1j4zd4zdx86t7w=
+tailscale.com v1.38.4 h1:ItZfSYhLCnY/fjwlBqdgcf0mjjh2W8eFhUM5XIsSqdE=
+tailscale.com v1.38.4/go.mod h1:UWLQxcd8dz+lds2I+HpfXSruHrvXM1j4zd4zdx86t7w=
 tulpa.dev/cadey/jvozba v0.0.0-20200326200349-f0ebe310be06 h1:va9TfLrDow17NpRPkZW9rwrEecY8lko/99rtBOS0AEE=
 tulpa.dev/cadey/jvozba v0.0.0-20200326200349-f0ebe310be06/go.mod h1:24Hynxow485ZwxAmn0yO1ATKApVnOB2dFM3zrtrGla0=
 within.website/johaus v1.1.0 h1:j59k9LM5ue+CDwUZAJitYjek6i8ISMkkCFiVXKZLByw=
