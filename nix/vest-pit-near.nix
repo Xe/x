@@ -30,6 +30,7 @@ in {
         HOME = "/var/lib/private/vest-pit-near";
         STATE_DIR = "/var/lib/private/vest-pit-near";
       };
+      path = with pkgs; [ docker ];
       serviceConfig = {
         DynamicUser = "true";
         SupplementaryGroups = [ "docker" ];
