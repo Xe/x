@@ -160,15 +160,15 @@
     "wasigo": {
       "flake": false,
       "locked": {
-        "lastModified": 1680023486,
-        "narHash": "sha256-LRCzxbowBykYSJnaffPqwVpckPRmFcHG6UsWxjfPxQ4=",
-        "owner": "Xe",
+        "lastModified": 1680820691,
+        "narHash": "sha256-PBYwz5tCa54XOJBbfrY1zjCSTfDh/SOoH7D6InTMxcA=",
+        "owner": "Pryz",
         "repo": "go",
-        "rev": "b558380c7a1c8976c8eeacde716be3d4ccd409f2",
+        "rev": "8b46a289d82f8a9313b1c4e07d11cb2373b0478c",
         "type": "github"
       },
       "original": {
-        "owner": "Xe",
+        "owner": "Pryz",
         "ref": "wasip1-wasm",
         "repo": "go",
         "type": "github"

@@ -37,7 +37,7 @@ func Get(symbol string, currencies []string) (map[string]float64, error) {
 
 	result := make(map[string]float64)
 	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, fmt.Errorf("cryptocompare: can't decode result: %w")
+		return nil, fmt.Errorf("cryptocompare: can't decode result: %w", err)
 	}
 
 	return result, nil

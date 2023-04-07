@@ -34,7 +34,7 @@
     # go + wasip1
     wasigo = {
       # https://github.com/Pryz/go/archive/refs/heads/wasip1-wasm.zip
-      url = "github:Xe/go/wasip1-wasm";
+      url = "github:Pryz/go/wasip1-wasm";
       flake = false;
     };
   };
