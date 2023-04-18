@@ -10,7 +10,6 @@ import (
 
 	"github.com/posener/complete"
 	"go4.org/legal"
-	"within.website/ln"
 	"within.website/ln/opname"
 	"within.website/x/internal/confyg/flagconfyg"
 	"within.website/x/internal/flagenv"
@@ -33,7 +32,7 @@ var (
 func configFileLocation() string {
 	dir, err := os.UserConfigDir()
 	if err != nil {
-		ln.Error(context.Background(), err, ln.Debug("can't read config dir"))
+		//ln.Error(context.Background(), err, ln.Debug("can't read config dir"))
 		return ""
 	}
 
@@ -47,10 +46,10 @@ func configFileLocation() string {
 // This always loads from the following configuration sources in the following
 // order:
 //
-//     - command line flags (to get -config)
-//     - environment variables
-//     - configuration file (if -config is set)
-//     - command line flags
+//   - command line flags (to get -config)
+//   - environment variables
+//   - configuration file (if -config is set)
+//   - command line flags
 //
 // This is done this way to ensure that command line flags always are the deciding
 // factor as an escape hatch.
@@ -61,8 +60,6 @@ func HandleStartup() {
 	ctx := opname.With(context.Background(), "internal.HandleStartup")
 
 	if *config != "" {
-		ln.Log(ctx, ln.Info("loading config"), ln.F{"path": *config})
-
 		flagconfyg.CmdParse(ctx, *config)
 	}
 	flag.Parse()

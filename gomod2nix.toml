@@ -73,6 +73,9 @@ schema = 3
   [mod."github.com/disintegration/imaging"]
     version = "v1.6.1"
     hash = "sha256-3IWhzlxuMQIQzhTYUT6SiToBjOzR9kfyoDCh1EetqgQ="
+  [mod."github.com/dlclark/regexp2"]
+    version = "v1.7.0"
+    hash = "sha256-Z/M62esiZ0fVwvueVQhwz18z0eS22LZ3DJ4O8FKp3AY="
   [mod."github.com/eaburns/peggy"]
     version = "v1.0.2"
     hash = "sha256-toux6NpVog1DW+zEWX8dAj+hCZaeMG6z2fe4cAz2LDw="
@@ -229,6 +232,12 @@ schema = 3
   [mod."github.com/rs/cors"]
     version = "v1.8.3"
     hash = "sha256-VgVB4HKAhPSjNg96mIEUN1bt5ZQng8Fi3ZABy3CDWQE="
+  [mod."github.com/samber/go-gpt-3-encoder"]
+    version = "v0.3.1"
+    hash = "sha256-quLfn1bazwQer7OBLtzjfN40cE39Q+whsUG4lWa/0p0="
+  [mod."github.com/samber/lo"]
+    version = "v1.37.0"
+    hash = "sha256-5m0advnk/wy/bFygNyxaPVX2PgA5oF1lSHP71hAOhCc="
   [mod."github.com/sebest/xff"]
     version = "v0.0.0-20210106013422-671bd2870b3a"
     hash = "sha256-t7Gdp7S71Koej5Njg3jOo5vwyj02tJCbJjrq/vZGOho="

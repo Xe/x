@@ -34,7 +34,7 @@
     # go + wasip1
     wasigo = {
       # https://github.com/Pryz/go/archive/refs/heads/wasip1-wasm.zip
-      url = "github:Pryz/go/wasip1-wasm";
+      url = "github:golang/go";
       flake = false;
     };
   };
@@ -254,7 +254,6 @@
             libavif
             sqlite-interactive
 
-            cargo
             cargo-watch
             rustfmt
             rust-analyzer
@@ -263,6 +262,9 @@
             wabt
             bloaty
             rust
+
+            tinyemu
+            zig
           ];
 
           XEDN_STATIC = self.packages.${system}.xedn-static;

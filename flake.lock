@@ -160,16 +160,15 @@
     "wasigo": {
       "flake": false,
       "locked": {
-        "lastModified": 1680820691,
-        "narHash": "sha256-PBYwz5tCa54XOJBbfrY1zjCSTfDh/SOoH7D6InTMxcA=",
-        "owner": "Pryz",
+        "lastModified": 1681491667,
+        "narHash": "sha256-Bb9EydUXgoKnjbaMWxa48VYU3Q0+xisGs5xzqsEuPtc=",
+        "owner": "golang",
         "repo": "go",
-        "rev": "8b46a289d82f8a9313b1c4e07d11cb2373b0478c",
+        "rev": "ac9d777caf06364524ce9c67203a14a899f71a57",
         "type": "github"
       },
       "original": {
-        "owner": "Pryz",
-        "ref": "wasip1-wasm",
+        "owner": "golang",
         "repo": "go",
         "type": "github"
       }
