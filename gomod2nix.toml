@@ -266,8 +266,8 @@ schema = 3
     version = "v0.2.0"
     hash = "sha256-bCWn8E+DcZY6+yPu07AF3hCcDZx3CFdD74qfpDIgVqI="
   [mod."github.com/tetratelabs/wazero"]
-    version = "v1.0.1"
-    hash = "sha256-OqKMmGNVK0TVGPy0mbMgQruAndNKZLx/pKYP25xzLAY="
+    version = "v1.0.2"
+    hash = "sha256-96aX6mGLRdxIaxGOnY7Y2coxXo2GhT9x2NMG6EmDRk8="
   [mod."github.com/tmc/scp"]
     version = "v0.0.0-20170824174625-f7b48647feef"
     hash = "sha256-qHwQb3JA43VVhJdB18/2zXbxqW/bgw1yvr8YhqFyd74="
