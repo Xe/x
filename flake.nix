@@ -98,12 +98,40 @@
 
           buildPhase = ''
             mkdir -p $out/static/css/iosevka
+            mkdir -p $out/static/pkg/iosevka
+            mkdir -p $out/static/pkg/xess
+            mkdir -p $out/static/pkg/xeact
+
+            tar xf ${pkgs.fetchurl {
+              name = "xeact-0.69.71";
+              url = "https://registry.npmjs.org/@xeserv/xeact/-/xeact-0.69.71.tgz";
+              sha256 = "19rfg5fbiz69vh4hzg6694szm9agz3hfk4sfsfj6ws0cq4ss805l";
+            }}
+
+            mkdir -p $out/static/pkg/xeact/0.69.71
+            cp -vrf ./package/* $out/static/pkg/xeact/0.69.71
+            rm -rf package
+
+            tar xf ${pkgs.fetchurl {
+              name = "xeact-0.70.0";
+              url = "https://registry.npmjs.org/@xeserv/xeact/-/xeact-0.70.0.tgz";
+              sha256 = "1mxwrs04vj1mixs418cy7gd5dy3nfaqcc00vmrjwsgzc36wnmwxz";
+            }}
+
+            mkdir -p $out/static/pkg/xeact/0.70.0
+            cp -vrf ./package/* $out/static/pkg/xeact/0.70.0
+            rm -rf package
 
             ln -s ${
               xess.packages.${system}.aoi
             }/static/css/xess.css $out/static/css/xess.css
             for file in ${iaso-fonts.packages.${system}.default}/*; do
               ln -s $file $out/static/css/iosevka
+              ln -s $file $out/static/pkg/iosevka
+            done
+
+            for file in ${xess.packages.${system}.combined}/*; do
+              ln -s $file $out/static/pkg/xess
             done
           '';
         };

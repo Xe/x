@@ -183,11 +183,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1679709433,
-        "narHash": "sha256-7whEimB2nIB+JKjRnEKCrA7D5mqSiY1TuyJJJcu/yv4=",
+        "lastModified": 1682266158,
+        "narHash": "sha256-VK66KyF1doJ24yktb9rp7Yv7auS6i0P8EnJLhFOz+jY=",
         "owner": "Xe",
         "repo": "Xess",
-        "rev": "6f1343b46552eed02f02268710d4fc9148f787c3",
+        "rev": "3a85d1de06cd3420b4d56a8edd72cd57e6f0806e",
         "type": "github"
       },
       "original": {
