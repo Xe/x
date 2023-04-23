@@ -37,10 +37,11 @@ import (
 )
 
 var (
-	b2Backend = flag.String("b2-backend", "f001.backblazeb2.com", "Backblaze B2 base host")
-	addr      = flag.String("addr", ":8080", "server address")
-	dir       = flag.String("dir", os.Getenv("XEDN_STATE"), "where XeDN should store cached data")
-	staticDir = flag.String("static-dir", envOr("XEDN_STATIC", "./static"), "where XeDN should look for static assets")
+	b2Backend   = flag.String("b2-backend", "f001.backblazeb2.com", "Backblaze B2 base host")
+	addr        = flag.String("addr", ":8080", "server bind address")
+	metricsAddr = flag.String("metrics-addr", ":8081", "metrics bind address")
+	dir         = flag.String("dir", os.Getenv("XEDN_STATE"), "where XeDN should store cached data")
+	staticDir   = flag.String("static-dir", envOr("XEDN_STATIC", "./static"), "where XeDN should look for static assets")
 
 	//go:embed index.html
 	indexHTML []byte
@@ -425,9 +426,9 @@ func main() {
 
 	os.MkdirAll(*dir, 0700)
 
+	go http.ListenAndServe(*metricsAddr, http.HandlerFunc(tsweb.VarzHandler))
+
 	mux := http.NewServeMux()
-	mux.HandleFunc("/.within/metrics", tsweb.VarzHandler)
-	mux.Handle("/.within/metrics/json", expvar.Handler())
 
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/" {

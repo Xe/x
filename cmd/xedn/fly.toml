@@ -48,5 +48,5 @@ processes = []
     timeout = "2s"
 
 [metrics]
-port = 8080
-path = "/.within/metrics"
+port = 8081
+path = "/metrics"
