@@ -26,8 +26,9 @@ require (
 	github.com/posener/complete v1.2.3
 	github.com/rogpeppe/go-internal v1.10.0
 	github.com/rs/cors v1.8.3
+	github.com/samber/go-gpt-3-encoder v0.3.1
 	github.com/sebest/xff v0.0.0-20210106013422-671bd2870b3a
-	github.com/tetratelabs/wazero v1.0.2
+	github.com/tetratelabs/wazero v1.0.3
 	github.com/tmc/scp v0.0.0-20170824174625-f7b48647feef
 	go.etcd.io/bbolt v1.3.7
 	go4.org v0.0.0-20190313082347-94abd6928b1d
@@ -96,7 +97,6 @@ require (
 	github.com/mndrix/ps v0.0.0-20170330174427-18e65badd6ab // indirect
 	github.com/olekukonko/tablewriter v0.0.5 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
-	github.com/samber/go-gpt-3-encoder v0.3.1 // indirect
 	github.com/samber/lo v1.37.0 // indirect
 	github.com/sendgrid/rest v2.6.9+incompatible // indirect
 	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect
