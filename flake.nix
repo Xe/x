@@ -122,6 +122,16 @@
             cp -vrf ./package/* $out/static/pkg/xeact/0.70.0
             rm -rf package
 
+            tar xf ${pkgs.fetchurl {
+              name = "xeact-0.71.0";
+              url = "https://registry.npmjs.org/@xeserv/xeact/-/xeact-0.71.0.tgz";
+              sha256 = "069qky042lmlvslbgsyl9j8jmkhl2hr6hy5slf1b03g3fzvkp6x4";
+            }}
+
+            mkdir -p $out/static/pkg/xeact/0.71.0
+            cp -vrf ./package/* $out/static/pkg/xeact/0.71.0
+            rm -rf package
+
             ln -s ${
               xess.packages.${system}.aoi
             }/static/css/xess.css $out/static/css/xess.css
