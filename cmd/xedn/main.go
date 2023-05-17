@@ -89,9 +89,12 @@ func (dc *Cache) Purge(w http.ResponseWriter, r *http.Request) {
 
 	defer r.Body.Close()
 	if err := json.NewDecoder(r.Body).Decode(&files); err != nil {
+		ln.Error(r.Context(), err, ln.F{"files": files})
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
+
+	ln.Log(r.Context(), ln.Action("purging files"), ln.F{"files": files})
 
 	if err := dc.DB.Update(func(tx *bbolt.Tx) error {
 		for _, fname := range files {
@@ -107,6 +110,7 @@ func (dc *Cache) Purge(w http.ResponseWriter, r *http.Request) {
 
 		return nil
 	}); err != nil {
+		ln.Error(r.Context(), err, ln.F{"files": files})
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
