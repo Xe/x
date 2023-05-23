@@ -20,7 +20,7 @@ require (
 	github.com/kr/pretty v0.3.1
 	github.com/mmikulicic/stringlist v1.0.0
 	github.com/mndrix/golog v0.0.0-20170330170653-a28e2a269775
-	github.com/otiai10/copy v1.9.0
+	github.com/otiai10/copy v1.11.0
 	github.com/peterh/liner v1.2.2
 	github.com/pkg/errors v0.9.1
 	github.com/posener/complete v1.2.3
@@ -96,7 +96,6 @@ require (
 	github.com/mitchellh/go-ps v1.0.0 // indirect
 	github.com/mndrix/ps v0.0.0-20170330174427-18e65badd6ab // indirect
 	github.com/olekukonko/tablewriter v0.0.5 // indirect
-	github.com/pasztorpisti/qs v0.0.0-20171216220353-8d6c33ee906c // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/samber/lo v1.37.0 // indirect
 	github.com/sendgrid/rest v2.6.9+incompatible // indirect
