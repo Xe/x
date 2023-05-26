@@ -34,7 +34,7 @@ require (
 	go4.org v0.0.0-20190313082347-94abd6928b1d
 	golang.org/x/crypto v0.7.0
 	golang.org/x/oauth2 v0.6.0
-	golang.org/x/sync v0.1.0
+	golang.org/x/sync v0.2.0
 	nhooyr.io/websocket v1.8.7
 	tailscale.com v1.40.1
 	tulpa.dev/cadey/jvozba v0.0.0-20200326200349-f0ebe310be06
