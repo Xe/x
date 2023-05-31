@@ -196,8 +196,6 @@
         packages = rec {
           default = everything;
 
-          wasigo = wasigo';
-
           mastosan-wasm = naersk'.buildPackage {
             src = ./web/mastosan;
             targets = [ "wasm32-wasi" ];
@@ -285,7 +283,6 @@
             strace
             hey
             boltbrowser
-            gowasi
 
             pkg-config
             libaom
