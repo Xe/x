@@ -41,7 +41,7 @@ import (
 // If you are using ln's opname facility (https://pkg.go.dev/within.website/ln/opname), then an
 // expvar gauge will be created that will contain the current heartbeat. This allows you to
 // monitor and alert on this value changing erratically.
-func Heartbeat(ctx context.Context, min, max time.Duration) (chan<- struct{}, func(), func()) {
+func Heartbeat(ctx context.Context, min, max time.Duration) (<-chan struct{}, func(), func()) {
 	heartbeat := make(chan struct{}, 1) // output channel
 	currDelay := (max + min) / 2        // start at half speed
 	var currDelayLock sync.Mutex
