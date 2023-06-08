@@ -47,9 +47,11 @@ func Heartbeat(ctx context.Context, min, max time.Duration) (<-chan struct{}, fu
 	var currDelayLock sync.Mutex
 
 	var counter *expvar.Int
+	var tachycardiaCounter *expvar.Int
 
 	if name, ok := opname.Get(ctx); ok {
 		counter = expvar.NewInt("gauge_heartbeat_" + name)
+		tachycardiaCounter = expvar.NewInt("gauge_heartbeat_backoff_" + name)
 	}
 
 	slower := func() {
@@ -89,6 +91,7 @@ func Heartbeat(ctx context.Context, min, max time.Duration) (<-chan struct{}, fu
 				select {
 				case heartbeat <- struct{}{}:
 				default:
+					tachycardiaCounter.Add(1)
 					slower() // back off if the channel is full
 				}
 			}
