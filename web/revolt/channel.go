@@ -23,7 +23,7 @@ type Channel struct {
 	LastMessage        interface{} `json:"last_message"`
 	Description        string      `json:"description"`
 	Icon               *Attachment `json:"icon"`
-	DefaultPermissions uint        `json:"default_permissions"`
+	DefaultPermissions interface{} `json:"default_permissions"`
 	RolePermissions    interface{} `json:"role_permissions"`
 	Permissions        uint        `json:"permissions"`
 }
