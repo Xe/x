@@ -13,6 +13,7 @@ type SendMessage struct {
 	Replies     []Replies       `json:"replies,omitempty"`
 	Embeds      []SendableEmbed `json:"embeds,omitempty"`
 	DeleteAfter uint            `json:"-"`
+	Masquerade *Masquerade `json:"masquerade,omitempty"`
 }
 
 type SendableEmbed struct {

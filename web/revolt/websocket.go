@@ -92,7 +92,7 @@ func (c *Client) handleEvents(ctx context.Context, rawData *struct {
 		User    string `json:"user"`
 	}
 
-	ctx = opname.With(ctx, "handleEvents")
+	ctx = opname.With(ctx, "handleEvents."+rawData.Type)
 	
 	switch rawData.Type {
 	case "Pong", "Authenticated": // ignore these messages
@@ -103,7 +103,7 @@ func (c *Client) handleEvents(ctx context.Context, rawData *struct {
 		// onReady event
 		if c.OnReadyFunctions != nil {
 			for _, i := range c.OnReadyFunctions {
-				i()
+				i(ctx)
 			}
 		}
 	case "Message":
@@ -116,7 +116,7 @@ func (c *Client) handleEvents(ctx context.Context, rawData *struct {
 		}
 
 		for _, i := range c.OnMessageFunctions {
-			i(msgData)
+			i(ctx, msgData)
 		}
 	case "MessageAppend":
 		data := struct{
@@ -128,6 +128,10 @@ func (c *Client) handleEvents(ctx context.Context, rawData *struct {
 		if err := json.Unmarshal([]byte(message), &data); err != nil {
 			ln.Error(ctx, err, ln.F{"type": rawData.Type})
 			fmt.Printf("Unexcepted Error: %s", err)
+		}
+
+		for _, i := range c.OnMessageAppendFunctions {
+			i(ctx, data.ChannelId, data.MessageId, data.Append)
 		}
 	case "MessageUpdate":
 		// Message update event.
@@ -142,7 +146,7 @@ func (c *Client) handleEvents(ctx context.Context, rawData *struct {
 		}
 
 		for _, i := range c.OnMessageUpdateFunctions {
-			i(data.ChannelId, data.MessageId, data.Payload)
+			i(ctx, data.ChannelId, data.MessageId, data.Payload)
 		}
 	case "MessageDelete":
 		// Message delete event.
@@ -153,7 +157,7 @@ func (c *Client) handleEvents(ctx context.Context, rawData *struct {
 		}
 
 		for _, i := range c.OnMessageDeleteFunctions {
-			i(data.Channel, data.ID)
+			i(ctx, data.Channel, data.ID)
 		}
 	case "ChannelCreate":
 		// Channel create event.
@@ -165,7 +169,7 @@ func (c *Client) handleEvents(ctx context.Context, rawData *struct {
 		}
 
 		for _, i := range c.OnChannelCreateFunctions {
-			i(channelData)
+			i(ctx, channelData)
 		}
 	case "ChannelUpdate":
 		// Channel update event.
@@ -180,7 +184,7 @@ func (c *Client) handleEvents(ctx context.Context, rawData *struct {
 		}
 
 		for _, i := range c.OnChannelUpdateFunctions {
-			i(data.ChannelId, data.Clear, data.Payload)
+			i(ctx, data.ChannelId, data.Clear, data.Payload)
 		}
 	case "ChannelDelete":
 		// Channel delete event.
@@ -191,7 +195,7 @@ func (c *Client) handleEvents(ctx context.Context, rawData *struct {
 		}
 
 		for _, i := range c.OnChannelDeleteFunctions {
-			i(data.ID)
+			i(ctx, data.ID)
 		}
 	case "GroupCreate":
 		// Group channel create event.
@@ -203,7 +207,7 @@ func (c *Client) handleEvents(ctx context.Context, rawData *struct {
 		}
 
 		for _, i := range c.OnGroupCreateFunctions {
-			i(groupChannelData)
+			i(ctx, groupChannelData)
 		}
 	case "GroupMemeberAdded":
 		// Group member added event.
@@ -214,7 +218,7 @@ func (c *Client) handleEvents(ctx context.Context, rawData *struct {
 		}
 
 		for _, i := range c.OnGroupMemberAddedFunctions {
-			i(data.ID, data.User)
+			i(ctx, data.ID, data.User)
 		}
 	case "GroupMemberRemoved":
 		// Group member removed event.
@@ -225,7 +229,7 @@ func (c *Client) handleEvents(ctx context.Context, rawData *struct {
 		}
 
 		for _, i := range c.OnGroupMemberRemovedFunctions {
-			i(data.ID, data.User)
+			i(ctx, data.ID, data.User)
 		}
 	case "ChannelStartTyping":
 		// Channel start typing event.
@@ -236,7 +240,7 @@ func (c *Client) handleEvents(ctx context.Context, rawData *struct {
 		}
 
 		for _, i := range c.OnChannelStartTypingFunctions {
-			i(data.ID, data.User)
+			i(ctx, data.ID, data.User)
 		}
 	case "ChannelStopTyping":
 		// Channel stop typing event.
@@ -247,7 +251,7 @@ func (c *Client) handleEvents(ctx context.Context, rawData *struct {
 		}
 
 		for _, i := range c.OnChannelStopTypingFunctions {
-			i(data.ID, data.User)
+			i(ctx, data.ID, data.User)
 		}
 	case "ServerCreate":
 		// Server create event.
@@ -259,7 +263,7 @@ func (c *Client) handleEvents(ctx context.Context, rawData *struct {
 		}
 
 		for _, i := range c.OnServerCreateFunctions {
-			i(serverData)
+			i(ctx, serverData)
 		}
 	case "ServerUpdate":
 		// Server update event.
@@ -274,7 +278,7 @@ func (c *Client) handleEvents(ctx context.Context, rawData *struct {
 		}
 
 		for _, i := range c.OnServerUpdateFunctions {
-			i(data.ServerId, data.Clear, data.Payload)
+			i(ctx, data.ServerId, data.Clear, data.Payload)
 		}
 	case "ServerDelete":
 		// Server delete event.
@@ -285,7 +289,7 @@ func (c *Client) handleEvents(ctx context.Context, rawData *struct {
 		}
 
 		for _, i := range c.OnServerDeleteFunctions {
-			i(data.ID)
+			i(ctx, data.ID)
 		}
 	case "ServerMemberUpdate":
 		// Member update event.
@@ -300,7 +304,7 @@ func (c *Client) handleEvents(ctx context.Context, rawData *struct {
 		}
 
 		for _, i := range c.OnServerMemberUpdateFunctions {
-			i(data.ServerId, data.Clear, data.Payload)
+			i(ctx, data.ServerId, data.Clear, data.Payload)
 		}
 	case "ServerMemberJoin":
 		// Member join event.
@@ -311,7 +315,7 @@ func (c *Client) handleEvents(ctx context.Context, rawData *struct {
 		}
 
 		for _, i := range c.OnServerMemberJoinFunctions {
-			i(data.ID, data.User)
+			i(ctx, data.ID, data.User)
 		}
 	case "ServerMemberLeave":
 		// Member left event.
@@ -322,14 +326,14 @@ func (c *Client) handleEvents(ctx context.Context, rawData *struct {
 		}
 
 		for _, i := range c.OnServerMemberLeaveFunctions {
-			i(data.ID, data.User)
+			i(ctx, data.ID, data.User)
 		}
 	default:
 		log.Printf("unknown event %s", rawData.Type)
 		// Unknown event.
 		if c.OnUnknownEventFunctions != nil {
 			for _, i := range c.OnUnknownEventFunctions {
-				i(message)
+				i(ctx, message)
 			}
 		}
 	}

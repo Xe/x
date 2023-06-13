@@ -1,6 +1,7 @@
 package revolt
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -22,26 +23,26 @@ type Client struct {
 	Cache   *Cache
 
 	// Event Functions
-	OnUnknownEventFunctions       []func(message string)	
-	OnReadyFunctions              []func()
-	OnMessageFunctions            []func(message *Message)
-	OnMessageAppendFunctions []func(channelID, messageID string, payload map[string]any)
-	OnMessageUpdateFunctions      []func(channel_id, message_id string, payload map[string]interface{})
-	OnMessageDeleteFunctions      []func(channel_id, message_id string)
-	OnChannelCreateFunctions      []func(channel *Channel)
-	OnChannelUpdateFunctions      []func(channel_id, clear string, payload map[string]interface{})
-	OnChannelDeleteFunctions      []func(channel_id string)
-	OnGroupCreateFunctions        []func(group *Group)
-	OnGroupMemberAddedFunctions   []func(group_id, user_id string)
-	OnGroupMemberRemovedFunctions []func(group_id, user_id string)
-	OnChannelStartTypingFunctions []func(channel_id, user_id string)
-	OnChannelStopTypingFunctions  []func(channel_id, user_id string)
-	OnServerCreateFunctions       []func(server_id *Server)
-	OnServerUpdateFunctions       []func(server_id, clear string, payload map[string]interface{})
-	OnServerDeleteFunctions       []func(server_id string)
-	OnServerMemberUpdateFunctions []func(server_id, clear string, payload map[string]interface{})
-	OnServerMemberJoinFunctions   []func(server_id, user_id string)
-	OnServerMemberLeaveFunctions  []func(server_id, user_id string)
+	OnUnknownEventFunctions       []func(ctx context.Context, message string)
+	OnReadyFunctions              []func(ctx context.Context)
+	OnMessageFunctions            []func(ctx context.Context, message *Message)
+	OnMessageAppendFunctions      []func(ctx context.Context, channelID, messageID string, payload map[string]any)
+	OnMessageUpdateFunctions      []func(ctx context.Context, channelID, messageID string, payload map[string]interface{})
+	OnMessageDeleteFunctions      []func(ctx context.Context, channelID, messageID string)
+	OnChannelCreateFunctions      []func(ctx context.Context, channel *Channel)
+	OnChannelUpdateFunctions      []func(ctx context.Context, channelID, clear string, payload map[string]interface{})
+	OnChannelDeleteFunctions      []func(ctx context.Context, channelID string)
+	OnGroupCreateFunctions        []func(ctx context.Context, group *Group)
+	OnGroupMemberAddedFunctions   []func(ctx context.Context, groupID, userID string)
+	OnGroupMemberRemovedFunctions []func(ctx context.Context, groupID, userID string)
+	OnChannelStartTypingFunctions []func(ctx context.Context, channelID, userID string)
+	OnChannelStopTypingFunctions  []func(ctx context.Context, channelID, userID string)
+	OnServerCreateFunctions       []func(ctx context.Context, serverID *Server)
+	OnServerUpdateFunctions       []func(ctx context.Context, serverID, clear string, payload map[string]interface{})
+	OnServerDeleteFunctions       []func(ctx context.Context, serverID string)
+	OnServerMemberUpdateFunctions []func(ctx context.Context, serverID, clear string, payload map[string]interface{})
+	OnServerMemberJoinFunctions   []func(ctx context.Context, serverID, userID string)
+	OnServerMemberLeaveFunctions  []func(ctx context.Context, serverID, userID string)
 }
 
 // Self bot struct.
@@ -54,101 +55,101 @@ type SelfBot struct {
 }
 
 // On ready event will run when websocket connection is started and bot is ready to work.
-func (c *Client) OnReady(fn func()) {
+func (c *Client) OnReady(fn func(context.Context)) {
 	c.OnReadyFunctions = append(c.OnReadyFunctions, fn)
 }
 
 // On message event will run when someone sends a message.
-func (c *Client) OnMessage(fn func(message *Message)) {
+func (c *Client) OnMessage(fn func(ctx context.Context, message *Message)) {
 	c.OnMessageFunctions = append(c.OnMessageFunctions, fn)
 }
 
-func (c *Client) OnMessageAppend(fn func(channelID, messageID string, payload map[string]any)) {
+func (c *Client) OnMessageAppend(fn func(ctx context.Context, channelID, messageID string, payload map[string]any)) {
 	c.OnMessageAppendFunctions = append(c.OnMessageAppendFunctions, fn)
 }
 
 // On message update event will run when someone updates a message.
-func (c *Client) OnMessageUpdate(fn func(channel_id, message_id string, payload map[string]interface{})) {
+func (c *Client) OnMessageUpdate(fn func(ctx context.Context, channel_id, message_id string, payload map[string]interface{})) {
 	c.OnMessageUpdateFunctions = append(c.OnMessageUpdateFunctions, fn)
 }
 
 // On message delete event will run when someone deletes a message.
-func (c *Client) OnMessageDelete(fn func(channel_id, message_id string)) {
+func (c *Client) OnMessageDelete(fn func(ctx context.Context, channel_id, message_id string)) {
 	c.OnMessageDeleteFunctions = append(c.OnMessageDeleteFunctions, fn)
 }
 
 // On channel create event will run when someone creates a channel.
-func (c *Client) OnChannelCreate(fn func(channel *Channel)) {
+func (c *Client) OnChannelCreate(fn func(ctx context.Context, channel *Channel)) {
 	c.OnChannelCreateFunctions = append(c.OnChannelCreateFunctions, fn)
 }
 
 // On channel update event will run when someone updates a channel.
-func (c *Client) OnChannelUpdate(fn func(channel_id, clear string, payload map[string]interface{})) {
+func (c *Client) OnChannelUpdate(fn func(ctx context.Context, channel_id, clear string, payload map[string]interface{})) {
 	c.OnChannelUpdateFunctions = append(c.OnChannelUpdateFunctions, fn)
 }
 
 // On channel delete event will run when someone deletes a channel.
-func (c *Client) OnChannelDelete(fn func(channel_id string)) {
+func (c *Client) OnChannelDelete(fn func(ctx context.Context, channel_id string)) {
 	c.OnChannelDeleteFunctions = append(c.OnChannelDeleteFunctions, fn)
 }
 
 // On group channel create event will run when someones creates a group channel.
-func (c *Client) OnGroupCreate(fn func(group *Group)) {
+func (c *Client) OnGroupCreate(fn func(ctx context.Context, group *Group)) {
 	c.OnGroupCreateFunctions = append(c.OnGroupCreateFunctions, fn)
 }
 
 // On group member added will run when someone is added to a group channel.
-func (c *Client) OnGroupMemberAdded(fn func(group_id string, user_id string)) {
+func (c *Client) OnGroupMemberAdded(fn func(ctx context.Context, group_id string, user_id string)) {
 	c.OnGroupMemberAddedFunctions = append(c.OnGroupMemberAddedFunctions, fn)
 }
 
 // On group member removed will run when someone is removed from a group channel.
-func (c *Client) OnGroupMemberRemoved(fn func(group_id string, user_id string)) {
+func (c *Client) OnGroupMemberRemoved(fn func(ctx context.Context, group_id string, user_id string)) {
 	c.OnGroupMemberRemovedFunctions = append(c.OnGroupMemberRemovedFunctions, fn)
 }
 
 // On unknown event will run when client gets a unknown event.
-func (c *Client) OnUnknownEvent(fn func(message string)) {
+func (c *Client) OnUnknownEvent(fn func(ctx context.Context, message string)) {
 	c.OnUnknownEventFunctions = append(c.OnUnknownEventFunctions, fn)
 }
 
 // On channel start typing will run when someone starts to type a message.
-func (c *Client) OnChannelStartTyping(fn func(channel_id, user_id string)) {
+func (c *Client) OnChannelStartTyping(fn func(ctx context.Context, channel_id, user_id string)) {
 	c.OnChannelStartTypingFunctions = append(c.OnChannelStartTypingFunctions, fn)
 }
 
 // On channel stop typing will run when someone stops the typing status.
-func (c *Client) OnChannelStopTyping(fn func(channel_id, user_id string)) {
+func (c *Client) OnChannelStopTyping(fn func(ctx context.Context, channel_id, user_id string)) {
 	c.OnChannelStopTypingFunctions = append(c.OnChannelStopTypingFunctions, fn)
 }
 
 // On server create event will run when someone creates a server.
-func (c *Client) OnServerCreate(fn func(server *Server)) {
+func (c *Client) OnServerCreate(fn func(ctx context.Context, server *Server)) {
 	c.OnServerCreateFunctions = append(c.OnServerCreateFunctions, fn)
 }
 
 // On server update will run when someone updates a server.
-func (c *Client) OnServerUpdate(fn func(server_id, clear string, payload map[string]interface{})) {
+func (c *Client) OnServerUpdate(fn func(ctx context.Context, server_id, clear string, payload map[string]interface{})) {
 	c.OnServerUpdateFunctions = append(c.OnServerUpdateFunctions, fn)
 }
 
 // On server delete will run when someone deletes a server.
-func (c *Client) OnServerDelete(fn func(server_id string)) {
+func (c *Client) OnServerDelete(fn func(ctx context.Context, server_id string)) {
 	c.OnServerDeleteFunctions = append(c.OnServerDeleteFunctions, fn)
 }
 
 // On server member update will run when a server member updates.
-func (c *Client) OnServerMemberUpdate(fn func(server_id, clear string, payload map[string]interface{})) {
+func (c *Client) OnServerMemberUpdate(fn func(ctx context.Context, server_id, clear string, payload map[string]interface{})) {
 	c.OnServerMemberUpdateFunctions = append(c.OnServerMemberUpdateFunctions, fn)
 }
 
 // On server member join will run when someone joins to the server.
-func (c *Client) OnServerMemberJoin(fn func(server_id string, user_id string)) {
+func (c *Client) OnServerMemberJoin(fn func(ctx context.Context, server_id string, user_id string)) {
 	c.OnServerMemberJoinFunctions = append(c.OnServerMemberJoinFunctions, fn)
 }
 
 // On server member leave will run when someone left from server.
-func (c *Client) OnServerMemberLeave(fn func(server_id string, user_id string)) {
+func (c *Client) OnServerMemberLeave(fn func(ctx context.Context, server_id string, user_id string)) {
 	c.OnServerMemberLeaveFunctions = append(c.OnServerMemberLeaveFunctions, fn)
 }
 
