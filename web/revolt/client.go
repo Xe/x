@@ -25,6 +25,7 @@ type Client struct {
 	OnUnknownEventFunctions       []func(message string)	
 	OnReadyFunctions              []func()
 	OnMessageFunctions            []func(message *Message)
+	OnMessageAppendFunctions []func(channelID, messageID string, payload map[string]any)
 	OnMessageUpdateFunctions      []func(channel_id, message_id string, payload map[string]interface{})
 	OnMessageDeleteFunctions      []func(channel_id, message_id string)
 	OnChannelCreateFunctions      []func(channel *Channel)
@@ -60,6 +61,10 @@ func (c *Client) OnReady(fn func()) {
 // On message event will run when someone sends a message.
 func (c *Client) OnMessage(fn func(message *Message)) {
 	c.OnMessageFunctions = append(c.OnMessageFunctions, fn)
+}
+
+func (c *Client) OnMessageAppend(fn func(channelID, messageID string, payload map[string]any)) {
+	c.OnMessageAppendFunctions = append(c.OnMessageAppendFunctions, fn)
 }
 
 // On message update event will run when someone updates a message.

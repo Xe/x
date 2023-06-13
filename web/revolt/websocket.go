@@ -1,6 +1,7 @@
 package revolt
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -8,9 +9,11 @@ import (
 	"time"
 
 	"github.com/sacOO7/gowebsocket"
+	"within.website/ln"
+	"within.website/ln/opname"
 )
 
-func (c *Client) Start() {
+func (c *Client) Start(ctx context.Context) {
 	// Create new socket
 	c.Socket = gowebsocket.New(WS_URL)
 	c.HTTP = &http.Client{}
@@ -44,12 +47,17 @@ func (c *Client) Start() {
 		}
 
 		// Handle events.
-		c.handleEvents(rawData, message)
+		c.handleEvents(ctx, rawData, message)
 		// fmt.Println(message)
 	}
 
 	// Start connection.
 	c.Socket.Connect()
+
+	go func() {
+		<-ctx.Done()
+		c.Close()
+	}()
 }
 
 // Handle on connected.
@@ -75,15 +83,17 @@ func (c *Client) ping() {
 }
 
 // Handle events.
-func (c *Client) handleEvents(rawData *struct {
+func (c *Client) handleEvents(ctx context.Context, rawData *struct {
 	Type string `json:"type"`
 }, message string) {
 	type junk struct {
 		Channel string `json:"channel"`
-		ID string `json:"id"`
-		User string `json:"user"`
+		ID      string `json:"id"`
+		User    string `json:"user"`
 	}
 
+	ctx = opname.With(ctx, "handleEvents")
+	
 	switch rawData.Type {
 	case "Pong", "Authenticated": // ignore these messages
 	case "Ready":
@@ -107,6 +117,17 @@ func (c *Client) handleEvents(rawData *struct {
 
 		for _, i := range c.OnMessageFunctions {
 			i(msgData)
+		}
+	case "MessageAppend":
+		data := struct{
+			ChannelId string                 `json:"channel"`
+			MessageId string                 `json:"id"`
+			Append   map[string]interface{} `json:"append"`
+		}{}
+
+		if err := json.Unmarshal([]byte(message), &data); err != nil {
+			ln.Error(ctx, err, ln.F{"type": rawData.Type})
+			fmt.Printf("Unexcepted Error: %s", err)
 		}
 	case "MessageUpdate":
 		// Message update event.
@@ -248,7 +269,7 @@ func (c *Client) handleEvents(rawData *struct {
 			Payload  map[string]interface{} `json:"data"`
 		}{}
 
-		if err := json.Unmarshal([]byte(message), data);  err != nil {
+		if err := json.Unmarshal([]byte(message), data); err != nil {
 			fmt.Printf("Unexcepted Error: %s", err)
 		}
 

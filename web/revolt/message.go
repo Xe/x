@@ -16,7 +16,7 @@ type Message struct {
 	Nonce       string          `json:"nonce"`
 	ChannelId   string          `json:"channel"`
 	AuthorId    string          `json:"author"`
-	Content     interface{}     `json:"content"`
+	Content     *string     `json:"content"`
 	Edited      interface{}     `json:"edited"`
 	Embeds      []*MessageEmbed `json:"embeds"`
 	Attachments []*Attachment   `json:"attachments"`
@@ -101,7 +101,7 @@ func (m *Message) Edit(content string) error {
 		return err
 	}
 
-	m.Content = content
+	m.Content = &content
 	return nil
 }
 
