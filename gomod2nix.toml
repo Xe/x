@@ -226,6 +226,9 @@ schema = 3
   [mod."github.com/otiai10/copy"]
     version = "v1.11.0"
     hash = "sha256-2xQtmy9eor9BIhNuvs52noIQDJ1alG3ZXumXXSL6l9Q="
+  [mod."github.com/pasztorpisti/qs"]
+    version = "v0.0.0-20171216220353-8d6c33ee906c"
+    hash = "sha256-v9EZxWRkP13JdeAJ5ZPfnirgLJszfHtSzZP5oGLaACg="
   [mod."github.com/peterh/liner"]
     version = "v1.2.2"
     hash = "sha256-F+cIfbpR/xQ3ODf5srpfJxLYIdgSHVc6YK16oKSqAEM="
