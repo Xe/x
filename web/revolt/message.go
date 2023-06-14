@@ -25,6 +25,10 @@ type Message struct {
 	Masquerade  *Masquerade     `json:"masquerade"`
 }
 
+type MessageAppend struct {
+	Embeds []*MessageEmbed `json:"embeds"`
+}
+
 type Masquerade struct {
 	Name      string `json:"name"`
 	AvatarURL string `json:"avatar"`
@@ -33,7 +37,7 @@ type Masquerade struct {
 
 // Attachment struct.
 type Attachment struct {
-	Id          string `json:"_id"`
+	ID          string `json:"_id"`
 	Tag         string `json:"tag"`
 	Size        int    `json:"size"`
 	FileName    string `json:"filename"`

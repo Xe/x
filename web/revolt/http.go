@@ -12,7 +12,7 @@ func (c Client) Request(method, path string, data []byte) ([]byte, error) {
 	reqBody := bytes.NewBuffer(data)
 
 	// Prepare request
-	req, err := http.NewRequest(method, API_URL+path, reqBody)
+	req, err := http.NewRequest(method, c.BaseURL+path, reqBody)
 	if err != nil {
 		return []byte{}, err
 	}

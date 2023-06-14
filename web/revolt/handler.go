@@ -6,6 +6,7 @@ type NullHandler struct{}
 
 func (NullHandler) UnknownEvent(context.Context, string, []byte) error { return nil }
 func (NullHandler) Ready(context.Context) error                        { return nil }
+func (NullHandler) Authenticated(context.Context) error                { return nil }
 func (NullHandler) MessageCreate(context.Context, *Message) error      { return nil }
 func (NullHandler) MessageAppend(context.Context, string, string, *MessageAppend) error {
 	return nil
@@ -24,7 +25,7 @@ func (NullHandler) MessageRemoveReaction(context.Context, string, string, string
 	return nil
 }
 func (NullHandler) ChannelCreate(context.Context, *Channel) error { return nil }
-func (NullHandler) ChannelUpdate(context.Context, string, string, *Channel) error {
+func (NullHandler) ChannelUpdate(context.Context, string, *Channel, []string) error {
 	return nil
 }
 func (NullHandler) ChannelDelete(context.Context, string) error { return nil }
@@ -91,6 +92,7 @@ func (NullHandler) EmojiDelete(context.Context, string) error {
 
 type Handler interface {
 	UnknownEvent(ctx context.Context, kind string, data []byte) error
+	Authenticated(context.Context) error
 	Ready(context.Context) error
 
 	// Messages
@@ -106,7 +108,7 @@ type Handler interface {
 	// Channels
 
 	ChannelCreate(ctx context.Context, channel *Channel) error
-	ChannelUpdate(ctx context.Context, channelID, clear string, channel *Channel) error
+	ChannelUpdate(ctx context.Context, channelID string, channel *Channel, clear []string) error
 	ChannelDelete(ctx context.Context, channelID string) error
 	ChannelAck(ctx context.Context, channelID, userID, messageID string) error
 	ChannelStartTyping(ctx context.Context, channelID, userID string) error
@@ -126,6 +128,7 @@ type Handler interface {
 	ServerMemberJoin(ctx context.Context, serverID, userID string) error
 	ServerMemberLeave(ctx context.Context, serverID, userID string) error
 	ServerRoleUpdate(ctx context.Context, serverID, roleID string, role *Role, clear []string) error
+	ServerRoleDelete(ctx context.Context, serverID, roleID string) error
 
 	// Users
 	UserUpdate(ctx context.Context, userID string, user *User, clear []string) error

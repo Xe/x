@@ -13,7 +13,7 @@ type SendMessage struct {
 	Replies     []Replies       `json:"replies,omitempty"`
 	Embeds      []SendableEmbed `json:"embeds,omitempty"`
 	DeleteAfter uint            `json:"-"`
-	Masquerade *Masquerade `json:"masquerade,omitempty"`
+	Masquerade  *Masquerade     `json:"masquerade,omitempty"`
 }
 
 type SendableEmbed struct {
@@ -23,7 +23,7 @@ type SendableEmbed struct {
 	Title       string `json:"title,omitempty"`
 	Description string `json:"description,omitempty"`
 	Media       string `json:"media,omitempty"`
-	Colour      string `json:"colour,omitempty"`
+	Color       string `json:"colour,omitempty"`
 }
 
 type Replies struct {
@@ -107,13 +107,13 @@ func (ec *EditChannel) RemoveItem(item string) *EditChannel {
 // Edit server struct.
 // Please see https://developers.revolt.chat/api/#tag/Server-Information/paths/~1servers~1:server/patch for more detail.
 type EditServer struct {
-	Name           string                  `json:"name,omitempty"`
-	Description    string                  `json:"description,omitempty"`
-	Icon           string                  `json:"icon,omitempty"`
-	Banner         string                  `json:"banner,omitempty"`
-	Categories     []*ServerCategory       `json:"categories,omitempty"`
-	SystemMessages *ServerSystemMessages   `json:"system_messages,omitempty"`
-	Remove         string                  `json:"remove,omitempty"`
+	Name           string                `json:"name,omitempty"`
+	Description    string                `json:"description,omitempty"`
+	Icon           string                `json:"icon,omitempty"`
+	Banner         string                `json:"banner,omitempty"`
+	Categories     []*ServerCategory     `json:"categories,omitempty"`
+	SystemMessages *ServerSystemMessages `json:"system_messages,omitempty"`
+	Remove         string                `json:"remove,omitempty"`
 }
 
 // Set name for struct
@@ -194,7 +194,7 @@ func (em *EditMember) RemoveItem(item string) *EditMember {
 // Edit role struct.
 type EditRole struct {
 	Name   string `json:"name,omitempty"`
-	Colour string `json:"colour,omitempty"`
+	Color  string `json:"colour,omitempty"`
 	Hoist  bool   `json:"hoist,omitempty"`
 	Rank   int    `json:"rank,omitempty"`
 	Remove string `json:"remove,omitempty"`
@@ -207,8 +207,8 @@ func (er *EditRole) SetName(name string) *EditRole {
 }
 
 // Set valid HTML color for struct.
-func (er *EditRole) SetColour(color string) *EditRole {
-	er.Colour = color
+func (er *EditRole) SetColor(color string) *EditRole {
+	er.Color = color
 	return er
 }
 
@@ -260,8 +260,8 @@ func (eu *EditUser) SetStatus(text, presence string) *EditUser {
 // Set profile informations for struct.
 func (eu *EditUser) SetProfile(content, background string) *EditUser {
 	eu.Profile = struct {
-		Content    string "json:\"content,omitempty\""
-		Background string "json:\"background,omitempty\""
+		Content    string `json:"content,omitempty"`
+		Background string `json:"background,omitempty"`
 	}{
 		Content:    content,
 		Background: background,
