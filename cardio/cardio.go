@@ -43,7 +43,7 @@ import (
 // monitor and alert on this value changing erratically.
 func Heartbeat(ctx context.Context, min, max time.Duration) (<-chan struct{}, func(), func()) {
 	heartbeat := make(chan struct{}, 1) // output channel
-	currDelay := (max + min) / 2        // start at half speed
+	currDelay := max                    // start at max speed
 	var currDelayLock sync.Mutex
 
 	var counter *expvar.Int
@@ -83,11 +83,11 @@ func Heartbeat(ctx context.Context, min, max time.Duration) (<-chan struct{}, fu
 				toSleep := currDelay
 				currDelayLock.Unlock()
 				time.Sleep(toSleep)
-				
+
 				if counter != nil {
 					counter.Set(int64(toSleep))
 				}
-				
+
 				select {
 				case heartbeat <- struct{}{}:
 				default:
