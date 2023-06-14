@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"sync"
+	"time"
 
 	"github.com/sacOO7/gowebsocket"
 )
@@ -43,6 +45,10 @@ type Client struct {
 	OnServerMemberUpdateFunctions []func(ctx context.Context, serverID, clear string, payload map[string]interface{})
 	OnServerMemberJoinFunctions   []func(ctx context.Context, serverID, userID string)
 	OnServerMemberLeaveFunctions  []func(ctx context.Context, serverID, userID string)
+
+	// ping timer
+	pingMutex sync.Mutex
+	lastPing time.Time
 }
 
 // Self bot struct.

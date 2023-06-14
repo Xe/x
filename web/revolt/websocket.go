@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"time"
 
@@ -49,6 +48,12 @@ func (c *Client) Start(ctx context.Context) {
 		// Handle events.
 		c.handleEvents(ctx, rawData, message)
 		// fmt.Println(message)
+	}
+
+	c.Socket.OnDisconnected = func (err error, sock gowebsocket.Socket) {
+		ctx := opname.With(ctx, "websocket-ondisconnect")
+		ln.Error(ctx, err)
+		sock.Conn.Close()
 	}
 
 	// Start connection.
@@ -329,7 +334,7 @@ func (c *Client) handleEvents(ctx context.Context, rawData *struct {
 			i(ctx, data.ID, data.User)
 		}
 	default:
-		log.Printf("unknown event %s", rawData.Type)
+		ln.Log(ctx, ln.F{"unknown_event": rawData.Type})
 		// Unknown event.
 		if c.OnUnknownEventFunctions != nil {
 			for _, i := range c.OnUnknownEventFunctions {
