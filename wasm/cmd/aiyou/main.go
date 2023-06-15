@@ -3,11 +3,11 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
 	"io/fs"
-	"math/rand"
 	"net"
 	"os"
-	"strconv"
+	"path/filepath"
 	"time"
 
 	"github.com/tetratelabs/wazero"
@@ -26,7 +26,7 @@ var (
 
 func main() {
 	internal.HandleStartup()
-	ctx := opname.With(context.Background(), "tensei")
+	ctx := opname.With(context.Background(), "aiyou")
 
 	data, err := os.ReadFile(*binary)
 	if err != nil {
@@ -42,8 +42,13 @@ func main() {
 		ln.FatalErr(ctx, err)
 	}
 
-	name := strconv.Itoa(rand.Int())
-	config := wazero.NewModuleConfig().WithStdout(os.Stdout).WithStdin(os.Stdin).WithStderr(os.Stderr).WithArgs("aiyou").WithName(name).WithFS(ConnFS{})
+	config := wazero.NewModuleConfig().
+		// OS stdio
+		WithStdout(os.Stdout).WithStdin(os.Stdin).WithStderr(os.Stderr).
+		// Placeholder argv[0]
+		WithArgs("aiyou").WithName("aiyou").
+		// Put network in /dev/net
+		WithFSConfig(wazero.NewFSConfig().WithFSMount(ConnFS{}, "/dev/"))
 
 	mod, err := r.InstantiateModule(ctx, code, config)
 	if err != nil {
@@ -56,6 +61,8 @@ func main() {
 type ConnFS struct{}
 
 func (ConnFS) Open(name string) (fs.File, error) {
+	name = filepath.Base(name)
+	fmt.Println("connecting to", name)
 	conn, err := net.Dial("tcp", name)
 	if err != nil {
 		return nil, err

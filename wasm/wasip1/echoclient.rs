@@ -3,9 +3,9 @@ use std::io::prelude::*;
 
 fn main() -> io::Result<()> {
     let stdin = io::stdin(); // We get `Stdin` here.
-    let mut fout = File::create("localhost:1997")?;
+    let mut fout = File::create("/dev/localhost:1997")?;
     
-    print!("input> ");
+    print!("input>  ");
     io::stdout().lock().flush()?;
     let mut buf = String::new();
     stdin.read_line(&mut buf)?;
@@ -17,7 +17,7 @@ fn main() -> io::Result<()> {
     let mut buf = Vec::new();
     fout.read_to_end(&mut buf)?;
     let buf = unsafe { str::from_utf8_unchecked(&buf) };
-    print!("{}", buf);
+    print!("output> {}", buf);
     io::stdout().lock().flush()?;
 
     Ok(())
