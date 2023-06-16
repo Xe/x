@@ -35,11 +35,28 @@ require (
 	golang.org/x/crypto v0.10.0
 	golang.org/x/oauth2 v0.9.0
 	golang.org/x/sync v0.2.0
+	modernc.org/sqlite v1.23.1
 	nhooyr.io/websocket v1.8.7
 	tailscale.com v1.42.0
 	tulpa.dev/cadey/jvozba v0.0.0-20200326200349-f0ebe310be06
 	within.website/johaus v1.1.0
 	within.website/ln v0.9.1
+)
+
+require (
+	github.com/dustin/go-humanize v1.0.1 // indirect
+	github.com/google/uuid v1.3.0 // indirect
+	github.com/mattn/go-isatty v0.0.18 // indirect
+	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
+	lukechampine.com/uint128 v1.2.0 // indirect
+	modernc.org/cc/v3 v3.40.0 // indirect
+	modernc.org/ccgo/v3 v3.16.13 // indirect
+	modernc.org/libc v1.22.5 // indirect
+	modernc.org/mathutil v1.5.0 // indirect
+	modernc.org/memory v1.5.0 // indirect
+	modernc.org/opt v0.1.3 // indirect
+	modernc.org/strutil v1.1.3 // indirect
+	modernc.org/token v1.0.1 // indirect
 )
 
 require (
