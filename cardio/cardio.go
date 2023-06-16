@@ -50,8 +50,16 @@ func Heartbeat(ctx context.Context, min, max time.Duration) (<-chan struct{}, fu
 	var tachycardiaCounter *expvar.Int
 
 	if name, ok := opname.Get(ctx); ok {
-		counter = expvar.NewInt("gauge_heartbeat_" + name)
-		tachycardiaCounter = expvar.NewInt("gauge_heartbeat_backoff_" + name)
+		if ctr := expvar.Get("gauge_heartbeat_" + name); counter == nil {
+			counter = expvar.NewInt("gauge_heartbeat_" + name)
+		} else {
+			counter = ctr.(*expvar.Int)
+		}
+		if ctr := expvar.Get("gauge_heartbeat_backoff_" + name); tachycardiaCounter == nil {
+			tachycardiaCounter = expvar.NewInt("gauge_heartbeat_backoff_" + name)
+		} else {
+			tachycardiaCounter = ctr.(*expvar.Int)
+		}
 	}
 
 	slower := func() {
