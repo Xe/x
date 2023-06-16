@@ -52,13 +52,14 @@ func (c *Client) doWebsocket(ctx context.Context, token, wsURL string, handler H
 		return err
 	}
 
-	heartbeat, faster, slower := cardio.Heartbeat(opname.With(ctx, "websocket-pingloop"), time.Minute, 30*time.Second)
+	t := time.NewTicker(30 * time.Second)
+	defer t.Stop()
 	go func(ctx context.Context) {
 		for {
 			select {
 			case <-ctx.Done():
 				return
-			case <-heartbeat:
+			case <-t.C:
 				data, err := json.Marshal(struct {
 					Type string `json:"type"`
 					Data int    `json:"data"`
@@ -68,16 +69,12 @@ func (c *Client) doWebsocket(ctx context.Context, token, wsURL string, handler H
 				})
 				if err != nil {
 					ln.Error(ctx, err, ln.Info("error marshaling ping"))
-					slower()
 					continue
 				}
 				if err := conn.Write(ctx, websocket.MessageText, data); err != nil {
 					ln.Error(ctx, err, ln.Info("error writing ping"))
-					slower()
 					continue
 				}
-			default:
-				faster()
 			}
 		}
 	}(ctx)
@@ -92,7 +89,7 @@ func (c *Client) doWebsocket(ctx context.Context, token, wsURL string, handler H
 			select {
 			case <-ctx.Done():
 				return
-			case <-heartbeat:
+			case <-t.C:
 				if time.Since(lastMsgSeen) > 5*time.Minute {
 					conn.Close(websocket.StatusNormalClosure, "ping timeout")
 					return
@@ -111,13 +108,13 @@ func (c *Client) doWebsocket(ctx context.Context, token, wsURL string, handler H
 		}
 		lastMsgSeen = time.Now()
 
-		if err := c.handleOneMessage(ctx, data, handler, slower); err != nil {
+		if err := c.handleOneMessage(ctx, data, handler); err != nil {
 			return err
 		}
 	}
 }
 
-func (c *Client) handleOneMessage(ctx context.Context, data []byte, handler Handler, slower func()) error {
+func (c *Client) handleOneMessage(ctx context.Context, data []byte, handler Handler) error {
 	var msg typeResolver
 	if err := json.Unmarshal(data, &msg); err != nil {
 		return err
@@ -125,7 +122,6 @@ func (c *Client) handleOneMessage(ctx context.Context, data []byte, handler Hand
 	ctx = opname.With(ctx, msg.Type)
 	switch msg.Type {
 	case "Pong":
-		slower()
 	case "Authenticated":
 		if err := handler.Authenticated(ctx); err != nil {
 			ln.Error(ctx, err, ln.Info("error in handler.Authenticated"))
@@ -149,7 +145,7 @@ func (c *Client) handleOneMessage(ctx context.Context, data []byte, handler Hand
 			return err
 		}
 		for _, msg := range bulk.Messages {
-			if err := c.handleOneMessage(ctx, msg, handler, slower); err != nil {
+			if err := c.handleOneMessage(ctx, msg, handler); err != nil {
 				return err
 			}
 		}

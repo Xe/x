@@ -295,8 +295,8 @@ func (c *Client) ServerSetRolePermissions(ctx context.Context, serverID, roleID 
 }
 
 // Create a new role for server.
-// Returns string (role id), uint (server perms), uint (channel perms) and error.
-func (c *Client) ServerCreateRole(ctx context.Context, serverID, name string) (string, uint, uint, error) {
+// Returns string (role id) and error.
+func (c *Client) ServerCreateRole(ctx context.Context, serverID, name string) (string, error) {
 	role := &struct {
 		ID          string `json:"id"`
 		Permissions []uint `json:"permissions"`
@@ -306,20 +306,20 @@ func (c *Client) ServerCreateRole(ctx context.Context, serverID, name string) (s
 		"name": name,
 	})
 	if err != nil {
-		return role.ID, 0, 0, err
+		return role.ID, err
 	}
 
 	data, err = c.Request(ctx, "POST", "/servers/"+serverID+"/roles", data)
 	if err != nil {
-		return role.ID, 0, 0, err
+		return role.ID, err
 	}
 
 	err = json.Unmarshal(data, role)
 	if err != nil {
-		return role.ID, 0, 0, err
+		return role.ID, err
 	}
 
-	return role.ID, role.Permissions[0], role.Permissions[1], nil
+	return role.ID, nil
 }
 
 // Edit a server role.

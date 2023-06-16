@@ -3,14 +3,17 @@ package revolt
 import (
 	"bytes"
 	"context"
-	"fmt"
 	"io"
 	"net/http"
+
+	"within.website/x/web"
 )
 
 // Send http request
 func (c Client) Request(ctx context.Context, method, path string, data []byte) ([]byte, error) {
 	reqBody := bytes.NewBuffer(data)
+
+	<-c.Ticker.C
 
 	// Prepare request
 	req, err := http.NewRequestWithContext(ctx, method, c.BaseURL+path, reqBody)
@@ -42,7 +45,7 @@ func (c Client) Request(ctx context.Context, method, path string, data []byte) (
 	}
 
 	if !(resp.StatusCode >= 200 && resp.StatusCode < 300) {
-		return []byte{}, fmt.Errorf("%s: %s", resp.Status, body)
+		return []byte{}, web.NewError(200, resp)
 	}
 
 	return body, nil

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/sacOO7/gowebsocket"
 )
@@ -18,6 +19,7 @@ func New(token string) *Client {
 		Token:   token,
 		BaseURL: "https://api.revolt.chat",
 		WSURL:   "wss://ws.revolt.chat",
+		Ticker:  time.NewTicker(3 * time.Second),
 	}
 }
 
@@ -30,6 +32,7 @@ func NewWithEndpoint(token, baseURL, wsURL string) *Client {
 		Token:   token,
 		BaseURL: baseURL,
 		WSURL:   wsURL,
+		Ticker:  time.NewTicker(3 * time.Second),
 	}
 }
 
@@ -42,6 +45,7 @@ type Client struct {
 	Cache   *Cache
 	BaseURL string
 	WSURL   string
+	Ticker  *time.Ticker
 }
 
 // Self bot struct.
