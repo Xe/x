@@ -1,6 +1,7 @@
 package revolt
 
 import (
+	"context"
 	"encoding/json"
 	"time"
 
@@ -9,10 +10,9 @@ import (
 
 // Group channel struct.
 type Group struct {
-	Client    *Client
 	CreatedAt time.Time
 
-	Id          string   `json:"_id"`	
+	Id          string   `json:"_id"`
 	Nonce       string   `json:"nonce"`
 	OwnerId     string   `json:"owner"`
 	Name        string   `json:"name"`
@@ -28,8 +28,8 @@ type FetchedGroupMembers struct {
 
 // System messages struct.
 type GroupSystemMessages struct {
-	UserJoined  string `json:"user_joined,omitempty"`
-	UserLeft    string `json:"user_left,omitempty"`
+	UserJoined string `json:"user_joined,omitempty"`
+	UserLeft   string `json:"user_left,omitempty"`
 }
 
 // Calculate creation date and edit the struct.
@@ -45,10 +45,10 @@ func (c *Group) CalculateCreationDate() error {
 }
 
 // Fetch all of the members from group.
-func (c Channel) FetchMembers() ([]*User, error) {
+func (c *Client) GroupFetchMembers(ctx context.Context, groupID string) ([]*User, error) {
 	var groupMembers []*User
 
-	resp, err := c.Client.Request("GET", "/channels/"+c.Id+"/members", []byte{})
+	resp, err := c.Request(ctx, "GET", "/channels/"+groupID+"/members", []byte{})
 
 	if err != nil {
 		return groupMembers, err
@@ -59,13 +59,13 @@ func (c Channel) FetchMembers() ([]*User, error) {
 }
 
 // Add a new group recipient.
-func (c Channel) AddGroupRecipient(user_id string) error {
-	_, err := c.Client.Request("PUT", "/channels/"+c.Id+"/recipients/"+user_id, []byte{})
+func (c *Client) AddGroupRecipient(ctx context.Context, groupID, userID string) error {
+	_, err := c.Request(ctx, "PUT", "/channels/"+groupID+"/recipients/"+userID, []byte{})
 	return err
 }
 
 // Delete a group recipient.
-func (c Channel) DeleteGroupRecipient(user_id string) error {
-	_, err := c.Client.Request("DELETE", "/channels/"+c.Id+"/recipients/"+user_id, []byte{})
+func (c *Client) DeleteGroupRecipient(ctx context.Context, groupID, userID string) error {
+	_, err := c.Request(ctx, "DELETE", "/channels/"+groupID+"/recipients/"+userID, []byte{})
 	return err
 }

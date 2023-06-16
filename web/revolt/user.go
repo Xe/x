@@ -1,6 +1,7 @@
 package revolt
 
 import (
+	"context"
 	"encoding/json"
 	"time"
 
@@ -59,11 +60,10 @@ func (u User) FormatMention() string {
 }
 
 // Open a DM with the user.
-func (u User) OpenDirectMessage() (*Channel, error) {
+func (c *Client) UserOpenDirectMessage(ctx context.Context, uid string) (*Channel, error) {
 	dmChannel := &Channel{}
-	dmChannel.Client = u.Client
 
-	resp, err := u.Client.Request("GET", "/users/"+u.Id+"/dm", []byte{})
+	resp, err := c.Request(ctx, "GET", "/users/"+uid+"/dm", []byte{})
 
 	if err != nil {
 		return dmChannel, err
@@ -74,10 +74,10 @@ func (u User) OpenDirectMessage() (*Channel, error) {
 }
 
 // Fetch default user avatar.
-func (u User) FetchDefaultAvatar() (*Binary, error) {
+func (c *Client) UserFetchDefaultAvatar(ctx context.Context, uid string) (*Binary, error) {
 	avatarData := &Binary{}
 
-	resp, err := u.Client.Request("GET", "/users/"+u.Id+"/default_avatar", []byte{})
+	resp, err := c.Request(ctx, "GET", "/users/"+uid+"/default_avatar", []byte{})
 
 	if err != nil {
 		return avatarData, err
@@ -88,11 +88,11 @@ func (u User) FetchDefaultAvatar() (*Binary, error) {
 }
 
 // Fetch user relationship.
-func (u User) FetchRelationship() (*UserRelations, error) {
+func (c *Client) UserFetchRelationship(ctx context.Context, uid string) (*UserRelations, error) {
 	relationshipData := &UserRelations{}
-	relationshipData.Id = u.Id
+	relationshipData.Id = uid
 
-	resp, err := u.Client.Request("GET", "/users/"+u.Id+"/relationship", []byte{})
+	resp, err := c.Request(ctx, "GET", "/users/"+uid+"/relationship", []byte{})
 
 	if err != nil {
 		return relationshipData, err
@@ -103,11 +103,11 @@ func (u User) FetchRelationship() (*UserRelations, error) {
 }
 
 // Block user.
-func (u User) Block() (*UserRelations, error) {
+func (c *Client) UserBlock(ctx context.Context, uid string) (*UserRelations, error) {
 	relationshipData := &UserRelations{}
-	relationshipData.Id = u.Id
+	relationshipData.Id = uid
 
-	resp, err := u.Client.Request("PUT", "/users/"+u.Id+"/block", []byte{})
+	resp, err := c.Request(ctx, "PUT", "/users/"+uid+"/block", []byte{})
 
 	if err != nil {
 		return relationshipData, err
@@ -118,11 +118,11 @@ func (u User) Block() (*UserRelations, error) {
 }
 
 // Un-block user.
-func (u User) Unblock() (*UserRelations, error) {
+func (c *Client) UserUnblock(ctx context.Context, uid string) (*UserRelations, error) {
 	relationshipData := &UserRelations{}
-	relationshipData.Id = u.Id
+	relationshipData.Id = uid
 
-	resp, err := u.Client.Request("DELETE", "/users/"+u.Id+"/block", []byte{})
+	resp, err := c.Request(ctx, "DELETE", "/users/"+uid+"/block", []byte{})
 
 	if err != nil {
 		return relationshipData, err

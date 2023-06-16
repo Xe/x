@@ -1,9 +1,10 @@
 package revolt
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
-	"reflect"
+	"net/url"
 	"time"
 
 	"github.com/oklog/ulid/v2"
@@ -11,7 +12,6 @@ import (
 
 // Channel struct.
 type Channel struct {
-	Client    *Client
 	CreatedAt time.Time
 
 	Id                 string      `json:"_id"`
@@ -46,60 +46,46 @@ func (c *Channel) CalculateCreationDate() error {
 	return nil
 }
 
-// Send a message to the channel.
-func (c Channel) SendMessage(message *SendMessage) (*Message, error) {
-	if message.Nonce == "" {
-		message.CreateNonce()
-	}
-
-	respMessage := &Message{}
-	respMessage.Client = c.Client
-	msgData, err := json.Marshal(message)
+// SendMessage sends a message to a channel.
+func (c *Client) ChannelSendMessage(ctx context.Context, channelID string, message *SendMessage) (*Message, error) {
+	data, err := json.Marshal(message)
 
 	if err != nil {
-		return respMessage, err
+		return nil, err
 	}
 
-	resp, err := c.Client.Request("POST", "/channels/"+c.Id+"/messages", msgData)
-
+	resp, err := c.Request(ctx, "POST", "/channels/"+channelID+"/messages", data)
 	if err != nil {
-		return respMessage, err
+		return nil, err
 	}
 
-	err = json.Unmarshal(resp, respMessage)
+	msg := &Message{}
+	err = json.Unmarshal(resp, msg)
 
 	if err != nil {
-		return respMessage, err
+		return nil, err
 	}
 
 	if message.DeleteAfter != 0 {
 		go func() {
 			time.Sleep(time.Second * time.Duration(message.DeleteAfter))
-			respMessage.Delete()
+			c.MessageDelete(ctx, channelID, msg.ID)
 		}()
 	}
 
-	return respMessage, nil
+	return msg, nil
 }
 
 // Fetch messages from channel.
 // Check: https://developers.revolt.chat/api/#tag/Messaging/paths/~1channels~1:channel~1messages/get for map parameters.
-func (c Channel) FetchMessages(options map[string]interface{}) (*FetchedMessages, error) {
+func (c *Client) ChannelFetchMessages(ctx context.Context, channelID string, options url.Values) (*FetchedMessages, error) {
 	// Format url
-	url := "/channels/" + c.Id + "/messages?"
-
-	for key, value := range options {
-		if !reflect.ValueOf(value).IsZero() {
-			url += fmt.Sprintf("%s=%v&", key, value)
-		}
-	}
-
-	url = url[:len(url)-1]
+	url := "/channels/" + channelID + "/messages?" + options.Encode()
 
 	fetchedMsgs := &FetchedMessages{}
 
 	// Send request
-	resp, err := c.Client.Request("GET", url, []byte{})
+	resp, err := c.Request(ctx, "GET", url, []byte{})
 
 	if err != nil {
 		return fetchedMsgs, err
@@ -115,26 +101,14 @@ func (c Channel) FetchMessages(options map[string]interface{}) (*FetchedMessages
 		}
 	}
 
-	// Add client to users & messages
-	for _, msg := range fetchedMsgs.Messages {
-		msg.Client = c.Client
-	}
-
-	if fetchedMsgs.Users != nil {
-		for _, msg := range fetchedMsgs.Users {
-			msg.Client = c.Client
-		}
-	}
-
 	return fetchedMsgs, nil
 }
 
 // Fetch a message from channel by Id.
-func (c Channel) FetchMessage(id string) (*Message, error) {
+func (c *Client) ChannelFetchMessage(ctx context.Context, channelID, id string) (*Message, error) {
 	msg := &Message{}
-	msg.Client = c.Client
 
-	resp, err := c.Client.Request("GET", "/channels/"+c.Id+"/messages/"+id, []byte{})
+	resp, err := c.Request(ctx, "GET", "/channels/"+channelID+"/messages/"+id, []byte{})
 
 	if err != nil {
 		return msg, err
@@ -145,27 +119,26 @@ func (c Channel) FetchMessage(id string) (*Message, error) {
 }
 
 // Edit channel.
-func (c Channel) Edit(ec *EditChannel) error {
+func (c *Client) ChannelEdit(ctx context.Context, channelID string, ec *EditChannel) error {
 	data, err := json.Marshal(ec)
-
 	if err != nil {
 		return err
 	}
 
-	_, err = c.Client.Request("PATCH", "/channels/"+c.Id, data)
+	_, err = c.Request(ctx, "PATCH", "/channels/"+channelID, data)
 	return err
 }
 
 // Delete channel.
-func (c Channel) Delete() error {
-	_, err := c.Client.Request("DELETE", "/channels/"+c.Id, []byte{})
+func (c *Client) ChannelDelete(ctx context.Context, channelID string) error {
+	_, err := c.Request(ctx, "DELETE", "/channels/"+channelID, []byte{})
 	return err
 }
 
 // Create a new invite.
 // Returns a string (invite code) and error (nil if not exists).
-func (c Channel) CreateInvite() (string, error) {
-	data, err := c.Client.Request("POST", "/channels/"+c.Id+"/invites", []byte{})
+func (c *Client) ChannelCreateInvite(ctx context.Context, channelID string) (string, error) {
+	data, err := c.Request(ctx, "POST", "/channels/"+channelID+"/invites", []byte{})
 
 	if err != nil {
 		return "", err
@@ -181,21 +154,28 @@ func (c Channel) CreateInvite() (string, error) {
 
 // Set channel permissions for a role.
 // Leave role field empty if you want to edit default permissions
-func (c Channel) SetPermissions(role_id string, permissions uint) error {
-	if role_id == "" {
-		role_id = "default"
+func (c *Client) ChannelSetPermissions(ctx context.Context, channelID, roleID string, permissions uint) error {
+	if roleID == "" {
+		roleID = "default"
 	}
 
-	_, err := c.Client.Request("PUT", "/channels/"+c.Id+"/permissions/"+role_id, []byte(fmt.Sprintf("{\"permissions\":%d}", permissions)))
+	data, err := json.Marshal(struct {
+		Permissions uint `json:"permissions"`
+	}{Permissions: permissions})
+	if err != nil {
+		return err
+	}
+
+	_, err = c.Request(ctx, "PUT", "/channels/"+channelID+"/permissions/"+roleID, data)
 	return err
 }
 
-// Send a typing start event to the channel.
-func (c *Channel) BeginTyping() {
-	c.Client.Socket.SendText(fmt.Sprintf("{\"type\":\"BeginTyping\",\"channel\":\"%s\"}", c.Id))
-}
+// // Send a typing start event to the channel.
+// func (c *Channel) BeginTyping() {
+// 	c.Client.Socket.SendText(fmt.Sprintf("{\"type\":\"BeginTyping\",\"channel\":\"%s\"}", c.Id))
+// }
 
-// End the typing event in the channel.
-func (c *Channel) EndTyping() {
-	c.Client.Socket.SendText(fmt.Sprintf("{\"type\":\"EndTyping\",\"channel\":\"%s\"}", c.Id))
-}
+// // End the typing event in the channel.
+// func (c *Channel) EndTyping() {
+// 	c.Client.Socket.SendText(fmt.Sprintf("{\"type\":\"EndTyping\",\"channel\":\"%s\"}", c.Id))
+// }

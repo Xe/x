@@ -14,7 +14,7 @@ import (
 
 func (c *Client) Connect(ctx context.Context, handler Handler) {
 	ctx = opname.With(ctx, "websocket-connect")
-	heartbeat, slower, faster := cardio.Heartbeat(ctx, time.Second, time.Second)
+	heartbeat, slower, faster := cardio.Heartbeat(ctx, 10*time.Minute, time.Second)
 
 	go func(ctx context.Context) {
 		for {
@@ -52,7 +52,7 @@ func (c *Client) doWebsocket(ctx context.Context, token, wsURL string, handler H
 		return err
 	}
 
-	heartbeat, faster, slower := cardio.Heartbeat(opname.With(ctx, "websocket-pingloop"), 30*time.Second, time.Minute)
+	heartbeat, faster, slower := cardio.Heartbeat(opname.With(ctx, "websocket-pingloop"), time.Minute, 30*time.Second)
 	go func(ctx context.Context) {
 		for {
 			select {
@@ -159,7 +159,6 @@ func (c *Client) handleOneMessage(ctx context.Context, data []byte, handler Hand
 		if err := json.Unmarshal(data, &msg); err != nil {
 			return err
 		}
-		msg.Client = c
 		if err := handler.MessageCreate(ctx, &msg); err != nil {
 			ln.Error(ctx, err, ln.Info("error in handler.Message"))
 		}

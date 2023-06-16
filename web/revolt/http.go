@@ -2,17 +2,18 @@ package revolt
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"io"
 	"net/http"
 )
 
 // Send http request
-func (c Client) Request(method, path string, data []byte) ([]byte, error) {
+func (c Client) Request(ctx context.Context, method, path string, data []byte) ([]byte, error) {
 	reqBody := bytes.NewBuffer(data)
 
 	// Prepare request
-	req, err := http.NewRequest(method, c.BaseURL+path, reqBody)
+	req, err := http.NewRequestWithContext(ctx, method, c.BaseURL+path, reqBody)
 	if err != nil {
 		return []byte{}, err
 	}

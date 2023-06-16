@@ -1,6 +1,7 @@
 package revolt
 
 import (
+	"context"
 	"encoding/json"
 	"time"
 
@@ -9,10 +10,9 @@ import (
 
 // Message struct
 type Message struct {
-	Client    *Client
 	CreatedAt time.Time
 
-	Id          string          `json:"_id"`
+	ID          string          `json:"_id"`
 	Nonce       string          `json:"nonce"`
 	ChannelId   string          `json:"channel"`
 	AuthorId    string          `json:"author"`
@@ -94,7 +94,7 @@ type MessageEmbeddedVideo struct {
 
 // Calculate creation date and edit the struct.
 func (c *Message) CalculateCreationDate() error {
-	ulid, err := ulid.Parse(c.Id)
+	ulid, err := ulid.Parse(c.ID)
 
 	if err != nil {
 		return err
@@ -105,40 +105,44 @@ func (c *Message) CalculateCreationDate() error {
 }
 
 // Edit message content.
-func (m *Message) Edit(content string) error {
-	_, err := m.Client.Request("PATCH", "/channels/"+m.ChannelId+"/messages/"+m.Id, []byte("{\"content\": \""+content+"\"}"))
-
+func (c *Client) MessageEdit(ctx context.Context, channelID, messageID, content string) error {
+	data, err := json.Marshal(map[string]string{
+		"content": content,
+	})
 	if err != nil {
 		return err
 	}
 
-	m.Content = content
+	_, err = c.Request(ctx, "PATCH", "/channels/"+channelID+"/messages/"+messageID, data)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
 // Delete the message.
-func (m Message) Delete() error {
-	_, err := m.Client.Request("DELETE", "/channels/"+m.ChannelId+"/messages/"+m.Id, []byte{})
+func (c *Client) MessageDelete(ctx context.Context, channelID, messageID string) error {
+	_, err := c.Request(ctx, "DELETE", "/channels/"+channelID+"/messages/"+messageID, []byte{})
 	return err
 }
 
 // Reply to the message.
-func (m Message) Reply(mention bool, sm *SendMessage) (*Message, error) {
+func (c *Client) MessageReply(ctx context.Context, channelID, messageID string, mention bool, sm *SendMessage) (*Message, error) {
 	if sm.Nonce == "" {
 		sm.CreateNonce()
 	}
 
-	sm.AddReply(m.Id, mention)
+	sm.AddReply(messageID, mention)
 
 	respMessage := &Message{}
-	respMessage.Client = m.Client
 	msgData, err := json.Marshal(sm)
 
 	if err != nil {
 		return respMessage, err
 	}
 
-	resp, err := m.Client.Request("POST", "/channels/"+m.ChannelId+"/messages", msgData)
+	resp, err := c.Request(ctx, "POST", "/channels/"+channelID+"/messages", msgData)
 
 	if err != nil {
 		return respMessage, err
@@ -153,7 +157,7 @@ func (m Message) Reply(mention bool, sm *SendMessage) (*Message, error) {
 	if sm.DeleteAfter != 0 {
 		go func() {
 			time.Sleep(time.Second * time.Duration(sm.DeleteAfter))
-			respMessage.Delete()
+			c.MessageDelete(ctx, channelID, respMessage.ID)
 		}()
 	}
 

@@ -1,8 +1,8 @@
 package revolt
 
 import (
+	"context"
 	"encoding/json"
-	"fmt"
 	"time"
 
 	"github.com/oklog/ulid/v2"
@@ -10,7 +10,6 @@ import (
 
 // Server struct.
 type Server struct {
-	Client    *Client
 	CreatedAt time.Time
 
 	Id                 string                 `json:"_id"`
@@ -93,14 +92,14 @@ func (s *Server) CalculateCreationDate() error {
 }
 
 // Edit server.
-func (s Server) Edit(es *EditServer) error {
+func (c *Client) ServerEdit(ctx context.Context, serverID string, es *EditServer) error {
 	data, err := json.Marshal(es)
 
 	if err != nil {
 		return err
 	}
 
-	_, err = s.Client.Request("PATCH", "/servers/"+s.Id, data)
+	_, err = c.Request(ctx, "PATCH", "/servers/"+serverID, data)
 
 	if err != nil {
 		return err
@@ -112,8 +111,8 @@ func (s Server) Edit(es *EditServer) error {
 // Delete / leave server.
 // If the server not created by client, it will leave.
 // Otherwise it will be deleted.
-func (s Server) Delete() error {
-	_, err := s.Client.Request("DELETE", "/servers/"+s.Id, []byte{})
+func (c *Client) ServerDelete(ctx context.Context, serverID string) error {
+	_, err := c.Request(ctx, "DELETE", "/servers/"+serverID, []byte{})
 
 	if err != nil {
 		return err
@@ -123,11 +122,10 @@ func (s Server) Delete() error {
 }
 
 // Create a new text-channel.
-func (s Server) CreateTextChannel(name, description string) (*Channel, error) {
+func (c *Client) CreateTextChannel(ctx context.Context, serverID, name, description string) (*Channel, error) {
 	channel := &Channel{}
-	channel.Client = s.Client
 
-	data, err := s.Client.Request("POST", "/servers/"+s.Id+"/channels", []byte("{\"type\":\"Text\",\"name\":\""+name+"\",\"description\":\""+description+"\",\"nonce\":\""+genULID()+"\"}"))
+	data, err := c.Request(ctx, "POST", "/servers/"+serverID+"/channels", []byte("{\"type\":\"Text\",\"name\":\""+name+"\",\"description\":\""+description+"\",\"nonce\":\""+genULID()+"\"}"))
 
 	if err != nil {
 		return channel, err
@@ -143,11 +141,10 @@ func (s Server) CreateTextChannel(name, description string) (*Channel, error) {
 }
 
 // Create a new voice-channel.
-func (s Server) CreateVoiceChannel(name, description string) (*Channel, error) {
+func (c *Client) CreateVoiceChannel(ctx context.Context, serverID, name, description string) (*Channel, error) {
 	channel := &Channel{}
-	channel.Client = s.Client
 
-	data, err := s.Client.Request("POST", "/servers/"+s.Id+"/channels", []byte("{\"type\":\"Voice\",\"name\":\""+name+"\",\"description\":\""+description+"\",\"nonce\":\""+genULID()+"\"}"))
+	data, err := c.Request(ctx, "POST", "/servers/"+serverID+"/channels", []byte("{\"type\":\"Voice\",\"name\":\""+name+"\",\"description\":\""+description+"\",\"nonce\":\""+genULID()+"\"}"))
 
 	if err != nil {
 		return channel, err
@@ -163,10 +160,10 @@ func (s Server) CreateVoiceChannel(name, description string) (*Channel, error) {
 }
 
 // Fetch a member from Server.
-func (s Server) FetchMember(id string) (*Member, error) {
+func (c *Client) ServerFetchMember(ctx context.Context, serverID, id string) (*Member, error) {
 	member := &Member{}
 
-	data, err := s.Client.Request("GET", "/servers/"+s.Id+"/members/"+id, []byte{})
+	data, err := c.Request(ctx, "GET", "/servers/"+serverID+"/members/"+id, []byte{})
 
 	if err != nil {
 		return member, err
@@ -182,10 +179,10 @@ func (s Server) FetchMember(id string) (*Member, error) {
 }
 
 // Fetch all of the members from Server.
-func (s Server) FetchMembers() (*FetchedMembers, error) {
+func (c *Client) ServerFetchMembers(ctx context.Context, serverID string) (*FetchedMembers, error) {
 	members := &FetchedMembers{}
 
-	data, err := s.Client.Request("GET", "/servers/"+s.Id+"/members", []byte{})
+	data, err := c.Request(ctx, "GET", "/servers/"+serverID+"/members", []byte{})
 
 	if err != nil {
 		return members, err
@@ -197,23 +194,18 @@ func (s Server) FetchMembers() (*FetchedMembers, error) {
 		return members, err
 	}
 
-	// Add client to the user
-	for _, i := range members.Users {
-		i.Client = s.Client
-	}
-
 	return members, nil
 }
 
 // Edit a member.
-func (s Server) EditMember(id string, em *EditMember) error {
+func (c *Client) ServerEditMember(ctx context.Context, serverID, id string, em *EditMember) error {
 	data, err := json.Marshal(em)
 
 	if err != nil {
 		return err
 	}
 
-	_, err = s.Client.Request("PATCH", "/servers/"+s.Id+"/members/"+id, data)
+	_, err = c.Request(ctx, "PATCH", "/servers/"+serverID+"/members/"+id, data)
 
 	if err != nil {
 		return err
@@ -223,8 +215,8 @@ func (s Server) EditMember(id string, em *EditMember) error {
 }
 
 // Kick a member from server.
-func (s Server) KickMember(id string) error {
-	_, err := s.Client.Request("DELETE", "/servers/"+s.Id+"/members/"+id, []byte{})
+func (c *Client) ServerKickMember(ctx context.Context, serverID, id string) error {
+	_, err := c.Request(ctx, "DELETE", "/servers/"+serverID+"/members/"+id, []byte{})
 
 	if err != nil {
 		return err
@@ -234,8 +226,12 @@ func (s Server) KickMember(id string) error {
 }
 
 // Ban a member from server.
-func (s Server) BanMember(id, reason string) error {
-	_, err := s.Client.Request("PUT", "/servers/"+s.Id+"/bans/"+id, []byte("{\"reason\":\""+reason+"\"}"))
+func (c *Client) ServerBanMember(ctx context.Context, serverID, id, reason string) error {
+	data, err := json.Marshal(map[string]string{"reason": reason})
+	if err != nil {
+		return err
+	}
+	_, err = c.Request(ctx, "PUT", "/servers/"+serverID+"/bans/"+id, data)
 
 	if err != nil {
 		return err
@@ -245,9 +241,8 @@ func (s Server) BanMember(id, reason string) error {
 }
 
 // Unban a member from server.
-func (s Server) UnbanMember(id string) error {
-	_, err := s.Client.Request("DELETE", "/servers/"+s.Id+"/bans/"+id, []byte{})
-
+func (c *Client) ServerUnbanMember(ctx context.Context, serverID, id string) error {
+	_, err := c.Request(ctx, "DELETE", "/servers/"+serverID+"/bans/"+id, []byte{})
 	if err != nil {
 		return err
 	}
@@ -256,44 +251,41 @@ func (s Server) UnbanMember(id string) error {
 }
 
 // Fetch server bans.
-func (s Server) FetchBans() (*FetchedBans, error) {
+func (c *Client) ServerFetchBans(ctx context.Context, serverID string) (*FetchedBans, error) {
 	bans := &FetchedBans{}
 
-	data, err := s.Client.Request("GET", "/servers/"+s.Id+"/bans", []byte{})
-
+	data, err := c.Request(ctx, "GET", "/servers/"+serverID+"/bans", []byte{})
 	if err != nil {
 		return bans, err
 	}
 
 	err = json.Unmarshal(data, bans)
-
 	if err != nil {
 		return bans, err
-	}
-
-	// Add client to the user
-	for _, i := range bans.Users {
-		i.Client = s.Client
 	}
 
 	return bans, nil
 }
 
-// Timeout a member from server.
-func (s Server) TimeoutMember(id string) error {
-	// Placeholder for timeout.
-
+// Timeout a member from server. Placeholder.
+func (c *Client) ServerTimeoutMember(ctx context.Context, serverID, id string) error {
 	return nil
 }
 
 // Set server permissions for a role.
 // Leave role field empty if you want to edit default permissions
-func (s Server) SetPermissions(role_id string, channel_permissions, server_permissions uint) error {
-	if role_id == "" {
-		role_id = "default"
+func (c *Client) ServerSetRolePermissions(ctx context.Context, serverID, roleID string, channelPermissions, serverPermissions uint) error {
+	data, err := json.Marshal(map[string]any{
+		"permissions": map[string]any{
+			"server":  serverPermissions,
+			"channel": channelPermissions,
+		},
+	})
+	if roleID == "" {
+		roleID = "default"
 	}
 
-	_, err := s.Client.Request("PUT", "/servers/"+s.Id+"/permissions/"+role_id, []byte(fmt.Sprintf("{\"permissions\":{\"server\":%d,\"channel\":%d}}", channel_permissions, server_permissions)))
+	_, err = c.Request(ctx, "PUT", "/servers/"+serverID+"/permissions/"+roleID, data)
 
 	if err != nil {
 		return err
@@ -304,37 +296,40 @@ func (s Server) SetPermissions(role_id string, channel_permissions, server_permi
 
 // Create a new role for server.
 // Returns string (role id), uint (server perms), uint (channel perms) and error.
-func (s Server) CreateRole(name string) (string, uint, uint, error) {
+func (c *Client) ServerCreateRole(ctx context.Context, serverID, name string) (string, uint, uint, error) {
 	role := &struct {
-		Id          string `json:"id"`
+		ID          string `json:"id"`
 		Permissions []uint `json:"permissions"`
 	}{}
 
-	data, err := s.Client.Request("POST", "/servers/"+s.Id+"/roles", []byte("{\"name\":\""+name+"\"}"))
-
+	data, err := json.Marshal(map[string]string{
+		"name": name,
+	})
 	if err != nil {
-		return role.Id, 0, 0, err
+		return role.ID, 0, 0, err
+	}
+
+	data, err = c.Request(ctx, "POST", "/servers/"+serverID+"/roles", data)
+	if err != nil {
+		return role.ID, 0, 0, err
 	}
 
 	err = json.Unmarshal(data, role)
-
 	if err != nil {
-		return role.Id, 0, 0, err
+		return role.ID, 0, 0, err
 	}
 
-	return role.Id, role.Permissions[0], role.Permissions[1], nil
+	return role.ID, role.Permissions[0], role.Permissions[1], nil
 }
 
 // Edit a server role.
-func (s Server) EditRole(id string, er *EditRole) error {
+func (c *Client) ServerEditRole(ctx context.Context, serverID, id string, er *EditRole) error {
 	data, err := json.Marshal(er)
-
 	if err != nil {
 		return err
 	}
 
-	_, err = s.Client.Request("PATCH", "/servers/"+s.Id+"/roles/"+id, data)
-
+	_, err = c.Request(ctx, "PATCH", "/servers/"+serverID+"/roles/"+id, data)
 	if err != nil {
 		return err
 	}
@@ -343,9 +338,8 @@ func (s Server) EditRole(id string, er *EditRole) error {
 }
 
 // Delete a server role.
-func (s Server) DeleteRole(id string) error {
-	_, err := s.Client.Request("DELETE", "/servers/"+s.Id+"/roles/"+id, []byte{})
-
+func (c *Client) ServerDeleteRole(ctx context.Context, serverID, id string) error {
+	_, err := c.Request(ctx, "DELETE", "/servers/"+serverID+"/roles/"+id, []byte{})
 	if err != nil {
 		return err
 	}
@@ -354,9 +348,8 @@ func (s Server) DeleteRole(id string) error {
 }
 
 // Fetch server invite.
-func (s Server) FetchInvites(id string) error {
-	_, err := s.Client.Request("GET", "/servers/"+id+"/invites", []byte{})
-
+func (c *Client) ServerFetchInvites(ctx context.Context, serverID string) error {
+	_, err := c.Request(ctx, "GET", "/servers/"+serverID+"/invites", []byte{})
 	if err != nil {
 		return err
 	}
@@ -365,8 +358,8 @@ func (s Server) FetchInvites(id string) error {
 }
 
 // Mark a server as read.
-func (s Server) MarkServerAsRead(id string) error {
-	_, err := s.Client.Request("PUT", "/servers/"+id+"/ack", []byte{})
+func (c *Client) MarkServerAsRead(ctx context.Context, id string) error {
+	_, err := c.Request(ctx, "PUT", "/servers/"+id+"/ack", []byte{})
 
 	if err != nil {
 		return err

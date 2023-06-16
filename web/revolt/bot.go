@@ -1,6 +1,7 @@
 package revolt
 
 import (
+	"context"
 	"encoding/json"
 	"time"
 
@@ -9,7 +10,6 @@ import (
 
 // Bot struct.
 type Bot struct {
-	Client    *Client
 	CreatedAt time.Time
 
 	Id              string `json:"_id"`
@@ -37,20 +37,23 @@ func (b *Bot) CalculateCreationDate() error {
 	return nil
 }
 
-// Edit the bot.
-func (b *Bot) Edit(eb *EditBot) error {
+func (c *Client) BotEdit(ctx context.Context, id string, eb *EditBot) error {
 	data, err := json.Marshal(eb)
-
 	if err != nil {
 		return err
 	}
 
-	_, err = b.Client.Request("PATCH", "/bots/"+b.Id, data)
-	return err
+	if _, err := c.Request(ctx, "PATCH", "/bots/"+id, data); err != nil {
+		return err
+	}
+
+	return nil
 }
 
-// Delete the bot.
-func (b *Bot) Delete() error {
-	_, err := b.Client.Request("DELETE", "/bots/"+b.Id, []byte{})
-	return err
+func (c *Client) BotDelete(ctx context.Context, id string) error {
+	if _, err := c.Request(ctx, "DELETE", "/bots/"+id, []byte{}); err != nil {
+		return err
+	}
+
+	return nil
 }
