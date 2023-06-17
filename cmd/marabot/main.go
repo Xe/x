@@ -1,22 +1,33 @@
 package main
 
 import (
+	"bytes"
 	"context"
+	"crypto/sha512"
 	"database/sql"
 	_ "embed"
 	"flag"
 	"fmt"
+	"io"
+	"net/http"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"syscall"
 	"time"
 
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/bwmarrin/discordgo"
 	_ "modernc.org/sqlite"
 	"tailscale.com/hostinfo"
 	"within.website/ln"
 	"within.website/ln/opname"
 	"within.website/x/internal"
+	"within.website/x/internal/bundler"
+	"within.website/x/web"
 	"within.website/x/web/revolt"
 )
 
@@ -26,6 +37,7 @@ var (
 	revoltToken           = flag.String("revolt-token", "", "Revolt bot token")
 	revoltAPIServer       = flag.String("revolt-api-server", "https://api.revolt.chat", "API server for Revolt")
 	revoltWebsocketServer = flag.String("revolt-ws-server", "wss://ws.revolt.chat", "Websocket server for Revolt")
+	revoltBotID           = flag.String("revolt-bot-id", "", "bot ID for revolt")
 	tsAuthkey             = flag.String("ts-authkey", "", "Tailscale authkey")
 	tsHostname            = flag.String("ts-hostname", "", "Tailscale hostname")
 
@@ -34,6 +46,8 @@ var (
 
 	furryholeDiscord = flag.String("furryhole-discord", "192289762302754817", "Discord channel ID for furryhole")
 	furryholeRevolt  = flag.String("furryhole-revolt", "01FEXZ1XPWMEJXMF836FP16HB8", "Revolt channel ID for furryhole")
+	awsS3Bucket      = flag.String("aws-s3-bucket", "", "S3 bucket name")
+	awsS3Region      = flag.String("aws-s3-region", "ca-central-1", "S3 bucket region")
 
 	//go:embed schema.sql
 	dbSchema string
@@ -59,9 +73,7 @@ func main() {
 		ln.FatalErr(ctx, err, ln.Action("running database schema"))
 	}
 
-	ircmsgs := make(chan string)
-
-	go NewIRCBot(ctx, db, ircmsgs)
+	ircmsgs := make(chan string, 10)
 
 	// Init a new client.
 	client, err := revolt.NewWithEndpoint(*revoltToken, *revoltAPIServer, *revoltWebsocketServer)
@@ -69,10 +81,29 @@ func main() {
 		ln.FatalErr(ctx, err, ln.Action("creating revolt client"))
 	}
 
+	sess, err := session.NewSession(&aws.Config{
+		Region: aws.String(*awsS3Region)},
+	)
+
+	uploader := s3manager.NewUploader(sess)
+
 	mr := &MaraRevolt{
-		cli: client,
-		db:  db,
+		cli:      client,
+		db:       db,
+		ircmsgs:  ircmsgs,
+		uploader: uploader,
+		s3:       s3.New(sess),
 	}
+
+	mr.attachmentUpload = bundler.New(mr.S3Upload)
+	mr.attachmentUpload.BundleCountThreshold = 5
+	mr.attachmentUpload.DelayThreshold = time.Minute
+
+	mr.attachmentPreprocess = bundler.New(mr.PreprocessLinks)
+	mr.attachmentPreprocess.BundleCountThreshold = 10
+	mr.attachmentPreprocess.DelayThreshold = 30 * time.Second
+
+	go mr.IRCBot(ctx)
 
 	client.Connect(ctx, mr)
 
@@ -82,6 +113,7 @@ func main() {
 	}
 
 	dg.AddHandler(mr.DiscordMessageCreate)
+	dg.AddHandler(mr.DiscordMessageDelete)
 	dg.AddHandler(mr.DiscordMessageEdit)
 
 	if err := dg.Open(); err != nil {
@@ -89,7 +121,7 @@ func main() {
 	}
 	defer dg.Close()
 
-	if err := importDiscordData(ctx, db, dg); err != nil {
+	if err := mr.importDiscordData(ctx, db, dg); err != nil {
 		ln.Error(ctx, err)
 	}
 
@@ -115,80 +147,111 @@ func main() {
 	}
 }
 
-func (mr *MaraRevolt) DiscordMessageEdit(s *discordgo.Session, m *discordgo.MessageUpdate) {
-	if _, err := mr.db.Exec("UPDATE discord_messages SET content = ?, edited_at = ? WHERE id = ?", m.Content, time.Now().Format(time.RFC3339), m.ID); err != nil {
-		ln.Error(context.Background(), err)
+type Attachment struct {
+	ID          string  `json:"id"`
+	URL         string  `json:"url"`
+	Kind        string  `json:"kind"`
+	ContentType string  `json:"content_type"`
+	CreatedAt   string  `json:"created_at"`
+	MessageID   *string `json:"message_id"`
+	Data        []byte  `json:"-"`
+}
+
+func (mr *MaraRevolt) PreprocessLinks(data [][3]string) {
+	ctx := opname.With(context.Background(), "marabot.link-preprocessor")
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Minute)
+	defer cancel()
+
+	mr.preprocessLinks(ctx, data)
+}
+
+func (mr *MaraRevolt) preprocessLinks(ctx context.Context, data [][3]string) {
+	for _, linkkind := range data {
+		kind := linkkind[1]
+		link := linkkind[0]
+		msgID := linkkind[2]
+
+		att, err := hashURL(link, kind)
+		if err != nil {
+			ln.Error(ctx, err, ln.F{"link": link, "kind": kind})
+		}
+
+		att.MessageID = aws.String(msgID)
+
+		mr.attachmentUpload.Add(att, len(att.Data))
 	}
 }
 
-func (mr *MaraRevolt) DiscordMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
-	if err := mr.discordMessageCreate(s, m); err != nil {
-		ln.Error(context.Background(), err)
-	}
-}
-
-func (mr *MaraRevolt) discordMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) error {
-	if _, err := mr.db.Exec(`INSERT INTO discord_users (id, username, avatar_url, accent_color)
-VALUES (?, ?, ?, ?)
-ON CONFLICT(id)
-DO UPDATE SET username = EXCLUDED.username, avatar_url = EXCLUDED.avatar_url, accent_color = EXCLUDED.accent_color`, m.Author.ID, m.Author.Username, m.Author.AvatarURL(""), m.Author.AccentColor); err != nil {
-		return err
-	}
-
-	if _, err := mr.db.Exec(`INSERT INTO discord_messages (id, guild_id, channel_id, author_id, content, created_at, edited_at, webhook_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`, m.ID, m.GuildID, m.ChannelID, m.Author.ID, m.Content, m.Timestamp.Format(time.RFC3339), m.EditedTimestamp, m.WebhookID); err != nil {
-		return err
-	}
-
-	if m.WebhookID != "" {
-		if _, err := mr.db.Exec("INSERT INTO discord_webhook_message_info (id, name, avatar_url) VALUES (?, ?, ?)", m.ID, m.Author.Username, m.Author.AvatarURL("")); err != nil {
-			return err
-		}
-	}
-
-	for _, att := range m.Attachments {
-		if _, err := mr.db.Exec(`INSERT INTO discord_attachments (id, message_id, url, proxy_url, filename, content_type, width, height, size) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`, att.ID, m.ID, att.URL, att.ProxyURL, att.Filename, att.ContentType, att.Width, att.Height, att.Size); err != nil {
-			return err
-		}
-	}
-
-	ch, err := s.Channel(m.ChannelID)
+func hashURL(itemURL, kind string) (*Attachment, error) {
+	resp, err := http.Get(itemURL)
 	if err != nil {
-		return err
+		return nil, err
+	}
+	if resp.StatusCode != http.StatusOK {
+		return nil, web.NewError(http.StatusOK, resp)
+	}
+	defer resp.Body.Close()
+
+	data, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
 	}
 
-	if _, err := mr.db.Exec("INSERT INTO discord_channels (id, guild_id, name, topic, nsfw) VALUES (?, ?, ?, ?, ?) ON CONFLICT(id) DO UPDATE SET name = EXCLUDED.name, topic = EXCLUDED.topic, nsfw = EXCLUDED.nsfw", ch.ID, ch.GuildID, ch.Name, ch.Topic, ch.NSFW); err != nil {
-		return err
+	h := sha512.New()
+	h.Write(data)
+	hash := fmt.Sprintf("%x", h.Sum(nil))
+
+	result := &Attachment{
+		ID:          hash,
+		URL:         itemURL,
+		Kind:        kind,
+		CreatedAt:   time.Now().Format(time.RFC3339),
+		ContentType: resp.Header.Get("Content-Type"),
+		Data:        data,
 	}
 
-	for _, emoji := range m.GetCustomEmojis() {
-		if _, err := mr.db.Exec("INSERT INTO discord_emoji (id, guild_id, name, url) VALUES (?, ?, ?, ?) ON CONFLICT(id) DO UPDATE SET name = EXCLUDED.name, url = EXCLUDED.url", emoji.ID, furryholeDiscord, emoji.Name, fmt.Sprintf("https://cdn.discordapp.com/emojis/%s.webp?size=240&quality=lossless", emoji.ID)); err != nil {
-			return err
+	return result, nil
+}
+
+func (mr *MaraRevolt) S3Upload(att []*Attachment) {
+	ctx := opname.With(context.Background(), "marabot.s3-uploader")
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Minute)
+	defer cancel()
+
+	mr.s3Upload(ctx, att)
+}
+
+func (mr *MaraRevolt) s3Upload(ctx context.Context, att []*Attachment) {
+	for _, att := range att {
+		key := filepath.Join(att.Kind, att.ID)
+
+		var count int
+		if err := mr.db.QueryRowContext(ctx, "SELECT COUNT(*) FROM s3_uploads WHERE id = ?", att.ID).Scan(&count); err != nil {
+			ln.Error(ctx, err)
+			continue
 		}
-	}
 
-	return nil
-}
+		if count != 0 {
+			continue
+		}
 
-type MaraRevolt struct {
-	cli *revolt.Client
-	db  *sql.DB
-	revolt.NullHandler
-}
-
-func (mr *MaraRevolt) MessageCreate(ctx context.Context, msg *revolt.Message) error {
-	if msg.Content == "!ping" {
-		sendMsg := &revolt.SendMessage{
-			Masquerade: &revolt.Masquerade{
-				Name:      "cipra",
-				AvatarURL: "https://cdn.xeiaso.net/avatar/" + internal.Hash("cipra", "yasomi"),
+		if _, err := mr.uploader.UploadWithContext(ctx, &s3manager.UploadInput{
+			Bucket:      aws.String(*awsS3Bucket),
+			Key:         aws.String(key),
+			ContentType: aws.String(att.ContentType),
+			Body:        bytes.NewBuffer(att.Data),
+			Metadata: map[string]*string{
+				"Original-URL": aws.String(att.URL),
+				"Message-ID":   att.MessageID,
 			},
+		}); err != nil {
+			ln.Error(ctx, err, ln.Action("trying to upload to S3"), ln.F{"att_url": att.URL, "att_content_type": att.ContentType})
+			continue
 		}
-		sendMsg.SetContent("🏓 Pong!")
 
-		if _, err := mr.cli.MessageReply(ctx, msg.ChannelId, msg.ID, true, sendMsg); err != nil {
-			return err
+		if _, err := mr.db.ExecContext(ctx, "INSERT INTO s3_uploads(id, url, kind, content_type, created_at, message_id) VALUES (?, ?, ?, ?, ?, ?)", att.ID, att.URL, att.Kind, att.ContentType, att.CreatedAt, att.MessageID); err != nil {
+			ln.Error(ctx, err, ln.Action("saving upload information to DB"))
 		}
 	}
 
-	return nil
 }

@@ -411,3 +411,7 @@ func (c *Client) Upload(ctx context.Context, tag, fname string, data []byte) (st
 	}
 	return res.ID, nil
 }
+
+func (c *Client) ResolveAttachment(att *Attachment) string {
+	return c.Settings.Features.Autumn.URL + "/" + att.Tag + "/" + att.ID
+}

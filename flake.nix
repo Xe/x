@@ -283,6 +283,7 @@
             strace
             hey
             boltbrowser
+            terraform
 
             pkg-config
             libaom
