@@ -13,13 +13,35 @@ import (
 )
 
 type Request struct {
-	Model    string    `json:"model"`
-	Messages []Message `json:"messages"`
+	Model        string     `json:"model"`
+	Messages     []Message  `json:"messages"`
+	Functions    []Function `json:"functions,omitempty"`
+	FunctionCall string     `json:"function_call"`
+}
+
+type Function struct {
+	Name        string  `json:"name"`
+	Description string  `json:"description,omitempty"`
+	Parameters  []Param `json:"parameters"`
+}
+
+type Param struct {
+	Type        string           `json:"type"`
+	Description string           `json:"description,omitempty"`
+	Enum        []string         `json:"enum,omitempty"`
+	Properties  map[string]Param `json:"properties,omitempty"`
+	Required    []string         `json:"required,omitempty"`
 }
 
 type Message struct {
-	Role    string `json:"role"`
-	Content string `json:"content"`
+	Role         string   `json:"role"`
+	Content      string   `json:"content"`
+	FunctionCall *Funcall `json:"function_call"`
+}
+
+type Funcall struct {
+	Name      string          `json:"name"`
+	Arguments json.RawMessage `json:"arguments"`
 }
 
 func (m Message) ProxyFormat() string {

@@ -1,51 +1,129 @@
 package revolt
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
+	"mime/multipart"
 	"net/http"
+	"net/textproto"
 	"time"
 
 	"github.com/sacOO7/gowebsocket"
 )
 
+type RevoltSettings struct {
+	Revolt   string         `json:"revolt"`
+	Features RevoltFeatures `json:"features"`
+	Ws       string         `json:"ws"`
+	App      string         `json:"app"`
+	Vapid    string         `json:"vapid"`
+	Build    RevoltBuild    `json:"build"`
+}
+
+type RevoltCaptcha struct {
+	Enabled bool   `json:"enabled"`
+	Key     string `json:"key"`
+}
+
+type RevoltAutumn struct {
+	Enabled bool   `json:"enabled"`
+	URL     string `json:"url"`
+}
+
+type RevoltJanuary struct {
+	Enabled bool   `json:"enabled"`
+	URL     string `json:"url"`
+}
+
+type RevoltVoso struct {
+	Enabled bool   `json:"enabled"`
+	URL     string `json:"url"`
+	Ws      string `json:"ws"`
+}
+
+type RevoltFeatures struct {
+	Captcha    RevoltCaptcha `json:"captcha"`
+	Email      bool          `json:"email"`
+	InviteOnly bool          `json:"invite_only"`
+	Autumn     RevoltAutumn  `json:"autumn"`
+	January    RevoltJanuary `json:"january"`
+	Voso       RevoltVoso    `json:"voso"`
+}
+
+type RevoltBuild struct {
+	CommitSha       string `json:"commit_sha"`
+	CommitTimestamp string `json:"commit_timestamp"`
+	Semver          string `json:"semver"`
+	OriginURL       string `json:"origin_url"`
+	Timestamp       string `json:"timestamp"`
+}
+
 // New creates a new client with the default Revolt server details.
 //
 // Use NewWithEndpoint to create a client with a custom endpoint.
-func New(token string) *Client {
-	return &Client{
-		HTTP:    &http.Client{},
-		Token:   token,
-		BaseURL: "https://api.revolt.chat",
-		WSURL:   "wss://ws.revolt.chat",
-		Ticker:  time.NewTicker(3 * time.Second),
+func New(token string) (*Client, error) {
+	var settings RevoltSettings
+
+	resp, err := http.Get("https://api.revolt.chat/")
+	if err != nil {
+		return nil, fmt.Errorf("failed to get Revolt settings: %w", err)
 	}
+	defer resp.Body.Close()
+
+	if err := json.NewDecoder(resp.Body).Decode(&settings); err != nil {
+		return nil, fmt.Errorf("failed to decode Revolt settings: %w", err)
+	}
+
+	return &Client{
+		HTTP:     &http.Client{},
+		Token:    token,
+		BaseURL:  "https://api.revolt.chat",
+		WSURL:    "wss://ws.revolt.chat",
+		Ticker:   time.NewTicker(3 * time.Second),
+		Settings: settings,
+	}, nil
 }
 
 // NewWithEndpoint creates a new client with a custom Revolt endpoint.
 //
 // You can use this to test the library against an arbirtary Revolt server.
-func NewWithEndpoint(token, baseURL, wsURL string) *Client {
-	return &Client{
-		HTTP:    &http.Client{},
-		Token:   token,
-		BaseURL: baseURL,
-		WSURL:   wsURL,
-		Ticker:  time.NewTicker(3 * time.Second),
+func NewWithEndpoint(token, baseURL, wsURL string) (*Client, error) {
+	var settings RevoltSettings
+
+	resp, err := http.Get(baseURL)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get Revolt settings: %w", err)
 	}
+	defer resp.Body.Close()
+
+	if err := json.NewDecoder(resp.Body).Decode(&settings); err != nil {
+		return nil, fmt.Errorf("failed to decode Revolt settings: %w", err)
+	}
+
+	return &Client{
+		HTTP:     &http.Client{},
+		Token:    token,
+		BaseURL:  baseURL,
+		WSURL:    wsURL,
+		Ticker:   time.NewTicker(3 * time.Second),
+		Settings: settings,
+	}, nil
 }
 
 // Client struct.
 type Client struct {
-	SelfBot *SelfBot
-	Token   string
-	Socket  gowebsocket.Socket
-	HTTP    *http.Client
-	Cache   *Cache
-	BaseURL string
-	WSURL   string
-	Ticker  *time.Ticker
+	SelfBot  *SelfBot
+	Token    string
+	Socket   gowebsocket.Socket
+	HTTP     *http.Client
+	Cache    *Cache
+	BaseURL  string
+	WSURL    string
+	Ticker   *time.Ticker
+	Settings RevoltSettings
 }
 
 // Self bot struct.
@@ -287,4 +365,49 @@ func (c *Client) FetchBot(ctx context.Context, id string) (*Bot, error) {
 
 	err = json.Unmarshal(resp, bot)
 	return bot.Bot, err
+}
+
+// Upload a file to Revolt using a multi-part form.
+func (c *Client) Upload(ctx context.Context, tag, fname string, data []byte) (string, error) {
+	type response struct {
+		ID string `json:"id"`
+	}
+
+	// Create a new multi-part form.
+	body := &bytes.Buffer{}
+	writer := multipart.NewWriter(body)
+
+	header := textproto.MIMEHeader{}
+	header.Set("Content-Disposition", fmt.Sprintf(`form-data; name="file"; filename="%s"`, fname))
+	header.Set("Content-Type", http.DetectContentType(data))
+
+	// Add the file to the form.
+	part, err := writer.CreatePart(header)
+	if err != nil {
+		return "", err
+	}
+	_, err = io.Copy(part, bytes.NewReader(data))
+	if err != nil {
+		return "", err
+	}
+
+	// Close the form and set the content type.
+	err = writer.Close()
+	if err != nil {
+		return "", err
+	}
+
+	// Send the request to the server.
+	resp, err := c.RequestWithPathAndContentType(ctx, "POST", c.Settings.Features.Autumn.URL+"/"+tag, writer.FormDataContentType(), body.Bytes())
+	if err != nil {
+		return "", err
+	}
+
+	// Parse the response and return the ID of the uploaded file.
+	var res response
+	err = json.Unmarshal(resp, &res)
+	if err != nil {
+		return "", err
+	}
+	return res.ID, nil
 }

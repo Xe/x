@@ -29,13 +29,14 @@ var (
 	tsAuthkey             = flag.String("ts-authkey", "", "Tailscale authkey")
 	tsHostname            = flag.String("ts-hostname", "", "Tailscale hostname")
 
+	adminDiscordUser = flag.String("admin-discord-user", "", "Discord user ID of the admin")
+	adminRevoltUser  = flag.String("admin-revolt-user", "", "Revolt user ID of the admin")
+
+	furryholeDiscord = flag.String("furryhole-discord", "192289762302754817", "Discord channel ID for furryhole")
+	furryholeRevolt  = flag.String("furryhole-revolt", "01FEXZ1XPWMEJXMF836FP16HB8", "Revolt channel ID for furryhole")
+
 	//go:embed schema.sql
 	dbSchema string
-)
-
-const (
-	furryholeDiscord = "192289762302754817"
-	furryholeRevolt  = "01H2VRKJFPYPEAE438B6JRFSCP"
 )
 
 func main() {
@@ -63,7 +64,10 @@ func main() {
 	go NewIRCBot(ctx, db, ircmsgs)
 
 	// Init a new client.
-	client := revolt.NewWithEndpoint(*revoltToken, *revoltAPIServer, *revoltWebsocketServer)
+	client, err := revolt.NewWithEndpoint(*revoltToken, *revoltAPIServer, *revoltWebsocketServer)
+	if err != nil {
+		ln.FatalErr(ctx, err, ln.Action("creating revolt client"))
+	}
 
 	mr := &MaraRevolt{
 		cli: client,
@@ -185,5 +189,6 @@ func (mr *MaraRevolt) MessageCreate(ctx context.Context, msg *revolt.Message) er
 			return err
 		}
 	}
+
 	return nil
 }

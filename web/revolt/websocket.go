@@ -17,6 +17,10 @@ func (c *Client) Connect(ctx context.Context, handler Handler) {
 	defer t.Stop()
 
 	go func(ctx context.Context) {
+		if err := c.doWebsocket(ctx, c.Token, c.WSURL, handler); err != nil {
+			ln.Error(ctx, err, ln.Info("websocket error, retrying"))
+		}
+
 		for {
 			select {
 			case <-ctx.Done():

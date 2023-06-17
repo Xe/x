@@ -12,7 +12,7 @@ import (
 
 func importDiscordData(ctx context.Context, db *sql.DB, dg *discordgo.Session) error {
 	ctx = opname.With(ctx, "import-discord-data")
-	channels, err := dg.GuildChannels(furryholeDiscord)
+	channels, err := dg.GuildChannels(*furryholeDiscord)
 	if err != nil {
 		return err
 	}
@@ -24,7 +24,7 @@ func importDiscordData(ctx context.Context, db *sql.DB, dg *discordgo.Session) e
 		}
 	}
 
-	roles, err := dg.GuildRoles(furryholeDiscord)
+	roles, err := dg.GuildRoles(*furryholeDiscord)
 	if err != nil {
 		return err
 	}
@@ -37,7 +37,7 @@ func importDiscordData(ctx context.Context, db *sql.DB, dg *discordgo.Session) e
 	}
 
 	// https://cdn.discordapp.com/emojis/664686615616290816.webp?size=240&quality=lossless
-	emoji, err := dg.GuildEmojis(furryholeDiscord)
+	emoji, err := dg.GuildEmojis(*furryholeDiscord)
 	if err != nil {
 		return err
 	}

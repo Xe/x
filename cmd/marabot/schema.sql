@@ -77,3 +77,16 @@ CREATE TABLE IF NOT EXISTS irc_messages (
     content TEXT NOT NULL,
     tags TEXT NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS revolt_emoji (
+    id TEXT PRIMARY KEY,
+    server_id TEXT NOT NULL,
+    name TEXT NOT NULL,
+    url TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS revolt_discord_emoji (
+    revolt_id TEXT NOT NULL,
+    discord_id TEXT NOT NULL,
+    name TEXT NOT NULL
+);
