@@ -74,7 +74,6 @@ func main() {
 	}
 
 	dg.AddHandler(mr.DiscordMessageCreate)
-	dg.AddHandler(mr.DiscordMessageDelete)
 	dg.AddHandler(mr.DiscordMessageEdit)
 
 	if err := dg.Open(); err != nil {
@@ -138,12 +137,6 @@ func main() {
 	}
 }
 
-func (mr *MaraRevolt) DiscordMessageDelete(s *discordgo.Session, m *discordgo.MessageDelete) {
-	if _, err := mr.db.Exec("DELETE FROM discord_messages WHERE id = ?", m.ID); err != nil {
-		ln.Error(context.Background(), err)
-	}
-}
-
 func (mr *MaraRevolt) DiscordMessageEdit(s *discordgo.Session, m *discordgo.MessageUpdate) {
 	if _, err := mr.db.Exec("UPDATE discord_messages SET content = ?, edited_at = ? WHERE id = ?", m.Content, time.Now().Format(time.RFC3339), m.ID); err != nil {
 		ln.Error(context.Background(), err)
@@ -166,6 +159,12 @@ DO UPDATE SET username = EXCLUDED.username, avatar_url = EXCLUDED.avatar_url, ac
 
 	if _, err := mr.db.Exec(`INSERT INTO discord_messages (id, guild_id, channel_id, author_id, content, created_at, edited_at, webhook_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`, m.ID, m.GuildID, m.ChannelID, m.Author.ID, m.Content, m.Timestamp.Format(time.RFC3339), m.EditedTimestamp, m.WebhookID); err != nil {
 		return err
+	}
+
+	if m.WebhookID != "" {
+		if _, err := mr.db.Exec("INSERT INTO discord_webhook_message_info (id, name, avatar_url) VALUES (?, ?, ?)", m.ID, m.Author.Username, m.Author.AvatarURL("")); err != nil {
+			return err
+		}
 	}
 
 	for _, att := range m.Attachments {

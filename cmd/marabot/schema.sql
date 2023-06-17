@@ -1,3 +1,5 @@
+PRAGMA journal_mode=WAL;
+
 CREATE TABLE IF NOT EXISTS discord_roles (
     id TEXT PRIMARY KEY,
     guild_id TEXT NOT NULL,
@@ -23,6 +25,12 @@ CREATE TABLE IF NOT EXISTS discord_messages (
     created_at TEXT NOT NULL,
     edited_at TEXT,
     webhook_id TEXT
+);
+
+CREATE TABLE IF NOT EXISTS discord_webhook_message_info (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    avatar_url TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS discord_attachments (
