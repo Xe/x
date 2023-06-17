@@ -9,25 +9,22 @@ import (
 	"nhooyr.io/websocket"
 	"within.website/ln"
 	"within.website/ln/opname"
-	"within.website/x/cardio"
 )
 
 func (c *Client) Connect(ctx context.Context, handler Handler) {
 	ctx = opname.With(ctx, "websocket-connect")
-	heartbeat, slower, faster := cardio.Heartbeat(ctx, 10*time.Minute, time.Second)
+	t := time.NewTicker(30 * time.Second)
+	defer t.Stop()
 
 	go func(ctx context.Context) {
 		for {
 			select {
 			case <-ctx.Done():
 				return
-			case <-heartbeat:
+			case <-t.C:
 				if err := c.doWebsocket(ctx, c.Token, c.WSURL, handler); err != nil {
 					ln.Error(ctx, err, ln.Info("websocket error, retrying"))
-					slower()
 				}
-			default:
-				faster()
 			}
 		}
 	}(ctx)
