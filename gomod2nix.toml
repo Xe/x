@@ -316,6 +316,9 @@ schema = 3
   [mod."github.com/tetratelabs/wazero"]
     version = "v1.2.0"
     hash = "sha256-fEutqeRE/JD53g249+Gs//R19SjV7bnD80/0DKpfrAo="
+  [mod."github.com/thoj/go-ircevent"]
+    version = "v0.0.0-20210723090443-73e444401d64"
+    hash = "sha256-gwYmlaF6DG5HcI4RoztWoyzb2952tdHA9vEu4gVdDVY="
   [mod."github.com/tmc/scp"]
     version = "v0.0.0-20170824174625-f7b48647feef"
     hash = "sha256-qHwQb3JA43VVhJdB18/2zXbxqW/bgw1yvr8YhqFyd74="

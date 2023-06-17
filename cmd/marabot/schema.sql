@@ -67,3 +67,13 @@ CREATE TABLE IF NOT EXISTS discord_emoji (
     name TEXT NOT NULL,
     url TEXT NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS irc_messages (
+    id SERIAL PRIMARY KEY,
+    nick TEXT NOT NULL,
+    user TEXT NOT NULL,
+    host TEXT NOT NULL,
+    channel TEXT NOT NULL,
+    content TEXT NOT NULL,
+    tags TEXT NOT NULL
+);
