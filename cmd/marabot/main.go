@@ -171,9 +171,19 @@ func (mr *MaraRevolt) preprocessLinks(ctx context.Context, data [][3]string) {
 		link := linkkind[0]
 		msgID := linkkind[2]
 
+		var count int
+		if err := mr.db.QueryRowContext(ctx, "SELECT COUNT(*) FROM s3_uploads WHERE url = ?", link).Scan(&count); err != nil {
+			ln.Error(ctx, err)
+			continue
+		}
+		if count != 0 {
+			continue
+		}
+
 		att, err := hashURL(link, kind)
 		if err != nil {
 			ln.Error(ctx, err, ln.F{"link": link, "kind": kind})
+			continue
 		}
 
 		att.MessageID = aws.String(msgID)
@@ -225,11 +235,15 @@ func (mr *MaraRevolt) s3Upload(ctx context.Context, att []*Attachment) {
 	for _, att := range att {
 		key := filepath.Join(att.Kind, att.ID)
 
+		f := ln.F{"kind": att.Kind, "id": att.ID, "url": att.URL, "content_type": att.ContentType}
+
 		var count int
 		if err := mr.db.QueryRowContext(ctx, "SELECT COUNT(*) FROM s3_uploads WHERE id = ?", att.ID).Scan(&count); err != nil {
-			ln.Error(ctx, err)
+			ln.Error(ctx, err, f)
 			continue
 		}
+
+		f["count"] = count
 
 		if count != 0 {
 			continue
@@ -245,12 +259,12 @@ func (mr *MaraRevolt) s3Upload(ctx context.Context, att []*Attachment) {
 				"Message-ID":   att.MessageID,
 			},
 		}); err != nil {
-			ln.Error(ctx, err, ln.Action("trying to upload to S3"), ln.F{"att_url": att.URL, "att_content_type": att.ContentType})
+			ln.Error(ctx, err, ln.Action("trying to upload to S3"), f)
 			continue
 		}
 
 		if _, err := mr.db.ExecContext(ctx, "INSERT INTO s3_uploads(id, url, kind, content_type, created_at, message_id) VALUES (?, ?, ?, ?, ?, ?)", att.ID, att.URL, att.Kind, att.ContentType, att.CreatedAt, att.MessageID); err != nil {
-			ln.Error(ctx, err, ln.Action("saving upload information to DB"))
+			ln.Error(ctx, err, ln.Action("saving upload information to DB"), f)
 		}
 	}
 

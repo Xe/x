@@ -67,6 +67,8 @@ func (mr *MaraRevolt) MessageCreate(ctx context.Context, msg *revolt.Message) er
 	}
 	avatarURL := mr.cli.ResolveAttachment(author.Avatar)
 
+	mr.attachmentPreprocess.Add([3]string{avatarURL, "avatars", ""}, len(avatarURL))
+
 	if _, err := mr.db.ExecContext(ctx, "INSERT INTO revolt_users(id, username, avatar_url, created_at) VALUES(?, ?, ?, ?) ON CONFLICT(id) DO UPDATE SET username = EXCLUDED.username, avatar_url = EXCLUDED.avatar_url, created_at = EXCLUDED.created_at", author.Id, author.Username, avatarURL, author.CreatedAt.Format(time.RFC3339)); err != nil {
 		ln.Error(ctx, err, ln.Action("writing revolt user record"))
 	}

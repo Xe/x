@@ -55,6 +55,19 @@ func (mr *MaraRevolt) importDiscordData(ctx context.Context, db *sql.DB, dg *dis
 		mr.attachmentPreprocess.Add([3]string{eURL, "emoji", ""}, len(eURL))
 	}
 
+	rows, err := mr.db.QueryContext(ctx, "SELECT url, message_id FROM discord_attachments WHERE url NOT IN ( SELECT url FROM s3_uploads )")
+	if err == nil {
+		defer rows.Close()
+		for rows.Next() {
+			var url, messageID string
+			if err := rows.Scan(&url, &messageID); err != nil {
+				continue
+			}
+
+			mr.attachmentPreprocess.Add([3]string{url, "attachments", messageID}, len(url))
+		}
+	}
+
 	return nil
 }
 
@@ -125,6 +138,9 @@ DO UPDATE SET username = EXCLUDED.username, avatar_url = EXCLUDED.avatar_url, ac
 	}
 
 	for _, emb := range m.Embeds {
+		if emb.Image == nil {
+			continue
+		}
 		if _, err := mr.db.Exec(`INSERT INTO discord_attachments (id, message_id, url, proxy_url, filename, content_type, width, height, size) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`, uuid.NewString(), m.ID, emb.Image.URL, emb.Image.ProxyURL, filepath.Base(emb.Image.URL), "", emb.Image.Width, emb.Image.Height, 0); err != nil {
 			return err
 		}
