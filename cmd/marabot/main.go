@@ -141,6 +141,8 @@ func main() {
 		case <-sc:
 			ln.Log(ctx, ln.Info("shutting down"))
 			cancel()
+			mr.attachmentPreprocess.Flush()
+			mr.attachmentUpload.Flush()
 			time.Sleep(150 * time.Millisecond)
 			return
 		}
