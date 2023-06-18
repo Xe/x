@@ -167,6 +167,7 @@
           };
 
         wasigo' = pkgs.go_1_20.overrideAttrs (old: {
+          patches = [];
           src = pkgs.runCommand "gowasi-version-hack" { } ''
             mkdir -p $out
             echo "go-wasip1-dev-${wasigo.shortRev}" > $out/VERSION
@@ -301,6 +302,8 @@
 
             tinyemu
             zig
+
+            gowasi
           ];
 
           XEDN_STATIC = self.packages.${system}.xedn-static;

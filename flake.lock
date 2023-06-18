@@ -49,11 +49,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1679567394,
-        "narHash": "sha256-ZvLuzPeARDLiQUt6zSZFGOs+HZmE+3g4QURc8mkBsfM=",
+        "lastModified": 1686572087,
+        "narHash": "sha256-jXTut7ZSYqLEgm/nTk7TuVL2ExahTip605bLINklAnQ=",
         "owner": "nix-community",
         "repo": "naersk",
-        "rev": "88cd22380154a2c36799fe8098888f0f59861a15",
+        "rev": "8507af04eb40c5520bd35d9ce6f9d2342cea5ad1",
         "type": "github"
       },
       "original": {
@@ -79,11 +79,11 @@
     },
     "nixpkgs_2": {
       "locked": {
-        "lastModified": 1685383865,
-        "narHash": "sha256-3uQytfnotO6QJv3r04ajSXbEFMII0dUtw0uqYlZ4dbk=",
+        "lastModified": 1686960236,
+        "narHash": "sha256-AYCC9rXNLpUWzD9hm+askOfpliLEC9kwAo7ITJc4HIw=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "5e871d8aa6f57cc8e0dc087d1c5013f6e212b4ce",
+        "rev": "04af42f3b31dba0ef742d254456dc4c14eedac86",
         "type": "github"
       },
       "original": {
@@ -114,11 +114,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1685327024,
-        "narHash": "sha256-mSFu5QI7St1Wj4BIKJkO8mEKZHJ6PosHoG6fEco16jg=",
+        "lastModified": 1687055571,
+        "narHash": "sha256-UvLoO6u5n9TzY80BpM4DaacxvyJl7u9mm9CA72d309g=",
         "owner": "oxalica",
         "repo": "rust-overlay",
-        "rev": "d6ac24aa7ff658552ce57913df4b0cb823cf15ab",
+        "rev": "2de557c780dcb127128ae987fca9d6c2b0d7dc0f",
         "type": "github"
       },
       "original": {
@@ -162,11 +162,11 @@
         "systems": "systems"
       },
       "locked": {
-        "lastModified": 1681202837,
-        "narHash": "sha256-H+Rh19JDwRtpVPAWp64F+rlEtxUWBAQW28eAi3SRSzg=",
+        "lastModified": 1685518550,
+        "narHash": "sha256-o2d0KcvaXzTrPRIo0kOLV0/QXHhDQ5DTi+OxcjO8xqY=",
         "owner": "numtide",
         "repo": "flake-utils",
-        "rev": "cfacdce06f30d2b68473a46042957675eebb3401",
+        "rev": "a1720a10a6cfe8234c0e93907ffe81be440f4cef",
         "type": "github"
       },
       "original": {
@@ -178,11 +178,11 @@
     "wasigo": {
       "flake": false,
       "locked": {
-        "lastModified": 1685154287,
-        "narHash": "sha256-U6YMh3WL9r1GtfZcotlaedzOmgZSnyFcSoTt3QUGiX0=",
+        "lastModified": 1687028565,
+        "narHash": "sha256-qTb4p9cwdDropX1l8CGvkSvs4l5BrRyxAGCph37YO4Q=",
         "owner": "golang",
         "repo": "go",
-        "rev": "7ad92e95b56019083824492fbec5bb07926d8ebd",
+        "rev": "261e26761805e03c126bf3934a8f39302e8d85fb",
         "type": "github"
       },
       "original": {
