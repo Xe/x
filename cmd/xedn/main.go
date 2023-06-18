@@ -25,6 +25,7 @@ import (
 	"github.com/sebest/xff"
 	"go.etcd.io/bbolt"
 	"golang.org/x/sync/singleflight"
+	"tailscale.com/hostinfo"
 	"tailscale.com/metrics"
 	"tailscale.com/tsnet"
 	"tailscale.com/tsweb"
@@ -367,6 +368,8 @@ func init() {
 func main() {
 	internal.HandleStartup()
 	ctx := opname.With(context.Background(), "startup")
+
+	hostinfo.SetApp("within.website/x/cmd/xedn")
 
 	os.MkdirAll(filepath.Join(*dir, "tsnet"), 0700)
 
