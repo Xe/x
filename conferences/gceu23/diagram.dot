@@ -1,0 +1,47 @@
+digraph G {
+    newrank=true;
+    graph [fontname = "Iosevka Aile Iaso"];
+    node [fontname = "Iosevka Aile Iaso"];
+    edge [fontname = "Iosevka Aile Iaso"];
+    
+    subgraph cluster_0 {
+        style=filled;
+        color=lightgrey;
+        node [style=filled,color=white];
+        label = "aiyou";
+        echoclient [label="echoclient.wasm"];
+        ConnFS;
+        connFile [label="connection"];
+    }
+
+    subgraph cluster_1 {
+        style=filled;
+        color=lightgrey;
+        node [style=filled,color=white];
+        label = "yuechu";
+        lis [label="net.Listener"];
+        conn [label="net.Conn"];
+        logger [label="ln.Logger"];
+        
+        subgraph cluster_2 {
+            style=filled;
+            color=grey;
+            node [style=filled,color=white];
+            label = "wasm program";
+            stdin;
+            stdout;
+            stderr;
+        }
+    }
+    
+    { rank=same; echoclient; lis; }
+    { rank=same; connFile; conn; }
+    
+    echoclient -> ConnFS [label="  mounted at /dev  "];
+    ConnFS -> connFile [label ="  opened to yuechu  "];
+    connFile -> lis [label = "TCP\nconnection"];
+    lis -> conn [label = "  accepted connection  "];
+    conn -> stdin [label = "input from\nuser"];
+    stdout -> conn [label = "  output from\nprogram"];
+    stderr -> logger [label = "error\nmessages"];
+}
