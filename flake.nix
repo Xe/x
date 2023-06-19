@@ -60,8 +60,8 @@
         version = "${self.sourceInfo.lastModifiedDate}";
 
         rust = pkgs.rust-bin.stable.latest.default.override {
-          extensions = [ "rust-src" ];
-          targets = [ "wasm32-wasi" ];
+          extensions = [ "rust-src" "rust-analysis" "clippy" ];
+          targets = [ "wasm32-wasi" "wasm32-unknown-unknown" "riscv64gc-unknown-linux-gnu" ];
         };
 
         naersk' = pkgs.callPackage naersk {
