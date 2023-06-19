@@ -10,8 +10,8 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3/s3iface"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"within.website/ln"
+	"within.website/x/bundler"
 	"within.website/x/internal"
-	"within.website/x/internal/bundler"
 	"within.website/x/web/revolt"
 )
 

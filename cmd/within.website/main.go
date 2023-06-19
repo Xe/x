@@ -12,7 +12,7 @@ import (
 	"within.website/ln/ex"
 	"within.website/ln/opname"
 	"within.website/x/internal"
-	"within.website/x/vanity"
+	"within.website/x/web/vanity"
 )
 
 //go:generate go-bindata -pkg main static

@@ -25,8 +25,8 @@ import (
 	"tailscale.com/hostinfo"
 	"within.website/ln"
 	"within.website/ln/opname"
+	"within.website/x/bundler"
 	"within.website/x/internal"
-	"within.website/x/internal/bundler"
 	"within.website/x/web"
 	"within.website/x/web/revolt"
 )

@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"cirello.io/goherokuname"
-	"within.website/x/namegen/elfs"
-	"within.website/x/namegen/tarot"
+	"within.website/x/misc/namegen/elfs"
+	"within.website/x/misc/namegen/tarot"
 )
 
 // Generator is a name generation function.
