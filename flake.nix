@@ -60,7 +60,7 @@
         version = "${self.sourceInfo.lastModifiedDate}";
 
         rust = pkgs.rust-bin.stable.latest.default.override {
-          extensions = [ "rust-src" "rust-analysis" "clippy" ];
+          extensions = [ "rust-src" "rust-analysis" "clippy" "rustfmt" ];
           targets = [ "wasm32-wasi" "wasm32-unknown-unknown" "riscv64gc-unknown-linux-gnu" ];
         };
 
@@ -304,8 +304,6 @@
             sqlite-interactive
 
             cargo-watch
-            rustfmt
-            rust-analyzer
             wasmtime
             binaryen
             wabt
