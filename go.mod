@@ -14,13 +14,14 @@ require (
 	github.com/fogleman/primitive v0.0.0-20190214200932-673f57e7b1b5
 	github.com/go-interpreter/wagon v0.6.0
 	github.com/google/go-github v17.0.0+incompatible
+	github.com/google/uuid v1.3.0
 	github.com/hullerob/go.farbfeld v0.0.0-20181222022525-3661193c725f
 	github.com/jaytaylor/html2text v0.0.0-20190408195923-01ec452cbe43
 	github.com/joho/godotenv v1.5.1
 	github.com/kr/pretty v0.3.1
 	github.com/mmikulicic/stringlist v1.0.0
 	github.com/mndrix/golog v0.0.0-20170330170653-a28e2a269775
-	github.com/otiai10/copy v1.11.0
+	github.com/otiai10/copy v1.12.0
 	github.com/peterh/liner v1.2.2
 	github.com/pkg/errors v0.9.1
 	github.com/posener/complete v1.2.3
@@ -29,6 +30,7 @@ require (
 	github.com/samber/go-gpt-3-encoder v0.3.1
 	github.com/sebest/xff v0.0.0-20210106013422-671bd2870b3a
 	github.com/tetratelabs/wazero v1.2.0
+	github.com/thoj/go-ircevent v0.0.0-20210723090443-73e444401d64
 	github.com/tmc/scp v0.0.0-20170824174625-f7b48647feef
 	go.etcd.io/bbolt v1.3.7
 	go4.org v0.0.0-20190313082347-94abd6928b1d
@@ -45,10 +47,8 @@ require (
 
 require (
 	github.com/dustin/go-humanize v1.0.1 // indirect
-	github.com/google/uuid v1.3.0 // indirect
 	github.com/mattn/go-isatty v0.0.18 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
-	github.com/thoj/go-ircevent v0.0.0-20210723090443-73e444401d64 // indirect
 	lukechampine.com/uint128 v1.2.0 // indirect
 	modernc.org/cc/v3 v3.40.0 // indirect
 	modernc.org/ccgo/v3 v3.16.13 // indirect
