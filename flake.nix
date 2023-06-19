@@ -104,31 +104,40 @@
             mkdir -p $out/static/pkg/xess
             mkdir -p $out/static/pkg/xeact
 
-            tar xf ${pkgs.fetchurl {
-              name = "xeact-0.69.71";
-              url = "https://registry.npmjs.org/@xeserv/xeact/-/xeact-0.69.71.tgz";
-              sha256 = "19rfg5fbiz69vh4hzg6694szm9agz3hfk4sfsfj6ws0cq4ss805l";
-            }}
+            tar xf ${
+              pkgs.fetchurl {
+                name = "xeact-0.69.71";
+                url =
+                  "https://registry.npmjs.org/@xeserv/xeact/-/xeact-0.69.71.tgz";
+                sha256 = "19rfg5fbiz69vh4hzg6694szm9agz3hfk4sfsfj6ws0cq4ss805l";
+              }
+            }
 
             mkdir -p $out/static/pkg/xeact/0.69.71
             cp -vrf ./package/* $out/static/pkg/xeact/0.69.71
             rm -rf package
 
-            tar xf ${pkgs.fetchurl {
-              name = "xeact-0.70.0";
-              url = "https://registry.npmjs.org/@xeserv/xeact/-/xeact-0.70.0.tgz";
-              sha256 = "1mxwrs04vj1mixs418cy7gd5dy3nfaqcc00vmrjwsgzc36wnmwxz";
-            }}
+            tar xf ${
+              pkgs.fetchurl {
+                name = "xeact-0.70.0";
+                url =
+                  "https://registry.npmjs.org/@xeserv/xeact/-/xeact-0.70.0.tgz";
+                sha256 = "1mxwrs04vj1mixs418cy7gd5dy3nfaqcc00vmrjwsgzc36wnmwxz";
+              }
+            }
 
             mkdir -p $out/static/pkg/xeact/0.70.0
             cp -vrf ./package/* $out/static/pkg/xeact/0.70.0
             rm -rf package
 
-            tar xf ${pkgs.fetchurl {
-              name = "xeact-0.71.0";
-              url = "https://registry.npmjs.org/@xeserv/xeact/-/xeact-0.71.0.tgz";
-              sha256 = "069qky042lmlvslbgsyl9j8jmkhl2hr6hy5slf1b03g3fzvkp6x4";
-            }}
+            tar xf ${
+              pkgs.fetchurl {
+                name = "xeact-0.71.0";
+                url =
+                  "https://registry.npmjs.org/@xeserv/xeact/-/xeact-0.71.0.tgz";
+                sha256 = "069qky042lmlvslbgsyl9j8jmkhl2hr6hy5slf1b03g3fzvkp6x4";
+              }
+            }
 
             mkdir -p $out/static/pkg/xeact/0.71.0
             cp -vrf ./package/* $out/static/pkg/xeact/0.71.0
@@ -169,7 +178,7 @@
           };
 
         wasigo' = pkgs.go_1_20.overrideAttrs (old: {
-          patches = [];
+          patches = [ ];
           src = pkgs.runCommand "gowasi-version-hack" { } ''
             mkdir -p $out
             echo "go-wasip1-dev-${wasigo.shortRev}" > $out/VERSION
@@ -186,9 +195,10 @@
           exec ${wasigo'}/bin/go $*
         '';
 
-        buildGoWasiModule = pkgs.callPackage "${nixpkgs}/pkgs/build-support/go/module.nix" {
-          go = wasigo';
-        };
+        buildGoWasiModule =
+          pkgs.callPackage "${nixpkgs}/pkgs/build-support/go/module.nix" {
+            go = wasigo';
+          };
       in {
         overlays.default = final: prev:
           let
