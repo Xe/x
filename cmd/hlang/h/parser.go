@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	"github.com/eaburns/peggy/peg"
-	"within.website/x/jbo/namcu"
+	"within.website/x/langs/jbo/namcu"
 )
 
 func (p *_Parser) Parse() (int, bool) {

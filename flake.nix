@@ -57,6 +57,8 @@
           ];
         };
 
+        version = "${self.sourceInfo.lastModifiedDate}";
+
         rust = pkgs.rust-bin.stable.latest.default.override {
           extensions = [ "rust-src" ];
           targets = [ "wasm32-wasi" ];
@@ -69,7 +71,7 @@
 
         everything = pkgs.buildGoApplication {
           pname = "xe-x-composite";
-          version = "1.4.0";
+          inherit version;
           src = ./.;
           modules = ./gomod2nix.toml;
 
@@ -83,7 +85,7 @@
 
         xedn = pkgs.buildGoApplication {
           pname = "xedn";
-          version = "1.2.3";
+          inherit version;
           src = ./.;
           modules = ./gomod2nix.toml;
           subPackages = [ "cmd/xedn" ];
@@ -148,10 +150,10 @@
 
         robocadey2 = pkgs.buildGoApplication {
           pname = "robocadey2";
-          version = "1.2.3";
+          inherit version;
           src = ./.;
           modules = ./gomod2nix.toml;
-          subPackages = [ "mastodon/robocadey2" ];
+          subPackages = [ "cmd/robocadey2" ];
         };
 
         copyFile = { pname, path ? pname }:
