@@ -5,7 +5,7 @@ go 1.19
 require (
 	cirello.io/goherokuname v0.0.0-20190914093443-b436bae8c2c5
 	github.com/McKael/madon/v2 v2.4.0
-	github.com/aws/aws-sdk-go v1.44.282
+	github.com/aws/aws-sdk-go v1.44.284
 	github.com/bwmarrin/discordgo v0.27.1
 	github.com/chai2010/webp v1.1.1
 	github.com/disintegration/imaging v1.6.1
@@ -29,6 +29,7 @@ require (
 	github.com/samber/go-gpt-3-encoder v0.3.1
 	github.com/sebest/xff v0.0.0-20210106013422-671bd2870b3a
 	github.com/tetratelabs/wazero v1.2.0
+	github.com/thoj/go-ircevent v0.0.0-20210723090443-73e444401d64
 	github.com/tmc/scp v0.0.0-20170824174625-f7b48647feef
 	go.etcd.io/bbolt v1.3.7
 	go4.org v0.0.0-20190313082347-94abd6928b1d
@@ -48,7 +49,6 @@ require (
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/mattn/go-isatty v0.0.18 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
-	github.com/thoj/go-ircevent v0.0.0-20210723090443-73e444401d64 // indirect
 	lukechampine.com/uint128 v1.2.0 // indirect
 	modernc.org/cc/v3 v3.40.0 // indirect
 	modernc.org/ccgo/v3 v3.16.13 // indirect
