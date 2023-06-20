@@ -77,10 +77,16 @@ func (mr *MaraRevolt) DiscordMessageDelete(s *discordgo.Session, m *discordgo.Me
 		ln.Error(ctx, err, ln.Action("nuking deleted messages"))
 	}
 
-	row := mr.db.QueryRowContext(ctx, "SELECT id FROM s3_uploads WHERE message_id = ?", m.ID)
-	if row.Err() == nil {
+	rows, err := mr.db.QueryContext(ctx, "SELECT id FROM s3_uploads WHERE message_id = ?", m.ID)
+	if err != nil {
+		ln.Error(ctx, err)
+		return
+	}
+	defer rows.Close()
+
+	for rows.Next() {
 		var id string
-		if err := row.Scan(&id); err != nil {
+		if err := rows.Scan(&id); err != nil {
 			ln.Error(ctx, err)
 			return
 		}

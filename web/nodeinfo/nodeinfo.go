@@ -140,7 +140,7 @@ func FetchWithClient(ctx context.Context, cli *http.Client, nodeURL string) (*No
 // Fetch uses the standard library HTTP client to fetch node information.
 func Fetch(ctx context.Context, nodeURL string) (*Node, error) {
 	cli := &http.Client{
-		Transport: useragent.Transport("github.com/Xe/x/web/nodeinfo", "https://within.website/.x.botinfo", http.DefaultTransport),
+		Transport: useragent.Transport("within.website/x/web/nodeinfo", "https://within.website/.x.botinfo", http.DefaultTransport),
 	}
 	return FetchWithClient(ctx, cli, nodeURL)
 }

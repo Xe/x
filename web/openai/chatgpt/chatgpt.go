@@ -13,10 +13,9 @@ import (
 )
 
 type Request struct {
-	Model        string     `json:"model"`
-	Messages     []Message  `json:"messages"`
-	Functions    []Function `json:"functions,omitempty"`
-	FunctionCall string     `json:"function_call"`
+	Model     string     `json:"model"`
+	Messages  []Message  `json:"messages"`
+	Functions []Function `json:"functions,omitempty"`
 }
 
 type Function struct {
@@ -36,7 +35,7 @@ type Param struct {
 type Message struct {
 	Role         string   `json:"role"`
 	Content      string   `json:"content"`
-	FunctionCall *Funcall `json:"function_call"`
+	FunctionCall *Funcall `json:"function_call,omitempty"`
 }
 
 type Funcall struct {

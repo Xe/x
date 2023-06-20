@@ -19,6 +19,12 @@ schema = 3
   [mod."github.com/alexbrainman/sspi"]
     version = "v0.0.0-20210105120005-909beea2cc74"
     hash = "sha256-sMY9gSeRWqKE0JwY4HbUF1KO9eaL/hQ/A/uoyr0hrQI="
+  [mod."github.com/andybalholm/brotli"]
+    version = "v1.0.5"
+    hash = "sha256-/qS8wU8yZQJ+uTOg66rEl9s7spxq9VIXF5L1BcaEClc="
+  [mod."github.com/andybalholm/cascadia"]
+    version = "v1.3.2"
+    hash = "sha256-Nc9SkqJO/ecincVcUBFITy24TMmMGj5o0Q8EgdNhrEk="
   [mod."github.com/aws/aws-sdk-go"]
     version = "v1.44.284"
     hash = "sha256-e0vxPOXFBc9i2EKoxowM1N+b9v1+AsQaVXuSUW7rdPQ="
@@ -100,6 +106,9 @@ schema = 3
   [mod."github.com/facebookgo/subset"]
     version = "v0.0.0-20150612182917-8dac2c3c4870"
     hash = "sha256-Ub0cBFwF6MBzTZ7fpqxrC375arBv+au5I/LLzksVzE8="
+  [mod."github.com/fasthttp/router"]
+    version = "v1.4.19"
+    hash = "sha256-RFDvVYSGI5vHdhGnso5kRE3neX9Xeo/rn1+ngvsls7Q="
   [mod."github.com/fogleman/gg"]
     version = "v1.3.0"
     hash = "sha256-Fs2JI0FmF4N5EzXJzGAPZMxZxo6wKyebkN/iBZ9sdNo="
@@ -115,9 +124,21 @@ schema = 3
   [mod."github.com/go-ole/go-ole"]
     version = "v1.2.6"
     hash = "sha256-+oxitLeJxYF19Z6g+6CgmCHJ1Y5D8raMi2Cb3M6nXCs="
+  [mod."github.com/go-shiori/dom"]
+    version = "v0.0.0-20210627111528-4e4722cd0d65"
+    hash = "sha256-kHoG7/v+Uc1DMLL0UcIDk2rFpujVv5RTMy4BkyRNjs0="
+  [mod."github.com/go-shiori/go-readability"]
+    version = "v0.0.0-20230421032831-c66949dfc0ad"
+    hash = "sha256-67CfGKvCghUq+1XMcAMF+O9xsbQNkwma4L9cxA4pLtw="
+  [mod."github.com/goccy/go-json"]
+    version = "v0.10.2"
+    hash = "sha256-6fMD2/Rku8HT0zDdeA23pX0YxbohiIOC8OJNYbylJTQ="
   [mod."github.com/godbus/dbus/v5"]
     version = "v5.1.0"
     hash = "sha256-xOCMJpQK3KTmHTPn/CdqI4j0eENCtMmJDgAIoYqYOEY="
+  [mod."github.com/gogs/chardet"]
+    version = "v0.0.0-20211120154057-b7413eaefb8f"
+    hash = "sha256-4MeqBJsh4U+ZEbfdDwdciTYMlQWkCil2KJbUxHjBSIo="
   [mod."github.com/golang/freetype"]
     version = "v0.0.0-20170609003504-e2365dfdc4a0"
     hash = "sha256-AHAFBd20/tqxohkWyQkui2bUef9i1HWYgk9LOIFErvA="
@@ -226,6 +247,9 @@ schema = 3
   [mod."github.com/mndrix/ps"]
     version = "v0.0.0-20170330174427-18e65badd6ab"
     hash = "sha256-Q9skxtyqOwkBxmUnzNCfbn813vPbqvwuAihwq/wkKs4="
+  [mod."github.com/mymmrac/telego"]
+    version = "v0.25.0"
+    hash = "sha256-fWfHuTzvIOW3qoM1oTMF+kUD9C5s5+TBREkvP6Vxmfo="
   [mod."github.com/oklog/ulid/v2"]
     version = "v2.1.0"
     hash = "sha256-/oQPgcO1xKbHXutxz0WPfIduShPrfH1l+7/mj8jLst8="
@@ -286,6 +310,9 @@ schema = 3
   [mod."github.com/samber/lo"]
     version = "v1.37.0"
     hash = "sha256-5m0advnk/wy/bFygNyxaPVX2PgA5oF1lSHP71hAOhCc="
+  [mod."github.com/savsgio/gotils"]
+    version = "v0.0.0-20230208104028-c358bd845dee"
+    hash = "sha256-38uPEruTtVRqleBivVwx6oO1FSx4edqEujYdZNTriMo="
   [mod."github.com/sebest/xff"]
     version = "v0.0.0-20210106013422-671bd2870b3a"
     hash = "sha256-t7Gdp7S71Koej5Njg3jOo5vwyj02tJCbJjrq/vZGOho="
@@ -325,6 +352,12 @@ schema = 3
   [mod."github.com/u-root/uio"]
     version = "v0.0.0-20230305220412-3e8cd9d6bf63"
     hash = "sha256-y0VT9PLROozi6wNMgnX706ifumQxlMc8y4/XZDhdfMY="
+  [mod."github.com/valyala/bytebufferpool"]
+    version = "v1.0.0"
+    hash = "sha256-I9FPZ3kCNRB+o0dpMwBnwZ35Fj9+ThvITn8a3Jr8mAY="
+  [mod."github.com/valyala/fasthttp"]
+    version = "v1.47.0"
+    hash = "sha256-7jeGnEnQi6s60bSGkUHWA7rt39FTEghSJLt+rGPk3og="
   [mod."github.com/vishvananda/netlink"]
     version = "v1.2.1-beta.2"
     hash = "sha256-ePReedgYT0KuAx/HOUgG76zDZ2XpW/u8bGlsWysxKzE="
