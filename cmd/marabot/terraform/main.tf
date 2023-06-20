@@ -21,6 +21,14 @@ resource "aws_s3_bucket" "marabot" {
   }
 }
 
+resource "aws_s3_bucket" "marabot-backups" {
+  bucket = "xeserv-marabot-backups"
+
+  tags = {
+    Name   = "Marabot database backups"
+  }
+}
+
 resource "aws_s3_bucket_lifecycle_configuration" "marabot" {
   bucket = aws_s3_bucket.marabot.id
 
@@ -39,11 +47,46 @@ resource "aws_s3_bucket_lifecycle_configuration" "marabot" {
   }
 }
 
+data "aws_iam_policy_document" "marabot-backups" {
+  statement {
+    actions = [
+      "s3:GetObject",
+      "s3:DeleteObject",
+      "s3:PutObject",
+      "s3:ListBucket",
+    ]
+    effect = "Allow"
+    resources = [
+      aws_s3_bucket.marabot.arn,
+      "${aws_s3_bucket.marabot.arn}/*",
+    ]
+  }
+
+  statement {
+    actions   = ["s3:ListAllMyBuckets", "s3:GetBucketLocation"]
+    effect    = "Allow"
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_policy" "marabot-backups" {
+  name        = "marabot-backups-policy"
+  description = "policy for managing S3 for marabot backups"
+
+  policy = data.aws_iam_policy_document.marabot-backups.json
+}
+
+resource "aws_iam_user_policy_attachment" "marabot-backups" {
+  user       = aws_iam_user.marabot.name
+  policy_arn = aws_iam_policy.marabot-backups.arn
+}
+
 data "aws_iam_policy_document" "marabot" {
   statement {
     actions = [
       "s3:GetObject",
       "s3:PutObject",
+      "s3:DeleteObject",
       "s3:ListBucket",
     ]
     effect = "Allow"
