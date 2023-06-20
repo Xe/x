@@ -297,6 +297,7 @@
             hey
             boltbrowser
             terraform
+            litestream
 
             pkg-config
             libaom
