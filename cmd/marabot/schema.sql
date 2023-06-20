@@ -1,4 +1,7 @@
-PRAGMA journal_mode=WAL;
+PRAGMA journal_mode = WAL;
+PRAGMA synchronous = NORMAL;
+PRAGMA wal_autocheckpoint = 0;
+PRAGMA busy_timeout = 5000;
 
 CREATE TABLE IF NOT EXISTS discord_roles (
     id TEXT PRIMARY KEY,

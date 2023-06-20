@@ -28,6 +28,12 @@ type MaraRevolt struct {
 }
 
 func (mr *MaraRevolt) MessageCreate(ctx context.Context, msg *revolt.Message) error {
+	tx, err := mr.db.Begin()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
 	if msg.Content == "!ping" {
 		sendMsg := &revolt.SendMessage{
 			Masquerade: &revolt.Masquerade{
@@ -46,12 +52,12 @@ func (mr *MaraRevolt) MessageCreate(ctx context.Context, msg *revolt.Message) er
 		return err
 	}
 
-	if _, err := mr.db.ExecContext(ctx, "INSERT INTO revolt_messages(id, channel_id, author_id, content, created_at) VALUES (?, ?, ?, ?, ?)", msg.ID, msg.ChannelId, msg.AuthorId, msg.Content, msg.CreatedAt.Format(time.RFC3339)); err != nil {
+	if _, err := tx.ExecContext(ctx, "INSERT INTO revolt_messages(id, channel_id, author_id, content, created_at) VALUES (?, ?, ?, ?, ?)", msg.ID, msg.ChannelId, msg.AuthorId, msg.Content, msg.CreatedAt.Format(time.RFC3339)); err != nil {
 		ln.Error(ctx, err, ln.Action("saving revolt message to database"))
 	}
 
 	if msg.Masquerade != nil {
-		if _, err := mr.db.ExecContext(ctx, "INSERT INTO revolt_message_masquerade(id, username, avatar_url) VALUES(?, ?, ?)", msg.ID, msg.Masquerade.Name, msg.Masquerade.AvatarURL); err != nil {
+		if _, err := tx.ExecContext(ctx, "INSERT INTO revolt_message_masquerade(id, username, avatar_url) VALUES(?, ?, ?)", msg.ID, msg.Masquerade.Name, msg.Masquerade.AvatarURL); err != nil {
 			ln.Error(ctx, err, ln.Action("saving masquerade info to database"))
 		}
 
@@ -69,14 +75,14 @@ func (mr *MaraRevolt) MessageCreate(ctx context.Context, msg *revolt.Message) er
 
 	mr.attachmentPreprocess.Add([3]string{avatarURL, "avatars", ""}, len(avatarURL))
 
-	if _, err := mr.db.ExecContext(ctx, "INSERT INTO revolt_users(id, username, avatar_url, created_at) VALUES(?, ?, ?, ?) ON CONFLICT(id) DO UPDATE SET username = EXCLUDED.username, avatar_url = EXCLUDED.avatar_url, created_at = EXCLUDED.created_at", author.Id, author.Username, avatarURL, author.CreatedAt.Format(time.RFC3339)); err != nil {
+	if _, err := tx.ExecContext(ctx, "INSERT INTO revolt_users(id, username, avatar_url, created_at) VALUES(?, ?, ?, ?) ON CONFLICT(id) DO UPDATE SET username = EXCLUDED.username, avatar_url = EXCLUDED.avatar_url, created_at = EXCLUDED.created_at", author.Id, author.Username, avatarURL, author.CreatedAt.Format(time.RFC3339)); err != nil {
 		ln.Error(ctx, err, ln.Action("writing revolt user record"))
 	}
 
 	for _, att := range msg.Attachments {
 		url := mr.cli.ResolveAttachment(att)
 
-		if _, err := mr.db.ExecContext(ctx, "INSERT INTO revolt_attachments(id, tag, message_id, url, filename, content_type, width, height, size) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", att.ID, att.Tag, msg.ID, url, att.FileName, att.ContentType, att.Metadata.Width, att.Metadata.Height, att.Size); err != nil {
+		if _, err := tx.ExecContext(ctx, "INSERT INTO revolt_attachments(id, tag, message_id, url, filename, content_type, width, height, size) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", att.ID, att.Tag, msg.ID, url, att.FileName, att.ContentType, att.Metadata.Width, att.Metadata.Height, att.Size); err != nil {
 			ln.Error(ctx, err, ln.Action("writing revolt attachment information"))
 		}
 
@@ -103,6 +109,10 @@ func (mr *MaraRevolt) MessageCreate(ctx context.Context, msg *revolt.Message) er
 		for _, att := range msg.Attachments {
 			mr.ircmsgs <- fmt.Sprintf("%s\\ %s", nick, mr.cli.ResolveAttachment(att))
 		}
+	}
+
+	if err := tx.Commit(); err != nil {
+		return err
 	}
 
 	return nil
