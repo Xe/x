@@ -13,19 +13,21 @@ import (
 
 func (c *Client) Connect(ctx context.Context, handler Handler) {
 	ctx = opname.With(ctx, "websocket-connect")
-	t := time.NewTicker(30 * time.Second)
-	defer t.Stop()
 
 	go func(ctx context.Context) {
 		if err := c.doWebsocket(ctx, c.Token, c.WSURL, handler); err != nil {
 			ln.Error(ctx, err, ln.Info("websocket error, retrying"))
 		}
 
+		t := time.NewTicker(30 * time.Second)
+		defer t.Stop()
+
 		for {
 			select {
 			case <-ctx.Done():
 				return
 			case <-t.C:
+				ln.Log(ctx, ln.Action("reconnecting"))
 				if err := c.doWebsocket(ctx, c.Token, c.WSURL, handler); err != nil {
 					ln.Error(ctx, err, ln.Info("websocket error, retrying"))
 				}
