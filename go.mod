@@ -13,6 +13,7 @@ require (
 	github.com/facebookgo/ensure v0.0.0-20160127193407-b4ab57deab51
 	github.com/fogleman/primitive v0.0.0-20190214200932-673f57e7b1b5
 	github.com/go-interpreter/wagon v0.6.0
+	github.com/go-shiori/go-readability v0.0.0-20230421032831-c66949dfc0ad
 	github.com/google/go-github v17.0.0+incompatible
 	github.com/google/uuid v1.3.0
 	github.com/hullerob/go.farbfeld v0.0.0-20181222022525-3661193c725f
@@ -21,6 +22,7 @@ require (
 	github.com/kr/pretty v0.3.1
 	github.com/mmikulicic/stringlist v1.0.0
 	github.com/mndrix/golog v0.0.0-20170330170653-a28e2a269775
+	github.com/mymmrac/telego v0.25.0
 	github.com/otiai10/copy v1.12.0
 	github.com/peterh/liner v1.2.2
 	github.com/pkg/errors v0.9.1
@@ -51,11 +53,9 @@ require (
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/fasthttp/router v1.4.19 // indirect
 	github.com/go-shiori/dom v0.0.0-20210627111528-4e4722cd0d65 // indirect
-	github.com/go-shiori/go-readability v0.0.0-20230421032831-c66949dfc0ad // indirect
 	github.com/goccy/go-json v0.10.2 // indirect
 	github.com/gogs/chardet v0.0.0-20211120154057-b7413eaefb8f // indirect
 	github.com/mattn/go-isatty v0.0.18 // indirect
-	github.com/mymmrac/telego v0.25.0 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	github.com/savsgio/gotils v0.0.0-20230208104028-c358bd845dee // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
