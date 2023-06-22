@@ -334,6 +334,9 @@ schema = 3
   [mod."github.com/tailscale/netlink"]
     version = "v1.1.1-0.20211101221916-cabfb018fe85"
     hash = "sha256-bMK5qqObMcxIbPy5XhOZP8TGDaXvDAHsE0FR68VMLi8="
+  [mod."github.com/tailscale/sqlite"]
+    version = "v0.0.0-20230608185013-baf1d754dab7"
+    hash = "sha256-fX74aeGPR+P61dZKK2sImG9KRGKWnWnkDXZShlddMAM="
   [mod."github.com/tailscale/wireguard-go"]
     version = "v0.0.0-20230410165232-af172621b4dd"
     hash = "sha256-QO+A8iUtqtEvERE2IRm1VFeUnnhRiYOGTzKHf0OgckI="

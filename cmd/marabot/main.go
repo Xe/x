@@ -5,6 +5,7 @@ import (
 	"context"
 	"crypto/sha512"
 	"database/sql"
+	"database/sql/driver"
 	_ "embed"
 	"flag"
 	"fmt"
@@ -16,13 +17,12 @@ import (
 	"syscall"
 	"time"
 
-	_ "modernc.org/sqlite"
-
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/bwmarrin/discordgo"
+	"github.com/tailscale/sqlite"
 	"tailscale.com/hostinfo"
 	"within.website/ln"
 	"within.website/ln/opname"
@@ -54,6 +54,19 @@ var (
 	dbSchema string
 )
 
+func openDB(fname string) (*sql.DB, error) {
+	db := sql.OpenDB(sqlite.Connector("file:"+fname, func(ctx context.Context, conn driver.ConnPrepareContext) error {
+		return sqlite.ExecScript(conn.(sqlite.SQLConn), dbSchema)
+	}, nil))
+
+	err := db.Ping()
+	if err != nil {
+		return nil, err
+	}
+
+	return db, nil
+}
+
 func main() {
 	internal.HandleStartup()
 
@@ -64,15 +77,11 @@ func main() {
 
 	ln.Log(ctx, ln.Action("starting up"))
 
-	db, err := sql.Open("sqlite", *dbFile)
+	db, err := openDB(*dbFile)
 	if err != nil {
 		ln.FatalErr(ctx, err, ln.Action("opening sqlite database"))
 	}
 	defer db.Close()
-
-	if _, err := db.ExecContext(ctx, dbSchema); err != nil {
-		ln.FatalErr(ctx, err, ln.Action("running database schema"))
-	}
 
 	ircmsgs := make(chan string, 10)
 
@@ -116,6 +125,7 @@ func main() {
 	dg.AddHandler(mr.DiscordMessageCreate)
 	dg.AddHandler(mr.DiscordMessageDelete)
 	dg.AddHandler(mr.DiscordMessageEdit)
+	dg.AddHandler(mr.DiscordReactionAdd)
 
 	if err := dg.Open(); err != nil {
 		ln.FatalErr(ctx, err, ln.Action("opening discord client"))
@@ -215,6 +225,63 @@ func (mr *MaraRevolt) preprocessLinks(ctx context.Context, data [][3]string) {
 	if err := tx.Commit(); err != nil {
 		ln.Error(ctx, err)
 	}
+}
+
+func (mr *MaraRevolt) archiveAttachment(ctx context.Context, tx *sql.Tx, link, kind, messageID string) error {
+	att, err := hashURL(link, kind)
+	if err != nil {
+		ln.Error(ctx, err, ln.F{"link": link, "kind": kind})
+
+		if werr, ok := err.(*web.Error); ok {
+			if werr.GotStatus == http.StatusNotFound {
+				tx.ExecContext(ctx, "DELETE FROM discord_users WHERE avatar_url = ?", link)
+				tx.ExecContext(ctx, "DELETE FROM discord_attachments WHERE url = ?", link)
+				tx.ExecContext(ctx, "DELETE FROM discord_emoji WHERE url = ?", link)
+				tx.ExecContext(ctx, "DELETE FROM revolt_attachments WHERE url = ?", link)
+				tx.ExecContext(ctx, "DELETE FROM revolt_users WHERE avatar_url = ?", link)
+				tx.ExecContext(ctx, "DELETE FROM revolt_emoji WHERE url = ?", link)
+			} else {
+				return err
+			}
+		}
+	}
+
+	att.MessageID = aws.String(messageID)
+
+	key := filepath.Join(att.Kind, att.ID)
+
+	f := ln.F{"kind": att.Kind, "id": att.ID, "url": att.URL, "content_type": att.ContentType}
+
+	var count int
+	if err := tx.QueryRowContext(ctx, "SELECT COUNT(*) FROM s3_uploads WHERE id = ?", att.ID).Scan(&count); err != nil {
+		ln.Error(ctx, err, f)
+		return err
+	}
+
+	f["count"] = count
+
+	if count != 0 {
+		return nil
+	}
+
+	if _, err := mr.uploader.UploadWithContext(ctx, &s3manager.UploadInput{
+		Bucket:      aws.String(*awsS3Bucket),
+		Key:         aws.String(key),
+		ContentType: aws.String(att.ContentType),
+		Body:        bytes.NewBuffer(att.Data),
+		Metadata: map[string]*string{
+			"Original-URL": aws.String(att.URL),
+			"Message-ID":   att.MessageID,
+		},
+	}); err != nil {
+		return err
+	}
+
+	if _, err := tx.ExecContext(ctx, "INSERT INTO s3_uploads(id, url, kind, content_type, created_at, message_id) VALUES (?, ?, ?, ?, ?, ?)", att.ID, att.URL, att.Kind, att.ContentType, att.CreatedAt, att.MessageID); err != nil {
+		ln.Error(ctx, err, ln.Action("saving upload information to DB"), f)
+	}
+
+	return nil
 }
 
 func hashURL(itemURL, kind string) (*Attachment, error) {

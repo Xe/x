@@ -299,6 +299,9 @@
             terraform
             litestream
 
+            postgresql_15
+            pgloader
+
             pkg-config
             libaom
             libavif

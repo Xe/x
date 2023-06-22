@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/aws/aws-sdk-go/service/s3/s3iface"
@@ -23,6 +24,7 @@ type MaraRevolt struct {
 	attachmentUpload     *bundler.Bundler[*Attachment]
 	uploader             *s3manager.Uploader
 	s3                   s3iface.S3API
+	lock                 sync.Mutex
 
 	revolt.NullHandler
 }

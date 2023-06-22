@@ -96,7 +96,7 @@ CREATE INDEX IF NOT EXISTS discord_emoji_url
   ON discord_emoji(url);
 
 CREATE TABLE IF NOT EXISTS irc_messages (
-    id SERIAL PRIMARY KEY,
+    id SERIAL PRIMARY KEY AUTOINCREMENT,
     nick TEXT NOT NULL,
     user TEXT NOT NULL,
     host TEXT NOT NULL,
