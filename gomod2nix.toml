@@ -26,8 +26,8 @@ schema = 3
     version = "v1.3.2"
     hash = "sha256-Nc9SkqJO/ecincVcUBFITy24TMmMGj5o0Q8EgdNhrEk="
   [mod."github.com/aws/aws-sdk-go"]
-    version = "v1.44.284"
-    hash = "sha256-e0vxPOXFBc9i2EKoxowM1N+b9v1+AsQaVXuSUW7rdPQ="
+    version = "v1.44.287"
+    hash = "sha256-fEP17Yt6Suo3SMVZB9dPoLsEpLA4SvObJVTfdHW+va0="
   [mod."github.com/aws/aws-sdk-go-v2"]
     version = "v1.18.0"
     hash = "sha256-w5mGt4Z2ZelTCgt51QEoPc5E8eqiN7B8RBFtNDTIxlw="
@@ -248,8 +248,8 @@ schema = 3
     version = "v0.0.0-20170330174427-18e65badd6ab"
     hash = "sha256-Q9skxtyqOwkBxmUnzNCfbn813vPbqvwuAihwq/wkKs4="
   [mod."github.com/mymmrac/telego"]
-    version = "v0.25.0"
-    hash = "sha256-fWfHuTzvIOW3qoM1oTMF+kUD9C5s5+TBREkvP6Vxmfo="
+    version = "v0.25.1"
+    hash = "sha256-Jn4Bqlpw6Y4qt8NtqZY0dsaVxvZ9hoz5j3hGVTD03vM="
   [mod."github.com/oklog/ulid/v2"]
     version = "v2.1.0"
     hash = "sha256-/oQPgcO1xKbHXutxz0WPfIduShPrfH1l+7/mj8jLst8="
@@ -359,8 +359,8 @@ schema = 3
     version = "v1.0.0"
     hash = "sha256-I9FPZ3kCNRB+o0dpMwBnwZ35Fj9+ThvITn8a3Jr8mAY="
   [mod."github.com/valyala/fasthttp"]
-    version = "v1.47.0"
-    hash = "sha256-7jeGnEnQi6s60bSGkUHWA7rt39FTEghSJLt+rGPk3og="
+    version = "v1.48.0"
+    hash = "sha256-OFgjq4C+1sixt9RWerzbte5bZzUXY5gP9/d6F8MiXL0="
   [mod."github.com/vishvananda/netlink"]
     version = "v1.2.1-beta.2"
     hash = "sha256-ePReedgYT0KuAx/HOUgG76zDZ2XpW/u8bGlsWysxKzE="
@@ -416,8 +416,8 @@ schema = 3
     version = "v0.3.0"
     hash = "sha256-/hmc9skIswMYbivxNS7R8A6vCTUF9k2/7tr/ACkcEaM="
   [mod."golang.org/x/tools"]
-    version = "v0.8.0"
-    hash = "sha256-KTL9yVnFY5gqcZBHL8fLsKrMzQO1QGQIe2m5XQyNUmY="
+    version = "v0.9.1"
+    hash = "sha256-6jvh0cvdVMvGBceeBxWFj0+bFvboB8wuIYPHabxrST0="
   [mod."golang.zx2c4.com/wintun"]
     version = "v0.0.0-20230126152724-0fa3db229ce2"
     hash = "sha256-cjMLNjKnnupVROWmeASORVieAL9ieYdzX3cFzG8bCpo="
@@ -470,8 +470,8 @@ schema = 3
     version = "v1.8.7"
     hash = "sha256-6pQ35gFvbyMhNo0gv4bPxYDUrwDF/ok1GMA+BHfsRRM="
   [mod."tailscale.com"]
-    version = "v1.42.0"
-    hash = "sha256-TbA9MhacgL0Wx9FQS4L8YB1ouhndN5W9lR78hNp690o="
+    version = "v1.44.0"
+    hash = "sha256-Wa3hOvYz7WLkc9umRlMcXVEcsJ90P5RngS2Aao1HxpQ="
   [mod."tulpa.dev/cadey/jvozba"]
     version = "v0.0.0-20200326200349-f0ebe310be06"
     hash = "sha256-0rP0rdwDp8C+hHlM/Cgp+4YGZRm2y7jgRKFOsWYRKUQ="
