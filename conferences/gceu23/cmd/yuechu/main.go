@@ -50,6 +50,8 @@ func main() {
 		ln.FatalErr(ctx, err)
 	}
 
+	ln.Log(ctx, ln.Action("listening"), ln.F{"bind": *bind})
+
 	for {
 		conn, err := server.Accept()
 		if err != nil {
