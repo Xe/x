@@ -8,16 +8,17 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"sync"
 
 	"within.website/x/web"
 )
 
 var (
-	sdServerURL = flag.String("stablediffusion-server-url", "http://logos:7860", "URL for the Stable Diffusion API")
+	sdServerURL = flag.String("within.website/x/web/stablediffusion-server-url", "http://logos:7860", "URL for the Stable Diffusion API used with the default client")
 )
 
-func buildURL(path string) (*url.URL, error) {
-	u, err := url.Parse(*sdServerURL)
+func buildURL(base, path string) (*url.URL, error) {
+	u, err := url.Parse(base)
 	if err != nil {
 		return nil, err
 	}
@@ -87,18 +88,23 @@ var (
 	Default *Client = &Client{
 		HTTP: http.DefaultClient,
 	}
+	lock sync.Mutex
 )
 
 func Generate(ctx context.Context, inp SimpleImageRequest) (*ImageResponse, error) {
+	lock.Lock()
+	Default.APIServer = *sdServerURL
+	lock.Unlock()
 	return Default.Generate(ctx, inp)
 }
 
 type Client struct {
-	HTTP *http.Client
+	HTTP      *http.Client
+	APIServer string
 }
 
 func (c *Client) Generate(ctx context.Context, inp SimpleImageRequest) (*ImageResponse, error) {
-	u, err := buildURL("/sdapi/v1/txt2img")
+	u, err := buildURL(c.APIServer, "/sdapi/v1/txt2img")
 	if err != nil {
 		return nil, fmt.Errorf("error building URL: %w", err)
 	}

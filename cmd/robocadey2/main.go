@@ -24,8 +24,8 @@ import (
 	"within.website/ln/ex"
 	"within.website/ln/opname"
 	"within.website/x/internal"
-	"within.website/x/internal/stablediffusion"
 	"within.website/x/web/mastodon"
+	"within.website/x/web/stablediffusion"
 )
 
 var (
