@@ -8,7 +8,6 @@ import (
 	"os"
 	"path"
 	"testing"
-	"time"
 
 	"golang.org/x/crypto/acme/autocert"
 )
@@ -47,12 +46,16 @@ func TestLocalCA(t *testing.T) {
 			GetCertificate: m.GetCertificate,
 		}
 
+		ch := make(chan struct{})
+
 		go func() {
 			lis, err := tls.Listen("tcp", ":9293", tc)
 			if err != nil {
-				t.Fatal(err)
+				t.Error(err)
+				return
 			}
 			defer lis.Close()
+			ch <- struct{}{}
 
 			for {
 				select {
@@ -63,7 +66,8 @@ func TestLocalCA(t *testing.T) {
 
 				cli, err := lis.Accept()
 				if err != nil {
-					t.Fatal(err)
+					t.Error(err)
+					return
 				}
 				defer cli.Close()
 
@@ -71,7 +75,7 @@ func TestLocalCA(t *testing.T) {
 			}
 		}()
 
-		time.Sleep(130 * time.Millisecond)
+		<-ch
 		cli, err := tls.Dial("tcp", "localhost:9293", &tls.Config{InsecureSkipVerify: true})
 		if err != nil {
 			t.Fatal(err)
