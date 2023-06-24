@@ -10,5 +10,5 @@ func TestNosleep(t *testing.T) {
 }
 
 func TestNosleepIgnore(t *testing.T) {
-	time.Sleep(time.Second) // nosleep bypass(Mai): This test requires us to use a sleep statement here. I hate it too.
+	time.Sleep(time.Second) //nosleep:bypass This test requires us to use a sleep statement here. I hate it too.
 }

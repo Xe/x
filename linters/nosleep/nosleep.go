@@ -6,7 +6,7 @@
 //
 // If god is dead and you need to do this anyways, add a comment that reads:
 //
-//	// nosleep bypass(yournick): put a reason why here
+//	//nosleep:bypass put a reason why here
 package nosleep
 
 import (
@@ -25,7 +25,7 @@ var Analyzer = &analysis.Analyzer{
 	Run:  run,
 }
 
-var bypassRegex = regexp.MustCompile(`^// nosleep bypass\((\w+)\): ([\w \.\!\,]+)`)
+var bypassRegex = regexp.MustCompile(`^//nosleep:bypass ([\w \.\!\,]+)`)
 
 // nodeFuncName converts an ast.CallExpr into the human-readable name of
 // the function and name.
