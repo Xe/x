@@ -18,7 +18,7 @@ import (
 	"go.etcd.io/bbolt"
 	"golang.org/x/sync/singleflight"
 	"within.website/ln"
-	"within.website/x/internal/stablediffusion"
+	"within.website/x/web/stablediffusion"
 )
 
 var (

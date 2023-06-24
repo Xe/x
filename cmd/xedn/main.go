@@ -33,16 +33,17 @@ import (
 	"within.website/ln/ex"
 	"within.website/ln/opname"
 	"within.website/x/internal"
-	"within.website/x/internal/stablediffusion"
 	"within.website/x/web"
+	"within.website/x/web/stablediffusion"
 )
 
 var (
-	b2Backend   = flag.String("b2-backend", "f001.backblazeb2.com", "Backblaze B2 base host")
-	addr        = flag.String("addr", ":8080", "server bind address")
-	metricsAddr = flag.String("metrics-addr", ":8081", "metrics bind address")
-	dir         = flag.String("dir", os.Getenv("XEDN_STATE"), "where XeDN should store cached data")
-	staticDir   = flag.String("static-dir", envOr("XEDN_STATIC", "./static"), "where XeDN should look for static assets")
+	b2Backend             = flag.String("b2-backend", "f001.backblazeb2.com", "Backblaze B2 base host")
+	addr                  = flag.String("addr", ":8080", "server bind address")
+	metricsAddr           = flag.String("metrics-addr", ":8081", "metrics bind address")
+	dir                   = flag.String("dir", os.Getenv("XEDN_STATE"), "where XeDN should store cached data")
+	staticDir             = flag.String("static-dir", envOr("XEDN_STATIC", "./static"), "where XeDN should look for static assets")
+	stableDiffusionServer = flag.String("stable-diffusion-server", "http://logos:7860", "where XeDN should request Stable Diffusion images from (Automatic1111 over Tailscale)")
 
 	//go:embed index.html
 	indexHTML []byte
@@ -405,7 +406,7 @@ func main() {
 
 	sd := &StableDiffusion{
 		db:     db,
-		client: &stablediffusion.Client{HTTP: cli},
+		client: &stablediffusion.Client{HTTP: cli, APIServer: *stableDiffusionServer},
 		group:  &singleflight.Group{},
 	}
 
