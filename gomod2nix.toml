@@ -392,8 +392,8 @@ schema = 3
     version = "v0.7.0"
     hash = "sha256-8ymOoG5nFlSCJOgn/apVzP4Zk5jtoYNLwd5TJKlP2X8="
   [mod."golang.org/x/mod"]
-    version = "v0.10.0"
-    hash = "sha256-g0T2wz+K0nhPWdVQJRGGqEqzlTHMBahv+9C3y090eIM="
+    version = "v0.11.0"
+    hash = "sha256-mSiFXtYlketLJEHmaxUHYzkXoR9M7nJPDSbNiBYAyNE="
   [mod."golang.org/x/net"]
     version = "v0.11.0"
     hash = "sha256-9MWuk+lNmiiwRNLswRuIp/hhFRfYXJMrH2/Bs7iRW4M="
@@ -416,8 +416,8 @@ schema = 3
     version = "v0.3.0"
     hash = "sha256-/hmc9skIswMYbivxNS7R8A6vCTUF9k2/7tr/ACkcEaM="
   [mod."golang.org/x/tools"]
-    version = "v0.9.1"
-    hash = "sha256-6jvh0cvdVMvGBceeBxWFj0+bFvboB8wuIYPHabxrST0="
+    version = "v0.10.0"
+    hash = "sha256-9ylXC8l7/hgsIW/WMKq/5PtE6fswd2zp783Z4UO5IT4="
   [mod."golang.zx2c4.com/wintun"]
     version = "v0.0.0-20230126152724-0fa3db229ce2"
     hash = "sha256-cjMLNjKnnupVROWmeASORVieAL9ieYdzX3cFzG8bCpo="
