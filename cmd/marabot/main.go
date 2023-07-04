@@ -22,6 +22,8 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/bwmarrin/discordgo"
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/tailscale/sqlite"
 	"tailscale.com/hostinfo"
 	"within.website/ln"
@@ -33,7 +35,10 @@ import (
 )
 
 var (
-	dbFile                = flag.String("db-file", "marabot.db", "Path to the database file")
+	dbFile = flag.String("db-file", "marabot.db", "Path to the database file")
+
+	pgURL = flag.String("database-url", "", "URL for the database (postgres)")
+
 	discordToken          = flag.String("discord-token", "", "Discord bot token")
 	revoltToken           = flag.String("revolt-token", "", "Revolt bot token")
 	revoltAPIServer       = flag.String("revolt-api-server", "https://api.revolt.chat", "API server for Revolt")
@@ -83,6 +88,16 @@ func main() {
 	}
 	defer db.Close()
 
+	pg, err := pgxpool.New(ctx, *pgURL)
+	if err != nil {
+		ln.FatalErr(ctx, err, ln.Action("opening postgres database"))
+	}
+	defer pg.Close()
+
+	if err := pg.Ping(ctx); err != nil {
+		ln.FatalErr(ctx, err, ln.Action("testing postgres connection"))
+	}
+
 	ircmsgs := make(chan string, 10)
 
 	// Init a new client.
@@ -100,6 +115,7 @@ func main() {
 	mr := &MaraRevolt{
 		cli:      client,
 		db:       db,
+		pg:       pg,
 		ircmsgs:  ircmsgs,
 		uploader: uploader,
 		s3:       s3.New(sess),
@@ -227,19 +243,20 @@ func (mr *MaraRevolt) preprocessLinks(ctx context.Context, data [][3]string) {
 	}
 }
 
-func (mr *MaraRevolt) archiveAttachment(ctx context.Context, tx *sql.Tx, link, kind, messageID string) error {
+func (mr *MaraRevolt) archiveAttachment(ctx context.Context, tx pgx.Tx, link, kind, messageID string) error {
 	att, err := hashURL(link, kind)
 	if err != nil {
 		ln.Error(ctx, err, ln.F{"link": link, "kind": kind})
 
 		if werr, ok := err.(*web.Error); ok {
 			if werr.GotStatus == http.StatusNotFound {
-				tx.ExecContext(ctx, "DELETE FROM discord_users WHERE avatar_url = ?", link)
-				tx.ExecContext(ctx, "DELETE FROM discord_attachments WHERE url = ?", link)
-				tx.ExecContext(ctx, "DELETE FROM discord_emoji WHERE url = ?", link)
-				tx.ExecContext(ctx, "DELETE FROM revolt_attachments WHERE url = ?", link)
-				tx.ExecContext(ctx, "DELETE FROM revolt_users WHERE avatar_url = ?", link)
-				tx.ExecContext(ctx, "DELETE FROM revolt_emoji WHERE url = ?", link)
+				tx.Exec(ctx, "DELETE FROM discord_users WHERE avatar_url = $1", link)
+				tx.Exec(ctx, "DELETE FROM discord_attachments WHERE url = $1", link)
+				tx.Exec(ctx, "DELETE FROM discord_emoji WHERE url = $1", link)
+				tx.Exec(ctx, "DELETE FROM revolt_attachments WHERE url = $1", link)
+				tx.Exec(ctx, "DELETE FROM revolt_users WHERE avatar_url = $1", link)
+				tx.Exec(ctx, "DELETE FROM revolt_emoji WHERE url = $1", link)
+				return werr
 			} else {
 				return err
 			}
@@ -253,7 +270,7 @@ func (mr *MaraRevolt) archiveAttachment(ctx context.Context, tx *sql.Tx, link, k
 	f := ln.F{"kind": att.Kind, "id": att.ID, "url": att.URL, "content_type": att.ContentType}
 
 	var count int
-	if err := tx.QueryRowContext(ctx, "SELECT COUNT(*) FROM s3_uploads WHERE id = ?", att.ID).Scan(&count); err != nil {
+	if err := tx.QueryRow(ctx, "SELECT COUNT(*) FROM s3_uploads WHERE id = $1", att.ID).Scan(&count); err != nil {
 		ln.Error(ctx, err, f)
 		return err
 	}
@@ -277,7 +294,7 @@ func (mr *MaraRevolt) archiveAttachment(ctx context.Context, tx *sql.Tx, link, k
 		return err
 	}
 
-	if _, err := tx.ExecContext(ctx, "INSERT INTO s3_uploads(id, url, kind, content_type, created_at, message_id) VALUES (?, ?, ?, ?, ?, ?)", att.ID, att.URL, att.Kind, att.ContentType, att.CreatedAt, att.MessageID); err != nil {
+	if _, err := tx.Exec(ctx, "INSERT INTO s3_uploads(id, url, kind, content_type, created_at, message_id) VALUES ($1, $2, $3, $4, $5, $6)", att.ID, att.URL, att.Kind, att.ContentType, att.CreatedAt, att.MessageID); err != nil {
 		ln.Error(ctx, err, ln.Action("saving upload information to DB"), f)
 	}
 

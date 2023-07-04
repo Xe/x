@@ -184,6 +184,18 @@ schema = 3
   [mod."github.com/insomniacslk/dhcp"]
     version = "v0.0.0-20230407062729-974c6f05fe16"
     hash = "sha256-qeCrmCwVinMLcr/IpjpLRoNGzId5dmiJr4TdDYdX9Iw="
+  [mod."github.com/jackc/pgpassfile"]
+    version = "v1.0.0"
+    hash = "sha256-H0nFbC34/3pZUFnuiQk9W7yvAMh6qJDrqvHp+akBPLM="
+  [mod."github.com/jackc/pgservicefile"]
+    version = "v0.0.0-20221227161230-091c0ba34f0a"
+    hash = "sha256-rBtUw15WPPDp2eulHXH5e2zCIed1OPFYwlCpgDOnGRM="
+  [mod."github.com/jackc/pgx/v5"]
+    version = "v5.4.1"
+    hash = "sha256-F7rxrYBFFOUZIz5v80MG73bFrilRey9VYFeqkB8lcXY="
+  [mod."github.com/jackc/puddle/v2"]
+    version = "v2.2.0"
+    hash = "sha256-S9Ldac+a4auQt99hToXZ/WSuUhcEk/A5aDgQAb48B8M="
   [mod."github.com/jaytaylor/html2text"]
     version = "v0.0.0-20190408195923-01ec452cbe43"
     hash = "sha256-nnfxxHzCx8cEPQn3dixkq6/UwzC4vYb9OLJQWReouu8="

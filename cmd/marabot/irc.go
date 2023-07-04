@@ -57,7 +57,7 @@ func (mr *MaraRevolt) IRCBot(ctx context.Context) {
 
 		irccon.AddCallback("001", func(e *irc.Event) { irccon.Join("#xeserv") })
 		irccon.AddCallback("PRIVMSG", func(e *irc.Event) {
-			if _, err := mr.db.ExecContext(ctx, `INSERT INTO irc_messages(nick, user, host, channel, content, tags) VALUES (?, ?, ?, ?, ?, ?)`, e.Nick, e.User, e.Host, e.Arguments[0], e.Message(), ""); err != nil {
+			if _, err := mr.pg.Exec(ctx, `INSERT INTO irc_messages(nick, user, host, channel, content, tags) VALUES ($1, $2, $3, $4, $5, $6)`, e.Nick, e.User, e.Host, e.Arguments[0], e.Message(), ""); err != nil {
 				ln.Error(ctx, err)
 			}
 
