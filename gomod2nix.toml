@@ -478,6 +478,9 @@ schema = 3
   [mod."modernc.org/token"]
     version = "v1.0.1"
     hash = "sha256-lTSZX8nrb5hDZqOnRuFmI4VIaco3qwwWe28z24vohyo="
+  [mod."mvdan.cc/xurls/v2"]
+    version = "v2.5.0"
+    hash = "sha256-9hPXZ/t15+LG9fji1gyeWhUrYOr6eGyKYg3a1SmHJpQ="
   [mod."nhooyr.io/websocket"]
     version = "v1.8.7"
     hash = "sha256-6pQ35gFvbyMhNo0gv4bPxYDUrwDF/ok1GMA+BHfsRRM="
