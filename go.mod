@@ -38,7 +38,7 @@ require (
 	github.com/tmc/scp v0.0.0-20170824174625-f7b48647feef
 	go.etcd.io/bbolt v1.3.7
 	go4.org v0.0.0-20190313082347-94abd6928b1d
-	golang.org/x/crypto v0.10.0
+	golang.org/x/crypto v0.11.0
 	golang.org/x/oauth2 v0.9.0
 	golang.org/x/sync v0.3.0
 	modernc.org/sqlite v1.23.1
@@ -162,9 +162,9 @@ require (
 	golang.org/x/image v0.7.0 // indirect
 	golang.org/x/mod v0.11.0 // indirect
 	golang.org/x/net v0.11.0 // indirect
-	golang.org/x/sys v0.9.0 // indirect
-	golang.org/x/term v0.9.0 // indirect
-	golang.org/x/text v0.10.0 // indirect
+	golang.org/x/sys v0.10.0 // indirect
+	golang.org/x/term v0.10.0 // indirect
+	golang.org/x/text v0.11.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
 	golang.org/x/tools v0.10.0
 	golang.zx2c4.com/wintun v0.0.0-20230126152724-0fa3db229ce2 // indirect
