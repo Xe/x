@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"path/filepath"
 	"time"
@@ -12,11 +11,12 @@ import (
 	"github.com/bwmarrin/discordgo"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"within.website/ln"
 	"within.website/ln/opname"
 )
 
-func (mr *MaraRevolt) importDiscordData(ctx context.Context, db *sql.DB, dg *discordgo.Session) error {
+func (mr *MaraRevolt) importDiscordData(ctx context.Context, db *pgxpool.Pool, dg *discordgo.Session) error {
 	ctx = opname.With(ctx, "import-discord-data")
 
 	tx, err := mr.pg.Begin(ctx)
@@ -89,9 +89,6 @@ func (mr *MaraRevolt) importDiscordData(ctx context.Context, db *sql.DB, dg *dis
 }
 
 func (mr *MaraRevolt) DiscordMessageDelete(s *discordgo.Session, m *discordgo.MessageDelete) {
-	mr.lock.Lock()
-	defer mr.lock.Unlock()
-
 	ctx := opname.With(context.Background(), "marabot.discord-message-delete")
 
 	tx, err := mr.pg.Begin(ctx)
@@ -138,18 +135,12 @@ func (mr *MaraRevolt) DiscordMessageDelete(s *discordgo.Session, m *discordgo.Me
 }
 
 func (mr *MaraRevolt) DiscordMessageEdit(s *discordgo.Session, m *discordgo.MessageUpdate) {
-	mr.lock.Lock()
-	defer mr.lock.Unlock()
-
-	if _, err := mr.pg.Exec(context.Background(), "UPDATE discord_messages SET content = ?, edited_at = ? WHERE id = ?", m.Content, time.Now().Format(time.RFC3339), m.ID); err != nil {
+	if _, err := mr.pg.Exec(context.Background(), "UPDATE discord_messages SET content = $1, edited_at = $2 WHERE id = $3", m.Content, time.Now().Format(time.RFC3339), m.ID); err != nil {
 		ln.Error(context.Background(), err)
 	}
 }
 
 func (mr *MaraRevolt) DiscordMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
-	mr.lock.Lock()
-	defer mr.lock.Unlock()
-
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	ctx = opname.With(ctx, "marabot.discordMessageCreate")
@@ -219,7 +210,7 @@ func (mr *MaraRevolt) DiscordReactionAdd(s *discordgo.Session, mra *discordgo.Me
 
 func (mr *MaraRevolt) doesDiscordMessageExist(ctx context.Context, tx pgx.Tx, messageID string) (bool, error) {
 	var count int
-	if err := tx.QueryRow(ctx, "SELECT COUNT(*) FROM discord_messages WHERE id = ?", messageID).Scan(&count); err != nil {
+	if err := tx.QueryRow(ctx, "SELECT COUNT(*) FROM discord_messages WHERE id = $1", messageID).Scan(&count); err != nil {
 		return false, err
 	}
 
@@ -236,19 +227,19 @@ func (mr *MaraRevolt) backfillDiscordChannel(s *discordgo.Session, channelID, me
 
 	ln.Log(ctx, ln.Action("archiving channel from message"), ln.F{"channel_id": channelID, "message_id": messageID})
 
-	tx, err := mr.pg.Begin(ctx)
-	if err != nil {
-		ln.Error(ctx, err)
-		return
-	}
-	defer tx.Rollback(ctx)
-
-	t := time.NewTicker(30 * time.Second)
+	t := time.NewTicker(5 * time.Second)
 	defer t.Stop()
 
 	done := false
 
+outer:
 	for range t.C {
+		tx, err := mr.pg.Begin(ctx)
+		if err != nil {
+			ln.Error(ctx, err)
+			return
+		}
+
 		ln.Log(ctx, ln.Action("fetching batch of messages"), ln.F{"curr": curr})
 		msgs, err := s.ChannelMessages(channelID, 100, "", curr, "")
 		if err != nil {
@@ -256,38 +247,55 @@ func (mr *MaraRevolt) backfillDiscordChannel(s *discordgo.Session, channelID, me
 			s.ChannelMessageSend(channelID, fmt.Sprintf("error getting messages past %s: %v", curr, err))
 			break
 		}
+		ln.Log(ctx, ln.Action("fetching batch of messages"), ln.F{"num": len(msgs)})
+		if len(msgs) == 0 {
+			break
+		}
 
 		for _, msg := range msgs {
-			found, err := mr.doesDiscordMessageExist(ctx, tx, msg.ID)
-			if err != nil {
-				ln.Error(ctx, err, ln.F{"message_id": msg.ID})
-				continue
-			}
+			// found, err := mr.doesDiscordMessageExist(ctx, tx, msg.ID)
+			// if err != nil {
+			// 	ln.Error(ctx, err, ln.F{"message_id": msg.ID})
+			// 	continue
+			// }
 
-			if found {
-				ln.Log(ctx, ln.Action("stopping archival"))
-				done = true
-			}
+			// if found {
+			// 	if !done {
+			// 		ln.Log(ctx, ln.Action("stopping archival"))
+			// 	}
+			// 	done = true
+			// }
 
+			before := time.Now()
 			if err := mr.discordMessageCreate(ctx, tx, s, msg); err != nil {
 				ln.Error(ctx, err, ln.F{"message_id": msg.ID})
-				continue
+				tx.Rollback(ctx)
+				continue outer
 			}
+			dur := time.Since(before)
+			ln.Log(ctx, ln.F{"message_id": msg.ID, "created_at": msg.Timestamp, "archival_time": dur})
+			// found, err := mr.doesDiscordMessageExist(ctx, tx, msg.ID)
+			// if err != nil {
+			// 	ln.Error(ctx, err, ln.F{"message_id": msg.ID})
+			// 	continue
+			// }
 
 			curr = msg.ID
+		}
+
+		if err := tx.Commit(ctx); err != nil {
+			ln.Error(ctx, err, ln.F{
+				"channel_id": channelID,
+				"message_id": messageID,
+			})
 		}
 
 		if done {
 			break
 		}
+
 	}
 
-	if err := tx.Commit(ctx); err != nil {
-		ln.Error(ctx, err, ln.F{
-			"channel_id": channelID,
-			"message_id": messageID,
-		})
-	}
 }
 
 func (mr *MaraRevolt) discordMessageCreate(ctx context.Context, tx pgx.Tx, s *discordgo.Session, m *discordgo.Message) error {

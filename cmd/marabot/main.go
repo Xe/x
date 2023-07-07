@@ -4,8 +4,6 @@ import (
 	"bytes"
 	"context"
 	"crypto/sha512"
-	"database/sql"
-	"database/sql/driver"
 	_ "embed"
 	"flag"
 	"fmt"
@@ -24,7 +22,6 @@ import (
 	"github.com/bwmarrin/discordgo"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/tailscale/sqlite"
 	"tailscale.com/hostinfo"
 	"within.website/ln"
 	"within.website/ln/opname"
@@ -35,8 +32,6 @@ import (
 )
 
 var (
-	dbFile = flag.String("db-file", "marabot.db", "Path to the database file")
-
 	pgURL = flag.String("database-url", "", "URL for the database (postgres)")
 
 	discordToken          = flag.String("discord-token", "", "Discord bot token")
@@ -59,19 +54,6 @@ var (
 	dbSchema string
 )
 
-func openDB(fname string) (*sql.DB, error) {
-	db := sql.OpenDB(sqlite.Connector("file:"+fname, func(ctx context.Context, conn driver.ConnPrepareContext) error {
-		return sqlite.ExecScript(conn.(sqlite.SQLConn), dbSchema)
-	}, nil))
-
-	err := db.Ping()
-	if err != nil {
-		return nil, err
-	}
-
-	return db, nil
-}
-
 func main() {
 	internal.HandleStartup()
 
@@ -82,11 +64,13 @@ func main() {
 
 	ln.Log(ctx, ln.Action("starting up"))
 
-	db, err := openDB(*dbFile)
+	pgcfg, err := pgxpool.ParseConfig(*pgURL)
 	if err != nil {
-		ln.FatalErr(ctx, err, ln.Action("opening sqlite database"))
+		ln.FatalErr(ctx, err, ln.Action("parsing postgres config"))
 	}
-	defer db.Close()
+
+	pgcfg.MinConns = 5
+	pgcfg.MaxConns = 20
 
 	pg, err := pgxpool.New(ctx, *pgURL)
 	if err != nil {
@@ -114,7 +98,6 @@ func main() {
 
 	mr := &MaraRevolt{
 		cli:      client,
-		db:       db,
 		pg:       pg,
 		ircmsgs:  ircmsgs,
 		uploader: uploader,
@@ -148,7 +131,7 @@ func main() {
 	}
 	defer dg.Close()
 
-	if err := mr.importDiscordData(ctx, db, dg); err != nil {
+	if err := mr.importDiscordData(ctx, pg, dg); err != nil {
 		ln.Error(ctx, err)
 	}
 
@@ -261,6 +244,10 @@ func (mr *MaraRevolt) archiveAttachment(ctx context.Context, tx pgx.Tx, link, ki
 				return err
 			}
 		}
+	}
+
+	if att == nil {
+		return nil
 	}
 
 	att.MessageID = aws.String(messageID)

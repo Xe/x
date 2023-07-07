@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"strings"
 	"sync"
@@ -19,7 +18,6 @@ import (
 
 type MaraRevolt struct {
 	cli                  *revolt.Client
-	db                   *sql.DB
 	pg                   *pgxpool.Pool
 	ircmsgs              chan string
 	attachmentPreprocess *bundler.Bundler[[3]string]
