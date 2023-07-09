@@ -227,8 +227,8 @@ schema = 3
     version = "v0.2.0"
     hash = "sha256-fadcWxZOORv44oak3jTxm6YcITcFxdGt4bpn869HxUE="
   [mod."github.com/mattn/go-isatty"]
-    version = "v0.0.18"
-    hash = "sha256-QpIn0DSggtBn2ocyj0RlXDKLK5F5KZG1/ogzrqBCjF8="
+    version = "v0.0.19"
+    hash = "sha256-wYQqGxeqV3Elkmn26Md8mKZ/viw598R4Ych3vtt72YE="
   [mod."github.com/mattn/go-runewidth"]
     version = "v0.0.14"
     hash = "sha256-O3QdxqAcJgQ+HL1v8oBA4iKBwJ2AlDN+F464027hWMU="
@@ -346,9 +346,6 @@ schema = 3
   [mod."github.com/tailscale/netlink"]
     version = "v1.1.1-0.20211101221916-cabfb018fe85"
     hash = "sha256-bMK5qqObMcxIbPy5XhOZP8TGDaXvDAHsE0FR68VMLi8="
-  [mod."github.com/tailscale/sqlite"]
-    version = "v0.0.0-20230608185013-baf1d754dab7"
-    hash = "sha256-fX74aeGPR+P61dZKK2sImG9KRGKWnWnkDXZShlddMAM="
   [mod."github.com/tailscale/wireguard-go"]
     version = "v0.0.0-20230410165232-af172621b4dd"
     hash = "sha256-QO+A8iUtqtEvERE2IRm1VFeUnnhRiYOGTzKHf0OgckI="
@@ -478,9 +475,6 @@ schema = 3
   [mod."modernc.org/token"]
     version = "v1.0.1"
     hash = "sha256-lTSZX8nrb5hDZqOnRuFmI4VIaco3qwwWe28z24vohyo="
-  [mod."mvdan.cc/xurls/v2"]
-    version = "v2.5.0"
-    hash = "sha256-9hPXZ/t15+LG9fji1gyeWhUrYOr6eGyKYg3a1SmHJpQ="
   [mod."nhooyr.io/websocket"]
     version = "v1.8.7"
     hash = "sha256-6pQ35gFvbyMhNo0gv4bPxYDUrwDF/ok1GMA+BHfsRRM="
