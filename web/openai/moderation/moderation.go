@@ -4,7 +4,9 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"strings"
 )
 
 type Request struct {
@@ -16,6 +18,56 @@ type Response struct {
 	Model   string    `json:"model"`
 	Results []Results `json:"results"`
 }
+
+func (r Response) Flagged() bool {
+	var result bool
+
+	for _, set := range r.Results {
+		if set.Flagged {
+			result = true
+		}
+	}
+
+	return result
+}
+
+func (r Response) Reasons() string {
+	if !r.Flagged() {
+		return ""
+	}
+
+	var sb strings.Builder
+
+	fmt.Fprintln(&sb, "Your request failed for the following reasons:")
+	fmt.Fprintln(&sb)
+
+	for _, set := range r.Results {
+		if set.Categories.Hate {
+			fmt.Fprintln(&sb, "- hate")
+		}
+		if set.Categories.HateThreatening {
+			fmt.Fprintln(&sb, "- hate (threatening)")
+		}
+		if set.Categories.SelfHarm {
+			fmt.Fprintln(&sb, "- self harm")
+		}
+		if set.Categories.Sexual {
+			fmt.Fprintln(&sb, "- sexual")
+		}
+		if set.Categories.SexualMinors {
+			fmt.Fprintln(&sb, "- sexual (minors)")
+		}
+		if set.Categories.Violence {
+			fmt.Fprintln(&sb, "- violence")
+		}
+		if set.Categories.ViolenceGraphic {
+			fmt.Fprintln(&sb, "- violence (graphic)")
+		}
+	}
+
+	return sb.String()
+}
+
 type Categories struct {
 	Hate            bool `json:"hate"`
 	HateThreatening bool `json:"hate/threatening"`
