@@ -16,6 +16,7 @@ require (
 	github.com/go-shiori/go-readability v0.0.0-20230421032831-c66949dfc0ad
 	github.com/google/go-github v17.0.0+incompatible
 	github.com/google/uuid v1.3.0
+	github.com/hekmon/transmissionrpc/v2 v2.0.1
 	github.com/hullerob/go.farbfeld v0.0.0-20181222022525-3661193c725f
 	github.com/jackc/pgx/v5 v5.4.2
 	github.com/jaytaylor/html2text v0.0.0-20190408195923-01ec452cbe43
@@ -36,6 +37,7 @@ require (
 	github.com/thoj/go-ircevent v0.0.0-20210723090443-73e444401d64
 	github.com/tmc/scp v0.0.0-20170824174625-f7b48647feef
 	go.etcd.io/bbolt v1.3.7
+	go.jetpack.io/tyson v0.1.1
 	go4.org v0.0.0-20190313082347-94abd6928b1d
 	golang.org/x/crypto v0.11.0
 	golang.org/x/oauth2 v0.10.0
@@ -51,11 +53,16 @@ require (
 require (
 	github.com/andybalholm/brotli v1.0.5 // indirect
 	github.com/andybalholm/cascadia v1.3.2 // indirect
+	github.com/dop251/goja v0.0.0-20211115154819-26ebff68a7d5 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
+	github.com/evanw/esbuild v0.18.6 // indirect
 	github.com/fasthttp/router v1.4.19 // indirect
 	github.com/go-shiori/dom v0.0.0-20210627111528-4e4722cd0d65 // indirect
+	github.com/go-sourcemap/sourcemap v2.1.3+incompatible // indirect
 	github.com/goccy/go-json v0.10.2 // indirect
 	github.com/gogs/chardet v0.0.0-20211120154057-b7413eaefb8f // indirect
+	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
+	github.com/hekmon/cunits/v2 v2.1.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a // indirect
 	github.com/jackc/puddle/v2 v2.2.0 // indirect
@@ -157,7 +164,7 @@ require (
 	github.com/x448/float16 v0.8.4 // indirect
 	go4.org/mem v0.0.0-20220726221520-4f986261bf13 // indirect
 	go4.org/netipx v0.0.0-20230303233057-f1b76eb4bb35 // indirect
-	golang.org/x/exp v0.0.0-20230425010034-47ecfdc1ba53
+	golang.org/x/exp v0.0.0-20230711153332-06a737ee72cb
 	golang.org/x/image v0.7.0 // indirect
 	golang.org/x/mod v0.12.0 // indirect
 	golang.org/x/net v0.12.0 // indirect
