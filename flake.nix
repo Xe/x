@@ -178,6 +178,7 @@
           };
 
         wasigo' = pkgs.go_1_20.overrideAttrs (old: {
+          GOROOT_BOOTSTRAP = "${pkgs.go_1_20}/share/go";
           patches = [ ];
           src = pkgs.runCommand "gowasi-version-hack" { } ''
             mkdir -p $out
