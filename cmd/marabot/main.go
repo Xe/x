@@ -178,12 +178,12 @@ func (mr *MaraRevolt) PreprocessLinks(data [][3]string) {
 }
 
 func (mr *MaraRevolt) preprocessLinks(ctx context.Context, data [][3]string) {
-	tx, err := mr.db.Begin()
+	tx, err := mr.pg.Begin(ctx)
 	if err != nil {
 		ln.Error(ctx, err)
 		return
 	}
-	defer tx.Rollback()
+	defer tx.Rollback(ctx)
 
 	for _, linkkind := range data {
 		kind := linkkind[1]
@@ -191,7 +191,7 @@ func (mr *MaraRevolt) preprocessLinks(ctx context.Context, data [][3]string) {
 		msgID := linkkind[2]
 
 		var count int
-		if err := tx.QueryRowContext(ctx, "SELECT COUNT(*) FROM s3_uploads WHERE url = ?", link).Scan(&count); err != nil {
+		if err := tx.QueryRow(ctx, "SELECT COUNT(*) FROM s3_uploads WHERE url = ?", link).Scan(&count); err != nil {
 			ln.Error(ctx, err)
 			continue
 		}
@@ -205,12 +205,12 @@ func (mr *MaraRevolt) preprocessLinks(ctx context.Context, data [][3]string) {
 
 			if werr, ok := err.(*web.Error); ok {
 				if werr.GotStatus == http.StatusNotFound {
-					tx.ExecContext(ctx, "DELETE FROM discord_users WHERE avatar_url = ?", link)
-					tx.ExecContext(ctx, "DELETE FROM discord_attachments WHERE url = ?", link)
-					tx.ExecContext(ctx, "DELETE FROM discord_emoji WHERE url = ?", link)
-					tx.ExecContext(ctx, "DELETE FROM revolt_attachments WHERE url = ?", link)
-					tx.ExecContext(ctx, "DELETE FROM revolt_users WHERE avatar_url = ?", link)
-					tx.ExecContext(ctx, "DELETE FROM revolt_emoji WHERE url = ?", link)
+					tx.Exec(ctx, "DELETE FROM discord_users WHERE avatar_url = ?", link)
+					tx.Exec(ctx, "DELETE FROM discord_attachments WHERE url = ?", link)
+					tx.Exec(ctx, "DELETE FROM discord_emoji WHERE url = ?", link)
+					tx.Exec(ctx, "DELETE FROM revolt_attachments WHERE url = ?", link)
+					tx.Exec(ctx, "DELETE FROM revolt_users WHERE avatar_url = ?", link)
+					tx.Exec(ctx, "DELETE FROM revolt_emoji WHERE url = ?", link)
 				}
 			}
 
@@ -221,7 +221,7 @@ func (mr *MaraRevolt) preprocessLinks(ctx context.Context, data [][3]string) {
 
 		mr.attachmentUpload.Add(att, len(att.Data))
 	}
-	if err := tx.Commit(); err != nil {
+	if err := tx.Commit(ctx); err != nil {
 		ln.Error(ctx, err)
 	}
 }
@@ -328,12 +328,12 @@ func (mr *MaraRevolt) S3Upload(att []*Attachment) {
 }
 
 func (mr *MaraRevolt) s3Upload(ctx context.Context, att []*Attachment) {
-	tx, err := mr.db.Begin()
+	tx, err := mr.pg.Begin(ctx)
 	if err != nil {
 		ln.Error(ctx, err)
 		return
 	}
-	defer tx.Rollback()
+	defer tx.Rollback(ctx)
 
 	for _, att := range att {
 		key := filepath.Join(att.Kind, att.ID)
@@ -341,7 +341,7 @@ func (mr *MaraRevolt) s3Upload(ctx context.Context, att []*Attachment) {
 		f := ln.F{"kind": att.Kind, "id": att.ID, "url": att.URL, "content_type": att.ContentType}
 
 		var count int
-		if err := tx.QueryRowContext(ctx, "SELECT COUNT(*) FROM s3_uploads WHERE id = ?", att.ID).Scan(&count); err != nil {
+		if err := tx.QueryRow(ctx, "SELECT COUNT(*) FROM s3_uploads WHERE id = ?", att.ID).Scan(&count); err != nil {
 			ln.Error(ctx, err, f)
 			continue
 		}
@@ -366,12 +366,12 @@ func (mr *MaraRevolt) s3Upload(ctx context.Context, att []*Attachment) {
 			continue
 		}
 
-		if _, err := tx.ExecContext(ctx, "INSERT INTO s3_uploads(id, url, kind, content_type, created_at, message_id) VALUES (?, ?, ?, ?, ?, ?)", att.ID, att.URL, att.Kind, att.ContentType, att.CreatedAt, att.MessageID); err != nil {
+		if _, err := tx.Exec(ctx, "INSERT INTO s3_uploads(id, url, kind, content_type, created_at, message_id) VALUES (?, ?, ?, ?, ?, ?)", att.ID, att.URL, att.Kind, att.ContentType, att.CreatedAt, att.MessageID); err != nil {
 			ln.Error(ctx, err, ln.Action("saving upload information to DB"), f)
 		}
 	}
 
-	if err := tx.Commit(); err != nil {
+	if err := tx.Commit(ctx); err != nil {
 		ln.Error(ctx, err)
 	}
 }

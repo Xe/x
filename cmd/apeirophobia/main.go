@@ -24,7 +24,6 @@ var (
 	dbLoc       = flag.String("db-loc", "./data.db", "")
 	openAIModel = flag.String("openai-model", "gpt-3.5-turbo", "OpenAI model to use")
 	openAIToken = flag.String("openai-token", "", "OpenAI API token")
-	slogLevel   = flag.String("slog-level", "INFO", "log level")
 	tsHostname  = flag.String("ts-hostname", "apeirophobia", "hostname to use on the tailnet")
 	tsDir       = flag.String("ts-dir", "", "directory to store Tailscale state")
 
@@ -41,15 +40,6 @@ var (
 func main() {
 	internal.HandleStartup()
 	hostinfo.SetApp("within.website/x/cmd/apeirophobia")
-
-	var programLevel slog.Level
-	if err := (&programLevel).UnmarshalText([]byte(*slogLevel)); err != nil {
-		fmt.Fprintf(os.Stderr, "invalid log level %s: %v, using info\n", *slogLevel, err)
-		programLevel = slog.LevelInfo
-	}
-
-	h := slog.NewJSONHandler(os.Stderr, &slog.HandlerOptions{Level: programLevel})
-	slog.SetDefault(slog.New(h))
 
 	slog.Debug("starting up", "hostname", *tsHostname)
 

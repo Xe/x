@@ -129,18 +129,6 @@ func main() {
 	internal.HandleStartup()
 	hostinfo.SetApp("within.website/x/cmd/sanguisuga")
 
-	var programLevel slog.Level
-	if err := (&programLevel).UnmarshalText([]byte(*slogLevel)); err != nil {
-		fmt.Fprintf(os.Stderr, "invalid log level %s: %v, using info\n", *slogLevel, err)
-		programLevel = slog.LevelInfo
-	}
-
-	h := slog.NewJSONHandler(os.Stderr, &slog.HandlerOptions{
-		AddSource: true,
-		Level:     programLevel,
-	})
-	slog.SetDefault(slog.New(h))
-
 	var c Config
 	if err := tyson.Unmarshal(*tysonConfig, &c); err != nil {
 		slog.Error("can't unmarshal config", "err", err)
@@ -194,7 +182,7 @@ func main() {
 	ircCli.AddCallback("001", func(ev *irc.Event) {
 		ircCli.Join(c.IRC.Channel)
 	})
-	ircCli.Log = slog.NewLogLogger(h.WithAttrs([]slog.Attr{slog.String("from", "ircevent")}), slog.LevelInfo)
+	ircCli.Log = slog.NewLogLogger(slog.Default().Handler().WithAttrs([]slog.Attr{slog.String("from", "ircevent")}), slog.LevelInfo)
 	ircCli.Timeout = 5 * time.Second
 
 	if err := ircCli.Connect(c.IRC.Server); err != nil {

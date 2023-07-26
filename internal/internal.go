@@ -14,6 +14,7 @@ import (
 	"within.website/x/internal/confyg/flagconfyg"
 	"within.website/x/internal/flagenv"
 	"within.website/x/internal/manpage"
+	"within.website/x/internal/slog"
 
 	// Debug routes
 	_ "expvar"
@@ -63,6 +64,7 @@ func HandleStartup() {
 		flagconfyg.CmdParse(ctx, *config)
 	}
 	flag.Parse()
+	slog.Init()
 
 	if *licenseShow {
 		fmt.Printf("Licenses for %v\n", os.Args)
