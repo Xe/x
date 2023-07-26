@@ -314,6 +314,7 @@
             wabt
             bloaty
             rust
+            flyctl
 
             tinyemu
             zig
