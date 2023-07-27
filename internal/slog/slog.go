@@ -5,15 +5,12 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"sync"
 
 	"golang.org/x/exp/slog"
 )
 
 var (
 	slogLevel = flag.String("slog-level", "INFO", "log level")
-
-	lock sync.Mutex
 
 	// The current slog handler.
 	Handler slog.Handler
@@ -32,7 +29,5 @@ func Init() {
 	})
 	slog.SetDefault(slog.New(h))
 
-	lock.Lock()
-	defer lock.Unlock()
 	Handler = h
 }
