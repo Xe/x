@@ -34,13 +34,12 @@ in {
   config = mkIf cfg.enable {
     systemd.services.within-website = {
       wantedBy = [ "multi-user.target" ];
-      after = [ "within-homedir.service" ];
       serviceConfig = {
         DynamicUser = "true";
         Restart = "always";
         RestartSec = "30s";
         ExecStart =
-          "${cfg.package}/bin/within.website --port=${toString cfg.port}";
+          "${cfg.package}/bin/within.website --port=${toString cfg.port} --tyson-config ${../cmd/within.website/config.ts}";
       };
     };
 
