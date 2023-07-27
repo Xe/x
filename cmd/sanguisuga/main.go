@@ -23,7 +23,6 @@ import (
 var (
 	dbLoc       = flag.String("db-loc", "./data.json", "path to data file")
 	tysonConfig = flag.String("tyson-config", "./config.ts", "path to configuration secrets (TySON)")
-	slogLevel   = flag.String("slog-level", "INFO", "log level")
 
 	annRegex = regexp.MustCompile(`^New Torrent Announcement: <([^>]*)>\s+Name:'(.*)' uploaded by '.*' ?(freeleech)?\s+-\s+https://\w+.\w+.\w+./\w+./([0-9]+)$`)
 	showName = regexp.MustCompile(`^(.*)\s+(S[0-9]+E[0-9]+)\s+([0-9]+p)\s+(\w+)\s+(.*)$`)
