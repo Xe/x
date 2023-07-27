@@ -17,11 +17,9 @@ type Show struct {
 }
 
 type Transmission struct {
-	Host     string `json:"host"`
+	URL      string `json:"url"`
 	User     string `json:"user"`
 	Password string `json:"password"`
-	HTTPS    bool   `json:"https"`
-	RPCURI   string `json:"rpcURI"`
 }
 
 type Config struct {

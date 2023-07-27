@@ -1,20 +1,22 @@
 package main
 
 import (
-	"context"
+	"bytes"
+	"encoding/base64"
 	"flag"
 	"fmt"
+	"io"
+	"net/http"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
 	"time"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/hekmon/transmissionrpc/v2"
 	irc "github.com/thoj/go-ircevent"
 	"go.jetpack.io/tyson"
 	"golang.org/x/exp/slog"
+	"honnef.co/go/transmission"
 	"tailscale.com/hostinfo"
 	"tailscale.com/jsondb"
 	"within.website/x/internal"
@@ -97,7 +99,7 @@ func ParseSeasonEpisode(input string) (*SeasonEpisode, error) {
 
 func ConvertURL(torrentID, rssKey, name string) string {
 	name = strings.ReplaceAll(name, " ", ".") + ".torrent"
-	return fmt.Sprintf("https://torrentleech.org/rss/download/%s/%s/%s", torrentID, rssKey, name)
+	return fmt.Sprintf("https://www.torrentleech.org/rss/download/%s/%s/%s", torrentID, rssKey, name)
 }
 
 type TorrentAnnouncement struct {
@@ -149,28 +151,16 @@ func main() {
 		os.Exit(1)
 	}
 
-	tm, err := transmissionrpc.New(c.Transmission.Host, c.Transmission.User, c.Transmission.Password, &transmissionrpc.AdvancedConfig{
-		Port:   443,
-		HTTPS:  c.Transmission.HTTPS,
-		RPCURI: c.Transmission.RPCURI,
-	})
-	if err != nil {
-		slog.Error("can't connect to transmission", "err", err)
-		os.Exit(1)
+	cl := &transmission.Client{
+		Client:   http.DefaultClient,
+		Endpoint: c.Transmission.URL,
+		Username: c.Transmission.User,
+		Password: c.Transmission.Password,
 	}
-	_ = tm
-
-	portOpen, err := tm.PortTest(context.Background())
-	if err != nil {
-		slog.Error("can't test if port is open", "err", err)
-		os.Exit(1)
-	}
-
-	slog.Info("port status", "open", portOpen)
 
 	s := &Sanguisuga{
 		Config: c,
-		tc:     tm,
+		cl:     cl,
 		db:     db,
 	}
 
@@ -194,14 +184,8 @@ func main() {
 
 type Sanguisuga struct {
 	Config Config
-	tc     *transmissionrpc.Client
+	cl     *transmission.Client
 	db     *jsondb.DB[State]
-}
-
-func (s *Sanguisuga) DelayedStartTorrent(tid int64) {
-	s.tc.TorrentStopIDs(context.Background(), []int64{tid})
-	time.Sleep(5 * time.Second) // delay a bit
-	s.tc.TorrentStartNowIDs(context.Background(), []int64{tid})
 }
 
 type State struct {
@@ -262,19 +246,39 @@ func (s *Sanguisuga) HandleIRCMessage(ev *irc.Event) {
 			slog.Debug("found url", "url", torrentURL)
 			downloadDir := filepath.Join(show.DiskPath, sm.SeasonEpisode.GetFormattedSeason())
 
-			t, err := s.tc.TorrentAdd(context.Background(), transmissionrpc.TorrentAddPayload{
-				DownloadDir: &downloadDir,
-				Filename:    aws.String(torrentURL),
-				Paused:      aws.Bool(false),
+			var buf bytes.Buffer
+			resp, err := http.Get(torrentURL)
+			if err != nil {
+				slog.Error("can't download torrent", "url", torrentURL, "err", err, "torrentID", ta.TorrentID)
+				continue
+			}
+
+			if resp.StatusCode != http.StatusOK {
+				slog.Error("got wrong status code", "want", http.StatusOK, "got", resp.StatusCode, "url", torrentURL, "torrentID", ta.TorrentID)
+				continue
+			}
+
+			defer resp.Body.Close()
+			if n, err := io.Copy(&buf, resp.Body); err != nil {
+				slog.Error("can't fetch torrent body", "url", torrentURL, "err", err, "torrentID", ta.TorrentID)
+				continue
+			} else {
+				slog.Info("downloaded bytes", "n", n, "url", torrentURL)
+			}
+
+			metaInfo := base64.StdEncoding.EncodeToString(buf.Bytes())
+
+			t, dupe, err := s.cl.AddTorrent(&transmission.NewTorrent{
+				DownloadDir: downloadDir,
+				Metainfo:    metaInfo,
+				Paused:      false,
 			})
 			if err != nil {
-				slog.Error("error adding torrent", "err", err, "torrentID", ta.TorrentID)
+				slog.Error("error adding torrent", "url", torrentURL, "err", err, "torrentID", ta.TorrentID)
 				return
 			}
 
-			go s.DelayedStartTorrent(*t.ID)
-
-			slog.Info("added torrent", "title", sm.Name, "id", id, "path", downloadDir)
+			slog.Info("added torrent", "title", sm.Name, "id", id, "path", downloadDir, "infohash", t.Hash, "dupe", dupe)
 
 			s.db.Data.Seen[sm.StateKey()] = *ta
 			if err := s.db.Save(); err != nil {

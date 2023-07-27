@@ -463,6 +463,9 @@ schema = 3
   [mod."gvisor.dev/gvisor"]
     version = "v0.0.0-20230504175454-7b0a1988a28f"
     hash = "sha256-U7HMPPcgBUpk/zhLTSfbchW2Xzb0PQX2SFRmaCqdUUw="
+  [mod."honnef.co/go/transmission"]
+    version = "v0.0.0-20200712215954-58262f0ca9c9"
+    hash = "sha256-fwUslzXTW3zCaJbND6UaBJyhxVmb7WgVhOZKxqQQBpM="
   [mod."inet.af/peercred"]
     version = "v0.0.0-20210906144145-0893ea02156a"
     hash = "sha256-f0ws9PdTpRpX64asTol0O82IWYM9r8NhZgOCi2dPToo="
