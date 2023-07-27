@@ -5,7 +5,7 @@ go 1.19
 require (
 	cirello.io/goherokuname v0.0.0-20190914093443-b436bae8c2c5
 	github.com/McKael/madon/v2 v2.4.0
-	github.com/aws/aws-sdk-go v1.44.287
+	github.com/aws/aws-sdk-go v1.44.309
 	github.com/bwmarrin/discordgo v0.27.1
 	github.com/chai2010/webp v1.1.1
 	github.com/disintegration/imaging v1.6.1
@@ -16,7 +16,6 @@ require (
 	github.com/go-shiori/go-readability v0.0.0-20230421032831-c66949dfc0ad
 	github.com/google/go-github v17.0.0+incompatible
 	github.com/google/uuid v1.3.0
-	github.com/hekmon/transmissionrpc/v2 v2.0.1
 	github.com/hullerob/go.farbfeld v0.0.0-20181222022525-3661193c725f
 	github.com/jackc/pgx/v5 v5.4.2
 	github.com/jaytaylor/html2text v0.0.0-20190408195923-01ec452cbe43
@@ -41,6 +40,7 @@ require (
 	golang.org/x/crypto v0.11.0
 	golang.org/x/oauth2 v0.10.0
 	golang.org/x/sync v0.3.0
+	honnef.co/go/transmission v0.0.0-20200712215954-58262f0ca9c9
 	modernc.org/sqlite v1.24.0
 	nhooyr.io/websocket v1.8.7
 	tailscale.com v1.46.1
@@ -72,7 +72,6 @@ require (
 	github.com/savsgio/gotils v0.0.0-20230208104028-c358bd845dee // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasthttp v1.48.0 // indirect
-	honnef.co/go/transmission v0.0.0-20200712215954-58262f0ca9c9 // indirect
 	lukechampine.com/uint128 v1.2.0 // indirect
 	modernc.org/cc/v3 v3.40.0 // indirect
 	modernc.org/ccgo/v3 v3.16.13 // indirect
