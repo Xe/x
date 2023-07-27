@@ -22,7 +22,6 @@ require (
 	github.com/jaytaylor/html2text v0.0.0-20190408195923-01ec452cbe43
 	github.com/joho/godotenv v1.5.1
 	github.com/kr/pretty v0.3.1
-	github.com/mmikulicic/stringlist v1.0.0
 	github.com/mndrix/golog v0.0.0-20170330170653-a28e2a269775
 	github.com/mymmrac/telego v0.25.1
 	github.com/otiai10/copy v1.12.0
@@ -44,7 +43,7 @@ require (
 	golang.org/x/sync v0.3.0
 	modernc.org/sqlite v1.24.0
 	nhooyr.io/websocket v1.8.7
-	tailscale.com v1.44.0
+	tailscale.com v1.46.1
 	tulpa.dev/cadey/jvozba v0.0.0-20200326200349-f0ebe310be06
 	within.website/johaus v1.1.0
 	within.website/ln v0.9.1
@@ -61,12 +60,14 @@ require (
 	github.com/go-sourcemap/sourcemap v2.1.3+incompatible // indirect
 	github.com/goccy/go-json v0.10.2 // indirect
 	github.com/gogs/chardet v0.0.0-20211120154057-b7413eaefb8f // indirect
+	github.com/google/nftables v0.1.1-0.20230115205135-9aa6fdf5a28c // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
 	github.com/hekmon/cunits/v2 v2.1.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a // indirect
 	github.com/jackc/puddle/v2 v2.2.0 // indirect
 	github.com/mattn/go-isatty v0.0.19 // indirect
+	github.com/miekg/dns v1.1.55 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	github.com/savsgio/gotils v0.0.0-20230208104028-c358bd845dee // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
@@ -154,10 +155,10 @@ require (
 	github.com/sendgrid/rest v2.6.9+incompatible // indirect
 	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect
 	github.com/tailscale/certstore v0.1.1-0.20220316223106-78d6e1c49d8d // indirect
-	github.com/tailscale/golang-x-crypto v0.0.0-20221115211329-17a3db2c30d2 // indirect
+	github.com/tailscale/golang-x-crypto v0.0.0-20230713185742-f0b76a10a08e // indirect
 	github.com/tailscale/goupnp v1.0.1-0.20210804011211-c64d0f06ea05 // indirect
 	github.com/tailscale/netlink v1.1.1-0.20211101221916-cabfb018fe85 // indirect
-	github.com/tailscale/wireguard-go v0.0.0-20230410165232-af172621b4dd // indirect
+	github.com/tailscale/wireguard-go v0.0.0-20230710185534-bb2c8f22eccf // indirect
 	github.com/tcnksm/go-httpstat v0.2.0 // indirect
 	github.com/u-root/uio v0.0.0-20230305220412-3e8cd9d6bf63 // indirect
 	github.com/vishvananda/netlink v1.2.1-beta.2 // indirect
