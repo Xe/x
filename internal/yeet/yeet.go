@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	"within.website/ln"
+	"golang.org/x/exp/slog"
 )
 
 // current working directory and date:time tag of app boot (useful for tagging slugs)
@@ -42,11 +42,7 @@ func ShouldWork(ctx context.Context, env []string, dir string, cmdName string, a
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
-	ln.Log(ctx, ln.Info("starting process"), ln.F{
-		"pwd":     dir,
-		"cmdName": cmdName,
-		"args":    args,
-	})
+	slog.Info("starting process", "pwd", dir, "cmd", loc, "args", args)
 
 	err = cmd.Run()
 	if err != nil {
