@@ -28,6 +28,7 @@
       inputs.utils.follows = "utils";
     };
 
+    ## don't follow nixpkgs because that causes a very long font build process.
     iaso-fonts.url = "github:Xe/iosevka";
 
     ## other things

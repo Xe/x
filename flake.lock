@@ -79,11 +79,11 @@
     },
     "nixpkgs_2": {
       "locked": {
-        "lastModified": 1690179384,
-        "narHash": "sha256-+arbgqFTAtoeKtepW9wCnA0njCOyoiDFyl0Q0SBSOtE=",
+        "lastModified": 1690272529,
+        "narHash": "sha256-MakzcKXEdv/I4qJUtq/k/eG+rVmyOZLnYNC2w1mB59Y=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "b12803b6d90e2e583429bb79b859ca53c348b39a",
+        "rev": "ef99fa5c5ed624460217c31ac4271cfb5cb2502c",
         "type": "github"
       },
       "original": {
@@ -114,11 +114,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1690338181,
-        "narHash": "sha256-Sz2oQ9aNS3MVncnCMndr0302G26UrFUfPynoH2iLjsg=",
+        "lastModified": 1690424156,
+        "narHash": "sha256-Bpml+L280tHTQpwpC5/BJbU4HSvEzMvW8IZ4gAXimhE=",
         "owner": "oxalica",
         "repo": "rust-overlay",
-        "rev": "b7f0b7b58b3c6f14a1377ec31a3d78b23ab843ec",
+        "rev": "f335a0213504c7e6481c359dc1009be9cf34432c",
         "type": "github"
       },
       "original": {
@@ -178,11 +178,11 @@
     "wasigo": {
       "flake": false,
       "locked": {
-        "lastModified": 1690384404,
-        "narHash": "sha256-UHOz4r8xvTGKIDmh0ShcxgEwMaHCNg4PnflKyqUfC9k=",
+        "lastModified": 1690421841,
+        "narHash": "sha256-areZ+V2mktz0KfHI2DqqExUs5SSM8PcF18HC9hZ69ko=",
         "owner": "golang",
         "repo": "go",
-        "rev": "f0894a00f4b756d4b9b4078af2e686b359493583",
+        "rev": "8a1ff5182780af72d08c3e6b91694425a1498014",
         "type": "github"
       },
       "original": {
