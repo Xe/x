@@ -1,0 +1,23 @@
+{{template "header" .}}
+
+This vanity domain houses a lot of <a href="https://xeiaso.net">Xe Iaso's</a> custom Go packages. Here is a list of all of the packages currently tracked:
+
+<ul>
+{{range .Repos}}
+    <li><a href="#{{.Repo}}">{{.Repo}}</a></li>
+{{end}}
+</ul>
+
+<img src="https://pride-badges.pony.workers.dev/static/v1?label=enbyware&labelColor=%23555&stripeWidth=8&stripeColors=FCF434%2CFFFFFF%2C9C59D1%2C2C2C2C" />
+
+{{range .Repos}}
+<h2>within.website/{{.Repo}}</h2>
+
+<p><a href="https://pkg.go.dev/within.website/{{.Repo}}"><img src="https://pkg.go.dev/badge/within.website/{{.Repo}}.svg" alt="Go Reference"></a> <a href="https://{{.Domain}}/{{.User}}/{{.Repo}}"><img alt="Source code link" src="https://img.shields.io/badge/source-link-green"></a></p>
+
+<p>{{.Description}}</p>
+
+<code><pre>go get within.website/{{.Repo}}</pre></code>
+{{end}}
+
+{{template "footer" .}}

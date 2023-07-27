@@ -2,147 +2,103 @@
 package main
 
 import (
-	"context"
 	"embed"
 	"flag"
+	"html/template"
 	"net/http"
+	"os"
 
-	"github.com/mmikulicic/stringlist"
-	"within.website/ln"
-	"within.website/ln/ex"
-	"within.website/ln/opname"
+	"go.jetpack.io/tyson"
+	"golang.org/x/exp/slog"
 	"within.website/x/internal"
 	"within.website/x/web/vanity"
 )
 
-//go:generate go-bindata -pkg main static
-
 var (
-	domain         = flag.String("domain", "within.website", "domain this is run on")
-	githubUsername = flag.String("github-user", "Xe", "GitHub username for GitHub repos")
-	gogsDomain     = flag.String("gogs-url", "tulpa.dev", "Gogs domain to use")
-	gogsUsername   = flag.String("gogs-username", "cadey", "Gogs username for above Gogs instance")
-	port           = flag.String("port", "2134", "HTTP port to listen on")
-	goProxyServer  = flag.String("go-proxy-server", "https://cache.greedo.xeserv.us", "go proxy server to point to for go module clients")
+	domain      = flag.String("domain", "within.website", "domain this is run on")
+	port        = flag.String("port", "2134", "HTTP port to listen on")
+	tysonConfig = flag.String("tyson-config", "./config.ts", "TySON config file")
 
-	githubRepos = stringlist.Flag("github-repo", "list of GitHub repositories to use")
-	gogsRepos   = stringlist.Flag("gogs-repo", "list of Gogs repositories to use")
+	//go:embed tmpl/*
+	templateFiles embed.FS
 )
 
-var (
-	//go:embed static
-	staticFS embed.FS
-)
-
-var githubReposDefault = []string{
-	"ln",
-	"x",
-	"eclier",
-	"gluanetrc",
-	"xultybau",
-	"johaus",
-	"confyg",
-	"derpigo",
-	"olin",
+type Repo struct {
+	Kind        string `json:"kind"`
+	Domain      string `json:"domain"`
+	User        string `json:"string"`
+	Repo        string `json:"repo"`
+	Description string `json:"description"`
 }
 
-var gogsReposDefault = []string{
-	"gorqlite",
-	"gopher",
-	"mi",
+func (r Repo) LogValue() slog.Value {
+	return slog.GroupValue(
+		slog.String("kind", r.Kind),
+		slog.String("domain", r.Domain),
+		slog.String("user", r.User),
+		slog.String("repo", r.Repo),
+	)
+}
+
+func (r Repo) RegisterHandlers(lg *slog.Logger) {
+	switch r.Kind {
+	case "gitea":
+		http.Handle("/"+r.Repo, vanity.GogsHandler(*domain+"/"+r.Repo, r.Domain, r.User, r.Repo, "https"))
+		http.Handle("/"+r.Repo+"/", vanity.GogsHandler(*domain+"/"+r.Repo, r.Domain, r.User, r.Repo, "https"))
+	case "github":
+		http.Handle("/"+r.Repo, vanity.GitHubHandler(*domain+"/"+r.Repo, r.User, r.Repo, "https"))
+		http.Handle("/"+r.Repo+"/", vanity.GitHubHandler(*domain+"/"+r.Repo, r.User, r.Repo, "https"))
+	}
+	lg.Debug("registered repo handler", "repo", r)
 }
 
 func main() {
 	internal.HandleStartup()
-	ctx := opname.With(context.Background(), "main")
-	ctx = ln.WithF(ctx, ln.F{
-		"domain":       *domain,
-		"proxy_server": *goProxyServer,
-	})
 
-	if len(*githubRepos) == 0 {
-		*githubRepos = githubReposDefault
+	lg := slog.Default().With("domain", *domain, "configPath", *tysonConfig)
+
+	tmpls := template.Must(template.ParseFS(templateFiles, "tmpl/*.tmpl"))
+
+	var repos []Repo
+	if err := tyson.Unmarshal(*tysonConfig, &repos); err != nil {
+		lg.Error("can't unmarshal config", "err", err)
+		os.Exit(1)
 	}
 
-	if len(*gogsRepos) == 0 {
-		*gogsRepos = gogsReposDefault
+	for _, repo := range repos {
+		repo.RegisterHandlers(lg)
 	}
-
-	for _, repo := range *githubRepos {
-		http.Handle("/"+repo, vanity.GitHubHandler(*domain+"/"+repo, *githubUsername, repo, "https"))
-		http.Handle("/"+repo+"/", vanity.GitHubHandler(*domain+"/"+repo, *githubUsername, repo, "https"))
-
-		ln.Log(ctx, ln.F{"github_repo": repo, "github_user": *githubUsername}, ln.Info("adding github repo"))
-	}
-
-	for _, repo := range *gogsRepos {
-		http.Handle("/"+repo, vanity.GogsHandler(*domain+"/"+repo, *gogsDomain, *gogsUsername, repo, "https"))
-		http.Handle("/"+repo+"/", vanity.GogsHandler(*domain+"/"+repo, *gogsDomain, *gogsUsername, repo, "https"))
-
-		ln.Log(ctx, ln.F{"gogs_domain": *gogsDomain, "gogs_username": *gogsUsername, "gogs_repo": repo}, ln.Info("adding gogs repo"))
-	}
-
-	http.Handle("/static/", http.FileServer(http.FS(staticFS)))
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Add("Content-Type", "text/html")
 		if r.URL.Path != "/" {
-			http.NotFound(w, r)
+			w.WriteHeader(http.StatusNotFound)
+			tmpls.ExecuteTemplate(w, "404.tmpl", struct {
+				Title string
+			}{
+				Title: "Not found: " + r.URL.Path,
+			})
+
 			return
 		}
-
-		w.Header().Add("Content-Type", "text/html")
-		w.Write([]byte(indexTemplate))
+		tmpls.ExecuteTemplate(w, "index.tmpl", struct {
+			Title string
+			Repos []Repo
+		}{
+			Title: "within.website Go packages",
+			Repos: repos,
+		})
 	})
 
 	http.HandleFunc("/.x.botinfo", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Content-Type", "text/html")
-		w.Write([]byte(botInfoPage))
+		tmpls.ExecuteTemplate(w, "botinfo.tmpl", struct {
+			Title string
+		}{
+			Title: "x repo bots",
+		})
 	})
 
-	ln.Log(ctx, ln.F{"port": *port}, ln.Info("Listening on HTTP"))
-	http.ListenAndServe(":"+*port, ex.HTTPLog(http.DefaultServeMux))
-
+	lg.Info("listening", "port", *port)
+	http.ListenAndServe(":"+*port, http.DefaultServeMux)
 }
-
-const indexTemplate = `<!DOCTYPE html>
-<html>
-	<head>
-		<title>within.website Go Packages</title>
-		<link rel="stylesheet" href="/static/gruvbox.css">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	</head>
-	<body id="top">
-		<main>
-			<h1><code>within.website</code> Go Packages</h1>
-
-			<ul>
-				<li><a href="https://within.website/confyg">confyg</a> - A generic configuration file parser based on the go modfile parser</li>
-				<li><a href="https://within.website/derpigo">derpigo</a> - A simple wrapper to the <a href="https://derpibooru.org">Derpibooru</a> API</li>
-				<li><a href="https://within.website/eclier">eclier</a> - A go+lua command line application framework</li>
-				<li><a href="https://within.website/gopher">gopher</a> - A simple Gopher client/server framework based on net/http</li>
-				<li><a href="https://within.website/gluanetrc">gluanetrc</a> - A GopherLua binding for <a href="https://github.com/dickeyxxx/netrc">netrc</a> file management</li>
-				<li><a href="https://within.website/gorqlite">gorqlite</a> - A driver for <a href="https://github.com/rqlite/rqlite">rqlite</a></li>
-				<li><a href="https://within.website/johaus">johaus</a> - <a href="http://lojban.org">Lojban</a> parsing</li>
-				<li><a href="https://within.website/ln">ln</a> - Key->value based logging made context-aware and simple</li>
-				<li><a href="https://within.website/olin">olin</a> - WebAssembly on the server</li>
-				<li><a href="https://within.website/x">x</a> - Experiments, toys and tinkering (many subpackages)</li>
-			</ul>
-
-			<hr />
-
-			<footer class="is-text-center">
-				<p>Need help with these packages? Inquire <a href="https://github.com/Xe">Within</a>.</p>
-			</footer>
-		</main>
-	</body>
-</html>`
-
-const botInfoPage = `<link rel="stylesheet" href="/static/gruvbox.css">
-<title>x repo bots</title>
-<main>
-<h1>x repo bots</h1>
-
-<p>Hello, if you are reading this, you have found this URL in your access logs.
-
-If one of these programs is doing something you don't want them to do, please <a href="https://christine.website/contact">contact me</a> or open an issue <a href="https://github.com/Xe/x">here</a>.</p>
-</main>`
