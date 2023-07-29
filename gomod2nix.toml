@@ -26,8 +26,8 @@ schema = 3
     version = "v1.3.2"
     hash = "sha256-Nc9SkqJO/ecincVcUBFITy24TMmMGj5o0Q8EgdNhrEk="
   [mod."github.com/aws/aws-sdk-go"]
-    version = "v1.44.309"
-    hash = "sha256-SB2MhwtRr5L3KVs3okuf2jdpON7LyrV/MlpkUN/HR7M="
+    version = "v1.44.311"
+    hash = "sha256-jyTYBoi+y4Hih+mel9xpm8n7biqFqAKnKXuaVIgPo9A="
   [mod."github.com/aws/aws-sdk-go-v2"]
     version = "v1.18.0"
     hash = "sha256-w5mGt4Z2ZelTCgt51QEoPc5E8eqiN7B8RBFtNDTIxlw="
@@ -181,18 +181,12 @@ schema = 3
   [mod."github.com/hashicorp/errwrap"]
     version = "v1.1.0"
     hash = "sha256-6lwuMQOfBq+McrViN3maJTIeh4f8jbEqvLy2c9FvvFw="
-  [mod."github.com/hashicorp/go-cleanhttp"]
-    version = "v0.5.2"
-    hash = "sha256-N9GOKYo7tK6XQUFhvhImtL7PZW/mr4C4Manx/yPVvcQ="
   [mod."github.com/hashicorp/go-multierror"]
     version = "v1.1.1"
     hash = "sha256-ANzPEUJIZIlToxR89Mn7Db73d9LGI51ssy7eNnUgmlA="
   [mod."github.com/hdevalence/ed25519consensus"]
     version = "v0.1.0"
     hash = "sha256-MkqFWnyXt653RaJQUMWWxcW6NCskIxou8VEfj+8vd3Y="
-  [mod."github.com/hekmon/cunits/v2"]
-    version = "v2.1.0"
-    hash = "sha256-NqaZD9wPP0z2x/An3c+o2GDAXuwRvfwMmOIe7TOb8xY="
   [mod."github.com/hullerob/go.farbfeld"]
     version = "v0.0.0-20181222022525-3661193c725f"
     hash = "sha256-vUAM6JDuNV+W8bhOcY8lqZVevdQ7nIl7lwwntRBo/Sw="
