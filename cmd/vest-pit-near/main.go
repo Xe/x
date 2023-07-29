@@ -14,11 +14,9 @@ import (
 	"path/filepath"
 	"time"
 
+	"golang.org/x/exp/slog"
 	"tailscale.com/tsnet"
 	"tailscale.com/tsweb"
-	"within.website/ln"
-	"within.website/ln/ex"
-	"within.website/ln/opname"
 	"within.website/x/internal"
 	"within.website/x/internal/yeet"
 	"within.website/x/web/discordwebhook"
@@ -27,7 +25,7 @@ import (
 var (
 	checkURL      = flag.String("check-url", "https://am.i.mullvad.net/json", "connection endpoint to check")
 	containerNet  = flag.String("container", "wireguard", "container to assume the network stack of")
-	dockerImage   = flag.String("docker-image", "ghcr.io/xe/alpine:3.17.3", "docker image to use")
+	dockerImage   = flag.String("docker-image", "ghcr.io/xe/alpine:3.18.2", "docker image to use")
 	stateDir      = flag.String("state-dir", "", "where to store state data")
 	tsnetHostname = flag.String("tsnet-hostname", "vest-pit-near", "hostname for tsnet")
 	webhook       = flag.String("webhook", "", "Discord webhook URL")
@@ -37,8 +35,6 @@ var (
 
 func main() {
 	internal.HandleStartup()
-
-	ctx := context.Background()
 
 	os.MkdirAll(filepath.Join(*stateDir, "tsnet"), 0700)
 
@@ -53,14 +49,14 @@ func main() {
 
 	lis, err := srv.Listen("tcp", ":80")
 	if err != nil {
-		ln.FatalErr(ctx, err, ln.Action("tsnet listening"))
+		log.Fatalf("can't listen over tsnet: %v", err)
 	}
 
 	http.DefaultServeMux.HandleFunc("/metrics", tsweb.VarzHandler)
 
 	defer srv.Close()
 	defer lis.Close()
-	ln.FatalErr(opname.With(ctx, "metrics-tsnet"), http.Serve(lis, ex.HTTPLog(http.DefaultServeMux)))
+	log.Fatal(http.Serve(lis, http.DefaultServeMux))
 }
 
 func cron() {
@@ -70,7 +66,7 @@ func cron() {
 			defer cancel()
 
 			if err := check(ctx); err != nil {
-				ln.Error(ctx, err)
+				slog.Error("can't check status", "err", err)
 				defer failureCount.Set(1)
 
 				checkErr := err
@@ -82,12 +78,12 @@ func cron() {
 						AvatarURL: "https://cdn.discordapp.com/attachments/262330174140448768/1093162451341684736/04401-1288759123-flat_color_limited_palette_low_contrast_high_contrast_chromatic_aberration_1girl_hoodie_green_hair_coffee_onsen_green.png",
 					}))
 					if err != nil {
-						ln.Error(ctx, err)
+						slog.Error("can't report VPN is down", "err", err)
 						return
 					}
 
 					if err := discordwebhook.Validate(resp); err != nil {
-						ln.Error(ctx, err)
+						slog.Error("can't validate webhook response", "err", err)
 						return
 					}
 				}

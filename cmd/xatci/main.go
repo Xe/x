@@ -4,6 +4,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"log"
 	"strings"
 	"time"
 
@@ -12,8 +13,7 @@ import (
 	"github.com/mymmrac/telego"
 	th "github.com/mymmrac/telego/telegohandler"
 	tu "github.com/mymmrac/telego/telegoutil"
-	"within.website/ln"
-	"within.website/ln/opname"
+	"golang.org/x/exp/slog"
 	"within.website/x/internal"
 	"within.website/x/web/marginalia"
 	"within.website/x/web/openai/chatgpt"
@@ -30,10 +30,6 @@ var (
 func main() {
 	internal.HandleStartup()
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-	ctx = opname.With(ctx, "xatci")
-
 	mc := marginalia.New(*marginaliaToken, nil)
 
 	cGPT := chatgpt.NewClient(*openAIToken)
@@ -42,19 +38,19 @@ func main() {
 	// use in development only
 	bot, err := telego.NewBot(*telegramToken)
 	if err != nil {
-		ln.FatalErr(ctx, err)
+		log.Fatal(err)
 	}
 
 	// Get updates channel
 	updates, err := bot.UpdatesViaLongPolling(nil)
 	if err != nil {
-		ln.FatalErr(ctx, err)
+		log.Fatal(err)
 	}
 
 	// Create bot handler and specify from where to get updates
 	bh, err := th.NewBotHandler(bot, updates)
 	if err != nil {
-		ln.FatalErr(ctx, err)
+		log.Fatal(err)
 	}
 
 	// Stop handling updates
@@ -70,7 +66,7 @@ func main() {
 			tu.ID(update.Message.Chat.ID),
 			fmt.Sprintf("Hello %s!", update.Message.From.FirstName),
 		)); err != nil {
-			ln.Error(ctx, err)
+			slog.Error("can't send message", "err", err)
 		}
 	}, th.CommandEqual("start"))
 
@@ -84,22 +80,20 @@ func main() {
 
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
 		defer cancel()
-		ctx = opname.With(ctx, "xatci.marginalia.search")
 
 		q := strings.Join(strings.Split(update.Message.Text, " ")[1:], " ")
 
-		ctx = ln.WithF(ctx, ln.F{
-			"telegram_requestor":      update.Message.From.ID,
-			"telegram_requestor_name": fmt.Sprintf("%s %s", update.Message.From.FirstName, update.Message.From.LastName),
-			"search_query":            q,
-		})
-
+		lg := slog.Default().With(
+			"telegram_requestor", update.Message.From.ID,
+			"telegram_requestor_name", fmt.Sprintf("%s %s", update.Message.From.FirstName, update.Message.From.LastName),
+			"search_query", q,
+		)
 		results, err := mc.Search(ctx, &marginalia.Request{
 			Query: q,
 			Count: aws.Int(5),
 		})
 		if err != nil {
-			ln.Error(ctx, err)
+			lg.Error("can't search", "err", err)
 			bot.SendMessage(tu.Message(
 				tu.ID(update.Message.Chat.ID),
 				fmt.Sprintf("Error: %v", err),
@@ -114,10 +108,7 @@ func main() {
 		for _, result := range results.Results {
 			fmt.Fprintf(&sb, "**%s** (%s):\n", result.Title, result.URL)
 
-			ln.Log(ctx, ln.Action("resolving article"), ln.F{
-				"result_title": result.Title,
-				"result_url":   result.URL,
-			})
+			lg.Info("resolving article", "result_title", result.Title, "result_url", result.URL)
 
 			article, err := readability.FromURL(result.URL, 30*time.Second)
 			if err != nil {
@@ -139,7 +130,7 @@ func main() {
 				},
 			})
 			if err != nil {
-				ln.Error(ctx, err)
+				lg.Error("can't summarize article", "err", err)
 			}
 
 			fmt.Fprintf(&sb, "%s\n\n", resp.Choices[0].Message.Content)
@@ -149,11 +140,11 @@ func main() {
 		msg.ParseMode = telego.ModeMarkdown
 
 		if _, err := bot.SendMessage(msg); err != nil {
-			ln.Error(ctx, err)
+			lg.Error("can't send final message", "err", err)
 			return
 		}
 
-		ln.Log(ctx, ln.Action("query successful"))
+		lg.Info("query successful")
 	}, th.CommandEqual("search"))
 
 	// Register new handler with match on any command

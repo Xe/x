@@ -16,8 +16,8 @@ import (
 	"time"
 
 	"go.etcd.io/bbolt"
+	"golang.org/x/exp/slog"
 	"golang.org/x/sync/singleflight"
-	"within.website/ln"
 	"within.website/x/web/stablediffusion"
 )
 
@@ -39,7 +39,7 @@ type StableDiffusion struct {
 func (sd *StableDiffusion) RenderImage(ctx context.Context, w http.ResponseWriter, hash string) error {
 	prompt, seed := hallucinatePrompt(hash)
 
-	ln.Log(ctx, ln.Info("generating new image"), ln.F{"prompt": prompt})
+	slog.Info("generating new image", "prompt", prompt)
 
 	imgsVal, err, _ := sd.group.Do(hash, func() (interface{}, error) {
 		imgs, err := sd.client.Generate(ctx, stablediffusion.SimpleImageRequest{
@@ -83,7 +83,7 @@ func (sd *StableDiffusion) RenderImage(ctx context.Context, w http.ResponseWrite
 	}
 	imgs := imgsVal.(*stablediffusion.ImageResponse)
 
-	ln.Log(ctx, ln.Info("done generating image"), ln.F{"prompt": prompt})
+	slog.Info("done generating image", "prompt", prompt)
 
 	if err := sd.db.Update(func(tx *bbolt.Tx) error {
 		bkt := tx.Bucket([]byte("avatars"))
@@ -155,8 +155,8 @@ func (sd *StableDiffusion) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	if !found {
 		if err := sd.RenderImage(r.Context(), w, hash); err != nil {
+			slog.Error("can't render image", "err", err)
 			http.Error(w, "cannot render image, sorry", http.StatusInternalServerError)
-			ln.Error(r.Context(), err)
 			return
 		}
 	}

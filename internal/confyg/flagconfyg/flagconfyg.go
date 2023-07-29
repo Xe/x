@@ -7,9 +7,9 @@ import (
 	"context"
 	"flag"
 	"io/ioutil"
+	"log"
 	"strings"
 
-	"within.website/ln"
 	"within.website/x/internal/confyg"
 )
 
@@ -22,7 +22,7 @@ func CmdParse(ctx context.Context, path string) {
 
 	err = Parse(path, data, flag.CommandLine)
 	if err != nil {
-		ln.Error(ctx, err)
+		log.Printf("can't parse %s: %v", path, err)
 		return
 	}
 }

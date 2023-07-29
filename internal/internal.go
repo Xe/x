@@ -10,7 +10,6 @@ import (
 
 	"github.com/posener/complete"
 	"go4.org/legal"
-	"within.website/ln/opname"
 	"within.website/x/internal/confyg/flagconfyg"
 	"within.website/x/internal/flagenv"
 	"within.website/x/internal/manpage"
@@ -58,7 +57,7 @@ func HandleStartup() {
 	flag.Parse()
 	flagenv.Parse()
 
-	ctx := opname.With(context.Background(), "internal.HandleStartup")
+	ctx := context.Background()
 
 	if *config != "" {
 		flagconfyg.CmdParse(ctx, *config)

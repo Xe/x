@@ -3,7 +3,6 @@ package main
 
 import (
 	"bytes"
-	"context"
 	"crypto/md5"
 	_ "embed"
 	"encoding/json"
@@ -24,14 +23,12 @@ import (
 	"github.com/rs/cors"
 	"github.com/sebest/xff"
 	"go.etcd.io/bbolt"
+	"golang.org/x/exp/slog"
 	"golang.org/x/sync/singleflight"
 	"tailscale.com/hostinfo"
 	"tailscale.com/metrics"
 	"tailscale.com/tsnet"
 	"tailscale.com/tsweb"
-	"within.website/ln"
-	"within.website/ln/ex"
-	"within.website/ln/opname"
 	"within.website/x/internal"
 	"within.website/x/web"
 	"within.website/x/web/stablediffusion"
@@ -91,12 +88,12 @@ func (dc *Cache) Purge(w http.ResponseWriter, r *http.Request) {
 
 	defer r.Body.Close()
 	if err := json.NewDecoder(r.Body).Decode(&files); err != nil {
-		ln.Error(r.Context(), err, ln.F{"files": files})
+		slog.Error("can't read files to be purged", "err", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	ln.Log(r.Context(), ln.Action("purging files"), ln.F{"files": files})
+	slog.Info("purging files", "files", files)
 
 	if err := dc.DB.Update(func(tx *bbolt.Tx) error {
 		for _, fname := range files {
@@ -112,7 +109,7 @@ func (dc *Cache) Purge(w http.ResponseWriter, r *http.Request) {
 
 		return nil
 	}); err != nil {
-		ln.Error(r.Context(), err, ln.F{"files": files})
+		slog.Error("can't purge files", "err", err, "files", files)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -302,10 +299,10 @@ func (dc *Cache) GetFile(w http.ResponseWriter, r *http.Request) error {
 }
 
 func (dc *Cache) CronPurgeDead() {
-	ctx := opname.With(context.Background(), "cronpurgedead")
+	lg := slog.Default().With("job", "purgeDead")
 
 	for range time.Tick(30 * time.Minute) {
-		ln.Log(ctx, ln.Action("starting"))
+		lg.Info("starting")
 
 		if err := dc.DB.Update(func(tx *bbolt.Tx) error {
 			if err := tx.ForEach(func(name []byte, b *bbolt.Bucket) error {
@@ -313,10 +310,10 @@ func (dc *Cache) CronPurgeDead() {
 					return nil
 				}
 
-				ctx := ln.WithF(ctx, ln.F{"path": string(name)})
+				lg := lg.With("path", string(name))
 				diesAtBytes := b.Get([]byte("diesAt"))
 				if diesAtBytes == nil {
-					ln.Log(ctx, ln.Info("no diesAt key"))
+					lg.Error("no diesAt key")
 					return nil
 				}
 
@@ -331,7 +328,7 @@ func (dc *Cache) CronPurgeDead() {
 					}
 
 					fileDeaths.Add(string(name), 1)
-					ln.Log(ctx, ln.Info("deleted"), ln.F{"diesAt": diesAt.Format(time.RFC3339)})
+					lg.Info("deleted", "diesAt", diesAt)
 				}
 
 				return nil
@@ -341,7 +338,7 @@ func (dc *Cache) CronPurgeDead() {
 
 			return nil
 		}); err != nil {
-			ln.Error(ctx, err)
+			lg.Info("can't update database: %v", "err", err)
 		}
 	}
 }
@@ -368,7 +365,6 @@ func init() {
 
 func main() {
 	internal.HandleStartup()
-	ctx := opname.With(context.Background(), "startup")
 
 	hostinfo.SetApp("within.website/x/cmd/xedn")
 
@@ -376,7 +372,7 @@ func main() {
 
 	db, err := bbolt.Open(filepath.Join(*dir, "data"), 0600, &bbolt.Options{})
 	if err != nil {
-		ln.FatalErr(ctx, err)
+		log.Fatal(err)
 	}
 
 	dc := &Cache{
@@ -413,7 +409,7 @@ func main() {
 	go func() {
 		lis, err := srv.Listen("tcp", ":80")
 		if err != nil {
-			ln.FatalErr(ctx, err, ln.Action("tsnet listening"))
+			log.Fatalf("can't listen on tsnet: %v", err)
 		}
 
 		http.DefaultServeMux.HandleFunc("/debug/varz", tsweb.VarzHandler)
@@ -424,12 +420,12 @@ func main() {
 
 		defer srv.Close()
 		defer lis.Close()
-		ln.FatalErr(opname.With(ctx, "metrics-tsnet"), http.Serve(lis, ex.HTTPLog(http.DefaultServeMux)))
+		log.Fatal(http.Serve(lis, http.DefaultServeMux))
 	}()
 
 	xffMW, err := xff.Default()
 	if err != nil {
-		ln.FatalErr(ctx, err)
+		log.Fatal(err)
 	}
 
 	os.MkdirAll(*dir, 0700)
@@ -483,6 +479,6 @@ func main() {
 	mux.HandleFunc("/file/christine-static/", hdlr)
 	mux.HandleFunc("/file/xeserv-akko/", hdlr)
 
-	ln.Log(context.Background(), ln.F{"addr": *addr})
-	http.ListenAndServe(*addr, cors.Default().Handler(xffMW.Handler(ex.HTTPLog(mux))))
+	slog.Info("starting up", "addr", *addr)
+	http.ListenAndServe(*addr, cors.Default().Handler(xffMW.Handler(mux)))
 }

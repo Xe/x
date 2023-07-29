@@ -17,9 +17,9 @@ import (
 	"github.com/chai2010/webp"
 	"github.com/disintegration/imaging"
 	"go.etcd.io/bbolt"
+	"golang.org/x/exp/slog"
 	"golang.org/x/sync/singleflight"
 	"tailscale.com/metrics"
-	"within.website/ln"
 	"within.website/x/internal/avif"
 )
 
@@ -74,7 +74,7 @@ func (ois *OptimizedImageServer) ServeHTTP(w http.ResponseWriter, r *http.Reques
 
 	data, err := ois.ResizeTo(width, character, mood, format)
 	if err != nil {
-		ln.Error(r.Context(), err)
+		slog.Error("can't convert image", "err", err)
 		http.Error(w, "can't convert image", http.StatusInternalServerError)
 		return
 	}

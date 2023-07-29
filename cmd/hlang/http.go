@@ -10,7 +10,6 @@ import (
 	"os"
 
 	"github.com/rs/cors"
-	"within.website/ln/ex"
 	"within.website/x/cmd/hlang/run"
 )
 
@@ -27,7 +26,7 @@ func doHTTP() error {
 
 	srv := &http.Server{
 		Addr:    ":" + *port,
-		Handler: ex.HTTPLog(cors.Default().Handler(http.DefaultServeMux)),
+		Handler: cors.Default().Handler(http.DefaultServeMux),
 	}
 
 	if *sockpath != "" {
