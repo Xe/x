@@ -323,6 +323,7 @@
             gowasi
           ];
 
+          GOAMD64 = "v3";
           XEDN_STATIC = self.packages.${system}.xedn-static;
         };
       }) // {
