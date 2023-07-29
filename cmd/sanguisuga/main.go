@@ -6,8 +6,8 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
-	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -65,14 +65,12 @@ func main() {
 
 	var c Config
 	if err := tyson.Unmarshal(*tysonConfig, &c); err != nil {
-		slog.Error("can't unmarshal config", "err", err)
-		os.Exit(1)
+		log.Fatalf("can't unmarshal config: %v", err)
 	}
 
 	db, err := jsondb.Open[State](*dbLoc)
 	if err != nil {
-		slog.Error("can't set up database", "err", err)
-		os.Exit(1)
+		log.Fatalf("can't set up database: %v", err)
 	}
 	if db.Data == nil {
 		db.Data = &State{
@@ -80,8 +78,7 @@ func main() {
 		}
 	}
 	if err := db.Save(); err != nil {
-		slog.Error("can't ping database", "err", err)
-		os.Exit(1)
+		log.Fatalf("can't ping database: %v", err)
 	}
 
 	cl := &transmission.Client{
@@ -108,8 +105,7 @@ func main() {
 	ircCli.Timeout = 5 * time.Second
 
 	if err := ircCli.Connect(c.IRC.Server); err != nil {
-		slog.Error("can't connect to IRC server", "server", c.IRC.Server, "err", err)
-		os.Exit(1)
+		log.Fatalf("can't connect to IRC server %s: %v", c.IRC.Server, err)
 	}
 
 	ircCli.Loop()
@@ -153,7 +149,7 @@ func (s *Sanguisuga) HandleIRCMessage(ev *irc.Event) {
 		id := fmt.Sprintf("S%2dE%2d", ti.Season, ti.Episode)
 		slog.Debug("found ShowMeta", "title", ti.Title, "id", id, "quality", ti.Resolution, "group", ti.Group)
 
-		stateKey := fmt.Sprintf("%s %d", ti.Title, id)
+		stateKey := fmt.Sprintf("%s %s", ti.Title, id)
 
 		for _, show := range s.Config.Shows {
 			if s.db.Data == nil {
