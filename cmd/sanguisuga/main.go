@@ -20,6 +20,7 @@ import (
 	"tailscale.com/hostinfo"
 	"tailscale.com/jsondb"
 	"within.website/x/internal"
+	"within.website/x/web/parsetorrentname"
 )
 
 var (
@@ -27,75 +28,7 @@ var (
 	tysonConfig = flag.String("tyson-config", "./config.ts", "path to configuration secrets (TySON)")
 
 	annRegex = regexp.MustCompile(`^New Torrent Announcement: <([^>]*)>\s+Name:'(.*)' uploaded by '.*' ?(freeleech)?\s+-\s+https://\w+.\w+.\w+./\w+./([0-9]+)$`)
-	showName = regexp.MustCompile(`^(.*)\s+(S[0-9]+E[0-9]+)\s+([0-9]+p)\s+(\w+)\s+(.*)$`)
 )
-
-type ShowMeta struct {
-	Name          string
-	SeasonEpisode *SeasonEpisode
-	Quality       string
-	Kind          string
-	Group         string
-}
-
-func (sm ShowMeta) StateKey() string {
-	return fmt.Sprintf("%s %s", sm.Name, sm.SeasonEpisode)
-}
-
-func ParseShowMeta(input string) (*ShowMeta, error) {
-	match := showName.FindStringSubmatch(input)
-
-	if match == nil {
-		return nil, fmt.Errorf("invalid input for TV show name: %q", input)
-	}
-
-	result := ShowMeta{
-		Name:    strings.TrimSpace(match[1]),
-		Quality: match[3],
-		Kind:    match[4],
-		Group:   match[5],
-	}
-
-	se, err := ParseSeasonEpisode(match[2])
-	if err != nil {
-		return nil, err
-	}
-
-	result.SeasonEpisode = se
-
-	return &result, nil
-}
-
-type SeasonEpisode struct {
-	Season  string
-	Episode string
-}
-
-func (se SeasonEpisode) GetFormattedSeason() string {
-	return "Season " + se.Season
-}
-
-func (se *SeasonEpisode) String() string {
-	return "S" + se.Season + "E" + se.Episode
-}
-
-func ParseSeasonEpisode(input string) (*SeasonEpisode, error) {
-	re := regexp.MustCompile(`S([0-9]+)E([0-9]+)`)
-	match := re.FindStringSubmatch(input)
-
-	if match == nil {
-		return nil, fmt.Errorf("invalid input for SeasonEpisode: %q", input)
-	}
-
-	season := match[1]
-	episode := match[2]
-	se := &SeasonEpisode{
-		Season:  season,
-		Episode: episode,
-	}
-
-	return se, nil
-}
 
 func ConvertURL(torrentID, rssKey, name string) string {
 	name = strings.ReplaceAll(name, " ", ".") + ".torrent"
@@ -212,13 +145,15 @@ func (s *Sanguisuga) HandleIRCMessage(ev *irc.Event) {
 	slog.Debug("found torrent announcment", "category", ta.Category, "freeleech", ta.Freeleech, "name", ta.Name)
 
 	if ta.Category == "TV :: Episodes HD" {
-		sm, err := ParseShowMeta(ta.Name)
+		ti, err := parsetorrentname.Parse(ta.Name)
 		if err != nil {
 			slog.Debug("can't parse ShowMeta", "err", err, "name", ta.Name)
 			return
 		}
-		id := sm.SeasonEpisode.String()
-		slog.Debug("found ShowMeta", "title", sm.Name, "id", id, "quality", sm.Quality, "group", sm.Group)
+		id := fmt.Sprintf("S%2dE%2d", ti.Season, ti.Episode)
+		slog.Debug("found ShowMeta", "title", ti.Title, "id", id, "quality", ti.Resolution, "group", ti.Group)
+
+		stateKey := fmt.Sprintf("%s %d", ti.Title, id)
 
 		for _, show := range s.Config.Shows {
 			if s.db.Data == nil {
@@ -226,25 +161,25 @@ func (s *Sanguisuga) HandleIRCMessage(ev *irc.Event) {
 					Seen: map[string]TorrentAnnouncement{},
 				}
 			}
-			if _, found := s.db.Data.Seen[sm.StateKey()]; found {
-				slog.Info("already snatched", "title", sm.Name, "id", id)
+			if _, found := s.db.Data.Seen[stateKey]; found {
+				slog.Info("already snatched", "title", ti.Title, "id", id)
 				return
 			}
 
-			if show.Title != sm.Name {
+			if show.Title != ti.Title {
 				slog.Debug("wrong name")
 				continue
 			}
 
-			if show.Quality != sm.Quality {
-				slog.Debug("wrong quality")
+			if show.Quality != ti.Resolution {
+				slog.Debug("wrong resolution")
 				continue
 			}
 
 			torrentURL := ConvertURL(ta.TorrentID, s.Config.RSSKey, ta.Name)
 
 			slog.Debug("found url", "url", torrentURL)
-			downloadDir := filepath.Join(show.DiskPath, sm.SeasonEpisode.GetFormattedSeason())
+			downloadDir := filepath.Join(show.DiskPath, fmt.Sprintf("Season %2d", ti.Season))
 
 			var buf bytes.Buffer
 			resp, err := http.Get(torrentURL)
@@ -278,9 +213,9 @@ func (s *Sanguisuga) HandleIRCMessage(ev *irc.Event) {
 				return
 			}
 
-			slog.Info("added torrent", "title", sm.Name, "id", id, "path", downloadDir, "infohash", t.Hash, "dupe", dupe)
+			slog.Info("added torrent", "title", ti.Title, "id", id, "path", downloadDir, "infohash", t.Hash, "dupe", dupe)
 
-			s.db.Data.Seen[sm.StateKey()] = *ta
+			s.db.Data.Seen[stateKey] = *ta
 			if err := s.db.Save(); err != nil {
 				slog.Error("error saving state", "err", err)
 			}
