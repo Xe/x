@@ -17,12 +17,10 @@ import (
 	"time"
 
 	"github.com/jaytaylor/html2text"
+	"golang.org/x/exp/slog"
 	"tailscale.com/metrics"
 	"tailscale.com/tsnet"
 	"tailscale.com/tsweb"
-	"within.website/ln"
-	"within.website/ln/ex"
-	"within.website/ln/opname"
 	"within.website/x/internal"
 	"within.website/x/web/mastodon"
 	"within.website/x/web/stablediffusion"
@@ -63,12 +61,11 @@ func main() {
 
 	os.MkdirAll(*dataDir, 0777)
 
-	ctx := opname.With(context.Background(), "main")
 	rand.Seed(time.Now().Unix())
 
 	cli, err := mastodon.Authenticated("robocadey2", "https://within.website/.x.botinfo", *instance, *token)
 	if err != nil {
-		ln.FatalErr(ctx, err)
+		log.Fatal(err)
 	}
 
 	expvar.Publish("gauge_robocadey_usage_by_user", &usageCount)
@@ -81,15 +78,15 @@ func main() {
 	}
 
 	if err := srv.Start(); err != nil {
-		ln.FatalErr(ctx, err)
+		log.Fatal(err)
 	}
 
 	httpCli := srv.HTTPClient()
 	if err != nil {
-		ln.FatalErr(ctx, err)
+		log.Fatal(err)
 	}
 
-	ln.Log(ctx, ln.Info("waiting for messages"))
+	slog.Info("waiting for messages")
 
 	b := &Bot{
 		cli: cli,
@@ -99,21 +96,21 @@ func main() {
 	go func() {
 		lis, err := srv.Listen("tcp", ":80")
 		if err != nil {
-			ln.FatalErr(ctx, err, ln.Action("tsnet listening"))
+			log.Fatalf("tsnet can't listen: %v", err)
 		}
 
 		http.DefaultServeMux.HandleFunc("/debug/varz", tsweb.VarzHandler)
 
 		defer srv.Close()
 		defer lis.Close()
-		ln.FatalErr(opname.With(ctx, "metrics-tsnet"), http.Serve(lis, ex.HTTPLog(http.DefaultServeMux)))
+		log.Fatal(http.Serve(lis, http.DefaultServeMux))
 	}()
 
 	for {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(context.Background())
 		ch, err := cli.StreamMessages(ctx, mastodon.WSSubscribeRequest{Type: "subscribe", Stream: "user"})
 		if err != nil {
-			ln.FatalErr(ctx, err)
+			log.Fatal(err)
 		}
 
 		for msg := range ch {
@@ -121,7 +118,7 @@ func main() {
 			case "notification":
 				var n mastodon.Notification
 				if err := json.Unmarshal([]byte(msg.Payload), &n); err != nil {
-					ln.Error(ctx, err, ln.Info("can't parse notification"))
+					slog.Error("can't parse notification", "err", err)
 					continue
 				}
 
@@ -130,7 +127,7 @@ func main() {
 				}
 
 				if err := b.handleNotification(n); err != nil {
-					ln.Error(ctx, err, ln.F{"content": n.Status.Content})
+					slog.Error("can't handle notification", "err", err, "content", n.Status.Content)
 					continue
 				}
 			}
@@ -210,7 +207,7 @@ func (b *Bot) handleNotification(n mastodon.Notification) error {
 	for tries != 0 {
 		att, err = b.cli.UploadMedia(ctx, bytes.NewBuffer(imgs.Images[0]), "result.png", "prompt: "+text, "")
 		if err != nil {
-			ln.Error(ctx, err, ln.F{"tries": tries})
+			slog.Error("retrying", "err", err, "tries", tries)
 			time.Sleep(time.Second)
 			tries--
 			retries.Add(1)
@@ -242,7 +239,7 @@ func (b *Bot) handleNotification(n mastodon.Notification) error {
 	}); err != nil {
 		return err
 	} else {
-		ln.Log(ctx, ln.F{"url": st.URL, "responsible_party": n.Status.Account.Acct, "visibility": n.Status.Visibility})
+		slog.Info("status created", "url", st.URL, "responsible_party", n.Status.Account.Acct, "visibility", n.Status.Visibility)
 	}
 
 	return nil

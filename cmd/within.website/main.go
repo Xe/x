@@ -26,7 +26,7 @@ var (
 type Repo struct {
 	Kind        string `json:"kind"`
 	Domain      string `json:"domain"`
-	User        string `json:"string"`
+	User        string `json:"user"`
 	Repo        string `json:"repo"`
 	Description string `json:"description"`
 }

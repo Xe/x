@@ -50,6 +50,8 @@ func Pack(fname string, outFname string) error {
 		return err
 	}
 
+	copy.Copy("config.ts", dir)
+
 	if err := os.WriteFile(filepath.Join(dir, "Procfile"), []byte("web: /app/bin/main\n"), 0777); err != nil {
 		return err
 	}

@@ -21,7 +21,7 @@ func getAgent() (agent.Agent, error) {
 }
 
 var (
-	greedoAddr = flag.String("kahless-addr", "kahless.cetacean.club:22", "address to use for kahless")
+	greedoAddr = flag.String("kahless-addr", "lufta.cetacean.club:22", "address to use for kahless")
 	greedoUser = flag.String("kahless-user", "cadey", "username to use for kahless")
 )
 
@@ -73,9 +73,9 @@ func Copy(mode os.FileMode, fileName string, contents io.Reader, destinationPath
 	return nil
 }
 
-// CopyFile copies a file to Greedo's public files folder and returns its public-facing URL.
-func CopyFile(fileName string, contents io.Reader) (string, error) {
-	err := Copy(0644, fileName, contents, filepath.Join("public_html", "files", "slugs", fileName))
+// CopySlug copies a slug to Greedo's public files folder and returns its public-facing URL.
+func CopySlug(fileName string, contents io.Reader) (string, error) {
+	err := Copy(0644, fileName, contents, filepath.Join("/srv/http/xena.greedo.xeserv.us", "files", "slugs", fileName))
 	if err != nil {
 		return "", err
 	}
