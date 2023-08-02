@@ -22,7 +22,7 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/kr/pretty v0.3.1
 	github.com/mndrix/golog v0.0.0-20170330170653-a28e2a269775
-	github.com/mymmrac/telego v0.25.1
+	github.com/mymmrac/telego v0.26.0
 	github.com/otiai10/copy v1.12.0
 	github.com/peterh/liner v1.2.2
 	github.com/pkg/errors v0.9.1
@@ -55,7 +55,7 @@ require (
 	github.com/dop251/goja v0.0.0-20211115154819-26ebff68a7d5 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/evanw/esbuild v0.18.6 // indirect
-	github.com/fasthttp/router v1.4.19 // indirect
+	github.com/fasthttp/router v1.4.20 // indirect
 	github.com/go-shiori/dom v0.0.0-20210627111528-4e4722cd0d65 // indirect
 	github.com/go-sourcemap/sourcemap v2.1.3+incompatible // indirect
 	github.com/goccy/go-json v0.10.2 // indirect
