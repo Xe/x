@@ -40,23 +40,26 @@ func Init() {
 
 	http.HandleFunc("/.within/debug/slog-level", func(w http.ResponseWriter, r *http.Request) {
 		var level, old slog.Level
-		defer r.Body.Close()
-
 		old = leveler.Level()
 
-		data, err := io.ReadAll(http.MaxBytesReader(w, r.Body, 64))
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
+		if r.Method == http.MethodPost {
+			data, err := io.ReadAll(http.MaxBytesReader(w, r.Body, 64))
+			defer r.Body.Close()
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
 
-		if err := (&level).UnmarshalText(data); err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
+			if err := (&level).UnmarshalText(data); err != nil {
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
 
-		leveler.Set(level)
-		slog.Info("changed level", "from", old, "to", level)
-		fmt.Fprintln(w, level)
+			leveler.Set(level)
+			slog.Info("changed level", "from", old, "to", level)
+			fmt.Fprintln(w, level)
+		} else {
+			fmt.Fprintln(w, old)
+		}
 	})
 }

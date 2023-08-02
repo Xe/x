@@ -10,6 +10,7 @@ import (
 
 	"go.jetpack.io/tyson"
 	"golang.org/x/exp/slog"
+	"tailscale.com/tsweb"
 	"within.website/x/internal"
 	"within.website/x/web/vanity"
 )
@@ -69,6 +70,7 @@ func main() {
 		repo.RegisterHandlers(lg)
 	}
 
+	http.HandleFunc("/debug/varz", tsweb.VarzHandler)
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Content-Type", "text/html")
 		if r.URL.Path != "/" {

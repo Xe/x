@@ -146,7 +146,7 @@ func (s *Sanguisuga) HandleIRCMessage(ev *irc.Event) {
 			slog.Debug("can't parse ShowMeta", "err", err, "name", ta.Name)
 			return
 		}
-		id := fmt.Sprintf("S%2dE%2d", ti.Season, ti.Episode)
+		id := fmt.Sprintf("S%02dE%02d", ti.Season, ti.Episode)
 		slog.Debug("found ShowMeta", "title", ti.Title, "id", id, "quality", ti.Resolution, "group", ti.Group)
 
 		stateKey := fmt.Sprintf("%s %s", ti.Title, id)
