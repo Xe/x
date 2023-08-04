@@ -175,7 +175,7 @@ func (s *Sanguisuga) HandleIRCMessage(ev *irc.Event) {
 			torrentURL := ConvertURL(ta.TorrentID, s.Config.RSSKey, ta.Name)
 
 			slog.Debug("found url", "url", torrentURL)
-			downloadDir := filepath.Join(show.DiskPath, fmt.Sprintf("Season %2d", ti.Season))
+			downloadDir := filepath.Join(show.DiskPath, fmt.Sprintf("Season %02d", ti.Season))
 
 			var buf bytes.Buffer
 			resp, err := http.Get(torrentURL)
@@ -209,7 +209,7 @@ func (s *Sanguisuga) HandleIRCMessage(ev *irc.Event) {
 				return
 			}
 
-			slog.Info("added torrent", "title", ti.Title, "id", id, "path", downloadDir, "infohash", t.Hash, "dupe", dupe)
+			slog.Info("added torrent", "title", ti.Title, "id", id, "path", downloadDir, "infohash", t.Hash, "tid", t.ID, "dupe", dupe)
 
 			s.db.Data.Seen[stateKey] = *ta
 			if err := s.db.Save(); err != nil {
