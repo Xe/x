@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/base64"
+	"expvar"
 	"flag"
 	"fmt"
 	"io"
@@ -19,6 +20,7 @@ import (
 	"honnef.co/go/transmission"
 	"tailscale.com/hostinfo"
 	"tailscale.com/jsondb"
+	"tailscale.com/tsnet"
 	"within.website/x/internal"
 	"within.website/x/web/parsetorrentname"
 )
@@ -28,6 +30,8 @@ var (
 	tysonConfig = flag.String("tyson-config", "./config.ts", "path to configuration secrets (TySON)")
 
 	annRegex = regexp.MustCompile(`^New Torrent Announcement: <([^>]*)>\s+Name:'(.*)' uploaded by '.*' ?(freeleech)?\s+-\s+https://\w+.\w+.\w+./\w+./([0-9]+)$`)
+
+	snatches = expvar.NewInt("gauge_sanguisuga_snatches")
 )
 
 func ConvertURL(torrentID, rssKey, name string) string {
@@ -81,11 +85,41 @@ func main() {
 		log.Fatalf("can't ping database: %v", err)
 	}
 
+	var dataDir string
+	if c.Tailscale.DataDir != nil {
+		dataDir = *c.Tailscale.DataDir
+	}
+
+	srv := &tsnet.Server{
+		Dir:      dataDir,
+		AuthKey:  c.Tailscale.Authkey,
+		Hostname: c.Tailscale.Hostname,
+		Logf:     func(string, ...any) {},
+	}
+
+	if err := srv.Start(); err != nil {
+		log.Fatalf("can't start tsnet server: %v", err)
+	}
+
+	go func() {
+		ln, err := srv.Listen("tcp", ":80")
+		if err != nil {
+			log.Fatalf("can't listen on tsnet: %v", err)
+		}
+		defer ln.Close()
+
+		log.Fatal(http.Serve(ln, http.DefaultServeMux))
+	}()
+
 	cl := &transmission.Client{
-		Client:   http.DefaultClient,
+		Client:   srv.HTTPClient(),
 		Endpoint: c.Transmission.URL,
 		Username: c.Transmission.User,
 		Password: c.Transmission.Password,
+	}
+
+	if _, err := cl.SessionStats(); err != nil {
+		log.Fatalf("can't connect to transmission: %v", err)
 	}
 
 	s := &Sanguisuga{
@@ -138,16 +172,19 @@ func (s *Sanguisuga) HandleIRCMessage(ev *irc.Event) {
 		return
 	}
 
-	slog.Debug("found torrent announcment", "category", ta.Category, "freeleech", ta.Freeleech, "name", ta.Name)
+	lg := slog.Default().With("category", ta.Category, "freeleech", ta.Freeleech, "name", ta.Name)
+
+	lg.Debug("found torrent announcment")
 
 	if ta.Category == "TV :: Episodes HD" {
 		ti, err := parsetorrentname.Parse(ta.Name)
 		if err != nil {
-			slog.Debug("can't parse ShowMeta", "err", err, "name", ta.Name)
+			lg.Error("can't parse ShowMeta", "err", err)
 			return
 		}
 		id := fmt.Sprintf("S%02dE%02d", ti.Season, ti.Episode)
-		slog.Debug("found ShowMeta", "title", ti.Title, "id", id, "quality", ti.Resolution, "group", ti.Group)
+		lg := lg.With("title", ti.Title, "id", id, "quality", ti.Resolution, "group", ti.Group)
+		lg.Debug("found ShowMeta")
 
 		stateKey := fmt.Sprintf("%s %s", ti.Title, id)
 
@@ -158,43 +195,43 @@ func (s *Sanguisuga) HandleIRCMessage(ev *irc.Event) {
 				}
 			}
 			if _, found := s.db.Data.Seen[stateKey]; found {
-				slog.Info("already snatched", "title", ti.Title, "id", id)
+				lg.Info("already snatched", "title", ti.Title, "id", id)
 				return
 			}
 
 			if show.Title != ti.Title {
-				slog.Debug("wrong name")
+				lg.Debug("wrong name")
 				continue
 			}
 
 			if show.Quality != ti.Resolution {
-				slog.Debug("wrong resolution")
+				lg.Debug("wrong resolution")
 				continue
 			}
 
 			torrentURL := ConvertURL(ta.TorrentID, s.Config.RSSKey, ta.Name)
 
-			slog.Debug("found url", "url", torrentURL)
+			lg.Debug("found url", "url", torrentURL)
 			downloadDir := filepath.Join(show.DiskPath, fmt.Sprintf("Season %02d", ti.Season))
 
 			var buf bytes.Buffer
 			resp, err := http.Get(torrentURL)
 			if err != nil {
-				slog.Error("can't download torrent", "url", torrentURL, "err", err, "torrentID", ta.TorrentID)
+				lg.Error("can't download torrent", "url", torrentURL, "err", err, "torrentID", ta.TorrentID)
 				continue
 			}
 
 			if resp.StatusCode != http.StatusOK {
-				slog.Error("got wrong status code", "want", http.StatusOK, "got", resp.StatusCode, "url", torrentURL, "torrentID", ta.TorrentID)
+				lg.Error("got wrong status code", "want", http.StatusOK, "got", resp.StatusCode, "url", torrentURL, "torrentID", ta.TorrentID)
 				continue
 			}
 
 			defer resp.Body.Close()
 			if n, err := io.Copy(&buf, resp.Body); err != nil {
-				slog.Error("can't fetch torrent body", "url", torrentURL, "err", err, "torrentID", ta.TorrentID)
+				lg.Error("can't fetch torrent body", "url", torrentURL, "err", err, "torrentID", ta.TorrentID)
 				continue
 			} else {
-				slog.Info("downloaded bytes", "n", n, "url", torrentURL)
+				lg.Info("downloaded bytes", "n", n, "url", torrentURL)
 			}
 
 			metaInfo := base64.StdEncoding.EncodeToString(buf.Bytes())
@@ -205,15 +242,16 @@ func (s *Sanguisuga) HandleIRCMessage(ev *irc.Event) {
 				Paused:      false,
 			})
 			if err != nil {
-				slog.Error("error adding torrent", "url", torrentURL, "err", err, "torrentID", ta.TorrentID)
+				lg.Error("error adding torrent", "url", torrentURL, "err", err, "torrentID", ta.TorrentID)
 				return
 			}
 
-			slog.Info("added torrent", "title", ti.Title, "id", id, "path", downloadDir, "infohash", t.Hash, "tid", t.ID, "dupe", dupe)
+			lg.Info("added torrent", "title", ti.Title, "id", id, "path", downloadDir, "infohash", t.Hash, "tid", t.ID, "dupe", dupe)
+			snatches.Add(1)
 
 			s.db.Data.Seen[stateKey] = *ta
 			if err := s.db.Save(); err != nil {
-				slog.Error("error saving state", "err", err)
+				lg.Error("error saving state", "err", err)
 			}
 		}
 	}

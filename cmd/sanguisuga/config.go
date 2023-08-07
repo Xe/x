@@ -22,9 +22,16 @@ type Transmission struct {
 	Password string `json:"password"`
 }
 
+type Tailscale struct {
+	Hostname string  `json:"hostname"`
+	Authkey  string  `json:"authkey"`
+	DataDir  *string `json:"dataDir,omitempty"`
+}
+
 type Config struct {
 	IRC          IRC          `json:"irc"`
 	Transmission Transmission `json:"transmission"`
 	Shows        []Show       `json:"shows"`
 	RSSKey       string       `json:"rssKey"`
+	Tailscale    Tailscale    `json:"tailscale"`
 }

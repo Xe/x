@@ -21,11 +21,18 @@ export type Transmission = {
   rpcURI: string;
 };
 
+export type Tailscale = {
+  hostname: string;
+  authkey: string;
+  dataDir?: string;
+};
+
 export type Config = {
   irc: IRC;
   transmission: Transmission;
   shows: Show[];
   rssKey: string;
+  tailscale: Tailscale;
 };
 
 export default {
@@ -52,4 +59,9 @@ export default {
     }
   ],
   rssKey: "",
+  tailscale: {
+    hostname: "sanguisuga-dev",
+    authkey: "",
+    dataDir: undefined,
+  },
 } satisfies Config;
