@@ -234,6 +234,7 @@
           mainsanow = copyFile { pname = "mainsanow"; };
           prefix = copyFile { pname = "prefix"; };
           quickserv = copyFile { pname = "quickserv"; };
+          sanguisuga = copyFile { pname = "sanguisuga"; };
           todayinmarch2020 = copyFile { pname = "todayinmarch2020"; };
           uploud = copyFile { pname = "uploud"; };
           vest-pit-near = copyFile { pname = "vest-pit-near"; };
@@ -344,6 +345,7 @@
               aegis
               hlang
               todayinmarch2020
+              sanguisuga
               vest-pit-near
               within-website
             ];
@@ -352,6 +354,7 @@
           aegis = import ./nix/aegis.nix self;
           hlang = import ./nix/hlang.nix self;
           todayinmarch2020 = import ./nix/todayinmarch2020.nix self;
+          sanguisuga = import ./nix/sanguisuga.nix self;
           vest-pit-near = import ./nix/vest-pit-near.nix self;
           within-website = import ./nix/within-website.nix self;
         };
