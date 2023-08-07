@@ -94,7 +94,7 @@ func main() {
 		Dir:      dataDir,
 		AuthKey:  c.Tailscale.Authkey,
 		Hostname: c.Tailscale.Hostname,
-		Logf:     slog.NewLogLogger(slog.Default().Handler().WithAttrs([]slog.Attr{slog.String("from", "tsnet")}), slog.LevelInfo).Logf,
+		Logf:     slog.NewLogLogger(slog.Default().Handler().WithAttrs([]slog.Attr{slog.String("from", "tsnet")}), slog.LevelInfo).Printf,
 	}
 
 	if err := srv.Start(); err != nil {
