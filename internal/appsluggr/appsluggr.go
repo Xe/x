@@ -12,6 +12,7 @@ import (
 
 	"github.com/otiai10/copy"
 	"github.com/rogpeppe/go-internal/dirhash"
+	"golang.org/x/exp/slog"
 )
 
 // Must calls Pack and panics on an error.
@@ -52,13 +53,12 @@ func Pack(fname string, outFname string, extraFiles ...map[string]string) error 
 
 	for _, finfo := range extraFiles {
 		for src, dst := range finfo {
-			if err := copy.Copy(src, dst); err != nil {
+			slog.Debug("copying file", "src", src, "dst", dst)
+			if err := copy.Copy(src, filepath.Join(dir, dst)); err != nil {
 				return err
 			}
 		}
 	}
-
-	copy.Copy("config.ts", dir)
 
 	if err := os.WriteFile(filepath.Join(dir, "Procfile"), []byte("web: /app/bin/main\n"), 0777); err != nil {
 		return err

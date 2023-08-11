@@ -3,9 +3,7 @@ yeet.setenv("GOARCH", "amd64");
 yeet.setenv("CGO_ENABLED", "0");
 
 go.build();
-const fname = slug.build("within.website", {
-    "config.ts": "config.ts"
-});
+const fname = slug.build("todayinmarch2020");
 
 const url = slug.push(fname);
 const hash = nix.hashURL(url);
@@ -13,7 +11,7 @@ const hash = nix.hashURL(url);
 const expr = nix.expr`{ stdenv }:
 
 stdenv.mkDerivation {
-  name = "within.website";
+  name = "todayinmarch2020";
   src = builtins.fetchurl {
     url = ${url};
     sha256 = ${hash};
@@ -24,10 +22,9 @@ stdenv.mkDerivation {
   installPhase = ''
     tar xf $src
     mkdir -p $out/bin
-    cp bin/main $out/bin/withinwebsite
-    cp config.ts $out/config.ts
+    cp bin/main $out/bin/todayinmarch2020
   '';
 }
 `;
 
-file.write("/home/cadey/code/nixos-configs/pkgs/x/withinwebsite.nix", expr);
+file.write("/home/cadey/code/nixos-configs/pkgs/x/todayinmarch2020.nix", expr);

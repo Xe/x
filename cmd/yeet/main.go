@@ -11,6 +11,7 @@ import (
 	"runtime"
 	"runtime/debug"
 	"strconv"
+	"strings"
 
 	"github.com/dop251/goja"
 	"golang.org/x/exp/slog"
@@ -90,13 +91,14 @@ func nixbuild(target string) {
 	runcmd("nix", "build", target)
 }
 
-func slugbuild(bin string, extraFiles map[string]string) {
-	appsluggr.Must(bin, fmt.Sprintf("%s-%s.tar.gz", bin, yeet.DateTag), extraFiles)
+func slugbuild(bin string, extraFiles map[string]string) string {
+	result := fmt.Sprintf("%s-%s.tar.gz", bin, yeet.DateTag)
+	appsluggr.Must(bin, result, extraFiles)
 	os.Remove(bin)
+	return result
 }
 
-func slugpush(bin string) string {
-	fname := fmt.Sprintf("%s-%s.tar.gz", bin, yeet.DateTag)
+func slugpush(fname string) string {
 	fin, err := os.Open(fname)
 	if err != nil {
 		panic(err)
@@ -113,20 +115,6 @@ func slugpush(bin string) string {
 }
 
 func buildNixExpr(literals []string, exprs ...any) string {
-	/*
-		function nix(strings, ...expressions) {
-		    let result = "";
-		    expressions.forEach((value, i) => {
-			let formattedValue = `(builtins.fromJSON ${JSON.stringify(JSON.stringify(value))});`;
-			result += `${strings[i]} ${formattedValue}`;
-		    });
-
-		    result += strings[strings.length - 1]
-
-		    return result;
-		}
-	*/
-
 	result := ""
 	for i, value := range exprs {
 		formattedValue, _ := json.Marshal(value)
@@ -203,7 +191,7 @@ func main() {
 
 	vm.Set("nix", map[string]any{
 		"build":   nixbuild,
-		"hashURL": func(fileURL string) string { return runcmd("nix-prefetch-url", fileURL) },
+		"hashURL": func(fileURL string) string { return strings.TrimSpace(runcmd("nix-prefetch-url", fileURL)) },
 		"expr":    buildNixExpr,
 		"eval":    evalNixExpr,
 	})
