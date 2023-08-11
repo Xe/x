@@ -9,6 +9,7 @@ require (
 	github.com/bwmarrin/discordgo v0.27.1
 	github.com/chai2010/webp v1.1.1
 	github.com/disintegration/imaging v1.6.1
+	github.com/dop251/goja v0.0.0-20211115154819-26ebff68a7d5
 	github.com/eaburns/peggy v1.0.2
 	github.com/facebookgo/ensure v0.0.0-20160127193407-b4ab57deab51
 	github.com/fogleman/primitive v0.0.0-20190214200932-673f57e7b1b5
@@ -52,7 +53,6 @@ require (
 require (
 	github.com/andybalholm/brotli v1.0.5 // indirect
 	github.com/andybalholm/cascadia v1.3.2 // indirect
-	github.com/dop251/goja v0.0.0-20211115154819-26ebff68a7d5 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/evanw/esbuild v0.18.6 // indirect
 	github.com/fasthttp/router v1.4.20 // indirect
