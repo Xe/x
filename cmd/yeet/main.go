@@ -2,12 +2,15 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"log"
 	"os"
 	"path/filepath"
 	"runtime"
+	"runtime/debug"
+	"strconv"
 
 	"github.com/dop251/goja"
 	"golang.org/x/exp/slog"
@@ -61,6 +64,9 @@ func gittag() string {
 }
 
 func dockerload(fname string) {
+	if fname == "" {
+		fname = "./result"
+	}
 	yeet.DockerLoadResult(context.Background(), fname)
 }
 
@@ -106,6 +112,44 @@ func slugpush(bin string) string {
 	return pubURL
 }
 
+func buildNixExpr(literals []string, exprs ...any) string {
+	/*
+		function nix(strings, ...expressions) {
+		    let result = "";
+		    expressions.forEach((value, i) => {
+			let formattedValue = `(builtins.fromJSON ${JSON.stringify(JSON.stringify(value))});`;
+			result += `${strings[i]} ${formattedValue}`;
+		    });
+
+		    result += strings[strings.length - 1]
+
+		    return result;
+		}
+	*/
+
+	result := ""
+	for i, value := range exprs {
+		formattedValue, _ := json.Marshal(value)
+		formattedValue = []byte(fmt.Sprintf(`(builtins.fromJSON %s)`, strconv.Quote(string(formattedValue))))
+		result += literals[i] + string(formattedValue)
+	}
+
+	result += literals[len(literals)-1]
+
+	return result
+}
+
+func evalNixExpr(literals []string, exprs ...any) any {
+	expr := buildNixExpr(literals, exprs...)
+	data := []byte(runcmd("nix", "eval", "--json", "--expr", expr))
+	var result any
+	if err := json.Unmarshal(data, &result); err != nil {
+		panic(err)
+	}
+
+	return result
+}
+
 func main() {
 	internal.HandleStartup()
 
@@ -114,6 +158,7 @@ func main() {
 	defer func() {
 		if r := recover(); r != nil {
 			slog.Error("error in JS", "err", r)
+			debug.PrintStack()
 		}
 	}()
 
@@ -131,6 +176,14 @@ func main() {
 		"tag":   dockertag,
 	})
 
+	vm.Set("file", map[string]any{
+		"write": func(fname, data string) {
+			if err := os.WriteFile(fname, []byte(data), 0660); err != nil {
+				panic(err)
+			}
+		},
+	})
+
 	vm.Set("fly", map[string]any{
 		"deploy": flydeploy,
 	})
@@ -144,12 +197,15 @@ func main() {
 	})
 
 	vm.Set("log", map[string]any{
-		"info": lg.Println,
+		"info":    lg.Println,
+		"println": fmt.Println,
 	})
 
 	vm.Set("nix", map[string]any{
 		"build":   nixbuild,
 		"hashURL": func(fileURL string) string { return runcmd("nix-prefetch-url", fileURL) },
+		"expr":    buildNixExpr,
+		"eval":    evalNixExpr,
 	})
 
 	vm.Set("slug", map[string]any{
