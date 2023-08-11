@@ -45,6 +45,8 @@ func flyctlPath() string {
 func runcmd(cmdName string, args ...string) string {
 	ctx := context.Background()
 
+	slog.Info("running command", "cmd", cmdName, "args", args)
+
 	result, err := yeet.Output(ctx, cmdName, args...)
 	if err != nil {
 		panic(err)
@@ -177,7 +179,8 @@ func main() {
 	})
 
 	vm.Set("go", map[string]any{
-		"build": func() { runcmd("go", "build") },
+		"build":   func() { runcmd("go", "build") },
+		"install": func() { runcmd("go", "install") },
 	})
 
 	vm.Set("git", map[string]any{
