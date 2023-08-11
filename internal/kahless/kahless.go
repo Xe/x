@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"flag"
 	"io"
-	"io/ioutil"
 	"log"
 	"net"
 	"os"
@@ -21,7 +20,7 @@ func getAgent() (agent.Agent, error) {
 }
 
 var (
-	greedoAddr = flag.String("kahless-addr", "lufta.cetacean.club:22", "address to use for kahless")
+	greedoAddr = flag.String("kahless-addr", "lufta:22", "address to use for kahless")
 	greedoUser = flag.String("kahless-user", "cadey", "username to use for kahless")
 )
 
@@ -48,7 +47,7 @@ func Dial() (*ssh.Client, error) {
 
 // Copy copies a local file reader to the remote destination path. This copies the enitre contents of contents into ram. Don't use this function if doing so is a bad idea. Only works on files less than 2 GB.
 func Copy(mode os.FileMode, fileName string, contents io.Reader, destinationPath string) error {
-	data, err := ioutil.ReadAll(contents)
+	data, err := io.ReadAll(contents)
 	if err != nil {
 		return err
 	}

@@ -1,4 +1,5 @@
-//+build ignore
+//go:build ignore
+// +build ignore
 
 // Builds and deploys the application to minipaas.
 package main
@@ -30,7 +31,7 @@ func main() {
 	defer fin.Close()
 
 	fname := "johaus-" + yeet.DateTag + ".tar.gz"
-	pubURL, err := kahless.CopyFile(fname, fin)
+	pubURL, err := kahless.CopySlug(fname, fin)
 	if err != nil {
 		log.Fatal(err)
 	}

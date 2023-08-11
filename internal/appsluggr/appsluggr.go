@@ -17,15 +17,15 @@ import (
 // Must calls Pack and panics on an error.
 //
 // This is useful for using appsluggr from yeet scripts.
-func Must(fname, outFname string) {
-	if err := Pack(fname, outFname); err != nil {
+func Must(fname, outFname string, extraFiles ...map[string]string) {
+	if err := Pack(fname, outFname, extraFiles...); err != nil {
 		log.Panicf("error packing %s into %s: %v", fname, outFname, err)
 	}
 }
 
 // Pack takes a statically linked binary and packs it into a Heroku-compatible slug image
 // at outFname.
-func Pack(fname string, outFname string) error {
+func Pack(fname string, outFname string, extraFiles ...map[string]string) error {
 	dir, err := os.MkdirTemp("", "appsluggr")
 	if err != nil {
 		return err
@@ -48,6 +48,14 @@ func Pack(fname string, outFname string) error {
 
 	if err := copy.Copy(fname, filepath.Join(dir, "bin", "main")); err != nil {
 		return err
+	}
+
+	for _, finfo := range extraFiles {
+		for src, dst := range finfo {
+			if err := copy.Copy(src, dst); err != nil {
+				return err
+			}
+		}
 	}
 
 	copy.Copy("config.ts", dir)
