@@ -301,6 +301,7 @@
             boltbrowser
             terraform
             litestream
+            nodejs
 
             postgresql_15
             pgloader

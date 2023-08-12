@@ -92,8 +92,8 @@ schema = 3
     version = "v1.7.0"
     hash = "sha256-Z/M62esiZ0fVwvueVQhwz18z0eS22LZ3DJ4O8FKp3AY="
   [mod."github.com/dop251/goja"]
-    version = "v0.0.0-20211115154819-26ebff68a7d5"
-    hash = "sha256-ZNsIe01X2yoxJCuaeYOmtxXvSL8I8vgp7/e7ZEHv3tQ="
+    version = "v0.0.0-20230531210528-d7324b2d74f7"
+    hash = "sha256-O0H/t3fWMEgfVIvqS8SjDOkrSvgpz8WsilejmtqT2zk="
   [mod."github.com/dustin/go-humanize"]
     version = "v1.0.1"
     hash = "sha256-yuvxYYngpfVkUg9yAmG99IUVmADTQA0tMbBXe0Fq0Mc="
@@ -172,6 +172,9 @@ schema = 3
   [mod."github.com/google/nftables"]
     version = "v0.1.1-0.20230115205135-9aa6fdf5a28c"
     hash = "sha256-Q5MtyGT1as7WzU+gZWVeD8/mQuA7GxmmjACY4qZsYHA="
+  [mod."github.com/google/pprof"]
+    version = "v0.0.0-20230207041349-798e818bf904"
+    hash = "sha256-uBlQacjKVBHhsxJBudNqtpey0XS9kLG0A53KDI3p77w="
   [mod."github.com/google/uuid"]
     version = "v1.3.0"
     hash = "sha256-QoR55eBtA94T2tBszyxfDtO7/pjZZSGb5vm7U0Xhs0Y="
