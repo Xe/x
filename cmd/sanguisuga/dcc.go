@@ -7,7 +7,6 @@ import (
 	"errors"
 	"expvar"
 	"fmt"
-	"io"
 	"log"
 	"net"
 	"net/http"
@@ -99,33 +98,40 @@ func (s *Sanguisuga) XDCC() {
 
 func (s *Sanguisuga) TrackAnime(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	data, err := io.ReadAll(http.MaxBytesReader(w, r.Body, 256))
+
+	var show Show
+	err := json.NewDecoder(http.MaxBytesReader(w, r.Body, 4096)).Decode(&show)
 	if err != nil {
 		slog.Error("can't read request body", "err", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	name := strings.TrimSpace(string(data))
-
 	s.dbLock.Lock()
 	defer s.dbLock.Unlock()
 
-	s.db.Data.AnimeToTrack = append(s.db.Data.AnimeToTrack, name)
+	s.db.Data.AnimeWatch = append(s.db.Data.AnimeWatch, show)
 	if err := s.db.Save(); err != nil {
 		slog.Error("can't save database", "err", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	json.NewEncoder(w).Encode(s.db.Data.AnimeToTrack)
+	json.NewEncoder(w).Encode(s.db.Data.AnimeWatch)
+}
+
+func (s *Sanguisuga) ListAnimeSnatches(w http.ResponseWriter, r *http.Request) {
+	s.dbLock.Lock()
+	defer s.dbLock.Unlock()
+
+	json.NewEncoder(w).Encode(s.db.Data.AnimeSnatches)
 }
 
 func (s *Sanguisuga) ListAnime(w http.ResponseWriter, r *http.Request) {
 	s.dbLock.Lock()
 	defer s.dbLock.Unlock()
 
-	json.NewEncoder(w).Encode(s.db.Data.AnimeToTrack)
+	json.NewEncoder(w).Encode(s.db.Data.AnimeWatch)
 }
 
 func (s *Sanguisuga) ScrapeSubsplease(ev *irc.Event) {
@@ -167,8 +173,8 @@ func (s *Sanguisuga) ScrapeSubsplease(ev *irc.Event) {
 	}
 
 	found := false
-	for _, name := range s.db.Data.AnimeToTrack {
-		if ann.ShowName == name {
+	for _, show := range s.db.Data.AnimeWatch {
+		if ann.ShowName == show.Title {
 			found = true
 		}
 	}
@@ -241,10 +247,16 @@ func (s *Sanguisuga) SubspleaseDCC(ev *irc.Event) {
 	lg := slog.Default().With("fname", fname, "botName", ev.Nick, "addr", addr)
 	lg.Info("fetching episode")
 
-	outDir := filepath.Join(s.Config.BaseDiskPath, ann.ShowName)
-	outFname := filepath.Join(outDir, fname)
+	baseDir := ""
+	for _, show := range s.db.Data.AnimeWatch {
+		if ann.ShowName == show.Title {
+			baseDir = show.DiskPath
+		}
+	}
 
-	os.MkdirAll(outDir, 0777)
+	outFname := filepath.Join(baseDir, fname)
+
+	os.MkdirAll(baseDir, 0777)
 
 	fout, err := os.Create(outFname)
 	if err != nil {
@@ -258,10 +270,10 @@ func (s *Sanguisuga) SubspleaseDCC(ev *irc.Event) {
 	ctx, cancel := context.WithTimeout(ev.Ctx, 120*time.Minute)
 	defer cancel()
 
+	start := time.Now()
 	progc, errc := d.Run(ctx)
 
-	defer lg.Info("done")
-
+outer:
 	for {
 		select {
 		case p := <-progc:
@@ -269,20 +281,22 @@ func (s *Sanguisuga) SubspleaseDCC(ev *irc.Event) {
 			curr.Set(p.CurrentFileSize)
 
 			if p.CurrentFileSize == p.FileSize {
-				delete(s.animeInFlight, fname)
-				return
+				break outer
 			}
 
 			if p.Percentage >= 100 {
-				delete(s.animeInFlight, fname)
-				return
+				break outer
 			}
 
-			lg.Info("download progress", "progress", p)
+			lg.Debug("download progress", "progress", p)
 		case err := <-errc:
 			lg.Error("error in DCC thread, giving up", "err", err)
 			delete(s.animeInFlight, fname)
 			return
 		}
 	}
+
+	delete(s.animeInFlight, fname)
+	dur := time.Since(start)
+	lg.Info("finished downloading", "dur", dur.String())
 }

@@ -10,6 +10,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -28,8 +29,9 @@ import (
 )
 
 var (
-	dbLoc       = flag.String("db-loc", "./data.json", "path to data file")
-	tysonConfig = flag.String("tyson-config", "./config.ts", "path to configuration secrets (TySON)")
+	dbLoc        = flag.String("db-loc", "./data.json", "path to data file")
+	tysonConfig  = flag.String("tyson-config", "./config.ts", "path to configuration secrets (TySON)")
+	externalSeed = flag.Bool("external-seed", false, "try to external seed?")
 
 	annRegex = regexp.MustCompile(`^New Torrent Announcement: <([^>]*)>\s+Name:'(.*)' uploaded by '.*' ?(freeleech)?\s+-\s+https://\w+.\w+.\w+./\w+./([0-9]+)$`)
 
@@ -102,7 +104,7 @@ func main() {
 		AuthKey:  c.Tailscale.Authkey,
 		Hostname: c.Tailscale.Hostname,
 		Logf:     func(string, ...any) {},
-		//Logf:     slog.NewLogLogger(slog.Default().Handler().WithAttrs([]slog.Attr{slog.String("from", "tsnet")}), slog.LevelInfo).Printf,
+		//Logf:     slog.NewLogLogger(slog.Default().Handler().WithAttrs([]slog.Attr{slog.String("from", "tsnet")}), slog.LevelDebug).Printf,
 	}
 
 	if err := srv.Start(); err != nil {
@@ -139,9 +141,10 @@ func main() {
 	}
 
 	http.HandleFunc("/api/anime/list", s.ListAnime)
+	http.HandleFunc("/api/anime/snatches", s.ListAnimeSnatches)
 	http.HandleFunc("/api/anime/track", s.TrackAnime)
 
-	s.XDCC()
+	go s.XDCC()
 
 	ircCli := irc.IRC(c.IRC.Nick, c.IRC.User)
 	ircCli.Password = c.IRC.Password
@@ -175,7 +178,7 @@ type State struct {
 	Seen map[string]TorrentAnnouncement
 
 	AnimeSnatches map[string]SubspleaseAnnouncement
-	AnimeToTrack  []string
+	AnimeWatch    []Show
 }
 
 func (s *Sanguisuga) HandleIRCMessage(ev *irc.Event) {
@@ -198,7 +201,84 @@ func (s *Sanguisuga) HandleIRCMessage(ev *irc.Event) {
 
 	lg.Debug("found torrent announcment")
 
-	if ta.Category == "TV :: Episodes HD" {
+	switch ta.Category {
+	case "Animation :: Anime":
+		if !*externalSeed {
+			return
+		}
+
+		lg.Info("found anime")
+
+		fname := fmt.Sprintf("%s.mkv", ta.Category)
+		_ = fname
+		// make goroutine to delay until download is done, set up directory structure, hard link, and download torrent
+		s.dbLock.Lock()
+		ann, ok := s.db.Data.AnimeSnatches[fname]
+		s.dbLock.Unlock()
+
+		if !ok {
+			lg.Debug("can't opportunistically external seed", "why", "episode not already snatched")
+			return
+		}
+
+		s.dbLock.Lock()
+		var show Show
+		for _, trackShow := range s.db.Data.AnimeWatch {
+			if trackShow.Title == ann.ShowName {
+				show = trackShow
+			}
+		}
+		s.dbLock.Unlock()
+
+		if show.Title == "" {
+			lg.Debug("can't opportunistically external seed", "why", "can't find show in database but we have a snatch?")
+			return
+		}
+
+		torrentURL := ConvertURL(ta.TorrentID, s.Config.RSSKey, ta.Name)
+
+		dirName := filepath.Join("/data", "Torrents", "seedHacking", "tl", ta.Name)
+
+		if err := os.Link(filepath.Join(show.DiskPath, fname), filepath.Join(dirName, fname)); err != nil {
+			lg.Error("can't set up seedhacking directory", "err", err)
+			return
+		}
+
+		var buf bytes.Buffer
+		resp, err := http.Get(torrentURL)
+		if err != nil {
+			lg.Error("can't download torrent", "url", torrentURL, "err", err, "torrentID", ta.TorrentID)
+			return
+		}
+
+		if resp.StatusCode != http.StatusOK {
+			lg.Error("got wrong status code", "want", http.StatusOK, "got", resp.StatusCode, "url", torrentURL, "torrentID", ta.TorrentID)
+			return
+		}
+
+		defer resp.Body.Close()
+		if n, err := io.Copy(&buf, resp.Body); err != nil {
+			lg.Error("can't fetch torrent body", "url", torrentURL, "err", err, "torrentID", ta.TorrentID)
+			return
+		} else {
+			lg.Info("downloaded bytes", "n", n, "url", torrentURL)
+		}
+
+		metaInfo := base64.StdEncoding.EncodeToString(buf.Bytes())
+
+		_, _, err = s.cl.AddTorrent(&transmission.NewTorrent{
+			DownloadDir: dirName,
+			Metainfo:    metaInfo,
+			Paused:      false,
+		})
+		if err != nil {
+			lg.Error("error adding torrent", "url", torrentURL, "err", err, "torrentID", ta.TorrentID)
+			return
+		}
+
+		lg.Info("opportunistically external seeding")
+		snatches.Add(1)
+	case "TV :: Episodes HD":
 		ti, err := parsetorrentname.Parse(ta.Name)
 		if err != nil {
 			lg.Error("can't parse ShowMeta", "err", err)
