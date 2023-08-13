@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"flag"
@@ -10,6 +11,7 @@ import (
 
 	"github.com/google/subcommands"
 	"github.com/rodaine/table"
+	"within.website/x/web"
 )
 
 var (
@@ -22,9 +24,7 @@ type Show struct {
 	Quality  string `json:"quality"`
 }
 
-type sanguisugaAnimeList struct {
-	URL string
-}
+type sanguisugaAnimeList struct{}
 
 func (*sanguisugaAnimeList) Name() string     { return "anime-list" }
 func (*sanguisugaAnimeList) Synopsis() string { return "Print list of anime tracked by sanguisuga." }
@@ -55,6 +55,48 @@ func (sal *sanguisugaAnimeList) Execute(ctx context.Context, f *flag.FlagSet, _ 
 	}
 
 	tbl.Print()
+
+	return subcommands.ExitSuccess
+}
+
+type sanguisugaAnimeTrack struct{}
+
+func (*sanguisugaAnimeTrack) Name() string { return "anime-track" }
+func (*sanguisugaAnimeTrack) Synopsis() string {
+	return "Add a new anime to the list of anime to track."
+}
+func (*sanguisugaAnimeTrack) Usage() string {
+	return `anime-track <title> <dataDir>:
+  Add a new anime to the tracklist for XDCC.`
+}
+
+func (sal *sanguisugaAnimeTrack) SetFlags(f *flag.FlagSet) {}
+
+func (sal *sanguisugaAnimeTrack) Execute(ctx context.Context, f *flag.FlagSet, _ ...interface{}) subcommands.ExitStatus {
+	if f.NArg() != 2 {
+		fmt.Println(sal.Usage())
+		return subcommands.ExitFailure
+	}
+
+	show := Show{
+		Title:    f.Arg(0),
+		DiskPath: f.Arg(1),
+		Quality:  "1080p",
+	}
+
+	data, err := json.Marshal(show)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	resp, err := http.Post(fmt.Sprintf("%s/api/anime/track", *sanguisugaURL), "application/json", bytes.NewBuffer(data))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		log.Fatal(web.NewError(http.StatusOK, resp))
+	}
 
 	return subcommands.ExitSuccess
 }

@@ -35,7 +35,7 @@ in {
         Group = "sanguisuga";
         Restart = "always";
         RestartSec = "30s";
-        ExecStart = "${cfg.package}/bin/sanguisuga";
+        ExecStart = "${cfg.package}/bin/sanguisuga --external-seed";
         RuntimeDirectory = "sanguisuga";
         RuntimeDirectoryMode = "0755";
         CacheDirectory = "sanguisuga";

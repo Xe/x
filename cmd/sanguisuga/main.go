@@ -181,6 +181,91 @@ type State struct {
 	AnimeWatch    []Show
 }
 
+func (s *Sanguisuga) ExternalSeedAnime(ta *TorrentAnnouncement, lg *slog.Logger) {
+	fname := fmt.Sprintf("%s.mkv", ta.Category)
+	_ = fname
+	// make goroutine to delay until download is done, set up directory structure, hard link, and download torrent
+
+	for {
+		s.aifLock.Lock()
+		_, ok := s.animeInFlight[fname]
+		s.aifLock.Unlock()
+		if ok {
+			time.Sleep(5 * time.Second)
+			continue
+		} else {
+			break
+		}
+	}
+
+	s.dbLock.Lock()
+	ann, ok := s.db.Data.AnimeSnatches[fname]
+	s.dbLock.Unlock()
+
+	if !ok {
+		lg.Debug("can't opportunistically external seed", "why", "episode not already snatched")
+		return
+	}
+
+	s.dbLock.Lock()
+	var show Show
+	for _, trackShow := range s.db.Data.AnimeWatch {
+		if trackShow.Title == ann.ShowName {
+			show = trackShow
+		}
+	}
+	s.dbLock.Unlock()
+
+	if show.Title == "" {
+		lg.Debug("can't opportunistically external seed", "why", "can't find show in database but we have a snatch?")
+		return
+	}
+
+	torrentURL := ConvertURL(ta.TorrentID, s.Config.RSSKey, ta.Name)
+
+	dirName := filepath.Join("/data", "Torrents", "seedHacking", "tl", ta.TorrentID)
+
+	if err := os.Link(filepath.Join(show.DiskPath, fname), filepath.Join(dirName, fname)); err != nil {
+		lg.Error("can't set up seedhacking directory", "err", err)
+		return
+	}
+
+	var buf bytes.Buffer
+	resp, err := http.Get(torrentURL)
+	if err != nil {
+		lg.Error("can't download torrent", "url", torrentURL, "err", err, "torrentID", ta.TorrentID)
+		return
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		lg.Error("got wrong status code", "want", http.StatusOK, "got", resp.StatusCode, "url", torrentURL, "torrentID", ta.TorrentID)
+		return
+	}
+
+	defer resp.Body.Close()
+	if n, err := io.Copy(&buf, resp.Body); err != nil {
+		lg.Error("can't fetch torrent body", "url", torrentURL, "err", err, "torrentID", ta.TorrentID)
+		return
+	} else {
+		lg.Info("downloaded bytes", "n", n, "url", torrentURL)
+	}
+
+	metaInfo := base64.StdEncoding.EncodeToString(buf.Bytes())
+
+	_, _, err = s.cl.AddTorrent(&transmission.NewTorrent{
+		DownloadDir: dirName,
+		Metainfo:    metaInfo,
+		Paused:      false,
+	})
+	if err != nil {
+		lg.Error("error adding torrent", "url", torrentURL, "err", err, "torrentID", ta.TorrentID)
+		return
+	}
+
+	lg.Info("opportunistically external seeding")
+	snatches.Add(1)
+}
+
 func (s *Sanguisuga) HandleIRCMessage(ev *irc.Event) {
 	// check if in channel
 	if ev.Code != "PRIVMSG" {
@@ -207,77 +292,9 @@ func (s *Sanguisuga) HandleIRCMessage(ev *irc.Event) {
 			return
 		}
 
-		lg.Info("found anime")
+		lg.Info("found anime, starting external seed hack")
 
-		fname := fmt.Sprintf("%s.mkv", ta.Category)
-		_ = fname
-		// make goroutine to delay until download is done, set up directory structure, hard link, and download torrent
-		s.dbLock.Lock()
-		ann, ok := s.db.Data.AnimeSnatches[fname]
-		s.dbLock.Unlock()
-
-		if !ok {
-			lg.Debug("can't opportunistically external seed", "why", "episode not already snatched")
-			return
-		}
-
-		s.dbLock.Lock()
-		var show Show
-		for _, trackShow := range s.db.Data.AnimeWatch {
-			if trackShow.Title == ann.ShowName {
-				show = trackShow
-			}
-		}
-		s.dbLock.Unlock()
-
-		if show.Title == "" {
-			lg.Debug("can't opportunistically external seed", "why", "can't find show in database but we have a snatch?")
-			return
-		}
-
-		torrentURL := ConvertURL(ta.TorrentID, s.Config.RSSKey, ta.Name)
-
-		dirName := filepath.Join("/data", "Torrents", "seedHacking", "tl", ta.Name)
-
-		if err := os.Link(filepath.Join(show.DiskPath, fname), filepath.Join(dirName, fname)); err != nil {
-			lg.Error("can't set up seedhacking directory", "err", err)
-			return
-		}
-
-		var buf bytes.Buffer
-		resp, err := http.Get(torrentURL)
-		if err != nil {
-			lg.Error("can't download torrent", "url", torrentURL, "err", err, "torrentID", ta.TorrentID)
-			return
-		}
-
-		if resp.StatusCode != http.StatusOK {
-			lg.Error("got wrong status code", "want", http.StatusOK, "got", resp.StatusCode, "url", torrentURL, "torrentID", ta.TorrentID)
-			return
-		}
-
-		defer resp.Body.Close()
-		if n, err := io.Copy(&buf, resp.Body); err != nil {
-			lg.Error("can't fetch torrent body", "url", torrentURL, "err", err, "torrentID", ta.TorrentID)
-			return
-		} else {
-			lg.Info("downloaded bytes", "n", n, "url", torrentURL)
-		}
-
-		metaInfo := base64.StdEncoding.EncodeToString(buf.Bytes())
-
-		_, _, err = s.cl.AddTorrent(&transmission.NewTorrent{
-			DownloadDir: dirName,
-			Metainfo:    metaInfo,
-			Paused:      false,
-		})
-		if err != nil {
-			lg.Error("error adding torrent", "url", torrentURL, "err", err, "torrentID", ta.TorrentID)
-			return
-		}
-
-		lg.Info("opportunistically external seeding")
-		snatches.Add(1)
+		go s.ExternalSeedAnime(ta, lg)
 	case "TV :: Episodes HD":
 		ti, err := parsetorrentname.Parse(ta.Name)
 		if err != nil {
