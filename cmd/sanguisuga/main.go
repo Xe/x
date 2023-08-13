@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/base64"
+	"errors"
 	"expvar"
 	"flag"
 	"fmt"
@@ -12,6 +13,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+	"sync"
 	"time"
 
 	irc "github.com/thoj/go-ircevent"
@@ -50,7 +52,7 @@ func ParseTorrentAnnouncement(input string) (*TorrentAnnouncement, error) {
 	match := annRegex.FindStringSubmatch(input)
 
 	if match == nil {
-		return nil, fmt.Errorf("invalid torrent announcement format")
+		return nil, errors.New("invalid torrent announcement format")
 	}
 
 	torrent := &TorrentAnnouncement{
@@ -81,6 +83,11 @@ func main() {
 			Seen: map[string]TorrentAnnouncement{},
 		}
 	}
+
+	if db.Data.AnimeSnatches == nil {
+		db.Data.AnimeSnatches = map[string]SubspleaseAnnouncement{}
+	}
+
 	if err := db.Save(); err != nil {
 		log.Fatalf("can't ping database: %v", err)
 	}
@@ -94,7 +101,8 @@ func main() {
 		Dir:      dataDir,
 		AuthKey:  c.Tailscale.Authkey,
 		Hostname: c.Tailscale.Hostname,
-		Logf:     slog.NewLogLogger(slog.Default().Handler().WithAttrs([]slog.Attr{slog.String("from", "tsnet")}), slog.LevelInfo).Printf,
+		Logf:     func(string, ...any) {},
+		//Logf:     slog.NewLogLogger(slog.Default().Handler().WithAttrs([]slog.Attr{slog.String("from", "tsnet")}), slog.LevelInfo).Printf,
 	}
 
 	if err := srv.Start(); err != nil {
@@ -126,7 +134,14 @@ func main() {
 		Config: c,
 		cl:     cl,
 		db:     db,
+
+		animeInFlight: map[string]*SubspleaseAnnouncement{},
 	}
+
+	http.HandleFunc("/api/anime/list", s.ListAnime)
+	http.HandleFunc("/api/anime/track", s.TrackAnime)
+
+	s.XDCC()
 
 	ircCli := irc.IRC(c.IRC.Nick, c.IRC.User)
 	ircCli.Password = c.IRC.Password
@@ -149,11 +164,18 @@ type Sanguisuga struct {
 	Config Config
 	cl     *transmission.Client
 	db     *jsondb.DB[State]
+	dbLock sync.Mutex
+
+	animeInFlight map[string]*SubspleaseAnnouncement
+	aifLock       sync.Mutex
 }
 
 type State struct {
 	// Name + " " + SeasonEpisode -> TorrentAnnouncement
 	Seen map[string]TorrentAnnouncement
+
+	AnimeSnatches map[string]SubspleaseAnnouncement
+	AnimeToTrack  []string
 }
 
 func (s *Sanguisuga) HandleIRCMessage(ev *irc.Event) {
@@ -189,6 +211,8 @@ func (s *Sanguisuga) HandleIRCMessage(ev *irc.Event) {
 		stateKey := fmt.Sprintf("%s %s", ti.Title, id)
 
 		for _, show := range s.Config.Shows {
+			s.dbLock.Lock()
+			defer s.dbLock.Unlock()
 			if s.db.Data == nil {
 				s.db.Data = &State{
 					Seen: map[string]TorrentAnnouncement{},

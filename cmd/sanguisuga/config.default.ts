@@ -29,10 +29,12 @@ export type Tailscale = {
 
 export type Config = {
   irc: IRC;
+  xdcc: IRC;
   transmission: Transmission;
   shows: Show[];
   rssKey: string;
   tailscale: Tailscale;
+  baseDiskPath: string;
 };
 
 export default {

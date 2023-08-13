@@ -30,8 +30,10 @@ type Tailscale struct {
 
 type Config struct {
 	IRC          IRC          `json:"irc"`
+	XDCC         IRC          `json:"xdcc"`
 	Transmission Transmission `json:"transmission"`
 	Shows        []Show       `json:"shows"`
 	RSSKey       string       `json:"rssKey"`
 	Tailscale    Tailscale    `json:"tailscale"`
+	BaseDiskPath string       `json:"baseDiskPath"`
 }
