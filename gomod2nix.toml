@@ -175,6 +175,9 @@ schema = 3
   [mod."github.com/google/pprof"]
     version = "v0.0.0-20230207041349-798e818bf904"
     hash = "sha256-uBlQacjKVBHhsxJBudNqtpey0XS9kLG0A53KDI3p77w="
+  [mod."github.com/google/subcommands"]
+    version = "v1.2.0"
+    hash = "sha256-HEKRAxZsIzBN8dB2g4xDbwhAVjjvbh3HLd8kI1J3hwM="
   [mod."github.com/google/uuid"]
     version = "v1.3.0"
     hash = "sha256-QoR55eBtA94T2tBszyxfDtO7/pjZZSGb5vm7U0Xhs0Y="
@@ -319,6 +322,9 @@ schema = 3
   [mod."github.com/rivo/uniseg"]
     version = "v0.4.4"
     hash = "sha256-B8tbL9K6ICLdm0lEhs9+h4cpjAfvFtNiFMGvQZmw0bM="
+  [mod."github.com/rodaine/table"]
+    version = "v1.1.0"
+    hash = "sha256-Vy12XP5XF7g/fsWGvOIyShUaQ+p9H+NYbzhtUewRMzU="
   [mod."github.com/rogpeppe/go-internal"]
     version = "v1.11.0"
     hash = "sha256-BucSndJVnqX9e6p5PfA6Z8N2bGfIeRfxAxYLUDXTbIo="

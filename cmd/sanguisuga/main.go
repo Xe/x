@@ -290,9 +290,10 @@ func (s *Sanguisuga) HandleIRCMessage(ev *irc.Event) {
 
 		stateKey := fmt.Sprintf("%s %s", ti.Title, id)
 
+		s.dbLock.Lock()
+		defer s.dbLock.Unlock()
+
 		for _, show := range s.Config.Shows {
-			s.dbLock.Lock()
-			defer s.dbLock.Unlock()
 			if s.db.Data == nil {
 				s.db.Data = &State{
 					Seen: map[string]TorrentAnnouncement{},
