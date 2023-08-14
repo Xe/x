@@ -33,6 +33,8 @@ var (
 	tysonConfig  = flag.String("tyson-config", "./config.ts", "path to configuration secrets (TySON)")
 	externalSeed = flag.Bool("external-seed", false, "try to external seed?")
 
+	crcCheckCLI = flag.Bool("crc-check", false, "if true, check args[0] against hash args[1]")
+
 	annRegex = regexp.MustCompile(`^New Torrent Announcement: <([^>]*)>\s+Name:'(.*)' uploaded by '.*' ?(freeleech)?\s+-\s+https://\w+.\w+.\w+./\w+./([0-9]+)$`)
 
 	snatches = expvar.NewInt("gauge_sanguisuga_snatches")
@@ -70,6 +72,22 @@ func ParseTorrentAnnouncement(input string) (*TorrentAnnouncement, error) {
 func main() {
 	internal.HandleStartup()
 	hostinfo.SetApp("within.website/x/cmd/sanguisuga")
+
+	if *crcCheckCLI {
+		if flag.NArg() != 2 {
+			log.Fatalf("usage: %s <filename> <hash>", os.Args[0])
+		}
+
+		fname := flag.Arg(0)
+		hash := flag.Arg(1)
+
+		ok, err := crcCheck(fname, hash)
+		if err != nil {
+			log.Fatal(err)
+		}
+		log.Printf("hash status: %v", ok)
+		return
+	}
 
 	var c Config
 	if err := tyson.Unmarshal(*tysonConfig, &c); err != nil {
@@ -291,8 +309,6 @@ func (s *Sanguisuga) HandleIRCMessage(ev *irc.Event) {
 		if !*externalSeed {
 			return
 		}
-
-		lg.Info("found anime, starting external seed hack")
 
 		go s.ExternalSeedAnime(ta, lg)
 	case "TV :: Episodes HD":
