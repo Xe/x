@@ -7,6 +7,8 @@ import (
 	"errors"
 	"expvar"
 	"fmt"
+	"hash/crc32"
+	"io"
 	"log"
 	"net"
 	"net/http"
@@ -24,7 +26,7 @@ import (
 )
 
 var (
-	subspleaseAnnounceRegex = regexp.MustCompile(`^.*\* (\[SubsPlease\] (.*) - ([0-9]+) \(([0-9]+p)\).*\.mkv) \* /MSG ([A-Za-z-_|]+) XDCC SEND ([0-9]+)$`)
+	subspleaseAnnounceRegex = regexp.MustCompile(`^.*\* (?P<fname>\[SubsPlease\] (?P<showName>.*) - (?P<episode>[0-9]+) \((?P<resolution>[0-9]{3,4})p\) \[(?P<crc32>[0-9A-Fa-f]{8})\]\.mkv) \* /MSG (?P<botName>[^ ]+) XDCC SEND (?P<packID>[0-9]+)$`)
 	dccCommand              = regexp.MustCompile(`^DCC SEND "(.*)" ([0-9]+) ([0-9]+) ([0-9]+)$`)
 
 	bytesDownloaded = &metrics.LabelMap{Label: "filename"}
@@ -35,9 +37,13 @@ func init() {
 }
 
 type SubspleaseAnnouncement struct {
-	Filename, ShowName string
-	Episode, Quality   string
-	BotName, PackID    string
+	Filename   string `json:"fname"`
+	ShowName   string `json:"showName"`
+	Episode    string `json:"episode"`
+	Resolution string `json:"resolution"`
+	CRC32      string `json:"crc32"`
+	BotName    string `json:"botName"`
+	PackID     string `json:"packID"`
 }
 
 func (sa SubspleaseAnnouncement) Key() string {
@@ -48,25 +54,28 @@ func (sa SubspleaseAnnouncement) LogValue() slog.Value {
 	return slog.GroupValue(
 		slog.String("showname", sa.ShowName),
 		slog.String("episode", sa.Episode),
-		slog.String("quality", sa.Quality),
+		slog.String("resolution", sa.Resolution),
 		slog.String("botName", sa.BotName),
+		slog.String("crc32", sa.CRC32),
 	)
 }
 
 func ParseSubspleaseAnnouncement(input string) (*SubspleaseAnnouncement, error) {
-	match := subspleaseAnnounceRegex.FindStringSubmatch(input)
+	re := subspleaseAnnounceRegex
+	matches := subspleaseAnnounceRegex.FindStringSubmatch(input)
 
-	if match == nil {
+	if matches == nil {
 		return nil, errors.New("invalid annoucement format")
 	}
 
 	return &SubspleaseAnnouncement{
-		Filename: match[1],
-		ShowName: match[2],
-		Episode:  match[3],
-		Quality:  match[4],
-		BotName:  match[5],
-		PackID:   match[6],
+		Filename:   matches[re.SubexpIndex("fname")],
+		ShowName:   matches[re.SubexpIndex("showName")],
+		Episode:    matches[re.SubexpIndex("episode")],
+		Resolution: matches[re.SubexpIndex("resolution")],
+		CRC32:      matches[re.SubexpIndex("crc32")],
+		BotName:    matches[re.SubexpIndex("botName")],
+		PackID:     matches[re.SubexpIndex("packID")],
 	}, nil
 }
 
@@ -135,6 +144,7 @@ func (s *Sanguisuga) ListAnime(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Sanguisuga) ScrapeSubsplease(ev *irc.Event) {
+	slog.Debug("chat line", "code", ev.Code, "channel", ev.Arguments[0], "msg", ev.MessageWithoutFormat())
 	if ev.Code != "PRIVMSG" {
 		return
 	}
@@ -155,7 +165,7 @@ func (s *Sanguisuga) ScrapeSubsplease(ev *irc.Event) {
 		return
 	}
 
-	if ann.Quality != "1080p" {
+	if ann.Resolution != "1080" {
 		return
 	}
 
@@ -222,13 +232,33 @@ func (s *Sanguisuga) SubspleaseDCC(ev *irc.Event) {
 		fname = fname[:len(fname)-2]
 	}
 
-	ann, _ := s.animeInFlight[fname]
+	var ann *SubspleaseAnnouncement
+	t := time.NewTicker(25 * time.Millisecond)
+	defer t.Stop()
+	i := 0
+waitLoop:
+	for {
+		select {
+		case <-t.C:
+			ann, _ = s.animeInFlight[fname]
 
-	if ann == nil {
-		slog.Debug("ann == nil?", "fname", fname, "ann", s.animeInFlight[fname])
-		return
+			if ann == nil {
+				continue
+			} else {
+				slog.Debug("found announcement", "ann", ann)
+				break waitLoop
+			}
+
+		default:
+			if i >= 30 {
+				slog.Error("wanted to download file but we aren't watching for it", "fname", fname)
+				return
+			}
+
+		}
 	}
 
+	// TODO(Xe): fix for IPv6
 	ipUint, err := strconv.ParseUint(ipString, 10, 32)
 	if err != nil {
 		slog.Error("can't parse IP address", "addr", ipString, "err", err)
@@ -298,5 +328,35 @@ outer:
 
 	delete(s.animeInFlight, fname)
 	dur := time.Since(start)
+
 	lg.Info("finished downloading", "dur", dur.String())
+
+	_, err = crcCheck(fname, ann.CRC32)
+	if err != nil {
+		slog.Error("got wrong hash", "err", err)
+	}
+
+	lg.Debug("hash check passed")
+}
+
+func crcCheck(fname, wantHash string) (bool, error) {
+	fin, err := os.Open(fname)
+	if err != nil {
+		return false, err
+	}
+	defer fin.Close()
+
+	h := crc32.NewIEEE()
+
+	if _, err := io.Copy(h, fin); err != nil {
+		return false, err
+	}
+
+	gotHash := fmt.Sprintf("%X", h.Sum32())
+
+	if wantHash != gotHash {
+		return false, fmt.Errorf("hash didn't match: want %s, got: %s", wantHash, gotHash)
+	}
+
+	return true, nil
 }
