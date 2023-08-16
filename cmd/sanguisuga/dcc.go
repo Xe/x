@@ -22,7 +22,7 @@ import (
 	irc "github.com/thoj/go-ircevent"
 	"golang.org/x/exp/slog"
 	"tailscale.com/metrics"
-	"within.website/x/cmd/sanguisuga/dcc"
+	"within.website/x/cmd/sanguisuga/internal/dcc"
 )
 
 var (

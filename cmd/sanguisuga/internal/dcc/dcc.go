@@ -2,6 +2,7 @@ package dcc
 
 import (
 	"context"
+	"encoding/binary"
 	"io"
 	"net"
 	"time"
@@ -108,6 +109,18 @@ D:
 			return        // terminated..
 		case <-ticker.C:
 			d.progress(float64(written), &speed)
+			// notify the other side about the state of the connection
+			writtenNetworkOrder := uint32(written)
+			if err := binary.Write(d.conn, binary.BigEndian, writtenNetworkOrder); err != nil {
+				if err == io.EOF {
+					err = nil
+				}
+
+				d.progress(float64(written), &speed)
+				d.done <- err
+
+				return
+			}
 		default:
 			n, err := reader.Read(buf)
 

@@ -16,6 +16,7 @@ require (
 	github.com/go-interpreter/wagon v0.6.0
 	github.com/go-shiori/go-readability v0.0.0-20230421032831-c66949dfc0ad
 	github.com/google/go-github v17.0.0+incompatible
+	github.com/google/subcommands v1.2.0
 	github.com/google/uuid v1.3.0
 	github.com/hullerob/go.farbfeld v0.0.0-20181222022525-3661193c725f
 	github.com/jackc/pgx/v5 v5.4.3
@@ -28,6 +29,7 @@ require (
 	github.com/peterh/liner v1.2.2
 	github.com/pkg/errors v0.9.1
 	github.com/posener/complete v1.2.3
+	github.com/rodaine/table v1.1.0
 	github.com/rogpeppe/go-internal v1.11.0
 	github.com/rs/cors v1.9.0
 	github.com/samber/go-gpt-3-encoder v0.3.1
@@ -62,14 +64,12 @@ require (
 	github.com/gogs/chardet v0.0.0-20211120154057-b7413eaefb8f // indirect
 	github.com/google/nftables v0.1.1-0.20230115205135-9aa6fdf5a28c // indirect
 	github.com/google/pprof v0.0.0-20230207041349-798e818bf904 // indirect
-	github.com/google/subcommands v1.2.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a // indirect
 	github.com/jackc/puddle/v2 v2.2.1 // indirect
 	github.com/mattn/go-isatty v0.0.19 // indirect
 	github.com/miekg/dns v1.1.55 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
-	github.com/rodaine/table v1.1.0 // indirect
 	github.com/savsgio/gotils v0.0.0-20230208104028-c358bd845dee // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasthttp v1.48.0 // indirect
