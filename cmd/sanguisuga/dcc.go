@@ -331,6 +331,8 @@ outer:
 
 	lg.Info("finished downloading", "dur", dur.String())
 
+	s.Notify(fmt.Sprintf("Fetched %s episode %s", ann.ShowName, ann.Episode))
+
 	_, err = crcCheck(fname, ann.CRC32)
 	if err != nil {
 		slog.Error("got wrong hash", "err", err)

@@ -28,6 +28,11 @@ type Tailscale struct {
 	DataDir  *string `json:"dataDir,omitempty"`
 }
 
+type Telegram struct {
+	Token       string `json:"token"`
+	MentionUser int64  `json:"mentionUser"`
+}
+
 type Config struct {
 	IRC          IRC          `json:"irc"`
 	XDCC         IRC          `json:"xdcc"`
@@ -36,4 +41,5 @@ type Config struct {
 	RSSKey       string       `json:"rssKey"`
 	Tailscale    Tailscale    `json:"tailscale"`
 	BaseDiskPath string       `json:"baseDiskPath"`
+	Telegram     Telegram     `json:"telegram"`
 }

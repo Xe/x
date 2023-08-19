@@ -17,6 +17,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/mymmrac/telego"
+	tu "github.com/mymmrac/telego/telegoutil"
 	irc "github.com/thoj/go-ircevent"
 	"go.jetpack.io/tyson"
 	"golang.org/x/exp/slog"
@@ -150,10 +152,18 @@ func main() {
 		log.Fatalf("can't connect to transmission: %v", err)
 	}
 
+	bot, err := telego.NewBot(c.Telegram.Token)
+	if err != nil {
+		log.Fatalf("can't connect to telegram: %v", err)
+	}
+
+	defer bot.StopLongPolling()
+
 	s := &Sanguisuga{
 		Config: c,
 		cl:     cl,
 		db:     db,
+		bot:    bot,
 
 		animeInFlight: map[string]*SubspleaseAnnouncement{},
 	}
@@ -186,9 +196,14 @@ type Sanguisuga struct {
 	cl     *transmission.Client
 	db     *jsondb.DB[State]
 	dbLock sync.Mutex
+	bot    *telego.Bot
 
 	animeInFlight map[string]*SubspleaseAnnouncement
 	aifLock       sync.Mutex
+}
+
+func (s *Sanguisuga) Notify(msg string) {
+	s.bot.SendMessage(tu.Message(tu.ID(s.Config.Telegram.MentionUser), msg))
 }
 
 type State struct {
@@ -386,6 +401,8 @@ func (s *Sanguisuga) HandleIRCMessage(ev *irc.Event) {
 
 			lg.Info("added torrent", "title", ti.Title, "id", id, "path", downloadDir, "infohash", t.Hash, "tid", t.ID, "dupe", dupe)
 			snatches.Add(1)
+
+			s.Notify(fmt.Sprintf("added torrent for %s %s", ti.Title, id))
 
 			s.db.Data.Seen[stateKey] = *ta
 			if err := s.db.Save(); err != nil {

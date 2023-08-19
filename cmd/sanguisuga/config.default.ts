@@ -27,6 +27,11 @@ export type Tailscale = {
   dataDir?: string;
 };
 
+export type Telegram = {
+  token: string;
+  mentionUser: number;
+};
+
 export type Config = {
   irc: IRC;
   xdcc: IRC;
@@ -35,10 +40,19 @@ export type Config = {
   rssKey: string;
   tailscale: Tailscale;
   baseDiskPath: string;
+  telegram: Telegram;
 };
 
 export default {
   irc: {
+    server: "",
+    password: "",
+    channel: "",
+    nick: "",
+    user: "",
+    real: ""
+  },
+  xdcc: {
     server: "",
     password: "",
     channel: "",
@@ -65,5 +79,10 @@ export default {
     hostname: "sanguisuga-dev",
     authkey: "",
     dataDir: undefined,
+  },
+  baseDiskPath: "/data/TV/",
+  telegram: {
+    token: "",
+    mentionUser: 0,
   },
 } satisfies Config;
