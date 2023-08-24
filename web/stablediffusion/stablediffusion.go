@@ -14,7 +14,7 @@ import (
 )
 
 var (
-	sdServerURL = flag.String("within.website/x/web/stablediffusion-server-url", "http://logos:7860", "URL for the Stable Diffusion API used with the default client")
+	sdServerURL = flag.String("within.website/x/web/stablediffusion/server-url", "http://logos:7860", "URL for the Stable Diffusion API used with the default client")
 )
 
 func buildURL(base, path string) (*url.URL, error) {
