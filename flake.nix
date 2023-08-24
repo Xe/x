@@ -52,6 +52,9 @@
         pkgs = import nixpkgs {
           inherit system;
           overlays = [
+            (final: prev: {
+              go = prev.go_1_21;
+            })
             gomod2nix.overlays.default
             rust-overlay.overlays.default
             #(final: prev: self.packages.${system})
@@ -184,7 +187,7 @@
           src = pkgs.runCommand "gowasi-version-hack" { } ''
             mkdir -p $out
             echo "go-wasip1-dev-${wasigo.shortRev}" > $out/VERSION
-            cp -vrf ${wasigo}/* $out
+            cp -rf ${wasigo}/* $out
           '';
         }) // {
           GOOS = "wasip1";
@@ -302,6 +305,8 @@
             terraform
             litestream
             nodejs
+            deno
+            esbuild
 
             postgresql_15
             pgloader

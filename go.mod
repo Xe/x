@@ -1,6 +1,6 @@
 module within.website/x
 
-go 1.19
+go 1.21.0
 
 require (
 	cirello.io/goherokuname v0.0.0-20190914093443-b436bae8c2c5
