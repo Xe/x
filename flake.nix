@@ -30,18 +30,10 @@
 
     ## don't follow nixpkgs because that causes a very long font build process.
     iaso-fonts.url = "github:Xe/iosevka";
-
-    ## other things
-    # go + wasip1
-    wasigo = {
-      # https://github.com/Pryz/go/archive/refs/heads/wasip1-wasm.zip
-      url = "github:golang/go";
-      flake = false;
-    };
   };
 
   outputs = { self, nixpkgs, utils, gomod2nix, rust-overlay, naersk, xess
-    , iaso-fonts, wasigo }@inputs:
+    , iaso-fonts }@inputs:
     utils.lib.eachSystem [
       "x86_64-linux"
       "aarch64-linux"
@@ -181,29 +173,11 @@
             '';
           };
 
-        wasigo' = pkgs.go_1_20.overrideAttrs (old: {
-          GOROOT_BOOTSTRAP = "${pkgs.go_1_20}/share/go";
-          patches = [ ];
-          src = pkgs.runCommand "gowasi-version-hack" { } ''
-            mkdir -p $out
-            echo "go-wasip1-dev-${wasigo.shortRev}" > $out/VERSION
-            cp -rf ${wasigo}/* $out
-          '';
-        }) // {
-          GOOS = "wasip1";
-          GOARCH = "wasm";
-        };
-
         gowasi = pkgs.writeShellScriptBin "gowasi" ''
           export GOOS=wasip1
           export GOARCH=wasm
-          exec ${wasigo'}/bin/go $*
+          exec ${pkgs.go}/bin/go $*
         '';
-
-        buildGoWasiModule =
-          pkgs.callPackage "${nixpkgs}/pkgs/build-support/go/module.nix" {
-            go = wasigo';
-          };
       in {
         overlays.default = final: prev:
           let
@@ -243,6 +217,7 @@
           vest-pit-near = copyFile { pname = "vest-pit-near"; };
           whoisfront = copyFile { pname = "whoisfront"; };
           within-website = copyFile { pname = "within.website"; };
+          yeet = copyFile { pname = "yeet"; };
         };
 
         legacyPackages = {
