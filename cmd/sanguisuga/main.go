@@ -7,6 +7,7 @@ import (
 	"expvar"
 	"flag"
 	"fmt"
+	"html/template"
 	"io"
 	"log"
 	"log/slog"
@@ -34,6 +35,7 @@ var (
 	dbLoc        = flag.String("db-loc", "./data.json", "path to data file")
 	tysonConfig  = flag.String("tyson-config", "./config.ts", "path to configuration secrets (TySON)")
 	externalSeed = flag.Bool("external-seed", false, "try to external seed?")
+	tsnetVerbose = flag.Bool("tsnet-verbose", false, "enable verbose tsnet logging")
 
 	crcCheckCLI = flag.Bool("crc-check", false, "if true, check args[0] against hash args[1]")
 
@@ -102,12 +104,22 @@ func main() {
 	}
 	if db.Data == nil {
 		db.Data = &State{
-			Seen: map[string]TorrentAnnouncement{},
+			TVSnatches:    map[string]TorrentAnnouncement{},
+			AnimeSnatches: map[string]SubspleaseAnnouncement{},
+			TVWatch:       c.Shows,
 		}
+	}
+
+	if db.Data.TVSnatches == nil {
+		db.Data.TVSnatches = map[string]TorrentAnnouncement{}
 	}
 
 	if db.Data.AnimeSnatches == nil {
 		db.Data.AnimeSnatches = map[string]SubspleaseAnnouncement{}
+	}
+
+	if len(db.Data.TVWatch) == 0 {
+		db.Data.TVWatch = c.Shows
 	}
 
 	if err := db.Save(); err != nil {
@@ -124,7 +136,10 @@ func main() {
 		AuthKey:  c.Tailscale.Authkey,
 		Hostname: c.Tailscale.Hostname,
 		Logf:     func(string, ...any) {},
-		//Logf:     slog.NewLogLogger(slog.Default().Handler().WithAttrs([]slog.Attr{slog.String("from", "tsnet")}), slog.LevelDebug).Printf,
+	}
+
+	if *tsnetVerbose {
+		srv.Logf = slog.NewLogLogger(slog.Default().Handler().WithAttrs([]slog.Attr{slog.String("from", "tsnet")}), slog.LevelDebug).Printf
 	}
 
 	if err := srv.Start(); err != nil {
@@ -164,13 +179,26 @@ func main() {
 		cl:     cl,
 		db:     db,
 		bot:    bot,
+		tmpl:   template.Must(template.ParseFS(templates, "tmpl/*.html")),
 
 		animeInFlight: map[string]*SubspleaseAnnouncement{},
 	}
 
+	http.HandleFunc("/", s.AdminIndex)
+	http.HandleFunc("/anime", s.AdminAnimeList)
+	http.HandleFunc("/tv", s.AdminTVList)
+
 	http.HandleFunc("/api/anime/list", s.ListAnime)
 	http.HandleFunc("/api/anime/snatches", s.ListAnimeSnatches)
 	http.HandleFunc("/api/anime/track", s.TrackAnime)
+	http.HandleFunc("/api/anime/untrack", s.UntrackAnime)
+
+	http.HandleFunc("/api/tv/list", s.ListTV)
+	http.HandleFunc("/api/tv/snatches", s.ListTVSnatches)
+	http.HandleFunc("/api/tv/track", s.TrackTV)
+	http.HandleFunc("/api/tv/untrack", s.UntrackTV)
+
+	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.FS(static))))
 
 	go s.XDCC()
 
@@ -197,6 +225,7 @@ type Sanguisuga struct {
 	db     *jsondb.DB[State]
 	dbLock sync.Mutex
 	bot    *telego.Bot
+	tmpl   *template.Template
 
 	animeInFlight map[string]*SubspleaseAnnouncement
 	aifLock       sync.Mutex
@@ -207,8 +236,8 @@ func (s *Sanguisuga) Notify(msg string) {
 }
 
 type State struct {
-	// Name + " " + SeasonEpisode -> TorrentAnnouncement
-	Seen map[string]TorrentAnnouncement
+	TVSnatches map[string]TorrentAnnouncement
+	TVWatch    []Show
 
 	AnimeSnatches map[string]SubspleaseAnnouncement
 	AnimeWatch    []Show
@@ -341,13 +370,13 @@ func (s *Sanguisuga) HandleIRCMessage(ev *irc.Event) {
 		s.dbLock.Lock()
 		defer s.dbLock.Unlock()
 
-		for _, show := range s.Config.Shows {
+		for _, show := range s.db.Data.TVWatch {
 			if s.db.Data == nil {
 				s.db.Data = &State{
-					Seen: map[string]TorrentAnnouncement{},
+					TVSnatches: map[string]TorrentAnnouncement{},
 				}
 			}
-			if _, found := s.db.Data.Seen[stateKey]; found {
+			if _, found := s.db.Data.TVSnatches[stateKey]; found {
 				lg.Info("already snatched", "title", ti.Title, "id", id)
 				return
 			}
@@ -404,7 +433,7 @@ func (s *Sanguisuga) HandleIRCMessage(ev *irc.Event) {
 
 			s.Notify(fmt.Sprintf("added torrent for %s %s", ti.Title, id))
 
-			s.db.Data.Seen[stateKey] = *ta
+			s.db.Data.TVSnatches[stateKey] = *ta
 			if err := s.db.Save(); err != nil {
 				lg.Error("error saving state", "err", err)
 			}

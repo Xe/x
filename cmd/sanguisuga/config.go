@@ -1,5 +1,7 @@
 package main
 
+import "log/slog"
+
 type IRC struct {
 	Server   string `json:"server"`
 	Password string `json:"password"`
@@ -14,6 +16,14 @@ type Show struct {
 	Title    string `json:"title"`
 	DiskPath string `json:"diskPath"`
 	Quality  string `json:"quality"`
+}
+
+func (s Show) LogValue() slog.Value {
+	return slog.GroupValue(
+		slog.String("title", s.Title),
+		slog.String("disk_path", s.DiskPath),
+		slog.String("quality", s.Quality),
+	)
 }
 
 type Transmission struct {
