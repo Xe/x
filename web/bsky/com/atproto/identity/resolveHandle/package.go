@@ -3,10 +3,10 @@ package resolveHandle
 import (
 	"context"
 	"encoding/json"
+	"log/slog"
 	"net/http"
 
 	"github.com/pasztorpisti/qs"
-	"within.website/ln"
 	"within.website/x/web/bsky"
 )
 
@@ -35,7 +35,7 @@ func ServeHTTP(h Handler) http.HandlerFunc {
 		q := &Query{}
 
 		if err := qs.Unmarshal(q, req.URL.RawQuery); err != nil {
-			ln.Error(req.Context(), err, ln.Action("parsing request query parameters"))
+			slog.Error("error parsing request query parameters", "err", err)
 			rw.Header().Set("Content-Type", "application/json")
 			rw.WriteHeader(http.StatusBadRequest)
 			json.NewEncoder(rw).Encode(bsky.Error{
@@ -47,7 +47,7 @@ func ServeHTTP(h Handler) http.HandlerFunc {
 
 		output, err := h.IdentityResolveHandle(req.Context(), q)
 		if err != nil {
-			ln.Error(req.Context(), err, ln.Action("doing handler logic"))
+			slog.Error("error doing handler logic", "err", err)
 			switch err.(type) {
 			case *bsky.Error:
 				rw.Header().Set("Content-Type", "application/json")

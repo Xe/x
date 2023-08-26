@@ -4,19 +4,18 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"time"
 
 	"nhooyr.io/websocket"
-	"within.website/ln"
-	"within.website/ln/opname"
 )
 
 func (c *Client) Connect(ctx context.Context, handler Handler) {
-	ctx = opname.With(ctx, "websocket-connect")
+	lg := slog.Default().With("at", "websocket-client")
 
 	go func(ctx context.Context) {
 		if err := c.doWebsocket(ctx, c.Token, c.WSURL, handler); err != nil {
-			ln.Error(ctx, err, ln.Info("websocket error, retrying"))
+			lg.Error("websocket error, retrying", "err", err)
 		}
 
 		t := time.NewTicker(30 * time.Second)
@@ -27,9 +26,9 @@ func (c *Client) Connect(ctx context.Context, handler Handler) {
 			case <-ctx.Done():
 				return
 			case <-t.C:
-				ln.Log(ctx, ln.Action("reconnecting"))
+				lg.Debug("reconnecting")
 				if err := c.doWebsocket(ctx, c.Token, c.WSURL, handler); err != nil {
-					ln.Error(ctx, err, ln.Info("websocket error, retrying"))
+					lg.Error("websocket error, retrying", "err", err)
 				}
 			}
 		}
@@ -37,12 +36,12 @@ func (c *Client) Connect(ctx context.Context, handler Handler) {
 }
 
 func (c *Client) doWebsocket(ctx context.Context, token, wsURL string, handler Handler) error {
-	ln.Log(ctx, ln.Info("connecting to websocket"), ln.F{"server": wsURL})
 	conn, _, err := websocket.Dial(ctx, wsURL, &websocket.DialOptions{})
 	if err != nil {
 		return err
 	}
 	defer conn.Close(websocket.StatusNormalClosure, "doWebsocket function returned")
+	slog.Debug("connected to websocket", "server", wsURL)
 
 	data, err := json.Marshal(struct {
 		Type  string `json:"type"`
@@ -71,11 +70,11 @@ func (c *Client) doWebsocket(ctx context.Context, token, wsURL string, handler H
 					Data: 0,
 				})
 				if err != nil {
-					ln.Error(ctx, err, ln.Info("error marshaling ping"))
+					slog.Error("can't marshal ping message", "err", err)
 					continue
 				}
 				if err := conn.Write(ctx, websocket.MessageText, data); err != nil {
-					ln.Error(ctx, err, ln.Info("error writing ping"))
+					slog.Error("can't write ping message", "err", err)
 					continue
 				}
 			}
@@ -122,16 +121,15 @@ func (c *Client) handleOneMessage(ctx context.Context, data []byte, handler Hand
 	if err := json.Unmarshal(data, &msg); err != nil {
 		return err
 	}
-	ctx = opname.With(ctx, msg.Type)
 	switch msg.Type {
 	case "Pong":
 	case "Authenticated":
 		if err := handler.Authenticated(ctx); err != nil {
-			ln.Error(ctx, err, ln.Info("error in handler.Authenticated"))
+			slog.Error("error in handler", "call", msg.Type, "err", err)
 		}
 	case "Ready":
 		if err := handler.Ready(ctx); err != nil {
-			ln.Error(ctx, err, ln.Info("error in handler.Ready"))
+			slog.Error("error in handler", "call", msg.Type, "err", err)
 		}
 	case "Error":
 		var wserr WSError
@@ -159,7 +157,7 @@ func (c *Client) handleOneMessage(ctx context.Context, data []byte, handler Hand
 			return err
 		}
 		if err := handler.MessageCreate(ctx, &msg); err != nil {
-			ln.Error(ctx, err, ln.Info("error in handler.Message"))
+			slog.Error("error in handler", "call", "Message", "err", err)
 		}
 	case "MessageUpdate":
 		var msg struct {
@@ -172,7 +170,7 @@ func (c *Client) handleOneMessage(ctx context.Context, data []byte, handler Hand
 			return err
 		}
 		if err := handler.MessageUpdate(ctx, msg.ChannelID, msg.MessageID, msg.Data); err != nil {
-			ln.Error(ctx, err, ln.Info("error in handler.MessageUpdate"))
+			slog.Error("error in handler.MessageUpdate", "err", err)
 		}
 	case "MessageAppend":
 		var msg struct {
@@ -185,7 +183,7 @@ func (c *Client) handleOneMessage(ctx context.Context, data []byte, handler Hand
 			return err
 		}
 		if err := handler.MessageAppend(ctx, msg.ChannelID, msg.MessageID, msg.Append); err != nil {
-			ln.Error(ctx, err, ln.Info("error in handler.MessageAppend"))
+			slog.Error("error in handler", "call", msg.Type, "err", err)
 		}
 	case "MessageDelete":
 		var msg struct {
@@ -197,7 +195,7 @@ func (c *Client) handleOneMessage(ctx context.Context, data []byte, handler Hand
 			return err
 		}
 		if err := handler.MessageDelete(ctx, msg.ChannelID, msg.MessageID); err != nil {
-			ln.Error(ctx, err, ln.Info("error in handler.MessageDelete"))
+			slog.Error("error in handler", "call", msg.Type, "err", err)
 		}
 	case "MessageReact":
 		var msg struct {
@@ -211,7 +209,7 @@ func (c *Client) handleOneMessage(ctx context.Context, data []byte, handler Hand
 			return err
 		}
 		if err := handler.MessageReact(ctx, msg.ChannelID, msg.MessageID, msg.UserID, msg.Emoji); err != nil {
-			ln.Error(ctx, err, ln.Info("error in handler.MessageReact"))
+			slog.Error("error in handler", "call", msg.Type, "err", err)
 		}
 	case "MessageUnreact":
 		var msg struct {
@@ -225,7 +223,7 @@ func (c *Client) handleOneMessage(ctx context.Context, data []byte, handler Hand
 			return err
 		}
 		if err := handler.MessageUnreact(ctx, msg.ChannelID, msg.MessageID, msg.UserID, msg.Emoji); err != nil {
-			ln.Error(ctx, err, ln.Info("error in handler.MessageReact"))
+			slog.Error("error in handler", "call", msg.Type, "err", err)
 		}
 	case "MessageRemoveReaction":
 		var msg struct {
@@ -238,7 +236,7 @@ func (c *Client) handleOneMessage(ctx context.Context, data []byte, handler Hand
 			return err
 		}
 		if err := handler.MessageRemoveReaction(ctx, msg.ChannelID, msg.MessageID, msg.EmojiID); err != nil {
-			ln.Error(ctx, err, ln.Info("error in handler.MessageRemoveReaction"))
+			slog.Error("error in handler", "call", msg.Type, "err", err)
 		}
 	case "ChannelCreate":
 		var ch Channel
@@ -246,7 +244,7 @@ func (c *Client) handleOneMessage(ctx context.Context, data []byte, handler Hand
 			return err
 		}
 		if err := handler.ChannelCreate(ctx, &ch); err != nil {
-			ln.Error(ctx, err, ln.Info("error in handler.ChannelCreate"))
+			slog.Error("error in handler", "call", msg.Type, "err", err)
 		}
 	case "ChannelUpdate":
 		var ch struct {
@@ -259,7 +257,7 @@ func (c *Client) handleOneMessage(ctx context.Context, data []byte, handler Hand
 			return err
 		}
 		if err := handler.ChannelUpdate(ctx, ch.ChannelID, &ch.Data, ch.Clear); err != nil {
-			ln.Error(ctx, err, ln.Info("error in handler.ChannelUpdate"))
+			slog.Error("error in handler", "call", msg.Type, "err", err)
 		}
 	case "ChannelDelete":
 		var ch struct {
@@ -270,7 +268,7 @@ func (c *Client) handleOneMessage(ctx context.Context, data []byte, handler Hand
 			return err
 		}
 		if err := handler.ChannelDelete(ctx, ch.ChannelID); err != nil {
-			ln.Error(ctx, err, ln.Info("error in handler.ChannelDelete"))
+			slog.Error("error in handler", "call", msg.Type, "err", err)
 		}
 	case "ChannelAck":
 		var ch struct {
@@ -283,7 +281,7 @@ func (c *Client) handleOneMessage(ctx context.Context, data []byte, handler Hand
 			return err
 		}
 		if err := handler.ChannelAck(ctx, ch.ChannelID, ch.UserID, ch.MessageID); err != nil {
-			ln.Error(ctx, err, ln.Info("error in handler.ChannelAck"))
+			slog.Error("error in handler", "call", msg.Type, "err", err)
 		}
 	case "ChannelStartTyping":
 		var ch struct {
@@ -295,7 +293,7 @@ func (c *Client) handleOneMessage(ctx context.Context, data []byte, handler Hand
 			return err
 		}
 		if err := handler.ChannelStartTyping(ctx, ch.ChannelID, ch.UserID); err != nil {
-			ln.Error(ctx, err, ln.Info("error in handler.ChannelStartTyping"))
+			slog.Error("error in handler", "call", msg.Type, "err", err)
 		}
 	case "ChannelStopTyping":
 		var ch struct {
@@ -307,7 +305,7 @@ func (c *Client) handleOneMessage(ctx context.Context, data []byte, handler Hand
 			return err
 		}
 		if err := handler.ChannelStopTyping(ctx, ch.ChannelID, ch.UserID); err != nil {
-			ln.Error(ctx, err, ln.Info("error in handler.ChannelStopTyping"))
+			slog.Error("error in handler", "call", msg.Type, "err", err)
 		}
 	case "ChannelGroupJoin":
 		var ch struct {
@@ -319,7 +317,7 @@ func (c *Client) handleOneMessage(ctx context.Context, data []byte, handler Hand
 			return err
 		}
 		if err := handler.ChannelGroupJoin(ctx, ch.ChannelID, ch.UserID); err != nil {
-			ln.Error(ctx, err, ln.Info("error in handler.ChannelGroupJoin"))
+			slog.Error("error in handler", "call", msg.Type, "err", err)
 		}
 	case "ChannelGroupLeave":
 		var ch struct {
@@ -331,7 +329,7 @@ func (c *Client) handleOneMessage(ctx context.Context, data []byte, handler Hand
 			return err
 		}
 		if err := handler.ChannelGroupLeave(ctx, ch.ChannelID, ch.UserID); err != nil {
-			ln.Error(ctx, err, ln.Info("error in handler.ChannelGroupLeave"))
+			slog.Error("error in handler", "call", msg.Type, "err", err)
 		}
 	case "ServerCreate":
 		var srv Server
@@ -339,7 +337,7 @@ func (c *Client) handleOneMessage(ctx context.Context, data []byte, handler Hand
 			return err
 		}
 		if err := handler.ServerCreate(ctx, &srv); err != nil {
-			ln.Error(ctx, err, ln.Info("error in handler.ServerCreate"))
+			slog.Error("error in handler", "call", msg.Type, "err", err)
 		}
 	case "ServerUpdate":
 		var srv struct {
@@ -352,7 +350,7 @@ func (c *Client) handleOneMessage(ctx context.Context, data []byte, handler Hand
 			return err
 		}
 		if err := handler.ServerUpdate(ctx, srv.ServerID, &srv.Data, srv.Clear); err != nil {
-			ln.Error(ctx, err, ln.Info("error in handler.ServerUpdate"))
+			slog.Error("error in handler", "call", msg.Type, "err", err)
 		}
 	case "ServerDelete":
 		var srv struct {
@@ -363,7 +361,7 @@ func (c *Client) handleOneMessage(ctx context.Context, data []byte, handler Hand
 			return err
 		}
 		if err := handler.ServerDelete(ctx, srv.ServerID); err != nil {
-			ln.Error(ctx, err, ln.Info("error in handler.ServerDelete"))
+			slog.Error("error in handler", "call", msg.Type, "err", err)
 		}
 	case "ServerMemberUpdate":
 		var srv struct {
@@ -379,7 +377,7 @@ func (c *Client) handleOneMessage(ctx context.Context, data []byte, handler Hand
 			return err
 		}
 		if err := handler.ServerMemberUpdate(ctx, srv.ID.Server, srv.ID.User, &srv.Data, srv.Clear); err != nil {
-			ln.Error(ctx, err, ln.Info("error in handler.ServerMemberUpdate"))
+			slog.Error("error in handler", "call", msg.Type, "err", err)
 		}
 	case "ServerMemberJoin":
 		var srv struct {
@@ -391,7 +389,7 @@ func (c *Client) handleOneMessage(ctx context.Context, data []byte, handler Hand
 			return err
 		}
 		if err := handler.ServerMemberJoin(ctx, srv.ServerID, srv.UserID); err != nil {
-			ln.Error(ctx, err, ln.Info("error in handler.ServerMemberJoin"))
+			slog.Error("error in handler", "call", msg.Type, "err", err)
 		}
 	case "ServerMemberLeave":
 		var srv struct {
@@ -403,7 +401,7 @@ func (c *Client) handleOneMessage(ctx context.Context, data []byte, handler Hand
 			return err
 		}
 		if err := handler.ServerMemberLeave(ctx, srv.ServerID, srv.UserID); err != nil {
-			ln.Error(ctx, err, ln.Info("error in handler.ServerMemberLeave"))
+			slog.Error("error in handler", "call", msg.Type, "err", err)
 		}
 	case "ServerRoleUpdate":
 		var srv struct {
@@ -417,7 +415,7 @@ func (c *Client) handleOneMessage(ctx context.Context, data []byte, handler Hand
 			return err
 		}
 		if err := handler.ServerRoleUpdate(ctx, srv.ServerID, srv.RoleID, &srv.Data, srv.Clear); err != nil {
-			ln.Error(ctx, err, ln.Info("error in handler.ServerRoleUpdate"))
+			slog.Error("error in handler", "call", msg.Type, "err", err)
 		}
 	case "UserUpdate":
 		var usr struct {
@@ -430,7 +428,7 @@ func (c *Client) handleOneMessage(ctx context.Context, data []byte, handler Hand
 			return err
 		}
 		if err := handler.UserUpdate(ctx, usr.UserID, &usr.Data, usr.Clear); err != nil {
-			ln.Error(ctx, err, ln.Info("error in handler.UserUpdate"))
+			slog.Error("error in handler", "call", msg.Type, "err", err)
 		}
 	case "UserRelationship":
 		var usr struct {
@@ -443,7 +441,7 @@ func (c *Client) handleOneMessage(ctx context.Context, data []byte, handler Hand
 			return err
 		}
 		if err := handler.UserRelationship(ctx, usr.UserID, &usr.User, usr.Status); err != nil {
-			ln.Error(ctx, err, ln.Info("error in handler.UserRelationship"))
+			slog.Error("error in handler", "call", msg.Type, "err", err)
 		}
 	case "UserPlatformWipe":
 		var usr struct {
@@ -455,7 +453,7 @@ func (c *Client) handleOneMessage(ctx context.Context, data []byte, handler Hand
 			return err
 		}
 		if err := handler.UserPlatformWipe(ctx, usr.UserID, usr.Flags); err != nil {
-			ln.Error(ctx, err, ln.Info("error in handler.UserPlatformWipe"))
+			slog.Error("error in handler", "call", msg.Type, "err", err)
 		}
 	case "EmojiCreate":
 		var emoji Emoji
@@ -463,7 +461,7 @@ func (c *Client) handleOneMessage(ctx context.Context, data []byte, handler Hand
 			return err
 		}
 		if err := handler.EmojiCreate(ctx, &emoji); err != nil {
-			ln.Error(ctx, err, ln.Info("error in handler.EmojiCreate"))
+			slog.Error("error in handler", "call", msg.Type, "err", err)
 		}
 	case "EmojiDelete":
 		var emj struct {
@@ -474,11 +472,11 @@ func (c *Client) handleOneMessage(ctx context.Context, data []byte, handler Hand
 			return err
 		}
 		if err := handler.EmojiDelete(ctx, emj.EmojiID); err != nil {
-			ln.Error(ctx, err, ln.Info("error in handler.EmojiDelete"))
+			slog.Error("error in handler", "call", msg.Type, "err", err)
 		}
 	default:
 		if err := handler.UnknownEvent(ctx, msg.Type, data); err != nil {
-			ln.Error(ctx, err, ln.Info("error in handler.UnknownEvent"))
+			slog.Error("error in handler", "call", msg.Type, "err", err)
 		}
 	}
 	return nil

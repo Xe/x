@@ -1,8 +1,0 @@
-dbs:
-  - path: /home/cadey/code/Xe/x/cmd/marabot/marabot.db
-    replicas:
-      - path: /mnt/arsene/backup/marabot
-      - type: s3
-        bucket: xeserv-marabot-backups
-        path: db
-        region: ca-central-1

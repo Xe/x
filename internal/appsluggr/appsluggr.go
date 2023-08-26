@@ -6,13 +6,13 @@ import (
 	"compress/gzip"
 	"io"
 	"log"
+	"log/slog"
 	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/otiai10/copy"
 	"github.com/rogpeppe/go-internal/dirhash"
-	"golang.org/x/exp/slog"
 )
 
 // Must calls Pack and panics on an error.

@@ -2,8 +2,7 @@ package bsky
 
 import (
 	"fmt"
-
-	"within.website/ln"
+	"log/slog"
 )
 
 type Error struct {
@@ -15,9 +14,9 @@ func (e Error) Error() string {
 	return fmt.Sprintf("bsky: %s: %s", e.ErrorKind, e.Message)
 }
 
-func (e Error) F() ln.F {
-	return ln.F{
-		"error":   e.ErrorKind,
-		"message": e.Message,
-	}
+func (e Error) LogValue() slog.Value {
+	return slog.GroupValue(
+		slog.String("error", e.ErrorKind),
+		slog.String("msg", e.Message),
+	)
 }

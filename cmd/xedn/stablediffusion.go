@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"image"
 	"image/jpeg"
+	"log/slog"
 	"math/rand"
 	"net/http"
 	"path/filepath"
@@ -16,7 +17,6 @@ import (
 	"time"
 
 	"go.etcd.io/bbolt"
-	"golang.org/x/exp/slog"
 	"golang.org/x/sync/singleflight"
 	"within.website/x/web/stablediffusion"
 )

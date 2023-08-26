@@ -6,6 +6,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"log/slog"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -14,7 +15,6 @@ import (
 	"strings"
 
 	"github.com/dop251/goja"
-	"golang.org/x/exp/slog"
 	"within.website/x/internal"
 	"within.website/x/internal/appsluggr"
 	"within.website/x/internal/kahless"

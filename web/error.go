@@ -5,10 +5,9 @@ package web
 import (
 	"fmt"
 	"io/ioutil"
+	"log/slog"
 	"net/http"
 	"net/url"
-
-	"within.website/ln"
 )
 
 // NewError creates an Error based on an expected HTTP status code vs data populated
@@ -45,13 +44,13 @@ func (e Error) Error() string {
 	return fmt.Sprintf("%s %s: wanted status code %d, got: %d: %v", e.Method, e.URL, e.WantStatus, e.GotStatus, e.ResponseBody)
 }
 
-// F ields for logging.
-func (e Error) F() ln.F {
-	return ln.F{
-		"err_want_status":   e.WantStatus,
-		"err_got_status":    e.GotStatus,
-		"err_url":           e.URL,
-		"err_method":        e.Method,
-		"err_response_body": e.ResponseBody,
-	}
+// LogValue formats this Error for slog.
+func (e Error) LogValue() slog.Value {
+	return slog.GroupValue(
+		slog.Int("want_status", e.WantStatus),
+		slog.Int("got_status", e.GotStatus),
+		slog.String("url", e.URL.String()),
+		slog.String("method", e.Method),
+		slog.String("body", e.ResponseBody),
+	)
 }

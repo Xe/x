@@ -5,11 +5,11 @@ import (
 	"embed"
 	"flag"
 	"html/template"
+	"log/slog"
 	"net/http"
 	"os"
 
 	"go.jetpack.io/tyson"
-	"golang.org/x/exp/slog"
 	"tailscale.com/tsweb"
 	"within.website/x/internal"
 	"within.website/x/web/vanity"

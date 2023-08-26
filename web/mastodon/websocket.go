@@ -3,12 +3,11 @@ package mastodon
 import (
 	"context"
 	"encoding/json"
+	"log/slog"
 	"net/url"
 	"time"
 
 	"nhooyr.io/websocket"
-	"within.website/ln"
-	"within.website/ln/opname"
 )
 
 // WSSubscribeRequest is a websocket instruction to subscribe to a streaming feed.
@@ -28,7 +27,6 @@ type WSMessage struct {
 // StreamMessages is a low-level message streaming facility.
 func (c *Client) StreamMessages(ctx context.Context, subreq ...WSSubscribeRequest) (chan WSMessage, error) {
 	result := make(chan WSMessage, 10)
-	ctx = opname.With(ctx, "websocket-streaming")
 
 	u, err := c.server.Parse("/api/v1/streaming")
 	if err != nil {
@@ -55,7 +53,7 @@ func (c *Client) StreamMessages(ctx context.Context, subreq ...WSSubscribeReques
 			}
 
 			if err := doWebsocket(ctx, u, result, subreq); err != nil {
-				ln.Error(ctx, err, ln.Info("websocket error, retrying"))
+				slog.Error("websocket error, retrying", "err", err)
 			}
 			time.Sleep(time.Minute)
 		}
@@ -96,7 +94,7 @@ func doWebsocket(ctx context.Context, u *url.URL, result chan WSMessage, subreq 
 		}
 
 		if msgType != websocket.MessageText {
-			ln.Log(ctx, ln.Info("got non-text message from mastodon"))
+			slog.Debug("got non-text message from mastodon", "data", data)
 			continue
 		}
 

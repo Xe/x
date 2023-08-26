@@ -4,10 +4,9 @@ import (
 	"context"
 	"encoding/binary"
 	"io"
+	"log/slog"
 	"net"
 	"time"
-
-	"golang.org/x/exp/slog"
 )
 
 // Progress contains the progression of the

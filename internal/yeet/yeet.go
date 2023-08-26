@@ -3,13 +3,13 @@ package yeet
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"os"
 	"os/exec"
 	"strings"
 	"time"
 
 	"github.com/pkg/errors"
-	"golang.org/x/exp/slog"
 )
 
 // current working directory and date:time tag of app boot (useful for tagging slugs)

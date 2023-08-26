@@ -7,11 +7,11 @@ import (
 	"flag"
 	"fmt"
 	"html/template"
+	"log/slog"
 	"net/http"
 	"os"
 	"strings"
 
-	"golang.org/x/exp/slog"
 	_ "modernc.org/sqlite"
 	"tailscale.com/hostinfo"
 	"tailscale.com/tsnet"

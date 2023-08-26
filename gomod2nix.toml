@@ -202,18 +202,6 @@ schema = 3
   [mod."github.com/insomniacslk/dhcp"]
     version = "v0.0.0-20230407062729-974c6f05fe16"
     hash = "sha256-qeCrmCwVinMLcr/IpjpLRoNGzId5dmiJr4TdDYdX9Iw="
-  [mod."github.com/jackc/pgpassfile"]
-    version = "v1.0.0"
-    hash = "sha256-H0nFbC34/3pZUFnuiQk9W7yvAMh6qJDrqvHp+akBPLM="
-  [mod."github.com/jackc/pgservicefile"]
-    version = "v0.0.0-20221227161230-091c0ba34f0a"
-    hash = "sha256-rBtUw15WPPDp2eulHXH5e2zCIed1OPFYwlCpgDOnGRM="
-  [mod."github.com/jackc/pgx/v5"]
-    version = "v5.4.3"
-    hash = "sha256-ngF3yz6LQOwZUX5RgGqSJs4TUaabu64p3OF3h/d50hA="
-  [mod."github.com/jackc/puddle/v2"]
-    version = "v2.2.1"
-    hash = "sha256-Edf8SLT/8l+xfHm9IjUGxs1MHtic2VgRyfqb6OzGA9k="
   [mod."github.com/jaytaylor/html2text"]
     version = "v0.0.0-20190408195923-01ec452cbe43"
     hash = "sha256-nnfxxHzCx8cEPQn3dixkq6/UwzC4vYb9OLJQWReouu8="
@@ -514,6 +502,3 @@ schema = 3
   [mod."within.website/johaus"]
     version = "v1.1.0"
     hash = "sha256-iUfbQME/rIpSJUfAYQMybLL73Cf4WQ03kDR0/I7pbdI="
-  [mod."within.website/ln"]
-    version = "v0.9.1"
-    hash = "sha256-JcRR0SX3XzatjnZ+yho04VvJGqXvZr5zK50AUS99wmY="

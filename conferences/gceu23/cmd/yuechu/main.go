@@ -7,6 +7,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"log/slog"
 	"math/rand"
 	"net"
 	"os"
@@ -14,8 +15,6 @@ import (
 
 	"github.com/tetratelabs/wazero"
 	"github.com/tetratelabs/wazero/imports/wasi_snapshot_preview1"
-	"within.website/ln"
-	"within.website/ln/opname"
 	"within.website/x/internal"
 )
 
@@ -29,11 +28,11 @@ var (
 
 func main() {
 	internal.HandleStartup()
-	ctx := opname.With(context.Background(), "yuechu")
+	ctx := context.Background()
 
 	data, err := os.ReadFile(*binary)
 	if err != nil {
-		ln.FatalErr(ctx, err)
+		log.Fatal(err)
 	}
 
 	r = wazero.NewRuntime(ctx)
@@ -42,15 +41,15 @@ func main() {
 
 	code, err = r.CompileModule(ctx, data)
 	if err != nil {
-		ln.FatalErr(ctx, err)
+		log.Fatal(err)
 	}
 
 	server, err := net.Listen("tcp", *bind)
 	if err != nil {
-		ln.FatalErr(ctx, err)
+		log.Fatal(err)
 	}
 
-	ln.Log(ctx, ln.Action("listening"), ln.F{"bind": *bind})
+	slog.Info("listening", "bind", *bind)
 
 	for {
 		conn, err := server.Accept()
@@ -81,7 +80,7 @@ func main() {
 
 				mod, err := r.InstantiateModule(ctx, code, config)
 				if err != nil {
-					ln.Error(ctx, err, ln.F{"remote_host": conn.RemoteAddr().String()})
+					slog.Error("can't instantiate module", "err", err, "remote_host", conn.RemoteAddr().String())
 					return
 				}
 				defer mod.Close(ctx)

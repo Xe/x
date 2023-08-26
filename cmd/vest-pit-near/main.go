@@ -9,12 +9,13 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"log/slog"
 	"net/http"
 	"os"
 	"path/filepath"
 	"time"
 
-	"golang.org/x/exp/slog"
+	"tailscale.com/hostinfo"
 	"tailscale.com/tsnet"
 	"tailscale.com/tsweb"
 	"within.website/x/internal"
@@ -35,6 +36,8 @@ var (
 
 func main() {
 	internal.HandleStartup()
+
+	hostinfo.SetApp("within.website/x/cmd/vest-pit-near")
 
 	os.MkdirAll(filepath.Join(*stateDir, "tsnet"), 0700)
 

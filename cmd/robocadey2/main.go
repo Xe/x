@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"log/slog"
 	"math/rand"
 	"net/http"
 	"os"
@@ -17,7 +18,6 @@ import (
 	"time"
 
 	"github.com/jaytaylor/html2text"
-	"golang.org/x/exp/slog"
 	"tailscale.com/metrics"
 	"tailscale.com/tsnet"
 	"tailscale.com/tsweb"

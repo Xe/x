@@ -1,5 +1,0 @@
-*.db
-*.db-shm
-*.db-wal
-.marabot.db-litestream
-*.csv

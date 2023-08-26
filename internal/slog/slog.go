@@ -5,10 +5,9 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"log/slog"
 	"net/http"
 	"os"
-
-	"golang.org/x/exp/slog"
 )
 
 var (

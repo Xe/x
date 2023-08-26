@@ -2,10 +2,9 @@ package internal
 
 import (
 	"encoding/json"
+	"log/slog"
 	"net/http"
 	"runtime/debug"
-
-	"golang.org/x/exp/slog"
 )
 
 func init() {

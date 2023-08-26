@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"io/fs"
+	"log"
 	"net"
 	"os"
 	"path/filepath"
@@ -12,8 +13,6 @@ import (
 
 	"github.com/tetratelabs/wazero"
 	"github.com/tetratelabs/wazero/imports/wasi_snapshot_preview1"
-	"within.website/ln"
-	"within.website/ln/opname"
 	"within.website/x/internal"
 )
 
@@ -26,11 +25,11 @@ var (
 
 func main() {
 	internal.HandleStartup()
-	ctx := opname.With(context.Background(), "aiyou")
+	ctx := context.Background()
 
 	data, err := os.ReadFile(*binary)
 	if err != nil {
-		ln.FatalErr(ctx, err)
+		log.Fatal(err)
 	}
 
 	r = wazero.NewRuntime(ctx)
@@ -39,7 +38,7 @@ func main() {
 
 	code, err = r.CompileModule(ctx, data)
 	if err != nil {
-		ln.FatalErr(ctx, err)
+		log.Fatal(err)
 	}
 
 	config := wazero.NewModuleConfig().
@@ -52,7 +51,7 @@ func main() {
 
 	mod, err := r.InstantiateModule(ctx, code, config)
 	if err != nil {
-		ln.Error(ctx, err)
+		log.Fatal(err)
 		return
 	}
 	defer mod.Close(ctx)

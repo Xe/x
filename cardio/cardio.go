@@ -3,11 +3,8 @@ package cardio
 
 import (
 	"context"
-	"expvar"
 	"sync"
 	"time"
-
-	"within.website/ln/opname"
 )
 
 // Heartbeat is a function that creates a "heartbeat" channel that you can influence to go faster
@@ -37,30 +34,10 @@ import (
 //
 // This will let you have a dynamically adjusting heartbeat for when your sick, twisted desires
 // demand it.
-//
-// If you are using ln's opname facility (https://pkg.go.dev/within.website/ln/opname), then an
-// expvar gauge will be created that will contain the current heartbeat. This allows you to
-// monitor and alert on this value changing erratically.
 func Heartbeat(ctx context.Context, min, max time.Duration) (<-chan struct{}, func(), func()) {
 	heartbeat := make(chan struct{}, 1) // output channel
 	currDelay := max                    // start at max speed
 	var currDelayLock sync.Mutex
-
-	var counter *expvar.Int
-	var tachycardiaCounter *expvar.Int
-
-	if name, ok := opname.Get(ctx); ok {
-		if ctr := expvar.Get("gauge_heartbeat_" + name); counter == nil {
-			counter = expvar.NewInt("gauge_heartbeat_" + name)
-		} else {
-			counter = ctr.(*expvar.Int)
-		}
-		if ctr := expvar.Get("gauge_heartbeat_backoff_" + name); tachycardiaCounter == nil {
-			tachycardiaCounter = expvar.NewInt("gauge_heartbeat_backoff_" + name)
-		} else {
-			tachycardiaCounter = ctr.(*expvar.Int)
-		}
-	}
 
 	slower := func() {
 		currDelayLock.Lock()
@@ -92,14 +69,9 @@ func Heartbeat(ctx context.Context, min, max time.Duration) (<-chan struct{}, fu
 				currDelayLock.Unlock()
 				time.Sleep(toSleep)
 
-				if counter != nil {
-					counter.Set(int64(toSleep))
-				}
-
 				select {
 				case heartbeat <- struct{}{}:
 				default:
-					tachycardiaCounter.Add(1)
 					slower() // back off if the channel is full
 				}
 			}

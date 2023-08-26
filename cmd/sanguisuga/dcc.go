@@ -10,6 +10,7 @@ import (
 	"hash/crc32"
 	"io"
 	"log"
+	"log/slog"
 	"net"
 	"net/http"
 	"os"
@@ -20,7 +21,6 @@ import (
 	"time"
 
 	irc "github.com/thoj/go-ircevent"
-	"golang.org/x/exp/slog"
 	"tailscale.com/metrics"
 	"within.website/x/cmd/sanguisuga/internal/dcc"
 )
