@@ -43,7 +43,7 @@ func main() {
 
 	slog.Debug("starting up", "hostname", *tsHostname)
 
-	http.DefaultServeMux.Handle("/static/", http.FileServer(http.FS(staticFiles)))
+	http.Handle("/static/", http.FileServer(http.FS(staticFiles)))
 
 	srv := &tsnet.Server{
 		Hostname: *tsHostname,
