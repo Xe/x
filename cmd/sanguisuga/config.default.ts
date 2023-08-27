@@ -45,7 +45,6 @@ export type WireGuard = {
   peers: WireGuardPeer[];
 };
 
-
 export type Config = {
   irc: IRC;
   xdcc: IRC;
