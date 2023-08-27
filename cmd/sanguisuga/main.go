@@ -198,7 +198,7 @@ func main() {
 	http.HandleFunc("/api/tv/track", s.TrackTV)
 	http.HandleFunc("/api/tv/untrack", s.UntrackTV)
 
-	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.FS(static))))
+	http.Handle("/static/", http.FileServer(http.FS(static)))
 
 	go s.XDCC()
 

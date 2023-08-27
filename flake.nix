@@ -282,6 +282,7 @@
             nodejs
             deno
             esbuild
+            tailwindcss
 
             postgresql_15
             pgloader

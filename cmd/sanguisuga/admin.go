@@ -10,9 +10,11 @@ var (
 	//go:embed tmpl/*
 	templates embed.FS
 
-	// go:embed static
+	//go:embed static
 	static embed.FS
 )
+
+//go:generate tailwindcss --output static/styles.css --minify
 
 func (s *Sanguisuga) AdminIndex(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
