@@ -247,8 +247,11 @@ func (s *Sanguisuga) ScrapeSubsplease(ev *irc.Event) {
 		return
 	}
 }
-
 func (s *Sanguisuga) SubspleaseDCC(ev *irc.Event) {
+	go s.subspleaseDCC(ev)
+}
+
+func (s *Sanguisuga) subspleaseDCC(ev *irc.Event) {
 	matches := dccCommand.FindStringSubmatch(ev.MessageWithoutFormat())
 	if matches == nil {
 		return
@@ -374,7 +377,7 @@ outer:
 
 	_, err = crcCheck(outFname, ann.CRC32)
 	if err != nil {
-		slog.Error("got wrong hash", "err", err)
+		lg.Error("got wrong hash", "err", err)
 	}
 
 	lg.Debug("hash check passed")
@@ -396,8 +399,28 @@ func crcCheck(fname, wantHash string) (bool, error) {
 	gotHash := fmt.Sprintf("%X", h.Sum32())
 
 	if wantHash != gotHash {
-		return false, fmt.Errorf("hash didn't match: want %s, got: %s", wantHash, gotHash)
+		return false, crcError{
+			Want: wantHash,
+			Got:  gotHash,
+		}
 	}
 
 	return true, nil
+}
+
+type crcError struct {
+	Want string
+	Got  string
+}
+
+func (c crcError) Error() string {
+	return fmt.Sprintf("crc32 didn't match: want %s, got %s", c.Want, c.Got)
+}
+
+func (c crcError) LogValue() slog.Value {
+	return slog.GroupValue(
+		slog.String("type", "crc_error"),
+		slog.String("want", c.Want),
+		slog.String("got", c.Got),
+	)
 }
