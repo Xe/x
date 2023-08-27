@@ -48,6 +48,9 @@ type DCC struct {
 
 	// destination writer
 	writer io.Writer
+
+	// dial function
+	dialFunc func(ctx context.Context, network, address string) (net.Conn, error)
 }
 
 // NewDCC creates a new DCC instance.
@@ -59,6 +62,7 @@ func NewDCC(
 	address string,
 	size int,
 	writer io.Writer,
+	dialFunc func(ctx context.Context, network, address string) (net.Conn, error),
 ) *DCC {
 	return &DCC{
 		address:   address,
@@ -66,6 +70,7 @@ func NewDCC(
 		progressc: make(chan Progress, 1),
 		done:      make(chan error, 1),
 		writer:    writer,
+		dialFunc:  dialFunc,
 	}
 }
 
@@ -169,10 +174,7 @@ func (d *DCC) Run(ctx context.Context) (
 	// assign the passed context
 	d.ctx = ctx
 
-	dialer := &net.Dialer{Resolver: net.DefaultResolver}
-	conn, err := dialer.DialContext(
-		d.ctx, "tcp", d.address,
-	)
+	conn, err := d.dialFunc(d.ctx, "tcp", d.address)
 
 	if err != nil {
 		d.done <- err

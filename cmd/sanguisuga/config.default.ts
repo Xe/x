@@ -17,7 +17,7 @@ export type Transmission = {
   host: string;
   user: string;
   password: string;
-  https: bool;
+  https: boolean;
   rpcURI: string;
 };
 
@@ -32,6 +32,20 @@ export type Telegram = {
   mentionUser: number;
 };
 
+export type WireGuardPeer = {
+  publicKey: string;
+  endpoint: string;
+  allowedIPs: string[];
+};
+
+export type WireGuard = {
+  privateKey: string;
+  address: string[];
+  dns: string;
+  peers: WireGuardPeer[];
+};
+
+
 export type Config = {
   irc: IRC;
   xdcc: IRC;
@@ -41,6 +55,7 @@ export type Config = {
   tailscale: Tailscale;
   baseDiskPath: string;
   telegram: Telegram;
+  wireguard: WireGuard;
 };
 
 export default {
@@ -84,5 +99,17 @@ export default {
   telegram: {
     token: "",
     mentionUser: 0,
+  },
+  wireguard: { // for downloading files over DCC (XDCC)
+    privateKey: "",
+    address: [],
+    dns: "",
+    peers: [
+      {
+        publicKey: "",
+        allowedIPs: [],
+        endpoint: "",
+      },
+    ],
   },
 } satisfies Config;

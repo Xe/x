@@ -12,6 +12,7 @@ import (
 	"log"
 	"log/slog"
 	"net/http"
+	"net/netip"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -23,6 +24,9 @@ import (
 	tu "github.com/mymmrac/telego/telegoutil"
 	irc "github.com/thoj/go-ircevent"
 	"go.jetpack.io/tyson"
+	"golang.zx2c4.com/wireguard/conn"
+	"golang.zx2c4.com/wireguard/device"
+	"golang.zx2c4.com/wireguard/tun/netstack"
 	"honnef.co/go/transmission"
 	"tailscale.com/hostinfo"
 	"tailscale.com/jsondb"
@@ -174,12 +178,33 @@ func main() {
 
 	defer bot.StopLongPolling()
 
+	tun, tnet, err := netstack.CreateNetTUN(
+		c.WireGuard.Address,
+		[]netip.Addr{c.WireGuard.DNS},
+		1280,
+	)
+	if err != nil {
+		log.Fatalf("can't create tun: %v", err)
+	}
+
+	var confSB bytes.Buffer
+	if err := c.WireGuard.UAPI(&confSB); err != nil {
+		log.Fatalf("can't write wireguard config: %v", err)
+	}
+
+	dev := device.NewDevice(tun, conn.NewStdNetBind(), device.NewLogger(device.LogLevelError, "wireguard: "))
+	if err := dev.IpcSetOperation(&confSB); err != nil {
+		log.Fatalf("can't set wireguard config: %v", err)
+	}
+
 	s := &Sanguisuga{
 		Config: c,
 		cl:     cl,
 		db:     db,
 		bot:    bot,
 		tmpl:   template.Must(template.ParseFS(templates, "tmpl/*.html")),
+		tnet:   tnet,
+		srv:    srv,
 
 		animeInFlight: map[string]*SubspleaseAnnouncement{},
 	}
@@ -226,6 +251,8 @@ type Sanguisuga struct {
 	dbLock sync.Mutex
 	bot    *telego.Bot
 	tmpl   *template.Template
+	tnet   *netstack.Net
+	srv    *tsnet.Server
 
 	animeInFlight map[string]*SubspleaseAnnouncement
 	aifLock       sync.Mutex

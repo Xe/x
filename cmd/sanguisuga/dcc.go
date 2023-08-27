@@ -334,7 +334,7 @@ waitLoop:
 	}
 	defer fout.Close()
 
-	d := dcc.NewDCC(addr, size, fout)
+	d := dcc.NewDCC(addr, size, fout, s.tnet.DialContext)
 
 	ctx, cancel := context.WithTimeout(ev.Ctx, 120*time.Minute)
 	defer cancel()

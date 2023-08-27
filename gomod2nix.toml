@@ -442,6 +442,9 @@ schema = 3
   [mod."golang.zx2c4.com/wintun"]
     version = "v0.0.0-20230126152724-0fa3db229ce2"
     hash = "sha256-cjMLNjKnnupVROWmeASORVieAL9ieYdzX3cFzG8bCpo="
+  [mod."golang.zx2c4.com/wireguard"]
+    version = "v0.0.0-20230704135630-469159ecf7d1"
+    hash = "sha256-KqA2+do9FeDMInwixwChVDJWa368ixT4NB4tpCAS6tc="
   [mod."golang.zx2c4.com/wireguard/windows"]
     version = "v0.5.3"
     hash = "sha256-wcJWS/4Fqbc+1RHSntex0zBdlHiZfzrea4QabYkNKvU="
