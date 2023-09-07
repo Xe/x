@@ -52,6 +52,7 @@ require (
 require (
 	github.com/andybalholm/brotli v1.0.5 // indirect
 	github.com/andybalholm/cascadia v1.3.2 // indirect
+	github.com/antonmedv/expr v1.15.0 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/evanw/esbuild v0.18.6 // indirect
 	github.com/fasthttp/router v1.4.20 // indirect

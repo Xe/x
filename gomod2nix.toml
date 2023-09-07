@@ -25,6 +25,9 @@ schema = 3
   [mod."github.com/andybalholm/cascadia"]
     version = "v1.3.2"
     hash = "sha256-Nc9SkqJO/ecincVcUBFITy24TMmMGj5o0Q8EgdNhrEk="
+  [mod."github.com/antonmedv/expr"]
+    version = "v1.15.0"
+    hash = "sha256-fH1iOWnO/fhgmGNjYKdtmU+3tRqZ90MmrhBfNjPlxCE="
   [mod."github.com/aws/aws-sdk-go"]
     version = "v1.44.317"
     hash = "sha256-W+6USiZKFIIunoZHnmCyPIIG2JyxJFG/3CtPXIRexRA="
