@@ -7,6 +7,9 @@ schema = 3
   [mod."filippo.io/edwards25519"]
     version = "v1.0.0"
     hash = "sha256-APnPAcmItvtJ5Zsy863lzR2TjEBF9Y66TY1e4M1ap98="
+  [mod."github.com/Marcel-ICMC/graw"]
+    version = "v0.0.0-20230411090719-e24cd8592d25"
+    hash = "sha256-oKeE+BQHXpFEU3g21Z41PeSFJicABcRYsGEs807oo40="
   [mod."github.com/McKael/madon/v2"]
     version = "v2.4.0"
     hash = "sha256-bEkpnDMyJtzU5epFNrjLhgJW+cp5Tf4YL7lk99q0ymM="
@@ -262,6 +265,9 @@ schema = 3
   [mod."github.com/mitchellh/go-ps"]
     version = "v1.0.0"
     hash = "sha256-HzxVHNLHZpnsBuPcub0G+9jjDcDOsxM/6wifbsxf7EY="
+  [mod."github.com/mitchellh/mapstructure"]
+    version = "v1.5.0"
+    hash = "sha256-ztVhGQXs67MF8UadVvG72G3ly0ypQW0IRDdOOkjYwoE="
   [mod."github.com/mndrix/golog"]
     version = "v0.0.0-20170330170653-a28e2a269775"
     hash = "sha256-JD5kY0Krc1yHXT+0b3XzkwqFKpIvY3VFSok4/yHGOP8="
@@ -373,6 +379,9 @@ schema = 3
   [mod."github.com/tmc/scp"]
     version = "v0.0.0-20170824174625-f7b48647feef"
     hash = "sha256-qHwQb3JA43VVhJdB18/2zXbxqW/bgw1yvr8YhqFyd74="
+  [mod."github.com/turnage/redditproto"]
+    version = "v0.0.0-20151223012412-afedf1b6eddb"
+    hash = "sha256-ageZnAhwB2i8VP9Qa3ChUQG2a1cJu/89e6tVFdM6qyM="
   [mod."github.com/u-root/uio"]
     version = "v0.0.0-20230305220412-3e8cd9d6bf63"
     hash = "sha256-y0VT9PLROozi6wNMgnX706ifumQxlMc8y4/XZDhdfMY="
