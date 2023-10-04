@@ -398,6 +398,8 @@ func main() {
 		Dir:      filepath.Join(*dir, "tsnet"),
 	}
 
+	srv.Start()
+
 	cli := srv.HTTPClient()
 
 	sd := &StableDiffusion{
