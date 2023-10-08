@@ -6,6 +6,7 @@ import (
 	"log"
 	"log/slog"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/Marcel-ICMC/graw"
@@ -50,15 +51,15 @@ func main() {
 type announcer struct{}
 
 func addMemeArrow(str string) string {
-	var result string
+	var result strings.Builder
 	for _, char := range str {
 		if char == '\n' {
-			result += string(char) + "\n> "
+			result.WriteString("\n> ")
 		} else {
-			result += string(char)
+			result.WriteRune(char)
 		}
 	}
-	return result
+	return result.String()
 }
 
 func (a announcer) Post(post *reddit.Post) error {
