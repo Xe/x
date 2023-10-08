@@ -53,7 +53,7 @@ func addMemeArrow(str string) string {
 	var result string
 	for _, char := range str {
 		if char == '\n' {
-			result += string(char) + "> "
+			result += string(char) + "\n> "
 		} else {
 			result += string(char)
 		}
