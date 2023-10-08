@@ -11,10 +11,11 @@ import (
 
 // Webhook is the parent structure fired off to Discord.
 type Webhook struct {
-	Content   string   `json:"content,omitifempty"`
-	Username  string   `json:"username"`
-	AvatarURL string   `json:"avatar_url"`
-	Embeds    []Embeds `json:"embeds,omitifempty"`
+	Content         string              `json:"content,omitempty"`
+	Username        string              `json:"username,omitempty"`
+	AvatarURL       string              `json:"avatar_url"`
+	Embeds          []Embeds            `json:"embeds,omitempty"`
+	AllowedMentions map[string][]string `json:"allowed_mentions"`
 }
 
 // EmbedField is an individual field being embedded in a message.
@@ -32,8 +33,18 @@ type EmbedFooter struct {
 
 // Embeds is a set of embed fields and a footer.
 type Embeds struct {
-	Fields []EmbedField `json:"fields"`
-	Footer EmbedFooter  `json:"footer"`
+	Title       string       `json:"title,omitempty"`
+	Description string       `json:"description,omitempty"`
+	URL         string       `json:"url,omitempty"`
+	Author      *EmbedAuthor `json:"author,omitempty"`
+	Fields      []EmbedField `json:"fields,omitempty"`
+	Footer      *EmbedFooter `json:"footer,omitempty"`
+}
+
+type EmbedAuthor struct {
+	Name    string `json:"name"`
+	URL     string `json:"url"`
+	IconURL string `json:"icon_url"`
 }
 
 // Send returns a request for a Discord webhook.
@@ -59,8 +70,8 @@ func Send(whurl string, w Webhook) *http.Request {
 
 // Validate validates the response from Discord.
 func Validate(resp *http.Response) error {
-	if resp.StatusCode != http.StatusOK {
-		return web.NewError(http.StatusOK, resp)
+	if resp.StatusCode != http.StatusNoContent {
+		return web.NewError(http.StatusNoContent, resp)
 	}
 
 	return nil
