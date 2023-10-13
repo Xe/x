@@ -416,8 +416,8 @@ schema = 3
     version = "v0.0.0-20230303233057-f1b76eb4bb35"
     hash = "sha256-pg9qYKRramfIVeS9fOdPI5zBBo6c9yku/la3HgbFw1w="
   [mod."golang.org/x/crypto"]
-    version = "v0.12.0"
-    hash = "sha256-Wes72EA9ICTG8o0nEYWZk9xjpqlniorFeY6o26GExns="
+    version = "v0.14.0"
+    hash = "sha256-UUSt3X/i34r1K0mU+Y5IzljX5HYy07JcHh39Pm1MU+o="
   [mod."golang.org/x/exp"]
     version = "v0.0.0-20230711153332-06a737ee72cb"
     hash = "sha256-Cbw10ZJ+jATPV232G47xZrn6ExO1FDtiT6nlMRCH7EI="
@@ -428,8 +428,8 @@ schema = 3
     version = "v0.12.0"
     hash = "sha256-M/oXnzm7odpJdQzEnG6W0pNYtl0uhOM/l7qgfGVpU2M="
   [mod."golang.org/x/net"]
-    version = "v0.14.0"
-    hash = "sha256-QScKgO7lBWOsd0Y31wLRzFETv3tjqdB/eRQWW5q7aV4="
+    version = "v0.17.0"
+    hash = "sha256-qRawHWLSsJ06QNbLhUWPXGVSO1eaioeC9xZlUEWN8J8="
   [mod."golang.org/x/oauth2"]
     version = "v0.11.0"
     hash = "sha256-ztz1lRVZXq6lTN/q4b4Y+P6L1EkP8ZJuhUbSJ0QvCw4="
@@ -437,14 +437,14 @@ schema = 3
     version = "v0.3.0"
     hash = "sha256-bCJKLvwExhYacH2ZrWlZ38lr1d6oNenNt2m1QqDCs0o="
   [mod."golang.org/x/sys"]
-    version = "v0.11.0"
-    hash = "sha256-g/LjhABK2c/u6v7M2aAIrHvZjmx/ikGHkef86775N38="
+    version = "v0.13.0"
+    hash = "sha256-/+RDZ0a0oEfJ0k304VqpJpdrl2ZXa3yFlOxy4mjW7w0="
   [mod."golang.org/x/term"]
-    version = "v0.11.0"
-    hash = "sha256-muSv/d8Qpl+NXiOB01n6LeFEzC+hrlGviDdfu+6QdQ4="
+    version = "v0.13.0"
+    hash = "sha256-sLN+cjSZN2tfg/Lm9Ae4vYzoXREclMumxfksYFokymQ="
   [mod."golang.org/x/text"]
-    version = "v0.12.0"
-    hash = "sha256-aNQaW3EgCK9ehpnBzIAkZX6TmiUU1S175YlJUH7P5Qg="
+    version = "v0.13.0"
+    hash = "sha256-J34dbc8UNVIdRJUZP7jPt11oxuwG8VvrOOylxE7V3oA="
   [mod."golang.org/x/time"]
     version = "v0.3.0"
     hash = "sha256-/hmc9skIswMYbivxNS7R8A6vCTUF9k2/7tr/ACkcEaM="
