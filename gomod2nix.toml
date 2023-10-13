@@ -326,8 +326,8 @@ schema = 3
     version = "v1.11.0"
     hash = "sha256-BucSndJVnqX9e6p5PfA6Z8N2bGfIeRfxAxYLUDXTbIo="
   [mod."github.com/rs/cors"]
-    version = "v1.9.0"
-    hash = "sha256-CNBCGXOydU6MIEZ0B5eXBjBm3smH2ryYHvgRJA2udBM="
+    version = "v1.10.1"
+    hash = "sha256-um4INJM5/675MLK42npIsDbSQ1/Iy5ZiUNuAFReUfeM="
   [mod."github.com/sacOO7/go-logger"]
     version = "v0.0.0-20180719173527-9ac9add5a50d"
     hash = "sha256-n48EQatWILSbapA2cTTmikRY5j83lH5tU0FQ/lPlrQk="
