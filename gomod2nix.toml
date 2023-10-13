@@ -284,8 +284,8 @@ schema = 3
     version = "v0.0.5"
     hash = "sha256-/5i70IkH/qSW5KjGzv8aQNKh9tHoz98tqtL0K2DMFn4="
   [mod."github.com/otiai10/copy"]
-    version = "v1.12.0"
-    hash = "sha256-P27FbVxLUuVfbIFTxzgY8eJGHR1kebKP2YTOXGBf6eE="
+    version = "v1.14.0"
+    hash = "sha256-xsaL1ddkPS544y0Jv7u/INUALBYmYq29ddWvysLXk4A="
   [mod."github.com/pasztorpisti/qs"]
     version = "v0.0.0-20171216220353-8d6c33ee906c"
     hash = "sha256-v9EZxWRkP13JdeAJ5ZPfnirgLJszfHtSzZP5oGLaACg="
