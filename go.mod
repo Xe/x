@@ -25,7 +25,7 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/kr/pretty v0.3.1
 	github.com/mndrix/golog v0.0.0-20170330170653-a28e2a269775
-	github.com/mymmrac/telego v0.26.0
+	github.com/mymmrac/telego v0.26.3
 	github.com/otiai10/copy v1.14.0
 	github.com/peterh/liner v1.2.2
 	github.com/pkg/errors v0.9.1
@@ -72,7 +72,7 @@ require (
 	github.com/savsgio/gotils v0.0.0-20230208104028-c358bd845dee // indirect
 	github.com/turnage/redditproto v0.0.0-20151223012412-afedf1b6eddb // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
-	github.com/valyala/fasthttp v1.48.0 // indirect
+	github.com/valyala/fasthttp v1.50.0 // indirect
 	lukechampine.com/uint128 v1.2.0 // indirect
 	modernc.org/cc/v3 v3.40.0 // indirect
 	modernc.org/ccgo/v3 v3.16.13 // indirect

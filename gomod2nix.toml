@@ -275,8 +275,8 @@ schema = 3
     version = "v0.0.0-20170330174427-18e65badd6ab"
     hash = "sha256-Q9skxtyqOwkBxmUnzNCfbn813vPbqvwuAihwq/wkKs4="
   [mod."github.com/mymmrac/telego"]
-    version = "v0.26.0"
-    hash = "sha256-eHhvsUwyvmi9jJH8EQgF17ES452r51L4VhHgOw1pPNA="
+    version = "v0.26.3"
+    hash = "sha256-NEWQAqiWdOFCQekpzIPBd4RnD06qYtEFbqtE2mkjyA8="
   [mod."github.com/oklog/ulid/v2"]
     version = "v2.1.0"
     hash = "sha256-/oQPgcO1xKbHXutxz0WPfIduShPrfH1l+7/mj8jLst8="
@@ -389,8 +389,8 @@ schema = 3
     version = "v1.0.0"
     hash = "sha256-I9FPZ3kCNRB+o0dpMwBnwZ35Fj9+ThvITn8a3Jr8mAY="
   [mod."github.com/valyala/fasthttp"]
-    version = "v1.48.0"
-    hash = "sha256-OFgjq4C+1sixt9RWerzbte5bZzUXY5gP9/d6F8MiXL0="
+    version = "v1.50.0"
+    hash = "sha256-825dQTa0aLuLCzljblN6BvjFlYXOiOFQa47n90BSzKc="
   [mod."github.com/vishvananda/netlink"]
     version = "v1.2.1-beta.2"
     hash = "sha256-ePReedgYT0KuAx/HOUgG76zDZ2XpW/u8bGlsWysxKzE="
