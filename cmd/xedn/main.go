@@ -201,6 +201,10 @@ func (dc *Cache) Load(dir string, w io.Writer) error {
 			return err
 		}
 
+		if h.Get("Content-Type") == "" && filepath.Ext(dir) == ".svg" {
+			h.Set("Content-Type", "image/svg+xml")
+		}
+
 		data = bkt.Get([]byte("body"))
 		if data == nil {
 			return ErrNotCached
