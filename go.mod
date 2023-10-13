@@ -46,7 +46,7 @@ require (
 	golang.org/x/sync v0.3.0
 	golang.zx2c4.com/wireguard v0.0.0-20230704135630-469159ecf7d1
 	honnef.co/go/transmission v0.0.0-20200712215954-58262f0ca9c9
-	modernc.org/sqlite v1.25.0
+	modernc.org/sqlite v1.26.0
 	nhooyr.io/websocket v1.8.7
 	tailscale.com v1.46.1
 	tulpa.dev/cadey/jvozba v0.0.0-20200326200349-f0ebe310be06
