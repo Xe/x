@@ -38,14 +38,18 @@ func main() {
 		Logger:     slog.NewLogLogger(slog.Default().Handler(), slog.LevelInfo),
 	}
 
-	stop, wait, err := graw.Scan(announce, handle, scriptCfg)
-	if err != nil {
-		log.Fatal(err)
+	for {
+		stop, wait, err := graw.Scan(announce, handle, scriptCfg)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		defer stop()
+
+		wait()
+
+		time.Sleep(5 * time.Second)
 	}
-
-	defer stop()
-
-	wait()
 }
 
 type announcer struct{}
