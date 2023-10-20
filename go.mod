@@ -7,7 +7,7 @@ require (
 	github.com/Marcel-ICMC/graw v0.0.0-20230411090719-e24cd8592d25
 	github.com/McKael/madon/v2 v2.4.0
 	github.com/antonmedv/expr v1.15.0
-	github.com/aws/aws-sdk-go v1.45.25
+	github.com/aws/aws-sdk-go v1.46.0
 	github.com/bwmarrin/discordgo v0.27.1
 	github.com/chai2010/webp v1.1.1
 	github.com/disintegration/imaging v1.6.1
