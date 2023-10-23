@@ -46,7 +46,7 @@ require (
 	golang.zx2c4.com/wireguard v0.0.0-20230704135630-469159ecf7d1
 	honnef.co/go/transmission v0.0.0-20200712215954-58262f0ca9c9
 	modernc.org/sqlite v1.26.0
-	nhooyr.io/websocket v1.8.7
+	nhooyr.io/websocket v1.8.9
 	tailscale.com v1.50.1
 	tulpa.dev/cadey/jvozba v0.0.0-20200326200349-f0ebe310be06
 	within.website/johaus v1.1.0
