@@ -44,9 +44,8 @@ func main() {
 			log.Fatal(err)
 		}
 
-		defer stop()
-
 		wait()
+		stop()
 
 		time.Sleep(5 * time.Second)
 	}
