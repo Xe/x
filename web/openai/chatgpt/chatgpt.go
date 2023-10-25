@@ -19,17 +19,27 @@ type Request struct {
 }
 
 type Function struct {
-	Name        string  `json:"name"`
-	Description string  `json:"description,omitempty"`
-	Parameters  []Param `json:"parameters"`
+	Name        string `json:"name"`
+	Description string `json:"description,omitempty"`
+	Parameters  Param  `json:"parameters"`
 }
 
 type Param struct {
-	Type        string           `json:"type"`
-	Description string           `json:"description,omitempty"`
-	Enum        []string         `json:"enum,omitempty"`
-	Properties  map[string]Param `json:"properties,omitempty"`
-	Required    []string         `json:"required,omitempty"`
+	Type        string     `json:"type"`
+	Description string     `json:"description,omitempty"`
+	Enum        []string   `json:"enum,omitempty"`
+	Properties  Properties `json:"properties"`
+	Required    []string   `json:"required,omitempty"`
+}
+
+type Properties map[string]Param
+
+func (p Properties) MarshalJSON() ([]byte, error) {
+	if len(p) == 0 {
+		return []byte("{}"), nil
+	}
+
+	return json.Marshal(map[string]Param(p))
 }
 
 type Message struct {
@@ -39,8 +49,8 @@ type Message struct {
 }
 
 type Funcall struct {
-	Name      string          `json:"name"`
-	Arguments json.RawMessage `json:"arguments"`
+	Name      string `json:"name"`
+	Arguments string `json:"arguments"`
 }
 
 func (m Message) ProxyFormat() string {
