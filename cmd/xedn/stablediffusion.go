@@ -43,7 +43,7 @@ func (sd *StableDiffusion) RenderImage(ctx context.Context, w http.ResponseWrite
 
 	imgsVal, err, _ := sd.group.Do(hash, func() (interface{}, error) {
 		imgs, err := sd.client.Generate(ctx, stablediffusion.SimpleImageRequest{
-			Prompt:         "masterpiece, best quality, " + prompt,
+			Prompt:         "headshot, portrait, masterpiece, best quality, " + prompt,
 			NegativePrompt: "person in distance, worst quality, low quality, medium quality, deleted, lowres, comic, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, jpeg artifacts, signature, watermark, username, blurry",
 			Seed:           seed,
 			SamplerName:    "DPM++ 2M Karras",
