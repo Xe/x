@@ -340,12 +340,6 @@ schema = 3
   [mod."github.com/sacOO7/gowebsocket"]
     version = "v0.0.0-20221109081133-70ac927be105"
     hash = "sha256-N/fc2CbNM66Da+8qFf7PPRGLustXKgLeYfCtVeDG2hs="
-  [mod."github.com/samber/go-gpt-3-encoder"]
-    version = "v0.3.1"
-    hash = "sha256-quLfn1bazwQer7OBLtzjfN40cE39Q+whsUG4lWa/0p0="
-  [mod."github.com/samber/lo"]
-    version = "v1.37.0"
-    hash = "sha256-5m0advnk/wy/bFygNyxaPVX2PgA5oF1lSHP71hAOhCc="
   [mod."github.com/savsgio/gotils"]
     version = "v0.0.0-20230208104028-c358bd845dee"
     hash = "sha256-38uPEruTtVRqleBivVwx6oO1FSx4edqEujYdZNTriMo="

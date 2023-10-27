@@ -32,7 +32,6 @@ require (
 	github.com/rodaine/table v1.1.0
 	github.com/rogpeppe/go-internal v1.11.0
 	github.com/rs/cors v1.10.1
-	github.com/samber/go-gpt-3-encoder v0.3.1
 	github.com/sebest/xff v0.0.0-20210106013422-671bd2870b3a
 	github.com/tetratelabs/wazero v1.5.0
 	github.com/thoj/go-ircevent v0.0.0-20210723090443-73e444401d64
@@ -153,7 +152,6 @@ require (
 	github.com/rivo/uniseg v0.4.4 // indirect
 	github.com/sacOO7/go-logger v0.0.0-20180719173527-9ac9add5a50d // indirect
 	github.com/sacOO7/gowebsocket v0.0.0-20221109081133-70ac927be105
-	github.com/samber/lo v1.37.0 // indirect
 	github.com/sendgrid/rest v2.6.9+incompatible // indirect
 	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect
 	github.com/tailscale/certstore v0.1.1-0.20220316223106-78d6e1c49d8d // indirect
