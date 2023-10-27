@@ -3,11 +3,14 @@ package xesite
 import (
 	"archive/zip"
 	"compress/gzip"
+	"fmt"
 	"io"
 	"log/slog"
 	"net/http"
 	"os"
+	"path/filepath"
 	"sync"
+	"time"
 )
 
 const (
@@ -29,12 +32,13 @@ func init() {
 }
 
 type ZipServer struct {
+	dir  string
 	lock sync.RWMutex
 	zip  *zip.ReadCloser
 }
 
-func NewZipServer(zipPath string) (*ZipServer, error) {
-	result := &ZipServer{}
+func NewZipServer(zipPath, dir string) (*ZipServer, error) {
+	result := &ZipServer{dir: dir}
 
 	if _, err := os.Stat(zipPath); !os.IsNotExist(err) {
 		file, err := zip.OpenReader(zipPath)
@@ -46,6 +50,36 @@ func NewZipServer(zipPath string) (*ZipServer, error) {
 	}
 
 	return result, nil
+}
+
+func (zs *ZipServer) UploadNewZip(w http.ResponseWriter, r *http.Request) {
+	fname := fmt.Sprintf("xesite-%s.zip", time.Now().Format("2006-01-02T15-04-05"))
+	fpath := filepath.Join(zs.dir, "xesite", fname)
+	fout, err := os.Create(fpath)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		slog.Error("can't create file", "err", err, "fpath", fpath)
+		return
+	}
+	defer fout.Close()
+
+	if _, err := io.Copy(fout, r.Body); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		slog.Error("can't write file", "err", err, "fpath", fpath)
+		return
+	}
+
+	if err := fout.Close(); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		slog.Error("can't close file", "err", err, "fpath", fpath)
+		return
+	}
+
+	if err := zs.Update(fpath); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		slog.Error("can't update zip", "err", err, "fpath", fpath)
+		return
+	}
 }
 
 func (zs *ZipServer) Update(fname string) error {

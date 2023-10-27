@@ -126,6 +126,12 @@ func main() {
 		group:  &singleflight.Group{},
 	}
 
+	os.MkdirAll(filepath.Join(*dir, "xesite"), 0700)
+	zs, err := xesite.NewZipServer(filepath.Join(*dir, "xesite", "latest.zip"), *dir)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	go func() {
 		lis, err := srv.Listen("tcp", ":80")
 		if err != nil {
@@ -135,6 +141,7 @@ func main() {
 		http.DefaultServeMux.HandleFunc("/debug/varz", tsweb.VarzHandler)
 		http.DefaultServeMux.HandleFunc("/xedn/files", dc.ListFiles)
 		http.DefaultServeMux.HandleFunc("/xedn/purge", dc.Purge)
+		http.DefaultServeMux.HandleFunc("/xesite/upload", zs.UploadNewZip)
 		http.DefaultServeMux.HandleFunc("/sticker/files", ois.ListFiles)
 		http.DefaultServeMux.HandleFunc("/sticker/purge", ois.Purge)
 
@@ -192,18 +199,17 @@ func main() {
 	cdn.HandleFunc("/file/christine-static/", hdlr)
 	cdn.HandleFunc("/file/xeserv-akko/", hdlr)
 
-	os.MkdirAll(filepath.Join(*dir, "xesite"), 0700)
-	zs, err := xesite.NewZipServer(filepath.Join(*dir, "xesite", "latest.zip"))
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	topLevel := mux.NewRouter()
 
+	topLevel.Host("cdn.christine.website").Handler(cdn)
 	topLevel.Host("cdn.xeiaso.net").Handler(cdn)
 	topLevel.Host("xedn.fly.dev").Handler(cdn)
 	topLevel.Host("pneuma.shark-harmonic.ts.net").Handler(cdn)
 	topLevel.Host("xelaso.net").Handler(zs)
+
+	topLevel.NotFoundHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.Error(w, "wait, what, how did you do that?", http.StatusBadRequest)
+	})
 
 	slog.Info("starting up", "addr", *addr)
 	http.ListenAndServe(*addr, cors.Default().Handler(xffMW.Handler(topLevel)))
