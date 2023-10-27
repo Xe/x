@@ -6,6 +6,7 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
+	"os"
 	"sync"
 )
 
@@ -33,13 +34,15 @@ type ZipServer struct {
 }
 
 func NewZipServer(zipPath string) (*ZipServer, error) {
-	file, err := zip.OpenReader(zipPath)
-	if err != nil {
-		return nil, err
-	}
+	result := &ZipServer{}
 
-	result := &ZipServer{
-		zip: file,
+	if _, err := os.Stat(zipPath); !os.IsNotExist(err) {
+		file, err := zip.OpenReader(zipPath)
+		if err != nil {
+			return nil, err
+		}
+
+		result.zip = file
 	}
 
 	return result, nil
@@ -65,6 +68,11 @@ func (zs *ZipServer) Update(fname string) error {
 func (zs *ZipServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	zs.lock.RLock()
 	defer zs.lock.RUnlock()
+
+	if zs.zip == nil {
+		http.Error(w, "no zip file", http.StatusNotFound)
+		return
+	}
 
 	http.FileServer(http.FS(zs.zip)).ServeHTTP(w, r)
 }

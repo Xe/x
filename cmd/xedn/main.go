@@ -24,6 +24,7 @@ import (
 	"tailscale.com/metrics"
 	"tailscale.com/tsnet"
 	"tailscale.com/tsweb"
+	"within.website/x/cmd/xedn/internal/xesite"
 	"within.website/x/internal"
 	"within.website/x/web/stablediffusion"
 )
@@ -32,9 +33,10 @@ var (
 	b2Backend             = flag.String("b2-backend", "f001.backblazeb2.com", "Backblaze B2 base host")
 	addr                  = flag.String("addr", ":8080", "server bind address")
 	metricsAddr           = flag.String("metrics-addr", ":8081", "metrics bind address")
-	dir                   = flag.String("dir", os.Getenv("XEDN_STATE"), "where XeDN should store cached data")
+	dir                   = flag.String("dir", envOr("XEDN_STATE", "./var"), "where XeDN should store cached data")
 	staticDir             = flag.String("static-dir", envOr("XEDN_STATIC", "./static"), "where XeDN should look for static assets")
 	stableDiffusionServer = flag.String("stable-diffusion-server", "http://logos:7860", "where XeDN should request Stable Diffusion images from (Automatic1111 over Tailscale)")
+	tailscaleVerbose      = flag.Bool("tailscale-verbose", false, "enable verbose tailscale logging")
 
 	//go:embed index.html
 	indexHTML []byte
@@ -108,6 +110,10 @@ func main() {
 		Logf:     log.New(io.Discard, "", 0).Printf,
 		AuthKey:  os.Getenv("TS_AUTHKEY"),
 		Dir:      filepath.Join(*dir, "tsnet"),
+	}
+
+	if *tailscaleVerbose {
+		srv.Logf = log.Printf
 	}
 
 	srv.Start()
@@ -186,12 +192,19 @@ func main() {
 	cdn.HandleFunc("/file/christine-static/", hdlr)
 	cdn.HandleFunc("/file/xeserv-akko/", hdlr)
 
+	os.MkdirAll(filepath.Join(*dir, "xesite"), 0700)
+	zs, err := xesite.NewZipServer(filepath.Join(*dir, "xesite", "latest.zip"))
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	topLevel := mux.NewRouter()
 
 	topLevel.Host("cdn.xeiaso.net").Handler(cdn)
 	topLevel.Host("xedn.fly.dev").Handler(cdn)
 	topLevel.Host("pneuma.shark-harmonic.ts.net").Handler(cdn)
+	topLevel.Host("xelaso.net").Handler(zs)
 
 	slog.Info("starting up", "addr", *addr)
-	http.ListenAndServe(*addr, cors.Default().Handler(xffMW.Handler(cdn)))
+	http.ListenAndServe(*addr, cors.Default().Handler(xffMW.Handler(topLevel)))
 }

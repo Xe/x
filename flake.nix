@@ -284,9 +284,6 @@
             esbuild
             tailwindcss
 
-            postgresql_15
-            pgloader
-
             pkg-config
             libaom
             libavif
