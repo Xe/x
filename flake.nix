@@ -277,7 +277,7 @@
             strace
             hey
             boltbrowser
-            terraform
+            opentofu
             litestream
             nodejs
             deno
