@@ -141,6 +141,8 @@ func main() {
 		http.DefaultServeMux.HandleFunc("/debug/varz", tsweb.VarzHandler)
 		http.DefaultServeMux.HandleFunc("/xedn/files", dc.ListFiles)
 		http.DefaultServeMux.HandleFunc("/xedn/purge", dc.Purge)
+		http.DefaultServeMux.HandleFunc("/xesite/generations", zs.ListGenerations)
+		http.DefaultServeMux.HandleFunc("/xesite/nuke", zs.NukeGeneration)
 		http.DefaultServeMux.HandleFunc("/xesite/upload", zs.UploadNewZip)
 		http.DefaultServeMux.HandleFunc("/sticker/files", ois.ListFiles)
 		http.DefaultServeMux.HandleFunc("/sticker/purge", ois.Purge)
