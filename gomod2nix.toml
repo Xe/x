@@ -7,6 +7,9 @@ schema = 3
   [mod."filippo.io/edwards25519"]
     version = "v1.0.0"
     hash = "sha256-APnPAcmItvtJ5Zsy863lzR2TjEBF9Y66TY1e4M1ap98="
+  [mod."github.com/Khan/genqlient"]
+    version = "v0.6.0"
+    hash = "sha256-uJza5z+lT7iOgIRY/SWqEPcEx1Acz8J7IC5eKY0Y6Us="
   [mod."github.com/Marcel-ICMC/graw"]
     version = "v0.0.0-20230411090719-e24cd8592d25"
     hash = "sha256-oKeE+BQHXpFEU3g21Z41PeSFJicABcRYsGEs807oo40="
@@ -16,6 +19,9 @@ schema = 3
   [mod."github.com/Microsoft/go-winio"]
     version = "v0.6.1"
     hash = "sha256-BL0BVaHtmPKQts/711W59AbHXjGKqFS4ZTal0RYnR9I="
+  [mod."github.com/PuerkitoBio/rehttp"]
+    version = "v1.3.0"
+    hash = "sha256-L9Z2KEnx8KkcJwpZ4VUwSRDyz6UHVrS6l6mYp2LR3xs="
   [mod."github.com/akutz/memconn"]
     version = "v0.1.0"
     hash = "sha256-WOs/RQYjQbn41ui8ztHgWSd4jxydE+fvIrl/0dmHD9Y="
@@ -355,6 +361,12 @@ schema = 3
   [mod."github.com/ssor/bom"]
     version = "v0.0.0-20170718123548-6386211fdfcf"
     hash = "sha256-jYYzaIOaUFv575h3Sz/T4DPO6EWFRwEpwx1zF00i5SU="
+  [mod."github.com/superfly/flyctl/api"]
+    version = "v0.0.0-20231103162926-56f421e469a2"
+    hash = "sha256-2XgDAfa92ydPouhbXpUzX/VI3I5x7jbA6+aIYj0n/9k="
+  [mod."github.com/superfly/graphql"]
+    version = "v0.2.4"
+    hash = "sha256-+lS+da8aDtfqY2xQ4vawZcfaQDa1K/isK/ip0l61/g8="
   [mod."github.com/tailscale/certstore"]
     version = "v0.1.1-0.20220316223106-78d6e1c49d8d"
     hash = "sha256-qBlCkpHp8t+XNwMOJRO+YpvXn0nOJMABjUZKH70b/Y0="
@@ -394,6 +406,9 @@ schema = 3
   [mod."github.com/valyala/fasthttp"]
     version = "v1.50.0"
     hash = "sha256-825dQTa0aLuLCzljblN6BvjFlYXOiOFQa47n90BSzKc="
+  [mod."github.com/vektah/gqlparser/v2"]
+    version = "v2.5.1"
+    hash = "sha256-sfwSSafdEXEv/ca/EOjgaPEdezewuqdE+5AuwhsHxYU="
   [mod."github.com/vishvananda/netlink"]
     version = "v1.2.1-beta.2"
     hash = "sha256-ePReedgYT0KuAx/HOUgG76zDZ2XpW/u8bGlsWysxKzE="
