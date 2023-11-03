@@ -140,6 +140,14 @@ func evalNixExpr(literals []string, exprs ...any) any {
 	return result
 }
 
+func hostname() string {
+	result, err := os.Hostname()
+	if err != nil {
+		panic(err)
+	}
+	return result
+}
+
 func main() {
 	internal.HandleStartup()
 
@@ -205,12 +213,14 @@ func main() {
 	})
 
 	vm.Set("yeet", map[string]any{
-		"cwd":     yeet.WD,
-		"datetag": yeet.DateTag,
-		"runcmd":  runcmd,
-		"setenv":  os.Setenv,
-		"goos":    runtime.GOOS,
-		"goarch":  runtime.GOARCH,
+		"cwd":      yeet.WD,
+		"datetag":  yeet.DateTag,
+		"hostname": hostname(),
+		"runcmd":   runcmd,
+		"run":      runcmd,
+		"setenv":   os.Setenv,
+		"goos":     runtime.GOOS,
+		"goarch":   runtime.GOARCH,
 	})
 
 	if _, err := vm.RunScript(*fname, string(data)); err != nil {
