@@ -186,6 +186,11 @@ func deleteOldestFileInFolder(folderPath string) error {
 		if err != nil {
 			return err
 		}
+
+		if fileInfo.Name() == "latest.zip" {
+			continue
+		}
+
 		if oldestFile == nil || fileInfo.ModTime().Before(oldestTime) {
 			oldestFile = file
 			oldestTime = fileInfo.ModTime()
