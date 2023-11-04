@@ -71,6 +71,7 @@
           src = ./.;
           modules = ./gomod2nix.toml;
 
+          nativeBuildInputs = with pkgs; [ pkg-config ];
           buildInputs = with pkgs; [
             pkg-config
             libaom
@@ -86,6 +87,7 @@
           modules = ./gomod2nix.toml;
           subPackages = [ "cmd/xedn" ];
 
+          nativeBuildInputs = with pkgs; [ pkg-config ];
           buildInputs = with pkgs; [ pkg-config libaom libavif ];
         };
 
@@ -158,6 +160,7 @@
           inherit version;
           src = ./.;
           modules = ./gomod2nix.toml;
+          nativeBuildInputs = with pkgs; [ pkg-config ];
           subPackages = [ "cmd/robocadey2" ];
         };
 
