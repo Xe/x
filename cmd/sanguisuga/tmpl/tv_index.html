@@ -83,7 +83,7 @@
             submitData() {
                 this.message = ''
 
-                fetch('/api/anime/track', {
+                fetch('/api/tv/track', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(this.formData),
