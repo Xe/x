@@ -1,7 +1,6 @@
 package flymachines
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -46,35 +45,12 @@ func (mt MilliTime) MarshalJSON() ([]byte, error) {
 
 // CreateApp creates a single application in the given organization and on the given network.
 func (c *Client) CreateApp(ctx context.Context, caa CreateAppArgs) (*CreateAppResponse, error) {
-	var buf bytes.Buffer
-	if err := json.NewEncoder(&buf).Encode(caa); err != nil {
-		return nil, fmt.Errorf("flymachines: can't encode CreateApp request body: %w", err)
-	}
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, c.apiURL+"/v1/apps", &buf)
+	result, err := doJSONBody[CreateAppArgs, CreateAppResponse](ctx, c, http.MethodPost, "/v1/apps", caa, http.StatusCreated)
 	if err != nil {
-		return nil, fmt.Errorf("flymachines: can't create CreateApp request: %w", err)
+		return nil, fmt.Errorf("flymachines: can't decode CreateApp response: %w", err)
 	}
 
-	req.Header.Set("Content-Type", "application/json")
-
-	resp, err := c.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("flymachines: can't perform CreateApp request: %w", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusCreated {
-		return nil, web.NewError(http.StatusCreated, resp)
-	}
-
-	var car CreateAppResponse
-
-	if err := json.NewDecoder(resp.Body).Decode(&car); err != nil {
-		return nil, fmt.Errorf("flymachines: can't decode response body for CreateApp: %w", err)
-	}
-
-	return &car, nil
+	return &result, nil
 }
 
 // App is a Fly app. Apps are collections of resources such as machines, volumes, and IP addresses.
@@ -106,32 +82,12 @@ type Org struct {
 
 // GetApps gets all of the applications in an organization.
 func (c *Client) GetApps(ctx context.Context, orgSlug string) ([]ListApp, error) {
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, c.apiURL+"/v1/apps", nil)
-	if err != nil {
-		return nil, fmt.Errorf("flymachines: can't create GetApps request: %w", err)
-	}
-
-	q := req.URL.Query()
-	q.Set("org_slug", orgSlug)
-	req.URL.RawQuery = q.Encode()
-
-	resp, err := c.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("flymachines: can't perform GetApps request: %w", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return nil, web.NewError(http.StatusOK, resp)
-	}
-
-	var result struct {
+	result, err := doJSON[struct {
 		Apps      []ListApp `json:"apps"`
 		TotalApps int       `json:"total_apps"`
-	}
-
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, fmt.Errorf("flymachines: can't decode response body for GetApps: %w", err)
+	}](ctx, c, http.MethodGet, "/v1/apps?org_slug="+orgSlug, http.StatusOK)
+	if err != nil {
+		return nil, fmt.Errorf("flymachines: can't decode GetApps response: %w", err)
 	}
 
 	return result.Apps, nil
@@ -139,27 +95,12 @@ func (c *Client) GetApps(ctx context.Context, orgSlug string) ([]ListApp, error)
 
 // GetApp fetches information about one app in particular.
 func (c *Client) GetApp(ctx context.Context, appName string) (*SingleApp, error) {
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, c.apiURL+"/v1/apps/"+appName, nil)
+	result, err := doJSON[SingleApp](ctx, c, http.MethodGet, "/v1/apps/"+appName, http.StatusOK)
 	if err != nil {
-		return nil, fmt.Errorf("flymachines: can't create GetApp request: %w", err)
+		return nil, fmt.Errorf("flymachines: can't decode GetApp response: %w", err)
 	}
 
-	resp, err := c.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("flymachines: can't perform GetApp request: %w", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return nil, web.NewError(http.StatusOK, resp)
-	}
-
-	var app SingleApp
-	if err := json.NewDecoder(resp.Body).Decode(&app); err != nil {
-		return nil, fmt.Errorf("flymachines: can't decode response body for GetApp: %w", err)
-	}
-
-	return &app, nil
+	return &result, nil
 }
 
 func (c *Client) DeleteApp(ctx context.Context, appName string) error {

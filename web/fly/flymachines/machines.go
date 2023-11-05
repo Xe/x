@@ -1,7 +1,6 @@
 package flymachines
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -52,11 +51,12 @@ type MachineService struct {
 }
 
 type MachineGuest struct {
-	CPUKind    string   `json:"cpu_kind"` // "shared" or "performance"
-	CPUs       int      `json:"cpus"`
-	MemoryMB   int      `json:"memory_mb"`
-	GPUKind    *string  `json:"gpu_kind,omitempty"`
-	KernelArgs []string `json:"kernel_args,omitempty"`
+	CPUKind          string   `json:"cpu_kind"` // "shared" or "performance"
+	CPUs             int      `json:"cpus"`
+	MemoryMB         int      `json:"memory_mb"`
+	GPUKind          string   `json:"gpu_kind,omitempty"`
+	KernelArgs       []string `json:"kernel_args,omitempty"`
+	HostDedicationID string   `json:"host_dedication_id,omitempty"`
 }
 
 type MachineStopConfig struct {
@@ -173,54 +173,61 @@ type CreateMachine struct {
 }
 
 func (c *Client) CreateMachine(ctx context.Context, appID string, cm CreateMachine) (*Machine, error) {
-	buf := new(bytes.Buffer)
-	if err := json.NewEncoder(buf).Encode(cm); err != nil {
-		return nil, fmt.Errorf("flymachines: can't encode CreateMachine request body: %w", err)
-	}
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, c.apiURL+"/v1/apps/"+appID+"/machines", buf)
+	result, err := doJSONBody[CreateMachine, Machine](ctx, c, http.MethodPost, "/v1/apps/"+appID+"/machines", cm, http.StatusOK)
 	if err != nil {
-		return nil, fmt.Errorf("flymachines: can't create CreateMachine request: %w", err)
-	}
-
-	resp, err := c.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("flymachines: can't do CreateMachine request: %w", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("flymachines: CreateMachine request failed: %s", resp.Status)
-	}
-
-	var machine Machine
-	if err := json.NewDecoder(resp.Body).Decode(&machine); err != nil {
 		return nil, fmt.Errorf("flymachines: can't decode CreateMachine response: %w", err)
 	}
 
-	return &machine, nil
+	return &result, nil
 }
 
 func (c *Client) GetAppMachine(ctx context.Context, appID, machineID string) (*Machine, error) {
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, c.apiURL+"/v1/apps/"+appID+"/machines/"+machineID, nil)
+	result, err := doJSON[Machine](ctx, c, http.MethodGet, "/v1/apps/"+appID+"/machines/"+machineID, http.StatusOK)
 	if err != nil {
-		return nil, fmt.Errorf("flymachines: can't create GetMachine request: %w", err)
+		return nil, fmt.Errorf("flymachines: can't decode GetAppMachine response: %w", err)
 	}
 
-	resp, err := c.Do(req)
+	return &result, nil
+}
+
+func (c *Client) DeleteAppMachine(ctx context.Context, appID, machineID string) error {
+	return c.doRequestNoResponse(ctx, http.MethodDelete, "/v1/apps/"+appID+"/machines/"+machineID, http.StatusOK)
+}
+
+func (c *Client) CordonAppMachine(ctx context.Context, appID, machineID string) error {
+	return c.doRequestNoResponse(ctx, http.MethodPost, "/v1/apps/"+appID+"/machines/"+machineID+"/cordon", http.StatusOK)
+}
+
+func (c *Client) UncordonAppMachine(ctx context.Context, appID, machineID string) error {
+	return c.doRequestNoResponse(ctx, http.MethodPost, "/v1/apps/"+appID+"/machines/"+machineID+"/uncordon", http.StatusOK)
+}
+
+func (c *Client) StartAppMachine(ctx context.Context, appID, machineID string) error {
+	return c.doRequestNoResponse(ctx, http.MethodPost, "/v1/apps/"+appID+"/machines/"+machineID+"/start", http.StatusOK)
+}
+
+func (c *Client) StopAppMachine(ctx context.Context, appID, machineID string) error {
+	return c.doRequestNoResponse(ctx, http.MethodPost, "/v1/apps/"+appID+"/machines/"+machineID+"/stop", http.StatusOK)
+}
+
+func (c *Client) RestartAppMachine(ctx context.Context, appID, machineID string) error {
+	return c.doRequestNoResponse(ctx, http.MethodPost, "/v1/apps/"+appID+"/machines/"+machineID+"/restart", http.StatusOK)
+}
+
+func (c *Client) GetAppMachineEvents(ctx context.Context, appID, machineID string) ([]MachineEvent, error) {
+	result, err := doJSON[[]MachineEvent](ctx, c, http.MethodGet, "/v1/apps/"+appID+"/machines/"+machineID+"/events", http.StatusOK)
 	if err != nil {
-		return nil, fmt.Errorf("flymachines: can't do GetMachine request: %w", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("flymachines: GetMachine request failed: %s", resp.Status)
+		return nil, fmt.Errorf("flymachines: can't decode GetAppMachineEvents response: %w", err)
 	}
 
-	var machine Machine
-	if err := json.NewDecoder(resp.Body).Decode(&machine); err != nil {
-		return nil, fmt.Errorf("flymachines: can't decode GetMachine response: %w", err)
+	return result, nil
+}
+
+func (c *Client) GetAppMachineMetadata(ctx context.Context, appID, machineID string) (map[string]string, error) {
+	result, err := doJSON[map[string]string](ctx, c, http.MethodGet, "/v1/apps/"+appID+"/machines/"+machineID+"/metadata", http.StatusOK)
+	if err != nil {
+		return nil, fmt.Errorf("flymachines: can't decode GetAppMachineMetadata response: %w", err)
 	}
 
-	return &machine, nil
+	return result, nil
 }
