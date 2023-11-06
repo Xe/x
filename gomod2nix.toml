@@ -131,8 +131,8 @@ schema = 3
     version = "v0.0.0-20150612182917-8dac2c3c4870"
     hash = "sha256-Ub0cBFwF6MBzTZ7fpqxrC375arBv+au5I/LLzksVzE8="
   [mod."github.com/fasthttp/router"]
-    version = "v1.4.20"
-    hash = "sha256-aTkNxqB5seT0uAkBFQg7l0xdN2aPbZQzz3d4BnVlA2c="
+    version = "v1.4.21"
+    hash = "sha256-qcq7wqRm1wUH65I8NxIFa3SO7JJNqkqOBdp/h2wxIm4="
   [mod."github.com/fogleman/gg"]
     version = "v1.3.0"
     hash = "sha256-Fs2JI0FmF4N5EzXJzGAPZMxZxo6wKyebkN/iBZ9sdNo="
@@ -290,8 +290,8 @@ schema = 3
     version = "v0.0.0-20170330174427-18e65badd6ab"
     hash = "sha256-Q9skxtyqOwkBxmUnzNCfbn813vPbqvwuAihwq/wkKs4="
   [mod."github.com/mymmrac/telego"]
-    version = "v0.26.3"
-    hash = "sha256-NEWQAqiWdOFCQekpzIPBd4RnD06qYtEFbqtE2mkjyA8="
+    version = "v0.27.0"
+    hash = "sha256-XwrdxdysDjtUWfiGPwesnVmtoMoJr59vaVyHy/Lw96Y="
   [mod."github.com/oklog/ulid/v2"]
     version = "v2.1.0"
     hash = "sha256-/oQPgcO1xKbHXutxz0WPfIduShPrfH1l+7/mj8jLst8="

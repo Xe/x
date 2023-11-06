@@ -209,8 +209,8 @@ github.com/facebookgo/stack v0.0.0-20160209184415-751773369052 h1:JWuenKqqX8nojt
 github.com/facebookgo/stack v0.0.0-20160209184415-751773369052/go.mod h1:UbMTZqLaRiH3MsBH8va0n7s1pQYcu3uTb8G4tygF4Zg=
 github.com/facebookgo/subset v0.0.0-20150612182917-8dac2c3c4870 h1:E2s37DuLxFhQDg5gKsWoLBOB0n+ZW8s599zru8FJ2/Y=
 github.com/facebookgo/subset v0.0.0-20150612182917-8dac2c3c4870/go.mod h1:5tD+neXqOorC30/tWg0LCSkrqj/AR6gu8yY8/fpw1q0=
-github.com/fasthttp/router v1.4.20 h1:yPeNxz5WxZGojzolKqiP15DTXnxZce9Drv577GBrDgU=
-github.com/fasthttp/router v1.4.20/go.mod h1:um867yNQKtERxBm+C+yzgWxjspTiQoA8z86Ec3fK/tc=
+github.com/fasthttp/router v1.4.21 h1:Ysgck9aZwaovqxsfhv7nPx9EgsYvB7t3nthrBMQoeIg=
+github.com/fasthttp/router v1.4.21/go.mod h1:wtOlZHmOSGD048li7Nkuhw+ov40rr0tY2+IjT+mN9p4=
 github.com/fogleman/gg v1.3.0 h1:/7zJX8F6AaYQc57WQCyN9cAIz+4bCJGO9B+dyW29am8=
 github.com/fogleman/gg v1.3.0/go.mod h1:R/bRT+9gY/C5z7JzPU0zXsXHKM4/ayA+zqcVNZzPa1k=
 github.com/fogleman/primitive v0.0.0-20190214200932-673f57e7b1b5 h1:/oy2PBMZq4jeEfqM5OCuvWYu+6yZEb0SSPbwL1fCaXw=
@@ -450,8 +450,8 @@ github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd/go.mod h1:6dJ
 github.com/modern-go/reflect2 v0.0.0-20180701023420-4b7aa43c6742/go.mod h1:bx2lNnkwVCuqBIxFjflWJWanXIb3RllmbCylyMrvgv0=
 github.com/modern-go/reflect2 v1.0.1/go.mod h1:bx2lNnkwVCuqBIxFjflWJWanXIb3RllmbCylyMrvgv0=
 github.com/mwitkow/go-conntrack v0.0.0-20161129095857-cc309e4a2223/go.mod h1:qRWi+5nqEBWmkhHvq77mSJWrCKwh8bxhgT7d/eI7P4U=
-github.com/mymmrac/telego v0.26.3 h1:qdlddiur25YBUu8MFnm5r/AVdgy77QLyMTOKSId60M8=
-github.com/mymmrac/telego v0.26.3/go.mod h1:X0MAdPClcdoAfwm7LPJIHosWaIRiGZkEd6n0u4fQgVA=
+github.com/mymmrac/telego v0.27.0 h1:22RBP6gDTy4W4MLwFVvqIfECzFZdRQwLFECaPdoNAMY=
+github.com/mymmrac/telego v0.27.0/go.mod h1:h0FwbuLw+bw9hL+ImF3qHTFOEKQCTyzMlUpde9ZvFg4=
 github.com/oklog/ulid/v2 v2.1.0 h1:+9lhoxAP56we25tyYETBBY1YLA2SaoLvUFgrP2miPJU=
 github.com/oklog/ulid/v2 v2.1.0/go.mod h1:rcEKHmBBKfef9DhnvX7y1HZBYxjXb0cP5ExxNsTT1QQ=
 github.com/olekukonko/tablewriter v0.0.5 h1:P2Ga83D34wi1o9J6Wh1mRuqd4mF/x/lgBS7N7AbDhec=
