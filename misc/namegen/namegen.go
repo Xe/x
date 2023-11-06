@@ -3,7 +3,6 @@ package namegen
 
 import (
 	"math/rand"
-	"time"
 
 	"cirello.io/goherokuname"
 	"within.website/x/misc/namegen/elfs"
@@ -19,8 +18,6 @@ func AddGenerator(g Generator) {
 }
 
 func init() {
-	rand.Seed(time.Now().UnixNano())
-
 	AddGenerator(elfs.Next)
 	AddGenerator(tarot.Next)
 	AddGenerator(goherokuname.HaikunateHex)
