@@ -419,8 +419,8 @@ schema = 3
     version = "v0.8.4"
     hash = "sha256-VKzMTMS9pIB/cwe17xPftCSK9Mf4Y6EuBEJlB4by5mE="
   [mod."go.etcd.io/bbolt"]
-    version = "v1.3.7"
-    hash = "sha256-poZk8tPLDWwW95oCOkTJcQtEvOJTD9UXAZ2TqGJutwk="
+    version = "v1.3.8"
+    hash = "sha256-ekKy8198B2GfPldHLYZnvNjID6x07dUPYKgFx84TgVs="
   [mod."go.jetpack.io/tyson"]
     version = "v0.1.1"
     hash = "sha256-c4ROLn+BSX7v/4C9/IeU6HiE2YvnqDuXXGp2iZhAVk4="
