@@ -524,8 +524,8 @@ schema = 3
     version = "v1.0.1"
     hash = "sha256-lTSZX8nrb5hDZqOnRuFmI4VIaco3qwwWe28z24vohyo="
   [mod."nhooyr.io/websocket"]
-    version = "v1.8.7"
-    hash = "sha256-6pQ35gFvbyMhNo0gv4bPxYDUrwDF/ok1GMA+BHfsRRM="
+    version = "v1.8.10"
+    hash = "sha256-EsUWUFIA2uJTap1DfsYuSxlPMH3UHDpxEohJMalDOcI="
   [mod."tailscale.com"]
     version = "v1.50.1"
     hash = "sha256-KHwZToKRE/Av0gMvu+skWZ8kgdB1874fmOcQGon5+hI="
