@@ -6,7 +6,7 @@ require (
 	cirello.io/goherokuname v0.0.0-20190914093443-b436bae8c2c5
 	github.com/Marcel-ICMC/graw v0.0.0-20230411090719-e24cd8592d25
 	github.com/McKael/madon/v2 v2.4.0
-	github.com/antonmedv/expr v1.15.0
+	github.com/antonmedv/expr v1.15.3
 	github.com/aws/aws-sdk-go v1.46.7
 	github.com/bwmarrin/discordgo v0.27.1
 	github.com/chai2010/webp v1.1.1
