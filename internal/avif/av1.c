@@ -1,8 +1,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
-#include "aom/aom_encoder.h"
-#include "aom/aomcx.h"
+#include <aom/aom_encoder.h>
+#include <aom/aomcx.h>
 #include "av1.h"
 
 #define SET_CODEC_CONTROL(ctrl, val) \
