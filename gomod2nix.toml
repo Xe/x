@@ -440,8 +440,8 @@ schema = 3
     version = "v0.0.0-20230725093048-515e97ebf090"
     hash = "sha256-MynD8x+mg/OAZGFcrN89I243j+b29bzmqTYHZeIs87I="
   [mod."golang.org/x/image"]
-    version = "v0.7.0"
-    hash = "sha256-8ymOoG5nFlSCJOgn/apVzP4Zk5jtoYNLwd5TJKlP2X8="
+    version = "v0.10.0"
+    hash = "sha256-saOeA3ZgCwSIXUDam2HGwOfQsDlUly81HwFUSowMQ5M="
   [mod."golang.org/x/mod"]
     version = "v0.13.0"
     hash = "sha256-qh/YmxS0auZEiKzqdn+v84qs31SpkGIJn9rqKLjdKVU="
