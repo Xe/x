@@ -25,7 +25,7 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/kr/pretty v0.3.1
 	github.com/mndrix/golog v0.0.0-20170330170653-a28e2a269775
-	github.com/mymmrac/telego v0.27.0
+	github.com/mymmrac/telego v0.27.1
 	github.com/otiai10/copy v1.14.0
 	github.com/peterh/liner v1.2.2
 	github.com/pkg/errors v0.9.1
