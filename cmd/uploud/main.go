@@ -2,6 +2,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"image"
@@ -13,10 +14,9 @@ import (
 	"path/filepath"
 	"runtime"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/credentials"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/credentials"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/chai2010/webp"
 	"github.com/disintegration/imaging"
 	"within.website/x/internal"
@@ -181,6 +181,9 @@ func main() {
 		log.Fatalf("usage: %s <filename/folder> <b2 path>", os.Args[0])
 	}
 
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
 	td, err := os.MkdirTemp("", "uploud")
 	if err != nil {
 		log.Fatal(err)
@@ -236,7 +239,7 @@ func main() {
 		}
 		defer fin.Close()
 
-		_, err = s3c.PutObject(&s3.PutObjectInput{
+		_, err = s3c.PutObject(ctx, &s3.PutObjectInput{
 			Body:        fin,
 			Bucket:      b2Bucket,
 			Key:         aws.String(flag.Arg(1) + "/" + finfo.Name()),
@@ -257,15 +260,14 @@ var mimeTypes = map[string]string{
 	".css":  "text/css",
 }
 
-func mkS3Client() *s3.S3 {
-	s3Config := &aws.Config{
-		Credentials:      credentials.NewStaticCredentials(*b2KeyID, *b2KeySecret, ""),
-		Endpoint:         aws.String("https://s3.us-west-001.backblazeb2.com"),
-		Region:           aws.String("us-west-001"),
-		S3ForcePathStyle: aws.Bool(true),
+func mkS3Client() *s3.Client {
+	s3Config := aws.Config{
+		Credentials:  credentials.NewStaticCredentialsProvider(*b2KeyID, *b2KeySecret, ""),
+		BaseEndpoint: aws.String("https://s3.us-west-001.backblazeb2.com"),
+		Region:       "us-west-001",
 	}
-	newSession := session.New(s3Config)
-
-	s3Client := s3.New(newSession)
+	s3Client := s3.NewFromConfig(s3Config, (func(o *s3.Options) {
+		o.UsePathStyle = true
+	}))
 	return s3Client
 }

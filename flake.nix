@@ -1,3 +1,5 @@
+# nix-direnv cache busting line: sha256-0ppUTXko6qdbtpzRBtjtF1XLAZGI77TSfRgq/ECR2PI=
+
 {
   description = "/x/perimental code";
 
@@ -16,12 +18,6 @@
       inputs.flake-utils.follows = "utils";
     };
 
-    gomod2nix = {
-      url = "github:nix-community/gomod2nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.utils.follows = "utils";
-    };
-
     xess = {
       url = "github:Xe/Xess";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -32,8 +28,7 @@
     iaso-fonts.url = "github:Xe/iosevka";
   };
 
-  outputs = { self, nixpkgs, utils, gomod2nix, rust-overlay, naersk, xess
-    , iaso-fonts }@inputs:
+  outputs = { self, nixpkgs, utils, rust-overlay, naersk, xess, iaso-fonts }@inputs:
     utils.lib.eachSystem [
       "x86_64-linux"
       "aarch64-linux"
@@ -47,11 +42,12 @@
             (final: prev: {
               go = prev.go_1_21;
             })
-            gomod2nix.overlays.default
             rust-overlay.overlays.default
             #(final: prev: self.packages.${system})
           ];
         };
+
+        vendorSha256 = pkgs.lib.fileContents ./.go.mod.sri;
 
         version = "${self.sourceInfo.lastModifiedDate}";
 
@@ -65,11 +61,10 @@
           rustc = rust;
         };
 
-        everything = pkgs.buildGoApplication {
+        everything = pkgs.buildGo121Module {
           pname = "xe-x-composite";
-          inherit version;
+          inherit version vendorSha256;
           src = ./.;
-          modules = ./gomod2nix.toml;
 
           nativeBuildInputs = with pkgs; [ pkg-config ];
           buildInputs = with pkgs; [
@@ -80,11 +75,10 @@
           ];
         };
 
-        xedn = pkgs.buildGoApplication {
+        xedn = pkgs.buildGo121Module {
           pname = "xedn";
-          inherit version;
+          inherit version vendorSha256;
           src = ./.;
-          modules = ./gomod2nix.toml;
           subPackages = [ "cmd/xedn" ];
 
           nativeBuildInputs = with pkgs; [ pkg-config ];
@@ -155,11 +149,10 @@
           '';
         };
 
-        robocadey2 = pkgs.buildGoApplication {
+        robocadey2 = pkgs.buildGo121Module {
           pname = "robocadey2";
-          inherit version;
+          inherit version vendorSha256;
           src = ./.;
-          modules = ./gomod2nix.toml;
           nativeBuildInputs = with pkgs; [ pkg-config ];
           subPackages = [ "cmd/robocadey2" ];
         };
@@ -275,7 +268,6 @@
             gopls
             gotools
             go-tools
-            gomod2nix.packages.${system}.default
             python3
             strace
             hey
@@ -287,6 +279,8 @@
             esbuild
             tailwindcss
 
+            perl
+            
             pkg-config
             libaom
             libavif
