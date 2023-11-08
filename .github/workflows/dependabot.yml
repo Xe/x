@@ -22,6 +22,7 @@ jobs:
       # (e.g. actions/setup-node@2)
       - uses: actions/setup-go@v4
         with:
+          go-version: "1.21"
           check-latest: true
       - name: Bump Go mod
         run: ./bumperate.sh
