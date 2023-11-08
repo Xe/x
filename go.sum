@@ -469,8 +469,8 @@ github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd/go.mod h1:6dJ
 github.com/modern-go/reflect2 v0.0.0-20180701023420-4b7aa43c6742/go.mod h1:bx2lNnkwVCuqBIxFjflWJWanXIb3RllmbCylyMrvgv0=
 github.com/modern-go/reflect2 v1.0.1/go.mod h1:bx2lNnkwVCuqBIxFjflWJWanXIb3RllmbCylyMrvgv0=
 github.com/mwitkow/go-conntrack v0.0.0-20161129095857-cc309e4a2223/go.mod h1:qRWi+5nqEBWmkhHvq77mSJWrCKwh8bxhgT7d/eI7P4U=
-github.com/mymmrac/telego v0.27.0 h1:22RBP6gDTy4W4MLwFVvqIfECzFZdRQwLFECaPdoNAMY=
-github.com/mymmrac/telego v0.27.0/go.mod h1:h0FwbuLw+bw9hL+ImF3qHTFOEKQCTyzMlUpde9ZvFg4=
+github.com/mymmrac/telego v0.27.1 h1:6Fwof9WLrJ/Sg3zGYO/SJY4SZn8y9fZjewv4BHARW5Y=
+github.com/mymmrac/telego v0.27.1/go.mod h1:h0FwbuLw+bw9hL+ImF3qHTFOEKQCTyzMlUpde9ZvFg4=
 github.com/oklog/ulid/v2 v2.1.0 h1:+9lhoxAP56we25tyYETBBY1YLA2SaoLvUFgrP2miPJU=
 github.com/oklog/ulid/v2 v2.1.0/go.mod h1:rcEKHmBBKfef9DhnvX7y1HZBYxjXb0cP5ExxNsTT1QQ=
 github.com/olekukonko/tablewriter v0.0.5 h1:P2Ga83D34wi1o9J6Wh1mRuqd4mF/x/lgBS7N7AbDhec=
