@@ -1,0 +1,30 @@
+name: Fix dependabot imports
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+permissions:
+  pull-requests: write
+  contents: write
+
+jobs:
+  run-custom-command:
+    if: ${{ github.actor == 'dependabot[bot]' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{github.event.pull_request.head.ref}}
+          repository: ${{github.event.pull_request.head.repo.full_name}}
+          submodules: true
+      # TODO: Add any needed steps to be able to run your command
+      # (e.g. actions/setup-node@2)
+      - uses: actions/setup-go@v4
+        with:
+          check-latest: true
+      - name: Bump Go mod
+        run: ./bumperate.sh
+      - uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Bump Go mod SRI
