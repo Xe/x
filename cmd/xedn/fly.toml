@@ -8,6 +8,9 @@ kill_timeout = "5s"
 [build]
   image = "registry.fly.io/xedn:latest"
 
+[deploy]
+  strategy = "immediate"
+
 [env]
   XEDN_STATE = "/data/xedn"
 
