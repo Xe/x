@@ -213,6 +213,18 @@ func main() {
 		http.Error(w, "wait, what, how did you do that?", http.StatusBadRequest)
 	})
 
+	var h http.Handler = topLevel
+	h = xffMW.Handler(h)
+	h = cors.Default().Handler(h)
+	h = FlyRegionAnnotation(h)
+
 	slog.Info("starting up", "addr", *addr)
-	http.ListenAndServe(*addr, cors.Default().Handler(xffMW.Handler(topLevel)))
+	http.ListenAndServe(*addr, h)
+}
+
+func FlyRegionAnnotation(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Fly-Region", os.Getenv("FLY_REGION"))
+		next.ServeHTTP(w, r)
+	})
 }
