@@ -1,4 +1,4 @@
-# nix-direnv cache busting line: sha256-rcMsiZWlOJOT5e6F5LfkBdBowIhUM8VUivMmukbdGKo=
+# nix-direnv cache busting line: sha256-0CBptPqKxoJzY8JOaJ5GswA1AISScRbbh2bfae/9ndE=
 
 {
   description = "/x/perimental code";
