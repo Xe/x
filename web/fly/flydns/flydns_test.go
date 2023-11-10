@@ -15,3 +15,17 @@ func TestGetApps(t *testing.T) {
 		t.Errorf("Expected no error, but got an error: %v", err)
 	}
 }
+
+func TestParseMachine(t *testing.T) {
+	input := "1781965b593689 yyz"
+	expected := Machine{"1781965b593689", "yyz"}
+
+	result, err := parseMachine(input)
+	if err != nil {
+		t.Errorf("Expected no error, but got an error: %v", err)
+	}
+
+	if result != expected {
+		t.Errorf("Expected %v, but got %v", expected, result)
+	}
+}

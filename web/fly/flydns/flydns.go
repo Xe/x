@@ -7,6 +7,10 @@ import (
 	"strings"
 )
 
+func combineString(inp []string) string {
+	return strings.Join(inp, "")
+}
+
 func GetAppAddresses(appName string) ([]netip.Addr, error) {
 	addrs, err := net.LookupAddr(fmt.Sprintf("%s.internal", appName))
 	if err != nil {
@@ -89,9 +93,56 @@ func GetApps() ([]string, error) {
 	}
 
 	var result []string
-	for _, resp := range appString {
+	for _, resp := range strings.Split(appString[0], ",") {
 		result = append(result, strings.Split(resp, ",")...)
 	}
 
 	return result, nil
+}
+
+type Machine struct {
+	ID     string
+	Region string
+}
+
+func parseMachine(input string) (Machine, error) {
+	var result Machine
+	split := strings.Split(input, " ")
+	if len(split) != 2 {
+		return result, fmt.Errorf("invalid input")
+	}
+
+	result.ID = split[0]
+	result.Region = split[1]
+
+	return result, nil
+}
+
+func GetMachines(appName string) ([]Machine, error) {
+	machines, err := net.LookupTXT(fmt.Sprintf("vms.%s.internal", appName))
+	if err != nil {
+		return nil, err
+	}
+
+	var result []Machine
+	for _, machine := range strings.Split(combineString(machines), ",") {
+		m, err := parseMachine(machine)
+		if err != nil {
+			return nil, err
+		}
+
+		result = append(result, m)
+	}
+
+	return result, nil
+
+}
+
+func GetRegions(appName string) ([]string, error) {
+	regions, err := net.LookupTXT(fmt.Sprintf("regions.%s.internal", appName))
+	if err != nil {
+		return nil, err
+	}
+
+	return strings.Split(combineString(regions), ","), nil
 }
