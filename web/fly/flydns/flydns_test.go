@@ -1,10 +1,15 @@
 package flydns
 
 import (
+	"os"
 	"testing"
 )
 
 func TestGetApps(t *testing.T) {
+	if os.Getenv("DO_FLY") == "" {
+		t.Skip()
+	}
+
 	// Call the function to be tested
 	result, err := GetApps()
 
