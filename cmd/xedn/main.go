@@ -124,6 +124,10 @@ func main() {
 		group:  &singleflight.Group{},
 	}
 
+	iu := &ImageUploader{
+		s3: mkS3Client(),
+	}
+
 	os.MkdirAll(filepath.Join(*dir, "xesite"), 0700)
 	zs, err := xesite.NewZipServer(filepath.Join(*dir, "xesite", "latest.zip"), *dir)
 	if err != nil {
@@ -157,7 +161,14 @@ func main() {
 
 	os.MkdirAll(*dir, 0700)
 
-	go http.ListenAndServe(*metricsAddr, http.HandlerFunc(tsweb.VarzHandler))
+	{
+		mux := http.NewServeMux()
+
+		mux.HandleFunc("/metrics", tsweb.VarzHandler)
+		mux.HandleFunc("/xedn/optimize", iu.CreateImage)
+
+		go http.ListenAndServe(*metricsAddr, http.HandlerFunc(tsweb.VarzHandler))
+	}
 
 	cdn := http.NewServeMux()
 
