@@ -7,7 +7,7 @@ require (
 	github.com/Marcel-ICMC/graw v0.0.0-20230411090719-e24cd8592d25
 	github.com/McKael/madon/v2 v2.4.0
 	github.com/antonmedv/expr v1.15.3
-	github.com/aws/aws-sdk-go v1.47.7
+	github.com/aws/aws-sdk-go v1.47.9
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.42.1
 	github.com/bwmarrin/discordgo v0.27.1
 	github.com/chai2010/webp v1.1.1
