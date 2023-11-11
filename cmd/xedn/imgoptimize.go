@@ -263,25 +263,49 @@ func (iu *ImageUploader) CreateImage(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	id := uuid.New().String()
 
-	// Ten megabytes should be enough for anybody
-	reader := http.MaxBytesReader(w, r.Body, 1024*1024*10)
+	os.MkdirAll(filepath.Join(*dir, "uploud"), 0700)
 
-	buf := bytes.NewBuffer(make([]byte, r.ContentLength))
-
-	if _, err := io.Copy(buf, reader); err != nil {
+	fout, err := os.Create(filepath.Join(*dir, "uploud", id+".png"))
+	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		slog.Error("cannot copy image to buffer", "err", err)
+		slog.Error("cannot create temp file", "err", err)
 		return
 	}
 
-	img, _, err := image.Decode(buf)
+	if n, err := io.Copy(fout, r.Body); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		slog.Error("cannot copy image to buffer", "err", err)
+		return
+	} else {
+		slog.Info("copied image to buffer", "bytes", n, "content-length", r.ContentLength)
+	}
+
+	if err := fout.Close(); err != nil {
+		slog.Error("cannot close temp file", "err", err)
+		return
+	}
+
+	fin, err := os.Open(filepath.Join(*dir, "uploud", id+".png"))
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		slog.Error("cannot open temp file", "err", err)
+		return
+	}
+
+	img, err := png.Decode(fin)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		slog.Error("cannot decode image", "err", err)
 		return
 	}
 
-	directory, err := os.MkdirTemp(*staticDir, "uploud")
+	if err := fin.Close(); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		slog.Error("cannot close temp file", "err", err)
+		return
+	}
+
+	directory, err := os.MkdirTemp(*dir, "uploud")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		slog.Error("cannot create temp directory", "err", err)
@@ -328,7 +352,7 @@ func (iu *ImageUploader) CreateImage(w http.ResponseWriter, r *http.Request) {
 
 		_, err = s3c.PutObject(ctx, &s3.PutObjectInput{
 			Body:        fin,
-			Bucket:      b2Backend,
+			Bucket:      aws.String("christine-static"),
 			Key:         aws.String("xedn/dynamic/" + id + "/" + finfo.Name()),
 			ContentType: aws.String(mimeTypes[filepath.Ext(finfo.Name())]),
 		})

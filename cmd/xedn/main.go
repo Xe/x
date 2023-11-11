@@ -167,7 +167,14 @@ func main() {
 		mux.HandleFunc("/metrics", tsweb.VarzHandler)
 		mux.HandleFunc("/xedn/optimize", iu.CreateImage)
 
-		go http.ListenAndServe(*metricsAddr, http.HandlerFunc(tsweb.VarzHandler))
+		mux.HandleFunc("/", http.FileServer(http.Dir(filepath.Join(*dir, "uploud"))).ServeHTTP)
+
+		go http.ListenAndServe(*metricsAddr, tsweb.StdHandler(tsweb.ReturnHandlerFunc(func(w http.ResponseWriter, r *http.Request) error {
+			mux.ServeHTTP(w, r)
+			return nil
+		}), tsweb.HandlerOptions{
+			Logf: log.Printf,
+		}))
 	}
 
 	cdn := http.NewServeMux()
