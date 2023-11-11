@@ -35,7 +35,7 @@ var (
 	metricsAddr           = flag.String("metrics-addr", ":8081", "metrics bind address")
 	dir                   = flag.String("dir", envOr("XEDN_STATE", "./var"), "where XeDN should store cached data")
 	staticDir             = flag.String("static-dir", envOr("XEDN_STATIC", "./static"), "where XeDN should look for static assets")
-	stableDiffusionServer = flag.String("stable-diffusion-server", "http://logos:7860", "where XeDN should request Stable Diffusion images from (Automatic1111 over Tailscale)")
+	stableDiffusionServer = flag.String("stable-diffusion-server", "http://xe-automatic1111.internal:8080", "where XeDN should request Stable Diffusion images from (Automatic1111)")
 	tailscaleVerbose      = flag.Bool("tailscale-verbose", false, "enable verbose tailscale logging")
 
 	//go:embed index.html
@@ -118,11 +118,9 @@ func main() {
 
 	srv.Start()
 
-	cli := srv.HTTPClient()
-
 	sd := &StableDiffusion{
 		db:     db,
-		client: &stablediffusion.Client{HTTP: cli, APIServer: *stableDiffusionServer},
+		client: &stablediffusion.Client{HTTP: http.DefaultClient, APIServer: *stableDiffusionServer},
 		group:  &singleflight.Group{},
 	}
 
