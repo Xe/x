@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"crypto/sha256"
 	"encoding/json"
 	"errors"
 	"flag"
@@ -263,6 +264,8 @@ func (iu *ImageUploader) CreateImage(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	id := uuid.New().String()
 
+	defer r.Body.Close()
+
 	os.MkdirAll(filepath.Join(*dir, "uploud"), 0700)
 
 	fout, err := os.Create(filepath.Join(*dir, "uploud", id+".png"))
@@ -272,7 +275,9 @@ func (iu *ImageUploader) CreateImage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if n, err := io.Copy(fout, r.Body); err != nil {
+	h := sha256.New()
+
+	if n, err := io.Copy(io.MultiWriter(h, fout), r.Body); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		slog.Error("cannot copy image to buffer", "err", err)
 		return
@@ -339,6 +344,8 @@ func (iu *ImageUploader) CreateImage(w http.ResponseWriter, r *http.Request) {
 		slog.Error("cannot read directory", "err", err)
 		return
 	}
+
+	id = fmt.Sprintf("%x", h.Sum(nil))
 
 	s3c := mkS3Client()
 
