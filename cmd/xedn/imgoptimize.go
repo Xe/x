@@ -305,6 +305,8 @@ func (iu *ImageUploader) CreateImage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	os.Remove(filepath.Join(*dir, "uploud", id+".png"))
+
 	directory, err := os.MkdirTemp(*dir, "uploud")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
