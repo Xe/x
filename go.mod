@@ -7,7 +7,7 @@ require (
 	github.com/Marcel-ICMC/graw v0.0.0-20230411090719-e24cd8592d25
 	github.com/McKael/madon/v2 v2.4.0
 	github.com/antonmedv/expr v1.15.3
-	github.com/aws/aws-sdk-go v1.47.9
+	github.com/aws/aws-sdk-go v1.47.10
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.42.1
 	github.com/bwmarrin/discordgo v0.27.1
 	github.com/chai2010/webp v1.1.1
@@ -20,6 +20,7 @@ require (
 	github.com/go-shiori/go-readability v0.0.0-20230421032831-c66949dfc0ad
 	github.com/google/go-github v17.0.0+incompatible
 	github.com/google/subcommands v1.2.0
+	github.com/google/uuid v1.3.1
 	github.com/hullerob/go.farbfeld v0.0.0-20181222022525-3661193c725f
 	github.com/jaytaylor/html2text v0.0.0-20190408195923-01ec452cbe43
 	github.com/joho/godotenv v1.5.1
@@ -73,7 +74,6 @@ require (
 	github.com/gogs/chardet v0.0.0-20211120154057-b7413eaefb8f // indirect
 	github.com/google/nftables v0.1.1-0.20230115205135-9aa6fdf5a28c // indirect
 	github.com/google/pprof v0.0.0-20230207041349-798e818bf904 // indirect
-	github.com/google/uuid v1.3.1 // indirect
 	github.com/mattn/go-isatty v0.0.19 // indirect
 	github.com/miekg/dns v1.1.56 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
