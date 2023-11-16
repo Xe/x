@@ -20,12 +20,13 @@ require (
 	github.com/go-shiori/go-readability v0.0.0-20230421032831-c66949dfc0ad
 	github.com/google/go-github v17.0.0+incompatible
 	github.com/google/subcommands v1.2.0
+	github.com/google/uuid v1.3.1
 	github.com/hullerob/go.farbfeld v0.0.0-20181222022525-3661193c725f
 	github.com/jaytaylor/html2text v0.0.0-20190408195923-01ec452cbe43
 	github.com/joho/godotenv v1.5.1
 	github.com/kr/pretty v0.3.1
 	github.com/mndrix/golog v0.0.0-20170330170653-a28e2a269775
-	github.com/mymmrac/telego v0.27.1
+	github.com/mymmrac/telego v0.27.2
 	github.com/otiai10/copy v1.14.0
 	github.com/peterh/liner v1.2.2
 	github.com/pkg/errors v0.9.1
@@ -73,7 +74,6 @@ require (
 	github.com/gogs/chardet v0.0.0-20211120154057-b7413eaefb8f // indirect
 	github.com/google/nftables v0.1.1-0.20230115205135-9aa6fdf5a28c // indirect
 	github.com/google/pprof v0.0.0-20230207041349-798e818bf904 // indirect
-	github.com/google/uuid v1.3.1 // indirect
 	github.com/mattn/go-isatty v0.0.19 // indirect
 	github.com/miekg/dns v1.1.56 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
@@ -84,7 +84,7 @@ require (
 	github.com/tailscale/hujson v0.0.0-20221223112325-20486734a56a // indirect
 	github.com/turnage/redditproto v0.0.0-20151223012412-afedf1b6eddb // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
-	github.com/valyala/fasthttp v1.50.0 // indirect
+	github.com/valyala/fasthttp v1.51.0 // indirect
 	github.com/vektah/gqlparser/v2 v2.5.1 // indirect
 	lukechampine.com/uint128 v1.2.0 // indirect
 	modernc.org/cc/v3 v3.40.0 // indirect
