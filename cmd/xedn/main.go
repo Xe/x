@@ -3,8 +3,10 @@ package main
 
 import (
 	_ "embed"
+	"encoding/json"
 	"expvar"
 	"flag"
+	"fmt"
 	"image/png"
 	"io"
 	"log"
@@ -169,12 +171,7 @@ func main() {
 
 		mux.HandleFunc("/", http.FileServer(http.Dir(filepath.Join(*dir, "uploud"))).ServeHTTP)
 
-		go http.ListenAndServe(*metricsAddr, tsweb.StdHandler(tsweb.ReturnHandlerFunc(func(w http.ResponseWriter, r *http.Request) error {
-			mux.ServeHTTP(w, r)
-			return nil
-		}), tsweb.HandlerOptions{
-			Logf: log.Printf,
-		}))
+		go http.ListenAndServe(*metricsAddr, mux)
 	}
 
 	cdn := http.NewServeMux()
@@ -193,6 +190,20 @@ func main() {
 	cdn.Handle("/sticker/", ois)
 	cdn.Handle("/avatar/", sd)
 	cdn.Handle("/static/", http.FileServer(http.Dir(*staticDir)))
+	cdn.HandleFunc("/cgi-cdn/wtf", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintln(w, "Hello, here is what I know about you:")
+		fmt.Fprintln(w)
+		fmt.Fprintln(w, "HTTP headers from your client:")
+		fmt.Fprintln(w)
+
+		enc := json.NewEncoder(w)
+		enc.SetIndent("", "  ")
+		enc.Encode(r.Header)
+
+		fmt.Fprintln(w)
+		fmt.Fprintf(w, "I am XeDN %s (instance ID %s) running %s\n", os.Getenv("FLY_REGION"), os.Getenv("FLY_ALLOC_ID"), os.Args[0])
+		fmt.Fprintln(w)
+	})
 
 	hdlr := func(w http.ResponseWriter, r *http.Request) {
 		etagLock.RLock()

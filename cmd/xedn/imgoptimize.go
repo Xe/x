@@ -166,7 +166,7 @@ func (ois *OptimizedImageServer) ResizeTo(widthPixels int, character, mood, form
 				return nil, err
 			}
 		default:
-			return nil, fmt.Errorf("I don't know how to render to %s yet, sorry", format)
+			return nil, fmt.Errorf("i don't know how to render to %s yet, sorry", format)
 		}
 
 		OISFileConversions.Add(format, 1)
