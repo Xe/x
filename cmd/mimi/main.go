@@ -17,6 +17,7 @@ import (
 	"within.website/x/cmd/mimi/ollama"
 	"within.website/x/internal"
 	"within.website/x/llm"
+	"within.website/x/llm/llamaguard"
 )
 
 var (
@@ -24,6 +25,7 @@ var (
 	discordToken   = flag.String("discord-token", "", "discord token")
 	discordGuild   = flag.String("discord-guild", "192289762302754817", "discord guild")
 	discordChannel = flag.String("discord-channel", "217096701771513856", "discord channel")
+	llamaguardHost = flag.String("llamaguard-host", "http://ontos:11434", "llamaguard host")
 	ollamaModel    = flag.String("ollama-model", "xe/mimi:f16", "ollama model tag")
 	ollamaHost     = flag.String("ollama-host", "http://kaine:11434", "ollama host")
 	openAIKey      = flag.String("openai-api-key", "", "openai key")
@@ -122,17 +124,37 @@ func main() {
 
 		st, ok := stateMap[m.ChannelID]
 		if !ok {
-			st = &State{
-				Messages: []llm.Message{{
-					Role:    "user",
-					Content: prompt.String(),
-				}},
-			}
+			st = &State{}
+			/*				Messages: []llm.Message{{
+								Role:    "user",
+								Content: prompt.String(),
+							}},
+						}*/
 
 			stateMap[m.ChannelID] = st
 		}
 
-		fmt.Println(Prompt(st.Messages))
+		gr, err := llamaguard.Check(*llamaguardHost, st.Messages)
+		if err != nil {
+			slog.Error("llamaguard error", "error", err)
+		}
+
+		if !gr.Safe {
+			prompt.Reset()
+			prompt.WriteString("Please write a detailed message explaining that the request violates rule ")
+			for _, c := range gr.Categories {
+				prompt.WriteString(c)
+				prompt.WriteString(": ")
+				prompt.WriteString(llamaguard.Rules[c])
+			}
+			prompt.WriteString(".\n\nAlso explain that the conversation will be reset.")
+			defer delete(stateMap, m.ChannelID)
+		}
+
+		st.Messages = append(st.Messages, llm.Message{
+			Role:    "user",
+			Content: prompt.String(),
+		})
 
 		err = cli.Generate(ctx,
 			&ollama.GenerateRequest{
@@ -140,7 +162,7 @@ func main() {
 				Context: st.Context,
 				Prompt:  prompt.String(),
 				Stream:  p(true),
-				System:  "Your name is Mimi. You will answer questions from users when asked. You are an expert in programming and philosophy. You are a catgirl. You are relaxed, terse, and casual. Twilight Sparkle is best pony.",
+				System:  "Your name is Mimi, a helpful catgirl assistant.",
 			}, func(gr ollama.GenerateResponse) error {
 				fmt.Fprint(&sb, gr.Response)
 
@@ -150,13 +172,56 @@ func main() {
 						Role:    "assistant",
 						Content: gr.Response,
 					})
+
+					slog.Info("generated message", "dur", gr.EvalDuration.String(), "tokens/sec", float64(gr.EvalCount)/gr.EvalDuration.Seconds())
 				}
 				return nil
 			},
 		)
-
 		if err != nil {
 			slog.Error("generate error", "error", err, "channel", m.ChannelID)
+			return
+		}
+
+		gr, err = llamaguard.Check(*llamaguardHost, st.Messages)
+		if err != nil {
+			slog.Error("llamaguard error", "error", err)
+			s.ChannelMessageSend(m.ChannelID, "llamaguard error")
+			return
+		}
+
+		if !gr.Safe {
+			sb.Reset()
+			err = cli.Generate(ctx,
+				&ollama.GenerateRequest{
+					Model:   *ollamaModel,
+					Context: st.Context,
+					Prompt:  "Say that you're sorry and you can't help with that. The conversation will be reset.",
+					Stream:  p(true),
+					System:  "Your name is Mimi, a helpful catgirl assistant.",
+				}, func(gr ollama.GenerateResponse) error {
+					fmt.Fprint(&sb, gr.Response)
+
+					if gr.Done {
+						st.Context = gr.Context
+						st.Messages = append(st.Messages, llm.Message{
+							Role:    "assistant",
+							Content: gr.Response,
+						})
+
+						slog.Info("generated message", "dur", gr.EvalDuration.String(), "tokens/sec", float64(gr.EvalCount)/gr.EvalDuration.Seconds())
+					}
+					return nil
+				},
+			)
+			if err != nil {
+				slog.Error("generate error", "error", err, "channel", m.ChannelID)
+				return
+			}
+
+			s.ChannelMessageSend(m.ChannelID, "🔀"+sb.String())
+			defer delete(stateMap, m.ChannelID)
+
 			return
 		}
 
