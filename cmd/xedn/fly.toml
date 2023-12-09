@@ -5,44 +5,47 @@ kill_timeout = "5s"
 swap_size_mb = 512
 
 [experimental]
-  auto_rollback = true
+auto_rollback = true
 
 [build]
-  image = "registry.fly.io/xedn:latest"
+image = "registry.fly.io/xedn:latest"
 
 [deploy]
-  strategy = "immediate"
+strategy = "immediate"
 
 [env]
-  XEDN_STATE = "/data/xedn"
+XEDN_STATE = "/data/xedn"
 
-[[mounts]]
-  source = "xedn_cache"
-  destination = "/data"
+[mounts]
+source = "xedn_cache"
+destination = "/data"
+auto_extend_size_threshold = 80
+auto_extend_size_increment = "1GB"
+auto_extend_size_limit = "100GB"
 
 [[services]]
-  protocol = "tcp"
-  internal_port = 8080
-  processes = ["app"]
+protocol = "tcp"
+internal_port = 8080
+processes = ["app"]
 
-  [[services.ports]]
-    port = 80
-    handlers = ["http"]
-    force_https = true
+[[services.ports]]
+port = 80
+handlers = ["http"]
+force_https = true
 
-  [[services.ports]]
-    port = 443
-    handlers = ["tls", "http"]
-  [services.concurrency]
-    type = "connections"
-    hard_limit = 1000
-    soft_limit = 750
+[[services.ports]]
+port = 443
+handlers = ["tls", "http"]
+[services.concurrency]
+type = "connections"
+hard_limit = 1000
+soft_limit = 750
 
-  [[services.tcp_checks]]
-    interval = "15s"
-    timeout = "2s"
-    grace_period = "1s"
+[[services.tcp_checks]]
+interval = "15s"
+timeout = "2s"
+grace_period = "1s"
 
 [[metrics]]
-  port = 8081
-  path = "/metrics"
+port = 8081
+path = "/metrics"
