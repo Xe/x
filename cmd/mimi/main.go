@@ -49,6 +49,8 @@ func main() {
 		log.Fatal(err)
 	}
 
+	//mc := moderation.New(http.DefaultClient, *openAIKey)
+
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
@@ -223,6 +225,7 @@ func main() {
 			return
 		}
 
+		slog.Debug("generated message", "msg", sb.String())
 		gr, err = llamaguard.Check(*llamaguardHost, st.Messages)
 		if err != nil {
 			slog.Error("llamaguard error", "error", err)
