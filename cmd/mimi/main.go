@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"log/slog"
+	"net/http"
 	"os"
 	"os/signal"
 	"strings"
@@ -18,6 +19,7 @@ import (
 	"within.website/x/internal"
 	"within.website/x/llm"
 	"within.website/x/llm/llamaguard"
+	"within.website/x/llm/llava"
 )
 
 var (
@@ -26,6 +28,7 @@ var (
 	discordGuild   = flag.String("discord-guild", "192289762302754817", "discord guild")
 	discordChannel = flag.String("discord-channel", "217096701771513856", "discord channel")
 	llamaguardHost = flag.String("llamaguard-host", "http://ontos:11434", "llamaguard host")
+	llavaHost      = flag.String("llava-host", "http://localhost:8080", "llava host")
 	ollamaModel    = flag.String("ollama-model", "xe/mimi:f16", "ollama model tag")
 	ollamaHost     = flag.String("ollama-host", "http://kaine:11434", "ollama host")
 	openAIKey      = flag.String("openai-api-key", "", "openai key")
@@ -116,6 +119,43 @@ func main() {
 				"is_admin": m.Author.Username == "xeiaso",
 			}); err != nil {
 				slog.Error("json encode error", "error", err)
+			}
+		}
+
+		if len(m.Attachments) > 0 {
+			for i, a := range m.Attachments {
+				switch a.ContentType {
+				case "image/png", "image/jpeg", "image/gif":
+				default:
+					continue
+				}
+
+				resp, err := http.Get(a.URL)
+				if err != nil {
+					slog.Error("http get error", "error", err)
+					continue
+				}
+				defer resp.Body.Close()
+
+				lrq, err := llava.DefaultRequest(m.Content, resp.Body)
+				if err != nil {
+					slog.Error("llava error", "error", err)
+					continue
+				}
+
+				lresp, err := llava.Describe(context.Background(), *llavaHost+"/completion", lrq)
+				if err != nil {
+					slog.Error("llava error", "error", err)
+					continue
+				}
+
+				if err := json.NewEncoder(&prompt).Encode(map[string]any{
+					"image": i,
+					"desc":  lresp.Content,
+				}); err != nil {
+					slog.Error("json encode error", "error", err)
+					continue
+				}
 			}
 		}
 
