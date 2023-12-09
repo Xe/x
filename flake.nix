@@ -279,6 +279,9 @@
             esbuild
             tailwindcss
 
+            python3Packages.huggingface-hub
+            python3Packages.datasets
+            
             perl
             
             pkg-config
