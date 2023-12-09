@@ -97,6 +97,13 @@ type Client struct {
 	apiKey  string
 }
 
+func New(httpCli *http.Client, apiKey string) *Client {
+	return &Client{
+		httpCli: httpCli,
+		apiKey:  apiKey,
+	}
+}
+
 func (c Client) Check(ctx context.Context, input string) (*Response, error) {
 	data := Request{
 		Input: input,
