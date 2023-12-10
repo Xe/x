@@ -17,15 +17,20 @@ import (
 	"within.website/x/internal"
 	"within.website/x/web/marginalia"
 	"within.website/x/web/openai/chatgpt"
+	"within.website/x/web/openai/dalle"
 )
 
 var (
 	marginaliaToken = flag.String("marginalia-token", "", "Token for Marginalia internet search")
 	openAIToken     = flag.String("openai-token", "", "OpenAI token")
-	openAIModel     = flag.String("openai-model", "gpt-3.5-turbo-16k-0613", "OpenAI model to use")
+	openAIModel     = flag.String("openai-model", "gpt-3.5-turbo-16k", "OpenAI model to use")
 	telegramAdmin   = flag.Int64("telegram-admin", 0, "Telegram bot admin")
 	telegramToken   = flag.String("telegram-token", "", "Telegram bot token")
 )
+
+func p[T any](t T) *T {
+	return &t
+}
 
 func main() {
 	internal.HandleStartup()
@@ -33,6 +38,7 @@ func main() {
 	mc := marginalia.New(*marginaliaToken, nil)
 
 	cGPT := chatgpt.NewClient(*openAIToken)
+	de := dalle.New(*openAIToken)
 
 	// Note: Please keep in mind that default logger may expose sensitive information,
 	// use in development only
@@ -69,6 +75,52 @@ func main() {
 			slog.Error("can't send message", "err", err)
 		}
 	}, th.CommandEqual("start"))
+
+	bh.Handle(func(bot *telego.Bot, update telego.Update) {
+		if update.Message.From.ID != *telegramAdmin {
+			bot.SendMessage(tu.Message(
+				tu.ID(update.Message.Chat.ID),
+				"unknown command",
+			))
+		}
+
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+		defer cancel()
+
+		q := strings.Join(strings.Split(update.Message.Text, " ")[1:], " ")
+
+		lg := slog.Default().With(
+			"telegram_requestor", update.Message.From.ID,
+			"telegram_requestor_name", fmt.Sprintf("%s %s", update.Message.From.FirstName, update.Message.From.LastName),
+			"image_prompt", q,
+		)
+
+		resp, err := de.GenerateImage(ctx, dalle.Options{
+			Model:  dalle.DALLE3,
+			Prompt: q,
+			Size:   p(dalle.SizeHDWide),
+		})
+		if err != nil {
+			lg.Error("can't generate image", "err", err)
+			bot.SendMessage(tu.Message(
+				tu.ID(update.Message.Chat.ID),
+				fmt.Sprintf("Error: %v", err),
+			))
+			return
+		}
+
+		lg.Debug("got response", "resp", resp)
+
+		photo := tu.Photo(
+			tu.ID(update.Message.Chat.ID),
+			tu.FileFromURL(resp.Data[0].URL),
+		).WithCaption(q)
+
+		if _, err := bot.SendPhoto(photo); err != nil {
+			lg.Error("can't send photo", "err", err)
+			return
+		}
+	}, th.CommandEqual("image"))
 
 	bh.Handle(func(bot *telego.Bot, update telego.Update) {
 		if update.Message.From.ID != *telegramAdmin {
@@ -157,6 +209,8 @@ func main() {
 			"Unknown command, use /start",
 		))
 	}, th.AnyCommand())
+
+	slog.Info("started")
 
 	// Start handling updates
 	bh.Start()
