@@ -205,6 +205,21 @@ func main() {
 		fmt.Fprintln(w)
 	})
 
+	cdn.HandleFunc("/cgi-cdn/wtf/json", func(w http.ResponseWriter, r *http.Request) {
+		enc := json.NewEncoder(w)
+		enc.SetIndent("", "  ")
+
+		enc.Encode(map[string]any{
+			"headers": r.Header,
+			"your_ip": r.Header.Get("Fly-Client-Ip"),
+			"xedn": map[string]any{
+				"region":   os.Getenv("FLY_REGION"),
+				"instance": os.Getenv("FLY_ALLOC_ID"),
+				"binary":   os.Args[0],
+			},
+		})
+	})
+
 	hdlr := func(w http.ResponseWriter, r *http.Request) {
 		etagLock.RLock()
 		etag, ok := etags[r.URL.Path]
