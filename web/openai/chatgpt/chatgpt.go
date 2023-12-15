@@ -13,9 +13,11 @@ import (
 )
 
 type Request struct {
-	Model     string     `json:"model"`
-	Messages  []Message  `json:"messages"`
-	Functions []Function `json:"functions,omitempty"`
+	Model       string     `json:"model"`
+	Messages    []Message  `json:"messages"`
+	Functions   []Function `json:"functions,omitempty"`
+	Seed        *int       `json:"seed,omitempty"`
+	Temperature *float64   `json:"temperature,omitempty"`
 }
 
 type Function struct {

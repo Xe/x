@@ -31,7 +31,7 @@ type Message struct {
 
 type CompleteRequest struct {
 	Model    string         `json:"model"`
-	Messages Message        `json:"messages"`
+	Messages []Message      `json:"messages"`
 	Format   *string        `json:"format,omitempty"`
 	Template *string        `json:"template,omitempty"`
 	Stream   bool           `json:"stream,omitempty"`
