@@ -45,7 +45,7 @@ require (
 	golang.org/x/oauth2 v0.14.0
 	golang.org/x/sync v0.5.0
 	honnef.co/go/transmission v0.0.0-20200712215954-58262f0ca9c9
-	modernc.org/sqlite v1.27.0
+	modernc.org/sqlite v1.28.0
 	nhooyr.io/websocket v1.8.10
 	tailscale.com v1.54.0
 	tulpa.dev/cadey/jvozba v0.0.0-20200326200349-f0ebe310be06
