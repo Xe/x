@@ -94,8 +94,8 @@ github.com/anmitsu/go-shlex v0.0.0-20200514113438-38f4b401e2be/go.mod h1:ySMOLuW
 github.com/antihax/optional v1.0.0/go.mod h1:uupD/76wgC+ih3iEmQUL+0Ugr19nfwCT1kdvxnR2qWY=
 github.com/antonmedv/expr v1.15.4 h1:CrNads8WDnDVJNWt/FeUINBO+vDNjurEwT7SoQN132o=
 github.com/antonmedv/expr v1.15.4/go.mod h1:0E/6TxnOlRNp81GMzX9QfDPAmHo2Phg00y4JUv1ihsE=
-github.com/aws/aws-sdk-go v1.49.3 h1:+UGwhC3kChk0pRCxSsbaQSNIc8MfFURQL44Ig6RRR3I=
-github.com/aws/aws-sdk-go v1.49.3/go.mod h1:LF8svs817+Nz+DmiMQKTO3ubZ/6IaTpq3TjupRn3Eqk=
+github.com/aws/aws-sdk-go v1.49.4 h1:qiXsqEeLLhdLgUIyfr5ot+N/dGPWALmtM1SetRmbUlY=
+github.com/aws/aws-sdk-go v1.49.4/go.mod h1:LF8svs817+Nz+DmiMQKTO3ubZ/6IaTpq3TjupRn3Eqk=
 github.com/aws/aws-sdk-go-v2 v1.21.0/go.mod h1:/RfNgGmRxI+iFOB1OeJUyxiU+9s88k3pfHvDagGEp0M=
 github.com/aws/aws-sdk-go-v2 v1.23.0 h1:PiHAzmiQQr6JULBUdvR8fKlA+UPKLT/8KbiqpFBWiAo=
 github.com/aws/aws-sdk-go-v2 v1.23.0/go.mod h1:i1XDttT4rnf6vxc9AuskLc6s7XBee8rlLilKlc03uAA=
