@@ -41,7 +41,7 @@ require (
 	go.etcd.io/bbolt v1.3.8
 	go.jetpack.io/tyson v0.1.1
 	go4.org v0.0.0-20190313082347-94abd6928b1d
-	golang.org/x/crypto v0.16.0
+	golang.org/x/crypto v0.17.0
 	golang.org/x/oauth2 v0.15.0
 	golang.org/x/sync v0.5.0
 	honnef.co/go/transmission v0.0.0-20200712215954-58262f0ca9c9
