@@ -15,8 +15,8 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          ref: ${{github.event.pull_request.head.ref}}
-          repository: ${{github.event.pull_request.head.repo.full_name}}
+          ref: ${{ github.event.pull_request.head.ref }}
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
           submodules: true
       # TODO: Add any needed steps to be able to run your command
       # (e.g. actions/setup-node@2)
@@ -29,3 +29,8 @@ jobs:
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: Bump Go mod SRI
+          commit_user_name: Mimi
+          commit_user_email: mimi@xeserv.us
+          commit_author: Mimi <mimi@xeserv.us>
+      - name: Enable Pull Request Automerge
+        run: gh pr merge --merge --auto ${{ github.event.number }}
