@@ -47,7 +47,7 @@ require (
 	honnef.co/go/transmission v0.0.0-20200712215954-58262f0ca9c9
 	modernc.org/sqlite v1.28.0
 	nhooyr.io/websocket v1.8.10
-	tailscale.com v1.54.0
+	tailscale.com v1.56.1
 	tulpa.dev/cadey/jvozba v0.0.0-20200326200349-f0ebe310be06
 	within.website/johaus v1.1.0
 )
@@ -89,7 +89,7 @@ require (
 	github.com/superfly/graphql v0.2.4 // indirect
 	github.com/tailscale/go-winio v0.0.0-20231025203758-c4f33415bf55 // indirect
 	github.com/tailscale/hujson v0.0.0-20221223112325-20486734a56a // indirect
-	github.com/tailscale/web-client-prebuilt v0.0.0-20231114171715-25f8d12b3c2d // indirect
+	github.com/tailscale/web-client-prebuilt v0.0.0-20231213172531-a4fa669015b2 // indirect
 	github.com/turnage/redditproto v0.0.0-20151223012412-afedf1b6eddb // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
@@ -177,11 +177,11 @@ require (
 	github.com/sendgrid/rest v2.6.9+incompatible // indirect
 	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect
 	github.com/superfly/flyctl/api v0.0.0-20231103162926-56f421e469a2
-	github.com/tailscale/certstore v0.1.1-0.20231020161753-77811a65f4ff // indirect
+	github.com/tailscale/certstore v0.1.1-0.20231202035212-d3fa0460f47e // indirect
 	github.com/tailscale/golang-x-crypto v0.0.0-20230713185742-f0b76a10a08e // indirect
 	github.com/tailscale/goupnp v1.0.1-0.20210804011211-c64d0f06ea05 // indirect
 	github.com/tailscale/netlink v1.1.1-0.20211101221916-cabfb018fe85 // indirect
-	github.com/tailscale/wireguard-go v0.0.0-20231101022006-db7604d1aa90
+	github.com/tailscale/wireguard-go v0.0.0-20231121184858-cc193a0b3272
 	github.com/tcnksm/go-httpstat v0.2.0 // indirect
 	github.com/u-root/uio v0.0.0-20230305220412-3e8cd9d6bf63 // indirect
 	github.com/vishvananda/netlink v1.2.1-beta.2 // indirect
