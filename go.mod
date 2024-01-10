@@ -35,7 +35,7 @@ require (
 	github.com/rogpeppe/go-internal v1.12.0
 	github.com/rs/cors v1.10.1
 	github.com/sebest/xff v0.0.0-20210106013422-671bd2870b3a
-	github.com/tetratelabs/wazero v1.5.0
+	github.com/tetratelabs/wazero v1.6.0
 	github.com/thoj/go-ircevent v0.0.0-20210723090443-73e444401d64
 	github.com/tmc/scp v0.0.0-20170824174625-f7b48647feef
 	go.etcd.io/bbolt v1.3.8
