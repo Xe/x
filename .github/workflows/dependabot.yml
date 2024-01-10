@@ -33,6 +33,6 @@ jobs:
           commit_user_email: mimi@xeserv.us
           commit_author: Mimi <mimi@xeserv.us>
       - name: Enable Pull Request Automerge
-        run: gh pr merge --merge --auto ${{ github.event.number }}
+        run: gh pr merge --squash --auto ${{ github.event.number }}
         env:
           GH_TOKEN: ${{ github.token }}
