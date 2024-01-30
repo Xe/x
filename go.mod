@@ -8,7 +8,7 @@ require (
 	github.com/McKael/madon/v2 v2.4.0
 	github.com/antonmedv/expr v1.15.4
 	github.com/aws/aws-sdk-go v1.50.5
-	github.com/aws/aws-sdk-go-v2/service/s3 v1.48.0
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.48.1
 	github.com/bwmarrin/discordgo v0.27.1
 	github.com/chai2010/webp v1.1.1
 	github.com/disintegration/imaging v1.6.2
