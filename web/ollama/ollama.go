@@ -34,7 +34,7 @@ type CompleteRequest struct {
 	Messages []Message      `json:"messages"`
 	Format   *string        `json:"format,omitempty"`
 	Template *string        `json:"template,omitempty"`
-	Stream   bool           `json:"stream,omitempty"`
+	Stream   bool           `json:"stream"`
 	Options  map[string]any `json:"options"`
 }
 
@@ -57,7 +57,7 @@ func (c *Client) Chat(ctx context.Context, inp *CompleteRequest) (*CompleteRespo
 		return nil, fmt.Errorf("ollama: error encoding request: %w", err)
 	}
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, c.baseURL+"/chat", buf)
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, c.baseURL+"/api/chat", buf)
 	if err != nil {
 		return nil, fmt.Errorf("ollama: error creating request: %w", err)
 	}

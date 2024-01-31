@@ -75,6 +75,13 @@
           ];
         };
 
+        mimi = pkgs.buildGo121Module {
+          pname = "mimi";
+          inherit version vendorSha256;
+          src = ./.;
+          subPackages = [ "cmd/mimi" ];
+        };
+
         xedn = pkgs.buildGo121Module {
           pname = "xedn";
           inherit version vendorSha256;
@@ -198,7 +205,7 @@
             path = "make-mastodon-app";
           };
 
-          inherit xedn xedn-static robocadey2;
+          inherit xedn xedn-static robocadey2 mimi;
 
           aegis = copyFile { pname = "aegis"; };
           cadeybot = copyFile { pname = "cadeybot"; };
@@ -220,7 +227,17 @@
           docker = let
             robocadey2 = self.packages.${system}.robocadey2;
             xedn = self.packages.${system}.xedn;
+            mimi = self.packages.${system}.mimi;
           in {
+            mimi = pkgs.dockerTools.buildLayeredImage {
+              name = "registry.fly.io/mimi";
+              tag = "latest";
+              contents = [ pkgs.cacert ];
+              config = {
+                Cmd = [ "${mimi}/bin/mimi" ];
+                WorkingDir = "${mimi}";
+              };
+            };
             robocadey2 = pkgs.dockerTools.buildLayeredImage {
               name = "registry.fly.io/xe-robocadey2";
               tag = "latest";

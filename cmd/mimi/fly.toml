@@ -1,0 +1,14 @@
+# fly.toml app configuration file generated for mimi on 2024-01-30T20:17:39-05:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = "mimi"
+primary_region = "yyz"
+kill_signal = "SIGINT"
+kill_timeout = "5s"
+
+vm.size = "shared-cpu-2x"
+
+[build]
+image = "registry.fly.io/mimi:latest"
