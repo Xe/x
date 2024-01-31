@@ -6,7 +6,6 @@ require (
 	cirello.io/goherokuname v0.0.0-20190914093443-b436bae8c2c5
 	github.com/Marcel-ICMC/graw v0.0.0-20230411090719-e24cd8592d25
 	github.com/McKael/madon/v2 v2.4.0
-	github.com/antonmedv/expr v1.15.4
 	github.com/aws/aws-sdk-go v1.50.7
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.48.1
 	github.com/bwmarrin/discordgo v0.27.1
@@ -14,6 +13,7 @@ require (
 	github.com/disintegration/imaging v1.6.2
 	github.com/dop251/goja v0.0.0-20230531210528-d7324b2d74f7
 	github.com/eaburns/peggy v1.0.2
+	github.com/expr-lang/expr v1.16.0
 	github.com/facebookgo/ensure v0.0.0-20160127193407-b4ab57deab51
 	github.com/fogleman/primitive v0.0.0-20190214200932-673f57e7b1b5
 	github.com/go-interpreter/wagon v0.6.0
@@ -112,7 +112,7 @@ require (
 	github.com/akutz/memconn v0.1.0 // indirect
 	github.com/alexbrainman/sspi v0.0.0-20231016080023-1a75b4708caa // indirect
 	github.com/aws/aws-sdk-go-v2 v1.24.1
-	github.com/aws/aws-sdk-go-v2/config v1.18.42 // indirect
+	github.com/aws/aws-sdk-go-v2/config v1.18.42
 	github.com/aws/aws-sdk-go-v2/credentials v1.16.16
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.14.11 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/configsources v1.2.10 // indirect

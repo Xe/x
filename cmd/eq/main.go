@@ -7,7 +7,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/antonmedv/expr"
+	"github.com/expr-lang/expr"
 )
 
 var (
