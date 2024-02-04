@@ -306,6 +306,9 @@
             libavif
             sqlite-interactive
 
+            jq
+            jo
+
             cargo-watch
             wasmtime
             binaryen
