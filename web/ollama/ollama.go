@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"net/http"
 	"time"
+
+	"within.website/x/web"
 )
 
 type Client struct {
@@ -36,7 +38,7 @@ type CompleteRequest struct {
 	Template  *string        `json:"template,omitempty"`
 	Stream    bool           `json:"stream"`
 	Options   map[string]any `json:"options"`
-	KeepAlive string         `json:"keep_alive"`
+	KeepAlive time.Duration  `json:"keep_alive"`
 }
 
 type CompleteResponse struct {
@@ -53,7 +55,7 @@ type CompleteResponse struct {
 }
 
 func (c *Client) Chat(ctx context.Context, inp *CompleteRequest) (*CompleteResponse, error) {
-	inp.KeepAlive = "-1"
+	inp.KeepAlive = 24 * time.Hour
 
 	buf := &bytes.Buffer{}
 	if err := json.NewEncoder(buf).Encode(inp); err != nil {
@@ -73,6 +75,10 @@ func (c *Client) Chat(ctx context.Context, inp *CompleteRequest) (*CompleteRespo
 		return nil, fmt.Errorf("ollama: error making request: %w", err)
 	}
 	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, web.NewError(http.StatusOK, resp)
+	}
 
 	var result CompleteResponse
 	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {

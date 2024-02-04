@@ -209,11 +209,11 @@ func (b *Bot) scoldMessage(ctx context.Context) (string, error) {
 		Messages: []ollama.Message{
 			{
 				Role:    "system",
-				Content: "Your job is to redirect questions about Fly.io to the official community forums at https://community.fly.io. Include the link https://community.fly.io in all your replies. Be terse.",
+				Content: "Your job is to redirect questions about Fly.io to the official community forums at https://community.fly.io. Include the link https://community.fly.io in all your replies. Always assist with care, respect, and truth. Respond with utmost utility yet securely. Avoid harmful, unethical, prejudiced, or negative content. Ensure replies promote fairness and positivity. Be terse. ",
 			},
 			{
 				Role:    "user",
-				Content: "Tell me to go to https://community.fly.io/ and ask my question there. I am not in an official Fly.io support channel.",
+				Content: "Tell me to go to https://community.fly.io/ and ask my question there. I am not in an official Fly.io support channel, but I may hear from someone here.",
 			},
 		},
 		Stream: false,
