@@ -30,12 +30,13 @@ type Message struct {
 }
 
 type CompleteRequest struct {
-	Model    string         `json:"model"`
-	Messages []Message      `json:"messages"`
-	Format   *string        `json:"format,omitempty"`
-	Template *string        `json:"template,omitempty"`
-	Stream   bool           `json:"stream"`
-	Options  map[string]any `json:"options"`
+	Model     string         `json:"model"`
+	Messages  []Message      `json:"messages"`
+	Format    *string        `json:"format,omitempty"`
+	Template  *string        `json:"template,omitempty"`
+	Stream    bool           `json:"stream"`
+	Options   map[string]any `json:"options"`
+	KeepAlive string         `json:"keep_alive"`
 }
 
 type CompleteResponse struct {
@@ -52,6 +53,8 @@ type CompleteResponse struct {
 }
 
 func (c *Client) Chat(ctx context.Context, inp *CompleteRequest) (*CompleteResponse, error) {
+	inp.KeepAlive = "-1"
+
 	buf := &bytes.Buffer{}
 	if err := json.NewEncoder(buf).Encode(inp); err != nil {
 		return nil, fmt.Errorf("ollama: error encoding request: %w", err)
