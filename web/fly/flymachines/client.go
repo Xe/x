@@ -4,16 +4,59 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
+	"io"
+	"log/slog"
 	"net/http"
 	"os"
-
-	"within.website/x/web"
 )
 
 const (
 	internalURL = "http://_api.internal:4280"
 	publicURL   = "https://api.machines.dev"
 )
+
+type Error struct {
+	ErrorString string `json:"error"`
+	StatusCode  int    `json:"status_code"`
+	ReqID       string `json:"req_id"`
+	Method      string `json:"method"`
+	URL         string `json:"url"`
+}
+
+func NewError(resp *http.Response) error {
+	body, err := io.ReadAll(io.LimitReader(resp.Body, 4096))
+	if err != nil {
+		return fmt.Errorf("flymachines: can't read response body while creating error: %w", err)
+	}
+
+	result := &Error{
+		StatusCode: resp.StatusCode,
+		ReqID:      resp.Header.Get("Fly-Request-Id"),
+		Method:     resp.Request.Method,
+		URL:        resp.Request.URL.String(),
+	}
+
+	if err := json.Unmarshal(body, result); err != nil {
+		result.ErrorString = string(body)
+	}
+
+	return result
+}
+
+func (e *Error) Error() string {
+	return fmt.Sprintf("flymachines: %s %s (%d): %s", e.Method, e.URL, e.StatusCode, e.ErrorString)
+}
+
+func (e *Error) LogValue() slog.Value {
+	return slog.GroupValue(
+		slog.String("error", e.ErrorString),
+		slog.Int("status_code", e.StatusCode),
+		slog.String("req_id", e.ReqID),
+		slog.String("method", e.Method),
+		slog.String("url", e.URL),
+	)
+}
 
 type Client struct {
 	token, apiURL string
@@ -34,10 +77,12 @@ func NewClient(token, apiURL string, cli *http.Client) *Client {
 func New(token string, cli *http.Client) *Client {
 	resp, err := http.Get(internalURL)
 	if err != nil {
+		slog.Debug("can't reach internal API, falling back to public API", "err", err)
 		return NewClient(token, publicURL, cli)
 	}
 
 	if resp.StatusCode != http.StatusNotFound {
+		slog.Debug("can't reach internal API, falling back to public API", "status_code", resp.StatusCode)
 		return NewClient(token, publicURL, cli)
 	}
 
@@ -48,10 +93,11 @@ func New(token string, cli *http.Client) *Client {
 func (c *Client) Do(req *http.Request) (*http.Response, error) {
 	req.Header.Set("Authorization", "Bearer "+c.token)
 	req.Header.Set("User-Agent", "within.website/x/web/fly/flymachines in "+os.Args[0])
+
 	return c.cli.Do(req)
 }
 
-func (c *Client) doRequestNoResponse(ctx context.Context, method, path string, wantStatusCode int) error {
+func (c *Client) doRequestNoResponse(ctx context.Context, method, path string) error {
 	req, err := http.NewRequestWithContext(ctx, method, c.apiURL+path, nil)
 	if err != nil {
 		return err
@@ -63,8 +109,8 @@ func (c *Client) doRequestNoResponse(ctx context.Context, method, path string, w
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode != wantStatusCode {
-		return web.NewError(wantStatusCode, resp)
+	if resp.StatusCode/100 != 2 {
+		return NewError(resp)
 	}
 
 	return nil
@@ -86,7 +132,7 @@ func doJSON[Output any](ctx context.Context, c *Client, method, path string, wan
 	defer resp.Body.Close()
 
 	if resp.StatusCode != wantStatusCode {
-		return zilch[Output](), web.NewError(wantStatusCode, resp)
+		return zilch[Output](), NewError(resp)
 	}
 
 	var output Output
@@ -116,7 +162,7 @@ func doJSONBody[Input any, Output any](ctx context.Context, c *Client, method, p
 	defer resp.Body.Close()
 
 	if resp.StatusCode != wantStatusCode {
-		return zilch[Output](), web.NewError(wantStatusCode, resp)
+		return zilch[Output](), NewError(resp)
 	}
 
 	var output Output

@@ -3,11 +3,8 @@ package flymachines
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"time"
-
-	"within.website/x/web"
 )
 
 // CreateAppArgs are the arguments to the CreateApp call.
@@ -47,7 +44,7 @@ func (mt MilliTime) MarshalJSON() ([]byte, error) {
 func (c *Client) CreateApp(ctx context.Context, caa CreateAppArgs) (*CreateAppResponse, error) {
 	result, err := doJSONBody[CreateAppArgs, CreateAppResponse](ctx, c, http.MethodPost, "/v1/apps", caa, http.StatusCreated)
 	if err != nil {
-		return nil, fmt.Errorf("flymachines: can't decode CreateApp response: %w", err)
+		return nil, err
 	}
 
 	return &result, nil
@@ -87,7 +84,7 @@ func (c *Client) GetApps(ctx context.Context, orgSlug string) ([]ListApp, error)
 		TotalApps int       `json:"total_apps"`
 	}](ctx, c, http.MethodGet, "/v1/apps?org_slug="+orgSlug, http.StatusOK)
 	if err != nil {
-		return nil, fmt.Errorf("flymachines: can't decode GetApps response: %w", err)
+		return nil, err
 	}
 
 	return result.Apps, nil
@@ -97,27 +94,12 @@ func (c *Client) GetApps(ctx context.Context, orgSlug string) ([]ListApp, error)
 func (c *Client) GetApp(ctx context.Context, appName string) (*SingleApp, error) {
 	result, err := doJSON[SingleApp](ctx, c, http.MethodGet, "/v1/apps/"+appName, http.StatusOK)
 	if err != nil {
-		return nil, fmt.Errorf("flymachines: can't decode GetApp response: %w", err)
+		return nil, err
 	}
 
 	return &result, nil
 }
 
 func (c *Client) DeleteApp(ctx context.Context, appName string) error {
-	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, c.apiURL+"/v1/apps/"+appName, nil)
-	if err != nil {
-		return fmt.Errorf("flymachines: can't create DeleteApp request: %w", err)
-	}
-
-	resp, err := c.Do(req)
-	if err != nil {
-		return fmt.Errorf("flymachines: can't perform DeleteApp request: %w", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusAccepted {
-		return web.NewError(http.StatusAccepted, resp)
-	}
-
-	return nil
+	return c.doRequestNoResponse(ctx, http.MethodDelete, "/v1/apps/"+appName)
 }

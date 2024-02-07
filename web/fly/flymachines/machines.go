@@ -12,6 +12,14 @@ func Ptr[T any](t T) *T {
 	return &t
 }
 
+type MachineRestartPolicy string
+
+const (
+	MachineRestartPolicyNo        MachineRestartPolicy = "no"
+	MachineRestartPolicyAlways    MachineRestartPolicy = "always"
+	MachineRestartPolicyOnFailure MachineRestartPolicy = "on-failure"
+)
+
 type MachineConfig struct {
 	Env        map[string]string `json:"env"`
 	Metadata   map[string]string `json:"metadata"`
@@ -60,13 +68,13 @@ type MachineGuest struct {
 }
 
 type MachineStopConfig struct {
-	Timeout time.Duration `json:"timeout"`
-	Signal  string        `json:"signal"`
+	Timeout string `json:"timeout"`
+	Signal  string `json:"signal"`
 }
 
 type MachineRestart struct {
-	MaxRetries int    `json:"max_retries"` // only relevant when Policy is "on-fail"
-	Policy     string `json:"policy"`      // "no", "always", or "on-fail"
+	MaxRetries int                  `json:"max_retries"` // only relevant when Policy is "on-fail"
+	Policy     MachineRestartPolicy `json:"policy"`
 }
 
 type MachineServiceConcurrency struct {
@@ -168,14 +176,14 @@ type CreateMachine struct {
 	LSVD                    bool          `json:"lsvd"` // should be true?
 	Name                    string        `json:"name"`
 	Region                  string        `json:"region"`
-	SkipLaunch              bool          `json:"skip_launch"`
-	SkipServiceRegistration bool          `json:"skip_service_registration"`
+	SkipLaunch              *bool         `json:"skip_launch,omitempty"`
+	SkipServiceRegistration *bool         `json:"skip_service_registration,omitempty"`
 }
 
 func (c *Client) CreateMachine(ctx context.Context, appID string, cm CreateMachine) (*Machine, error) {
 	result, err := doJSONBody[CreateMachine, Machine](ctx, c, http.MethodPost, "/v1/apps/"+appID+"/machines", cm, http.StatusOK)
 	if err != nil {
-		return nil, fmt.Errorf("flymachines: can't decode CreateMachine response: %w", err)
+		return nil, err
 	}
 
 	return &result, nil
@@ -191,33 +199,37 @@ func (c *Client) GetAppMachine(ctx context.Context, appID, machineID string) (*M
 }
 
 func (c *Client) DeleteAppMachine(ctx context.Context, appID, machineID string) error {
-	return c.doRequestNoResponse(ctx, http.MethodDelete, "/v1/apps/"+appID+"/machines/"+machineID, http.StatusOK)
+	return c.doRequestNoResponse(ctx, http.MethodDelete, "/v1/apps/"+appID+"/machines/"+machineID)
+}
+
+func (c *Client) DestroyAppMachine(ctx context.Context, appID, machineID string) error {
+	return c.doRequestNoResponse(ctx, http.MethodDelete, "/v1/apps/"+appID+"/machines/"+machineID+"?force=true")
 }
 
 func (c *Client) CordonAppMachine(ctx context.Context, appID, machineID string) error {
-	return c.doRequestNoResponse(ctx, http.MethodPost, "/v1/apps/"+appID+"/machines/"+machineID+"/cordon", http.StatusOK)
+	return c.doRequestNoResponse(ctx, http.MethodPost, "/v1/apps/"+appID+"/machines/"+machineID+"/cordon")
 }
 
 func (c *Client) UncordonAppMachine(ctx context.Context, appID, machineID string) error {
-	return c.doRequestNoResponse(ctx, http.MethodPost, "/v1/apps/"+appID+"/machines/"+machineID+"/uncordon", http.StatusOK)
+	return c.doRequestNoResponse(ctx, http.MethodPost, "/v1/apps/"+appID+"/machines/"+machineID+"/uncordon")
 }
 
 func (c *Client) StartAppMachine(ctx context.Context, appID, machineID string) error {
-	return c.doRequestNoResponse(ctx, http.MethodPost, "/v1/apps/"+appID+"/machines/"+machineID+"/start", http.StatusOK)
+	return c.doRequestNoResponse(ctx, http.MethodPost, "/v1/apps/"+appID+"/machines/"+machineID+"/start")
 }
 
 func (c *Client) StopAppMachine(ctx context.Context, appID, machineID string) error {
-	return c.doRequestNoResponse(ctx, http.MethodPost, "/v1/apps/"+appID+"/machines/"+machineID+"/stop", http.StatusOK)
+	return c.doRequestNoResponse(ctx, http.MethodPost, "/v1/apps/"+appID+"/machines/"+machineID+"/stop")
 }
 
 func (c *Client) RestartAppMachine(ctx context.Context, appID, machineID string) error {
-	return c.doRequestNoResponse(ctx, http.MethodPost, "/v1/apps/"+appID+"/machines/"+machineID+"/restart", http.StatusOK)
+	return c.doRequestNoResponse(ctx, http.MethodPost, "/v1/apps/"+appID+"/machines/"+machineID+"/restart")
 }
 
 func (c *Client) GetAppMachineEvents(ctx context.Context, appID, machineID string) ([]MachineEvent, error) {
 	result, err := doJSON[[]MachineEvent](ctx, c, http.MethodGet, "/v1/apps/"+appID+"/machines/"+machineID+"/events", http.StatusOK)
 	if err != nil {
-		return nil, fmt.Errorf("flymachines: can't decode GetAppMachineEvents response: %w", err)
+		return nil, err
 	}
 
 	return result, nil
@@ -226,7 +238,7 @@ func (c *Client) GetAppMachineEvents(ctx context.Context, appID, machineID strin
 func (c *Client) GetAppMachineMetadata(ctx context.Context, appID, machineID string) (map[string]string, error) {
 	result, err := doJSON[map[string]string](ctx, c, http.MethodGet, "/v1/apps/"+appID+"/machines/"+machineID+"/metadata", http.StatusOK)
 	if err != nil {
-		return nil, fmt.Errorf("flymachines: can't decode GetAppMachineMetadata response: %w", err)
+		return nil, err
 	}
 
 	return result, nil

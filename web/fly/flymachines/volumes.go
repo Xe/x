@@ -64,9 +64,9 @@ func (c *Client) CreateVolume(ctx context.Context, appName string, cv CreateVolu
 }
 
 func (c *Client) DeleteVolume(ctx context.Context, appName, volumeID string) error {
-	_, err := doJSON[Volume](ctx, c, http.MethodDelete, "/v1/apps/"+appName+"/volumes/"+volumeID, http.StatusNoContent)
+	err := c.doRequestNoResponse(ctx, http.MethodDelete, "/v1/apps/"+appName+"/volumes/"+volumeID)
 	if err != nil {
-		return fmt.Errorf("flymachines: can't decode DeleteVolume response: %w", err)
+		return err
 	}
 
 	return nil
