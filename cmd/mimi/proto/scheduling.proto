@@ -1,0 +1,28 @@
+syntax = "proto3";
+package within.website.x.mimi.scheduling;
+option go_package = "within.website/x/cmd/mimi/modules/scheduling";
+
+service Scheduling {
+  rpc ParseEmail(ParseReq) returns (ParseResp);
+}
+
+message ConversationMember {
+  string role = 1;
+  string name = 2;
+  string email = 3;
+}
+
+message ParseReq {
+  string month = 1;
+  repeated ConversationMember conversation_members = 2;
+  string message = 3;
+  string date = 4;
+}
+
+message ParseResp {
+  string start_time = 1;
+  string duration = 2;
+  string summary = 3;
+  repeated ConversationMember attendees = 4;
+  string location = 5;
+}

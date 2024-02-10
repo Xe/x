@@ -1,4 +1,4 @@
-# nix-direnv cache busting line: sha256-EcJSjHdHv6GjcXXMfZ+LZOL+Odc6iUrWE5uVn1HAJzw=
+# nix-direnv cache busting line: 
 
 {
   description = "/x/perimental code";
@@ -47,7 +47,7 @@
           ];
         };
 
-        vendorSha256 = pkgs.lib.fileContents ./.go.mod.sri;
+        vendorHash = pkgs.lib.fileContents ./.go.mod.sri;
 
         version = "${self.sourceInfo.lastModifiedDate}";
 
@@ -63,7 +63,7 @@
 
         everything = pkgs.buildGo121Module {
           pname = "xe-x-composite";
-          inherit version vendorSha256;
+          inherit version vendorHash;
           src = ./.;
 
           nativeBuildInputs = with pkgs; [ pkg-config ];
@@ -77,14 +77,14 @@
 
         mimi = pkgs.buildGo121Module {
           pname = "mimi";
-          inherit version vendorSha256;
+          inherit version vendorHash;
           src = ./.;
           subPackages = [ "cmd/mimi" ];
         };
 
         xedn = pkgs.buildGo121Module {
           pname = "xedn";
-          inherit version vendorSha256;
+          inherit version vendorHash;
           src = ./.;
           subPackages = [ "cmd/xedn" ];
 
@@ -158,7 +158,7 @@
 
         robocadey2 = pkgs.buildGo121Module {
           pname = "robocadey2";
-          inherit version vendorSha256;
+          inherit version vendorHash;
           src = ./.;
           nativeBuildInputs = with pkgs; [ pkg-config ];
           subPackages = [ "cmd/robocadey2" ];
@@ -316,6 +316,11 @@
             bloaty
             rust
             flyctl
+
+            protobuf_23
+            protoc-gen-go
+            protoc-gen-twirp
+            protoc-gen-go-grpc
 
             tinyemu
             zig

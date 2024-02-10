@@ -1,7 +1,7 @@
 /*
 Package scheduling provides the scheduling module for Mimi.
 
-This module allows users to CC Anise Robòta in their emails to schedule meetings and events.
+This module allows authorized users to CC Nise in their emails to schedule meetings and events.
 When Nise is CCed in an email, she will parse the email and extract the date, time, and
 location of the event. Nise will then create a Google Calendar event and send an invitation.
 */
@@ -13,13 +13,16 @@ import (
 	_ "embed"
 	"encoding/json"
 	"fmt"
-	"net/http"
+	"log/slog"
 	"text/template"
 	"time"
 
+	"github.com/cenkalti/backoff/v4"
 	"within.website/x/cmd/mimi/internal"
 	"within.website/x/web/ollama"
 )
+
+//go:generate protoc --proto_path=. --go_out=. --go_opt=paths=source_relative --twirp_out=. scheduling.proto
 
 func p[T any](t T) *T {
 	return &t
@@ -30,30 +33,11 @@ const timeFormat string = "Monday January 2, 2006 at 3:04 PM"
 //go:embed nise_template.txt
 var niseTemplate string
 
-type ConversationMember struct {
-	Role  *string `json:"role,omitempty"`
-	Name  string  `json:"name"`
-	Email string  `json:"email"`
-}
-
-type NiseRequest struct {
-	Month               string               `json:"month"`
-	ConversationMembers []ConversationMember `json:"conversation_members"`
-	Message             string               `json:"message"`
-	Date                string               `json:"date"`
-}
-
-type NiseResponse struct {
-	StartTime string               `json:"start_time"`
-	Duration  string               `json:"duration"`
-	Summary   string               `json:"summary"`
-	Attendees []ConversationMember `json:"attendees"`
-	Location  *string              `json:"location,omitempty"`
-}
-
 type Module struct {
 	cli   *ollama.Client
 	model string
+
+	UnimplementedSchedulingServer
 }
 
 func New() *Module {
@@ -63,46 +47,21 @@ func New() *Module {
 	}
 }
 
-func (m *Module) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
+func (m *Module) ParseEmail(ctx context.Context, req *ParseReq) (*ParseResp, error) {
+	bo := backoff.NewExponentialBackOff()
 
-	now := time.Now()
-
-	// Only allow POST requests
-	if r.Method != http.MethodPost {
-		http.Error(w, "scheduling: only POST requests are allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
-	dateString := now.Format(timeFormat)
-	monthName := now.Month().String()
-
-	var niseReq NiseRequest
-	if err := json.NewDecoder(r.Body).Decode(&niseReq); err != nil {
-		http.Error(w, fmt.Sprintf("scheduling: error decoding request: %v", err), http.StatusBadRequest)
-		return
-	}
-
-	niseReq.Date = dateString
-	niseReq.Month = monthName
-
-	resp, err := m.Handle(r.Context(), &niseReq)
-	if err != nil {
-		http.Error(w, fmt.Sprintf("scheduling: error handling request: %v", err), http.StatusInternalServerError)
-		return
-	}
-
-	if err := json.NewEncoder(w).Encode(resp); err != nil {
-		http.Error(w, fmt.Sprintf("scheduling: error encoding response: %v", err), http.StatusInternalServerError)
-		return
-	}
+	return backoff.RetryNotifyWithData[*ParseResp](func() (*ParseResp, error) {
+		return m.parseEmail(ctx, req)
+	}, bo, func(err error, t time.Duration) {
+		slog.Error("error parsing email", "err", err, "t", t.String())
+	})
 }
 
-func (m *Module) Handle(ctx context.Context, req *NiseRequest) (*NiseResponse, error) {
+func (m *Module) parseEmail(ctx context.Context, req *ParseReq) (*ParseResp, error) {
 	tmpl := template.Must(template.New("nise").Parse(niseTemplate))
 	var buf bytes.Buffer
 	if err := tmpl.Execute(&buf, req); err != nil {
-		return nil, fmt.Errorf("scheduling: error executing template: %w", err)
+		return nil, backoff.Permanent(fmt.Errorf("scheduling: error executing template: %w", err))
 	}
 
 	resp, err := m.cli.Chat(ctx, &ollama.CompleteRequest{
@@ -110,7 +69,7 @@ func (m *Module) Handle(ctx context.Context, req *NiseRequest) (*NiseResponse, e
 		Messages: []ollama.Message{
 			{
 				Role: "system",
-				Content: `You are Anise Robòta, a scheduling assistant. You have been CCed in an email to schedule a meeting. Your task is to read this email and extract the following information into a JSON object:
+				Content: `You are Nise, a scheduling assistant. You have been CCed in an email to schedule a meeting. Your task is to read this email and extract the following information into a JSON object:
 
 				* The start time of the meeting
 				* The duration of the meeting
@@ -134,7 +93,7 @@ func (m *Module) Handle(ctx context.Context, req *NiseRequest) (*NiseResponse, e
 		return nil, fmt.Errorf("scheduling: error summarizing email: %w", err)
 	}
 
-	var niseResp NiseResponse
+	var niseResp ParseResp
 
 	if err := json.Unmarshal([]byte(resp.Message.Content), &niseResp); err != nil {
 		return nil, fmt.Errorf("scheduling: error unmarshaling response: %w", err)
