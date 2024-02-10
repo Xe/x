@@ -28,6 +28,7 @@ import (
 	"tailscale.com/tsweb"
 	"within.website/x/cmd/xedn/internal/xesite"
 	"within.website/x/internal"
+	"within.website/x/web/fly/flymachines"
 	"within.website/x/web/stablediffusion"
 )
 
@@ -127,7 +128,7 @@ func main() {
 	}
 
 	iu := &ImageUploader{
-		s3: mkS3Client(),
+		fmc: flymachines.New(*flyAPIToken, &http.Client{}),
 	}
 
 	os.MkdirAll(filepath.Join(*dir, "xesite"), 0700)

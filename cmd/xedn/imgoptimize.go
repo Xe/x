@@ -2,31 +2,22 @@ package main
 
 import (
 	"bytes"
-	"crypto/sha256"
 	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
 	"image"
-	"image/jpeg"
 	"image/png"
-	"io"
-	"log"
 	"log/slog"
 	"net/http"
 	"os"
 	"path/filepath"
-	"runtime"
 	"strconv"
 	"strings"
 	"time"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/credentials"
-	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/chai2010/webp"
 	"github.com/disintegration/imaging"
-	"github.com/google/uuid"
 	"go.etcd.io/bbolt"
 	"golang.org/x/sync/singleflight"
 	"tailscale.com/metrics"
@@ -254,202 +245,4 @@ func (ois *OptimizedImageServer) Purge(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-}
-
-type ImageUploader struct {
-	s3 *s3.Client
-}
-
-func (iu *ImageUploader) CreateImage(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-	id := uuid.New().String()
-
-	defer r.Body.Close()
-
-	os.MkdirAll(filepath.Join(*dir, "uploud"), 0700)
-
-	fout, err := os.Create(filepath.Join(*dir, "uploud", id+".png"))
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		slog.Error("cannot create temp file", "err", err)
-		return
-	}
-
-	h := sha256.New()
-
-	if n, err := io.Copy(io.MultiWriter(h, fout), r.Body); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		slog.Error("cannot copy image to buffer", "err", err)
-		return
-	} else {
-		slog.Info("copied image to buffer", "bytes", n, "content-length", r.ContentLength)
-	}
-
-	if err := fout.Close(); err != nil {
-		slog.Error("cannot close temp file", "err", err)
-		return
-	}
-
-	fin, err := os.Open(filepath.Join(*dir, "uploud", id+".png"))
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		slog.Error("cannot open temp file", "err", err)
-		return
-	}
-
-	img, err := png.Decode(fin)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		slog.Error("cannot decode image", "err", err)
-		return
-	}
-
-	if err := fin.Close(); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		slog.Error("cannot close temp file", "err", err)
-		return
-	}
-
-	os.Remove(filepath.Join(*dir, "uploud", id+".png"))
-
-	directory, err := os.MkdirTemp(*dir, "uploud")
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		slog.Error("cannot create temp directory", "err", err)
-		return
-	}
-	defer os.RemoveAll(directory)
-
-	if err := doAVIF(img, filepath.Join(directory, "image.avif")); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		slog.Error("cannot encode AVIF", "err", err)
-		return
-	}
-
-	if err := doWEBP(img, filepath.Join(directory, "image.webp")); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		slog.Error("cannot encode WEBP", "err", err)
-		return
-	}
-
-	if err := doJPEG(img, filepath.Join(directory, "image.jpg")); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		slog.Error("cannot encode JPEG", "err", err)
-		return
-	}
-
-	files, err := os.ReadDir(directory)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		slog.Error("cannot read directory", "err", err)
-		return
-	}
-
-	id = fmt.Sprintf("%x", h.Sum(nil))
-
-	s3c := mkS3Client()
-
-	for _, finfo := range files {
-		log.Printf("uploading %s", finfo.Name())
-		fin, err := os.Open(filepath.Join(directory, finfo.Name()))
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			slog.Error("cannot read file", "err", err)
-			return
-		}
-		defer fin.Close()
-
-		_, err = s3c.PutObject(ctx, &s3.PutObjectInput{
-			Body:        fin,
-			Bucket:      aws.String("christine-static"),
-			Key:         aws.String("xedn/dynamic/" + id + "/" + finfo.Name()),
-			ContentType: aws.String(mimeTypes[filepath.Ext(finfo.Name())]),
-		})
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			slog.Error("cannot upload file", "err", err)
-			return
-		}
-	}
-
-	json.NewEncoder(w).Encode(map[string]string{
-		"avif": "https://cdn.xeiaso.net/file/christine-static/xedn/dynamic/" + id + "/image.avif",
-		"webp": "https://cdn.xeiaso.net/file/christine-static/xedn/dynamic/" + id + "/image.webp",
-		"jpeg": "https://cdn.xeiaso.net/file/christine-static/xedn/dynamic/" + id + "/image.jpg",
-	})
-}
-
-var mimeTypes = map[string]string{
-	".avif": "image/avif",
-	".webp": "image/webp",
-	".jpg":  "image/jpeg",
-	".png":  "image/png",
-	".wasm": "application/wasm",
-	".css":  "text/css",
-}
-
-func mkS3Client() *s3.Client {
-	s3Config := aws.Config{
-		Credentials:  credentials.NewStaticCredentialsProvider(*b2KeyID, *b2KeySecret, ""),
-		BaseEndpoint: aws.String("https://s3.us-west-001.backblazeb2.com"),
-		Region:       "us-west-001",
-	}
-	s3Client := s3.NewFromConfig(s3Config, (func(o *s3.Options) {
-		o.UsePathStyle = true
-	}))
-	return s3Client
-}
-
-func doAVIF(src image.Image, dstPath string) error {
-	dst, err := os.Create(dstPath)
-	if err != nil {
-		log.Fatalf("Can't create destination file: %v", err)
-	}
-	defer dst.Close()
-
-	err = avif.Encode(dst, src, &avif.Options{
-		Threads: runtime.GOMAXPROCS(0),
-		Speed:   *avifEncoderSpeed,
-		Quality: *avifQuality,
-	})
-	if err != nil {
-		return err
-	}
-
-	log.Printf("Encoded AVIF at %s", dstPath)
-
-	return nil
-}
-
-func doWEBP(src image.Image, dstPath string) error {
-	fout, err := os.Create(dstPath)
-	if err != nil {
-		return err
-	}
-	defer fout.Close()
-
-	err = webp.Encode(fout, src, &webp.Options{Quality: float32(*webpQuality)})
-	if err != nil {
-		return err
-	}
-
-	log.Printf("Encoded WEBP at %s", dstPath)
-
-	return nil
-}
-
-func doJPEG(src image.Image, dstPath string) error {
-	fout, err := os.Create(dstPath)
-	if err != nil {
-		return err
-	}
-	defer fout.Close()
-
-	if err := jpeg.Encode(fout, src, &jpeg.Options{Quality: *jpegQuality}); err != nil {
-		return err
-	}
-
-	log.Printf("Encoded JPEG at %s", dstPath)
-
-	return nil
 }

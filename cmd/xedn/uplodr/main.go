@@ -36,6 +36,8 @@ var (
 	b2KeyID     = flag.String("b2-key-id", "", "Backblaze B2 application key ID")
 	b2KeySecret = flag.String("b2-application-key", "", "Backblaze B2 application secret")
 
+	msgSize = flag.Int("msg-size", 100*1024*1024, "how big the message should be")
+
 	tigrisBucket = flag.String("bucket-name", "xedn", "Tigris bucket to dump things to")
 
 	avifQuality      = flag.Int("avif-quality", 8, "AVIF quality (higher is worse quality)")
@@ -50,6 +52,8 @@ func main() {
 	internal.HandleStartup()
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Minute)
 	defer cancel()
+
+	os.MkdirAll("/tmp", 0777)
 
 	s, err := New(ctx)
 	if err != nil {
@@ -66,7 +70,10 @@ func main() {
 		log.Fatal(err)
 	}
 
-	gs := grpc.NewServer()
+	gs := grpc.NewServer(
+		grpc.MaxRecvMsgSize(*msgSize),
+		grpc.MaxSendMsgSize(*msgSize),
+	)
 
 	pb.RegisterImageServer(gs, s)
 
@@ -95,6 +102,7 @@ func New(ctx context.Context) (*Server, error) {
 }
 
 func (s *Server) Ping(ctx context.Context, msg *pb.Echo) (*pb.Echo, error) {
+	slog.Info("ping", "msg", msg.Nonce)
 	return msg, nil
 }
 
@@ -115,30 +123,35 @@ func (s *Server) Upload(ctx context.Context, ur *pb.UploadReq) (*pb.UploadResp, 
 		return nil, fmt.Errorf("failed to create temp dir: %w", err)
 	}
 	defer os.RemoveAll(dir)
+	os.MkdirAll(dir, 0777)
 
 	name := baseName + "-smol.png"
 	fnames = append(fnames, name)
 	if err := resizeSmol(img, filepath.Join(dir, name)); err != nil {
 		return nil, fmt.Errorf("failed to make smol png: %w", err)
 	}
+	slog.Debug("converted", "name", name)
 
 	name = baseName + ".webp"
-	fnames = append(fnames, filepath.Join(dir, name))
-	if err := doWEBP(img, name); err != nil {
+	fnames = append(fnames, name)
+	if err := doWEBP(img, filepath.Join(dir, name)); err != nil {
 		return nil, fmt.Errorf("failed to make webp: %w", err)
 	}
+	slog.Debug("converted", "name", name)
 
 	name = baseName + ".avif"
-	fnames = append(fnames, filepath.Join(dir, name))
-	if err := doAVIF(img, name); err != nil {
+	fnames = append(fnames, name)
+	if err := doAVIF(img, filepath.Join(dir, name)); err != nil {
 		return nil, fmt.Errorf("failed to make avif: %w", err)
 	}
+	slog.Debug("converted", "name", name)
 
 	name = baseName + ".jpg"
-	fnames = append(fnames, filepath.Join(dir, name))
-	if err := doJPEG(img, name); err != nil {
+	fnames = append(fnames, name)
+	if err := doJPEG(img, filepath.Join(dir, name)); err != nil {
 		return nil, fmt.Errorf("failed to make jpeg: %w", err)
 	}
+	slog.Debug("converted", "name", name)
 
 	var result []*pb.Variant
 
@@ -155,29 +168,33 @@ func (s *Server) Upload(ctx context.Context, ur *pb.UploadReq) (*pb.UploadResp, 
 		}
 		defer fin.Close()
 
-		if _, err := s.b2c.PutObject(ctx, &s3.PutObjectInput{
-			Body:        fin,
-			Bucket:      b2Bucket,
-			Key:         aws.String(fmt.Sprintf("%s/%s", ur.Folder, fname)),
-			ContentType: aws.String(mimeTypes[filepath.Ext(fname)]),
-		}); err != nil {
-			slog.Error("can't upload", "to", "b2", "err", err)
-			errs = append(errs, fmt.Errorf("while uploading %s to b2: %w", path, err))
-			continue
-		}
-
-		fin.Seek(0, 0)
+		key := fmt.Sprintf("%s/%s", ur.Folder, fname)
 
 		if _, err := s.tc.PutObject(ctx, &s3.PutObjectInput{
 			Body:        fin,
+			Bucket:      tigrisBucket,
+			Key:         aws.String(key),
+			ContentType: aws.String(mimeTypes[filepath.Ext(fname)]),
+		}); err != nil {
+			slog.Error("can't upload", "to", "tigris", "err", err)
+			errs = append(errs, fmt.Errorf("while uploading %s to tigris: %w", path, err))
+			continue
+		}
+		slog.Debug("uploaded", "to", "tigris", "key", key)
+
+		fin.Seek(0, 0)
+
+		if _, err := s.b2c.PutObject(ctx, &s3.PutObjectInput{
+			Body:        fin,
 			Bucket:      b2Bucket,
-			Key:         aws.String(fmt.Sprintf("%s/%s", ur.Folder, fname)),
+			Key:         aws.String(key),
 			ContentType: aws.String(mimeTypes[filepath.Ext(fname)]),
 		}); err != nil {
 			slog.Error("can't upload", "to", "b2", "err", err)
 			errs = append(errs, fmt.Errorf("while uploading %s to b2: %w", path, err))
 			continue
 		}
+		slog.Debug("uploaded", "to", "tigris", "key", key)
 
 		result = append(result, &pb.Variant{
 			Url:      fmt.Sprintf("https://cdn.xeiaso.net/file/christine-static/%s/%s", ur.GetFolder(), fname),
@@ -189,6 +206,8 @@ func (s *Server) Upload(ctx context.Context, ur *pb.UploadReq) (*pb.UploadResp, 
 		return nil, errors.Join(errs...)
 	}
 
+	slog.Info("uploaded", "input", ur.FileName, "result", result)
+
 	return &pb.UploadResp{
 		Variants: result,
 	}, nil
@@ -197,7 +216,7 @@ func (s *Server) Upload(ctx context.Context, ur *pb.UploadReq) (*pb.UploadResp, 
 func doAVIF(src image.Image, dstPath string) error {
 	dst, err := os.Create(dstPath)
 	if err != nil {
-		log.Fatalf("Can't create destination file: %v", err)
+		return fmt.Errorf("can't create destination file %s: %v", dstPath, err)
 	}
 	defer dst.Close()
 
@@ -218,7 +237,7 @@ func doAVIF(src image.Image, dstPath string) error {
 func doWEBP(src image.Image, dstPath string) error {
 	fout, err := os.Create(dstPath)
 	if err != nil {
-		return err
+		return fmt.Errorf("can't create destination file %s: %v", dstPath, err)
 	}
 	defer fout.Close()
 
@@ -239,7 +258,7 @@ func fileNameWithoutExt(fileName string) string {
 func doJPEG(src image.Image, dstPath string) error {
 	fout, err := os.Create(dstPath)
 	if err != nil {
-		return err
+		return fmt.Errorf("can't create destination file %s: %v", dstPath, err)
 	}
 	defer fout.Close()
 
@@ -255,7 +274,7 @@ func doJPEG(src image.Image, dstPath string) error {
 func resizeSmol(src image.Image, dstPath string) error {
 	fout, err := os.Create(dstPath)
 	if err != nil {
-		return err
+		return fmt.Errorf("can't create destination file %s: %v", dstPath, err)
 	}
 	defer fout.Close()
 
@@ -288,9 +307,11 @@ func mkTigrisClient(ctx context.Context) (*s3.Client, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to load Tigris config: %w", err)
 	}
+	cfg.Region = "auto"
 
 	return s3.NewFromConfig(cfg, func(o *s3.Options) {
 		o.BaseEndpoint = aws.String("https://fly.storage.tigris.dev")
+		o.Region = "auto"
 	}), nil
 }
 
@@ -302,6 +323,7 @@ func mkB2Client() *s3.Client {
 	}
 	s3Client := s3.NewFromConfig(s3Config, (func(o *s3.Options) {
 		o.UsePathStyle = true
+		o.Region = "us-west-001"
 	}))
 	return s3Client
 }
