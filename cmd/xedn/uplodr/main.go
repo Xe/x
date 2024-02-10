@@ -112,7 +112,7 @@ func (s *Server) Upload(ctx context.Context, ur *pb.UploadReq) (*pb.UploadResp, 
 
 	dir, err := os.MkdirTemp("", "xedn-uplodr")
 	if err != nil {
-		return nil, fmt.Errorf("failed to create temp dir: %w")
+		return nil, fmt.Errorf("failed to create temp dir: %w", err)
 	}
 	defer os.RemoveAll(dir)
 
