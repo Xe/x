@@ -15,6 +15,8 @@ func main() {
 
 	subcommands.Register(&sanguisugaAnimeList{}, "sanguisuga")
 	subcommands.Register(&sanguisugaAnimeTrack{}, "sanguisuga")
+	subcommands.Register(&sanguisugaTVList{}, "sanguisuga")
+	subcommands.Register(&sanguisugaTVTrack{}, "sanguisuga")
 
 	internal.HandleStartup()
 	ctx := context.Background()

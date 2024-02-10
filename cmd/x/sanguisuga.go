@@ -100,3 +100,80 @@ func (sal *sanguisugaAnimeTrack) Execute(ctx context.Context, f *flag.FlagSet, _
 
 	return subcommands.ExitSuccess
 }
+
+type sanguisugaTVList struct{}
+
+func (*sanguisugaTVList) Name() string     { return "tv-list" }
+func (*sanguisugaTVList) Synopsis() string { return "Print list of tv tracked by sanguisuga." }
+func (*sanguisugaTVList) Usage() string {
+	return `tv-list [--url]:
+  Print list of tv tracked by sanguisuga.`
+}
+
+func (sal *sanguisugaTVList) SetFlags(f *flag.FlagSet) {}
+
+func (sal *sanguisugaTVList) Execute(ctx context.Context, f *flag.FlagSet, _ ...interface{}) subcommands.ExitStatus {
+	resp, err := http.Get(fmt.Sprintf("%s/api/tv/list", *sanguisugaURL))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var shows []Show
+
+	defer resp.Body.Close()
+	if err := json.NewDecoder(resp.Body).Decode(&shows); err != nil {
+		log.Fatal(err)
+	}
+
+	tbl := table.New("Name", "Disk Path", "Quality")
+
+	for _, show := range shows {
+		tbl.AddRow(show.Title, show.DiskPath, show.Quality)
+	}
+
+	tbl.Print()
+
+	return subcommands.ExitSuccess
+}
+
+type sanguisugaTVTrack struct{}
+
+func (*sanguisugaTVTrack) Name() string { return "tv-track" }
+func (*sanguisugaTVTrack) Synopsis() string {
+	return "Add a new tv to the list of tv to track."
+}
+func (*sanguisugaTVTrack) Usage() string {
+	return `tv-track <title> <dataDir>:
+  Add a new tv to the tracklist for XDCC.`
+}
+
+func (sal *sanguisugaTVTrack) SetFlags(f *flag.FlagSet) {}
+
+func (sal *sanguisugaTVTrack) Execute(ctx context.Context, f *flag.FlagSet, _ ...interface{}) subcommands.ExitStatus {
+	if f.NArg() != 2 {
+		fmt.Println(sal.Usage())
+		return subcommands.ExitFailure
+	}
+
+	show := Show{
+		Title:    f.Arg(0),
+		DiskPath: f.Arg(1),
+		Quality:  "1080p",
+	}
+
+	data, err := json.Marshal(show)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	resp, err := http.Post(fmt.Sprintf("%s/api/tv/track", *sanguisugaURL), "application/json", bytes.NewBuffer(data))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		log.Fatal(web.NewError(http.StatusOK, resp))
+	}
+
+	return subcommands.ExitSuccess
+}
