@@ -1,4 +1,4 @@
-# nix-direnv cache busting line: 
+# nix-direnv cache busting line: sha256-uyAZCQaWGagfEdnfPctER//uOnt+bNwBVHIFQpshimo=
 
 {
   description = "/x/perimental code";
@@ -86,7 +86,7 @@
           pname = "xedn";
           inherit version vendorHash;
           src = ./.;
-          subPackages = [ "cmd/xedn" ];
+          subPackages = [ "cmd/xedn" "cmd/xedn/uplodr" ];
 
           nativeBuildInputs = with pkgs; [ pkg-config ];
           buildInputs = with pkgs; [ pkg-config libaom libavif ];
@@ -250,7 +250,7 @@
             xedn = pkgs.dockerTools.buildLayeredImage {
               name = "registry.fly.io/xedn";
               tag = "latest";
-              contents = [ pkgs.cacert ];
+              contents = [ pkgs.cacert xedn ];
               config = {
                 Cmd = [ "${xedn}/bin/xedn" ];
                 WorkingDir = "${xedn}";

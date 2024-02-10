@@ -9,6 +9,7 @@ require (
 	github.com/aws/aws-sdk-go v1.50.13
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.48.1
 	github.com/bwmarrin/discordgo v0.27.1
+	github.com/cenkalti/backoff/v4 v4.2.1
 	github.com/chai2010/webp v1.1.1
 	github.com/disintegration/imaging v1.6.2
 	github.com/dop251/goja v0.0.0-20230531210528-d7324b2d74f7
@@ -38,6 +39,7 @@ require (
 	github.com/tetratelabs/wazero v1.6.0
 	github.com/thoj/go-ircevent v0.0.0-20210723090443-73e444401d64
 	github.com/tmc/scp v0.0.0-20170824174625-f7b48647feef
+	github.com/twitchtv/twirp v8.1.3+incompatible
 	go.etcd.io/bbolt v1.3.8
 	go.jetpack.io/tyson v0.1.1
 	go4.org v0.0.0-20190313082347-94abd6928b1d
@@ -64,7 +66,6 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/internal/checksum v1.2.10 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.16.10 // indirect
 	github.com/bytedance/sonic v1.10.2 // indirect
-	github.com/cenkalti/backoff/v4 v4.2.1 // indirect
 	github.com/chenzhuoyu/base64x v0.0.0-20230717121745-296ad89f973d // indirect
 	github.com/chenzhuoyu/iasm v0.9.1 // indirect
 	github.com/coreos/go-systemd/v22 v22.5.0 // indirect
