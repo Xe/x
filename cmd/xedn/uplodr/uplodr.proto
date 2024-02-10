@@ -1,0 +1,27 @@
+syntax = "proto3";
+package within.website.x.xedn.uplodr;
+option go_package = "within.website/x/cmd/xedn/uplodr/pb";
+
+service Image {
+  rpc Ping(Echo) returns (Echo);
+  rpc Upload(UploadReq) returns (UploadResp);
+}
+
+message UploadReq {
+  string file_name = 1;
+  bytes data = 2;
+  string folder = 3;
+}
+
+message UploadResp {
+  repeated Variant variants = 1;
+}
+
+message Variant {
+  string url = 1;
+  string mime_type = 2;
+}
+
+message Echo {
+  string nonce = 1;
+}
