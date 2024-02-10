@@ -48,10 +48,17 @@ type CreateVolume struct {
 	Name              string        `json:"name,omitempty"`
 	Region            string        `json:"region,omitempty"`
 	RequireUniqueZone bool          `json:"require_unique_zone"`
-	SizeGB            int           `json:"size_gb"`
+	SizeGB            int           `json:"size_gb,omitempty"`
 	SnapshotID        string        `json:"snapshot_id,omitempty"`
 	SnapshotRetention int           `json:"snapshot_retention"`
 	SourceVolumeID    string        `json:"source_volume_id,omitempty"`
+}
+
+func (cv CreateVolume) Fork(vol *Volume) CreateVolume {
+	cv.SourceVolumeID = vol.ID
+	cv.SnapshotRetention = vol.SnapshotRetention
+	cv.FSType = vol.FSType
+	return cv
 }
 
 func (c *Client) CreateVolume(ctx context.Context, appName string, cv CreateVolume) (*Volume, error) {
