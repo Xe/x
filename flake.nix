@@ -286,7 +286,6 @@
             gotools
             go-tools
             python3
-            strace
             hey
             boltbrowser
             opentofu
@@ -321,9 +320,6 @@
             protoc-gen-go
             protoc-gen-twirp
             protoc-gen-go-grpc
-
-            tinyemu
-            zig
 
             gowasi
           ];
