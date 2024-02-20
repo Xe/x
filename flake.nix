@@ -40,7 +40,7 @@
           inherit system;
           overlays = [
             (final: prev: {
-              go = prev.go_1_21;
+              go = prev.go_1_22;
             })
             rust-overlay.overlays.default
             #(final: prev: self.packages.${system})
@@ -61,7 +61,7 @@
           rustc = rust;
         };
 
-        everything = pkgs.buildGo121Module {
+        everything = pkgs.buildGo122Module {
           pname = "xe-x-composite";
           inherit version vendorHash;
           src = ./.;
@@ -75,14 +75,14 @@
           ];
         };
 
-        mimi = pkgs.buildGo121Module {
+        mimi = pkgs.buildGo122Module {
           pname = "mimi";
           inherit version vendorHash;
           src = ./.;
           subPackages = [ "cmd/mimi" ];
         };
 
-        xedn = pkgs.buildGo121Module {
+        xedn = pkgs.buildGo122Module {
           pname = "xedn";
           inherit version vendorHash;
           src = ./.;
@@ -316,7 +316,7 @@
             rust
             flyctl
 
-            protobuf_23
+            protobuf
             protoc-gen-go
             protoc-gen-twirp
             protoc-gen-go-grpc
