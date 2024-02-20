@@ -161,7 +161,7 @@
           '';
         };
 
-        robocadey2 = pkgs.buildGo121Module {
+        robocadey2 = pkgs.buildGo122Module {
           pname = "robocadey2";
           inherit version vendorHash;
           src = ./.;
