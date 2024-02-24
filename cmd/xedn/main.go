@@ -260,9 +260,17 @@ func main() {
 	h = xffMW.Handler(h)
 	h = cors.Default().Handler(h)
 	h = FlyRegionAnnotation(h)
+	h = XeDNAnnotation(h)
 
 	slog.Info("starting up", "addr", *addr)
 	http.ListenAndServe(*addr, h)
+}
+
+func XeDNAnnotation(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("XeDN", "true")
+		next.ServeHTTP(w, r)
+	})
 }
 
 func FlyRegionAnnotation(next http.Handler) http.Handler {
