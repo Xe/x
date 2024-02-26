@@ -23,11 +23,11 @@ auto_extend_size_threshold = 80
 auto_extend_size_increment = "1GB"
 auto_extend_size_limit = "100GB"
 
-#[[statics]]
-#url_prefix = "/file/christine-static"
-#guest_path = "/unused"
-#tigris_bucket = "xedn"
-#
+[[statics]]
+url_prefix = "/file/christine-static"
+guest_path = "/"
+tigris_bucket = "xedn"
+
 [[services]]
 protocol = "tcp"
 internal_port = 8080
