@@ -107,7 +107,7 @@ func (sd *StableDiffusion) RenderImage(ctx context.Context, w http.ResponseWrite
 	return nil
 }
 
-var isHexRegex = regexp.MustCompile(`[-fA-F0-9]+$`)
+var isHexRegex = regexp.MustCompile(`[a-fA-F0-9]+$`)
 
 func (sd *StableDiffusion) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	hash := filepath.Base(r.URL.Path)
