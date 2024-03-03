@@ -156,7 +156,7 @@ func Hallucinate[T valid.Interface](ctx context.Context, c *Client, opts Halluci
 				}
 			}
 
-			slog.Debug("got response", "response", cr.Message.Content)
+			//slog.Debug("got response", "response", cr.Message.Content)
 
 			if _, err := fmt.Fprint(buf, cr.Message.Content); err != nil {
 				return nil, fmt.Errorf("ollama: error writing response to buffer: %w", err)
@@ -172,11 +172,11 @@ func Hallucinate[T valid.Interface](ctx context.Context, c *Client, opts Halluci
 				cancel()
 			}
 
-			slog.Debug("buffer is now", "buffer", buf.String())
+			//slog.Debug("buffer is now", "buffer", buf.String())
 
 			var result T
 			if err := json.NewDecoder(bytes.NewBuffer(buf.Bytes())).Decode(&result); err != nil {
-				slog.Default().Log(ctx, slog.LevelDebug-1, "error decoding response", "err", err)
+				//slog.Debug("error decoding response", "err", err)
 				continue
 			}
 
@@ -185,7 +185,7 @@ func Hallucinate[T valid.Interface](ctx context.Context, c *Client, opts Halluci
 				continue
 			}
 
-			slog.Debug("got valid response", "response", result)
+			//slog.Debug("got valid response", "response", result)
 			cancel()
 
 			return &result, nil
