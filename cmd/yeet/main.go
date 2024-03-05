@@ -25,6 +25,7 @@ import (
 var (
 	fname  = flag.String("fname", "yeetfile.js", "filename for the yeetfile")
 	flyctl = flag.String("flyctl-path", flyctlPath(), "path to flyctl binary")
+	protocPath = flag.String("protoc-path", "protoc", "path to protoc binary")
 )
 
 func flyctlPath() string {
@@ -148,10 +149,20 @@ func hostname() string {
 	return result
 }
 
+type protocInput struct {
+	Input string `json:"input"`
+	Output string `json:"output"`
+	Kinds []struct {
+		Kind string `json:"kind"`
+		Opt string `json:"opt"`
+	} `json:"kinds"`
+}
+
 func main() {
 	internal.HandleStartup()
 
 	vm := goja.New()
+	vm.SetFieldNameMapper(goja.TagFieldNameMapper("json", true))
 
 	defer func() {
 		if r := recover(); r != nil {
@@ -184,6 +195,12 @@ func main() {
 
 	vm.Set("fly", map[string]any{
 		"deploy": flydeploy,
+	})
+
+	vm.Set("git", map[string]any{
+		"repoRoot": func() string {
+			return runcmd("git", "rev-parse", "--show-toplevel")
+		},
 	})
 
 	vm.Set("go", map[string]any{
