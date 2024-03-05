@@ -1,4 +1,4 @@
-# nix-direnv cache busting line: sha256-h393xlDbuA+ZDo7Rrl7o3LoRQSs75iQ1IB2j7mNG+jA=
+# nix-direnv cache busting line: sha256-Lz7RLPqdL7vzzU397rzJL90M5yro2KmFiRUphcb06ZA=
 
 {
   description = "/x/perimental code";
@@ -255,12 +255,23 @@
             xedn = pkgs.dockerTools.buildLayeredImage {
               name = "registry.fly.io/xedn";
               tag = "latest";
-              contents = [ pkgs.cacert xedn ];
+              contents = [ pkgs.cacert xedn self.packages.${system}.xedn-static ];
               config = {
                 Cmd = [ "${xedn}/bin/xedn" ];
                 WorkingDir = "${xedn}";
                 Env = [ "XEDN_STATIC=${self.packages.${system}.xedn-static}" ];
               };
+            };
+            xedn-squished = pkgs.dockerTools.buildLayeredImage {
+              name = "registry.fly.io/xedn";
+              tag = "latest";
+              contents = [ pkgs.cacert xedn self.packages.${system}.xedn-static ];
+              config = {
+                Cmd = [ "${xedn}/bin/xedn" ];
+                WorkingDir = "${xedn}";
+                Env = [ "XEDN_STATIC=${self.packages.${system}.xedn-static}" ];
+              };
+              maxLayers = 10;
             };
           };
           portable = {
