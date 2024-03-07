@@ -46,7 +46,7 @@ require (
 	golang.org/x/crypto v0.19.0
 	golang.org/x/oauth2 v0.16.0
 	golang.org/x/sync v0.6.0
-	google.golang.org/grpc v1.61.0
+	google.golang.org/grpc v1.62.1
 	honnef.co/go/transmission v0.0.0-20200712215954-58262f0ca9c9
 	modernc.org/sqlite v1.29.1
 	nhooyr.io/websocket v1.8.10
@@ -101,7 +101,7 @@ require (
 	github.com/valyala/fasthttp v1.51.0 // indirect
 	github.com/vektah/gqlparser/v2 v2.5.1 // indirect
 	golang.org/x/arch v0.6.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20231106174013-bbf56f31fb17 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20240123012728-ef4313101c80 // indirect
 	modernc.org/gc/v3 v3.0.0-20240107210532-573471604cb6 // indirect
 	modernc.org/libc v1.41.0 // indirect
 	modernc.org/mathutil v1.6.0 // indirect
