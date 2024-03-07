@@ -101,7 +101,7 @@ func doTemplate(body string) http.Handler {
 const indexTemplate = `<html>
   <head>
     <title>The h Programming Language</title>
-    <link rel="stylesheet" href="https://within.website/static/gruvbox.css">
+    <link rel="stylesheet" href="https://cdn.xeiaso.net/static/pkg/xess/xess.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   </head>
   <body>
