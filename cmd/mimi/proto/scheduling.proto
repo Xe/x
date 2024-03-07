@@ -2,9 +2,10 @@ syntax = "proto3";
 package within.website.x.mimi.scheduling;
 option go_package = "within.website/x/cmd/mimi/modules/scheduling";
 
-service Scheduling {
-  rpc ParseEmail(ParseReq) returns (ParseResp);
-}
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+
+service Scheduling { rpc ParseEmail(ParseReq) returns (ParseResp); }
 
 message ConversationMember {
   string role = 1;
