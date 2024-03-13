@@ -206,7 +206,7 @@ require (
 	golang.zx2c4.com/wintun v0.0.0-20230126152724-0fa3db229ce2 // indirect
 	golang.zx2c4.com/wireguard/windows v0.5.3 // indirect
 	google.golang.org/appengine v1.6.8 // indirect
-	google.golang.org/protobuf v1.32.0
+	google.golang.org/protobuf v1.33.0
 	gvisor.dev/gvisor v0.0.0-20240119233241-c9c1d4f9b186 // indirect
 	inet.af/peercred v0.0.0-20210906144145-0893ea02156a // indirect
 )
