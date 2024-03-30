@@ -61,11 +61,7 @@ func main() {
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != "/" {
-			http.NotFound(w, r)
-			return
-		}
-		http.ServeFile(w, r, "static/index.html")
+		http.ServeFileFS(w, r, static, "static/index.html")
 	})
 	mux.Handle("/static/", http.FileServer(http.FS(static)))
 	mux.HandleFunc("/ws", srv.WebsocketHandler)

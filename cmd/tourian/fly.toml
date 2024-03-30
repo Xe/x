@@ -12,9 +12,18 @@ image = "registry.fly.io/tourian:latest"
 strategy = "immediate"
 
 [[services.ports]]
-port = 8080
+port = 80
+internal_port = 8080
 handlers = ["http"]
 force_https = true
+
+[[services.ports]]
+port = 443
+handlers = ["tls", "http"]
+[services.concurrency]
+type = "connections"
+hard_limit = 1000
+soft_limit = 750
 
 [[services.tcp_checks]]
 interval = "15s"

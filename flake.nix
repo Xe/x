@@ -217,7 +217,7 @@
             path = "make-mastodon-app";
           };
 
-          inherit xedn xedn-static robocadey2 mimi;
+          inherit xedn xedn-static robocadey2 mimi tourian;
 
           aegis = copyFile { pname = "aegis"; };
           cadeybot = copyFile { pname = "cadeybot"; };
