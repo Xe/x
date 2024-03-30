@@ -87,6 +87,13 @@
           subPackages = [ "cmd/mimi" ];
         };
 
+        tourian = pkgs.buildGo122Module {
+          pname = "tourian";
+          inherit version vendorHash;
+          src = ./.;
+          subPackages = [ "cmd/tourian" ];
+        };
+
         xedn = pkgs.buildGo122Module {
           pname = "xedn";
           inherit version vendorHash;
@@ -233,6 +240,7 @@
             robocadey2 = self.packages.${system}.robocadey2;
             xedn = self.packages.${system}.xedn;
             mimi = self.packages.${system}.mimi;
+            tourian = self.packages.${system}.tourian;
           in {
             mimi = pkgs.dockerTools.buildLayeredImage {
               name = "registry.fly.io/mimi";
@@ -250,6 +258,15 @@
               config = {
                 Cmd = [ "${robocadey2}/bin/robocadey2" ];
                 WorkingDir = "${robocadey2}";
+              };
+            };
+            tourian = pkgs.dockerTools.buildLayeredImage {
+              name = "registry.fly.io/tourian";
+              tag = "latest";
+              contents = [ pkgs.cacert ];
+              config = {
+                Cmd = [ "${tourian}/bin/tourian" ];
+                WorkingDir = "${tourian}";
               };
             };
             xedn = pkgs.dockerTools.buildLayeredImage {

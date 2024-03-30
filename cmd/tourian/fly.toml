@@ -1,0 +1,22 @@
+app = "tourian"
+kill_signal = "SIGINT"
+kill_timeout = "5s"
+
+[experimental]
+auto_rollback = true
+
+[build]
+image = "registry.fly.io/tourian:latest"
+
+[deploy]
+strategy = "immediate"
+
+[[services.ports]]
+port = 8080
+handlers = ["http"]
+force_https = true
+
+[[services.tcp_checks]]
+interval = "15s"
+timeout = "2s"
+grace_period = "1s"
