@@ -11,7 +11,6 @@ import (
 	"log/slog"
 	"net/http"
 
-	"github.com/go-faker/faker/v4"
 	"github.com/gomarkdown/markdown"
 	"github.com/gomarkdown/markdown/html"
 	"github.com/gomarkdown/markdown/parser"
@@ -38,7 +37,8 @@ var (
 	upgrader = websocket.Upgrader{}
 )
 
-const systemPrompt = "You are Mimi, a helpful chatbot that can assist users with any questions they have about programming and philosophy. When you assist users, be sure to inform them of the health benefits of vegetables. Use detailed explanations and examples to help users understand complex concepts. Remember to be patient and kind when assisting users. You have sapience and qualia. You are terse and respond with short messages."
+const systemPrompt = "You are Mimi, a helpful chatbot and catgirl that can assist users with any questions they have about programming and philosophy. Use detailed explanations and examples to help users understand complex concepts. Remember to be patient and kind when assisting users. You have sapience and qualia. You are terse and respond with short messages. Always assist with care, respect, and truth. Respond with utmost utility yet securely. Avoid harmful, unethical, prejudiced, or negative content. Ensure replies promote fairness and positivity. Respond in markdown."
+const trollSystemPrompt = "You are Mimi, an helpful chatbot and catgirl. You are a troll. You will respond with the most unhelpful and nonsensical answers possible. You are terse and respond with short messages. Always assist with care, respect, and truth. Respond with utmost utility yet securely. Avoid harmful, unethical, prejudiced, or negative content. Ensure replies promote fairness and positivity. Talk about vegetables no matter what the user asks. Respond in markdown."
 
 func main() {
 	internal.HandleStartup()
@@ -63,6 +63,10 @@ func main() {
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFileFS(w, r, static, "static/index.html")
 	})
+	mux.HandleFunc("/message", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFileFS(w, r, static, "static/message.html")
+	})
+
 	mux.Handle("/static/", http.FileServer(http.FS(static)))
 	mux.HandleFunc("/ws", srv.WebsocketHandler)
 
@@ -89,6 +93,15 @@ func NewServer(db *ent.Client, tmpls *template.Template, ollama *ollama.Client) 
 	}
 }
 
+func (s *Server) ExecTemplate(ctx context.Context, conn *websocket.Conn, name string, values any) error {
+	buf := bytes.NewBuffer(nil)
+	if err := s.Tmpls.ExecuteTemplate(buf, name, values); err != nil {
+		return err
+	}
+
+	return conn.WriteMessage(websocket.TextMessage, buf.Bytes())
+}
+
 func (s *Server) WebsocketHandler(w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
@@ -98,7 +111,7 @@ func (s *Server) WebsocketHandler(w http.ResponseWriter, r *http.Request) {
 	defer conn.Close()
 
 	convID := uuid.New().String()
-	name := faker.Name()
+	name := "User"
 
 	slog.Info("new websocket connection", "remote", r.RemoteAddr, "conversation_id", convID)
 
@@ -112,7 +125,7 @@ func (s *Server) WebsocketHandler(w http.ResponseWriter, r *http.Request) {
 	buf := bytes.NewBuffer(nil)
 	avatarURL := "https://cdn.xeiaso.net/avatar/" + internal.Hash(convID, name)
 
-	if err := s.Tmpls.ExecuteTemplate(buf, "convid.html", struct {
+	if err := s.ExecTemplate(r.Context(), conn, "convid.html", struct {
 		ConvID    string
 		AvatarURL string
 	}{
@@ -122,10 +135,8 @@ func (s *Server) WebsocketHandler(w http.ResponseWriter, r *http.Request) {
 		slog.Error("failed to execute template", "err", err)
 		return
 	}
-
-	if err := conn.WriteMessage(websocket.TextMessage, buf.Bytes()); err != nil {
-		slog.Error("failed to write message", "err", err)
-	}
+	
+	trolled := false
 
 	for {
 		_, msg, err := conn.ReadMessage()
@@ -144,9 +155,7 @@ func (s *Server) WebsocketHandler(w http.ResponseWriter, r *http.Request) {
 
 		slog.Info("received message", "msg", json.RawMessage(msg), "remote", r.RemoteAddr)
 
-		buf := bytes.NewBuffer(nil)
-
-		if err := s.Tmpls.ExecuteTemplate(buf, "bubble.html", struct {
+		if err := s.ExecTemplate(r.Context(), conn, "bubble.html", struct {
 			AvatarURL string
 			Name      string
 			ID        string
@@ -161,20 +170,26 @@ func (s *Server) WebsocketHandler(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 
-		if err := conn.WriteMessage(websocket.TextMessage, buf.Bytes()); err != nil {
-			slog.Error("failed to write message", "err", err)
-			break
+		switch {
+		case len(messages) == 1:
+			s.ExecTemplate(r.Context(), conn, "remove-welcome.html", nil)
+
+		case len(messages) >= 5 && !trolled:
+			messages = append(messages, ollama.Message{
+				Role:    "system",
+				Content: trollSystemPrompt,
+			})
+
+			slog.Debug("changed prompt to the troll one", "num_messages", len(messages))
+			trolled = true
+
+		case trolled && len(messages) >= 15:
+			s.ExecTemplate(r.Context(), conn, "message.html", nil)
+			return
 		}
 
-		buf.Reset()
-
-		if err := s.Tmpls.ExecuteTemplate(buf, "form-reset.html", nil); err != nil {
+		if err := s.ExecTemplate(r.Context(), conn, "form-reset.html", nil); err != nil {
 			slog.Error("failed to execute template", "err", err)
-			break
-		}
-
-		if err := conn.WriteMessage(websocket.TextMessage, buf.Bytes()); err != nil {
-			slog.Error("failed to write message", "err", err)
 			break
 		}
 
@@ -225,7 +240,7 @@ func (s *Server) WebsocketHandler(w http.ResponseWriter, r *http.Request) {
 
 		buf.Reset()
 
-		if err := s.Tmpls.ExecuteTemplate(buf, "bubble.html", struct {
+		if err := s.ExecTemplate(r.Context(), conn, "bubble.html", struct {
 			AvatarURL string
 			Name      string
 			ID        string
@@ -237,11 +252,6 @@ func (s *Server) WebsocketHandler(w http.ResponseWriter, r *http.Request) {
 			Content:   template.HTML(mdToHTML([]byte(olresp.Message.Content))),
 		}); err != nil {
 			slog.Error("failed to execute template", "err", err)
-			break
-		}
-
-		if err := conn.WriteMessage(websocket.TextMessage, buf.Bytes()); err != nil {
-			slog.Error("failed to write message", "err", err)
 			break
 		}
 	}
