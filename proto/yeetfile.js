@@ -11,6 +11,7 @@ const mkGoProtoFile = (name, kinds) => {
 const protoFiles = [
     mkGoProtoFile("uplodr", ["go", "go-grpc"]),
     mkGoProtoFile("sanguisuga", ["go", "twirp"]),
+    mkGoProtoFile("mimi/statuspage", ["go", "twirp"]),
 ];
 
 protoFiles.forEach((protoFile) => {

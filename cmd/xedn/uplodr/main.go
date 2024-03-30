@@ -62,7 +62,8 @@ func main() {
 
 	go func() {
 		<-ctx.Done()
-		panic("timeout")
+		slog.Error("timeout")
+		os.Exit(0)
 	}()
 
 	lis, err := net.Listen("tcp", *grpcAddr)

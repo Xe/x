@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatMimi</title>
+    <link rel="stylesheet" href="https://cdn.xeiaso.net/static/pkg/iosevka/family.css" />
+    <link rel="stylesheet" href="/static/font/podkova.css" />
+    <link href="/static/styles.css" rel="stylesheet" />
+    <script src="/static/js/htmx.min.js"></script>
+    <script src="/static/js/ws.js"></script>
+
+    <!-- Open Graph meta tags for social media previews -->
+    <meta property="og:title" content="ChatMimi" />
+    <meta property="og:description" content="Chat with Mimi, the helpful AI catgirl from the Xe Iaso dot net cinematic universe!" />
+    <meta property="og:image" content="https://cdn.xeiaso.net/file/christine-static/shitpost/mimi-hime.jpg" />
+</head>
+
+<body class="bg-gray-100 h-screen flex justify-center items-center">
+    <div hx-ext="ws" ws-connect="/ws" class="max-w-3xl w-full bg-white shadow-md rounded-lg overflow-hidden">
+        <div class="bg-gray-200 px-4 py-2 border-b">
+            <h2 class="text-lg font-semibold font-serif text-gray-800 mb-0 pb-0">Mimi</h2>
+            <p class="ml-auto mr-4 text-xs text-gray-600" id="conversation_id">Connecting...</p>
+        </div>
+
+        <div class="px-4 py-6 h-[40em] overflow-y-auto" hx-trigger="load" id="messages">
+            <!-- Messages will be dynamically added here -->
+        </div>
+
+        <form id="form" class="bg-gray-200 px-4 py-2 border-t flex items-center" ws-send>
+            <input name="role" type="hidden" value="user" />
+            <input name="content" type="text" autofocus placeholder="Type your message..." class="flex-1 px-2 py-1 rounded-md focus:outline-none focus:ring focus:ring-blue-300" />
+            <button type="submit" class="bg-blue-500 text-white px-4 py-1 rounded-md ml-2">Send</button>
+        </div>
+    </div>
+</body>
+
+<script>
+    document.getElementById('messages').addEventListener('htmx:load', function(event) {
+        event.target.scrollIntoView(false);
+    });
+</script>
+</html>

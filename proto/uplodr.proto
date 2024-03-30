@@ -5,16 +5,20 @@ option go_package = "within.website/x/proto/uplodr";
 service Image {
   rpc Ping(Echo) returns (Echo);
   rpc Upload(UploadReq) returns (UploadResp);
+  rpc Stream(stream UploadReq) returns (stream UploadResp);
 }
 
 message UploadReq {
   string file_name = 1;
   bytes data = 2;
   string folder = 3;
+  bool no_encode = 4;
+  bool done = 5;
 }
 
 message UploadResp {
   repeated Variant variants = 1;
+  string blurhash = 2;
 }
 
 message Variant {
@@ -22,6 +26,4 @@ message Variant {
   string mime_type = 2;
 }
 
-message Echo {
-  string nonce = 1;
-}
+message Echo { string nonce = 1; }

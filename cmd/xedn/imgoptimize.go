@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"flag"
 	"fmt"
 	"image"
 	"image/png"
@@ -34,16 +33,6 @@ type OptimizedImageServer struct {
 var (
 	OISFileConversions = metrics.LabelMap{Label: "format"}
 	OISFileHits        = metrics.LabelMap{Label: "path"}
-
-	b2KeyID     = flag.String("b2-key-id", "", "Backblaze B2 application key ID")
-	b2KeySecret = flag.String("b2-application-key", "", "Backblaze B2 application secret")
-
-	avifQuality      = flag.Int("avif-quality", 24, "AVIF quality (higher is worse quality)")
-	avifEncoderSpeed = flag.Int("avif-encoder-speed", 0, "AVIF encoder speed (higher is faster)")
-
-	jpegQuality = flag.Int("jpeg-quality", 85, "JPEG quality (lower means lower file size)")
-
-	webpQuality = flag.Int("webp-quality", 25, "WEBP quality (higher is worse quality)")
 )
 
 func (ois *OptimizedImageServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {

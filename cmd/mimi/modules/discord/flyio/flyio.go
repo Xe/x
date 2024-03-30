@@ -8,7 +8,9 @@ import (
 	"log/slog"
 
 	"github.com/bwmarrin/discordgo"
+	"google.golang.org/protobuf/types/known/emptypb"
 	"within.website/x/cmd/mimi/internal"
+	"within.website/x/proto/mimi/statuspage"
 	"within.website/x/web/ollama"
 )
 
@@ -187,4 +189,8 @@ func (m *Module) ReactionAddFlyIO(s *discordgo.Session, mra *discordgo.MessageRe
 		slog.Error("cannot send scold message", "error", err)
 		return
 	}
+}
+
+func (m *Module) Poke(ctx context.Context, upd *statuspage.StatusUpdate) (*emptypb.Empty, error) {
+	return &emptypb.Empty{}, nil
 }

@@ -15,7 +15,6 @@ import (
 	"runtime"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/chai2010/webp"
 	"github.com/disintegration/imaging"
@@ -24,9 +23,7 @@ import (
 )
 
 var (
-	b2Bucket    = flag.String("b2-bucket", "christine-static", "Backblaze B2 bucket to dump things to")
-	b2KeyID     = flag.String("b2-key-id", "", "Backblaze B2 application key ID")
-	b2KeySecret = flag.String("b2-application-key", "", "Backblaze B2 application secret")
+	b2Bucket = flag.String("tigris-bucket", "xedn", "Tigris bucket to dump things to")
 
 	avifQuality      = flag.Int("avif-quality", 24, "AVIF quality (higher is worse quality)")
 	avifEncoderSpeed = flag.Int("avif-encoder-speed", 0, "AVIF encoder speed (higher is faster)")
@@ -229,7 +226,10 @@ func main() {
 		log.Fatal(err)
 	}
 
-	s3c := mkS3Client()
+	s3c, err := internal.TigrisClient(context.Background())
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	for _, finfo := range files {
 		log.Printf("uploading %s", finfo.Name())
@@ -258,16 +258,4 @@ var mimeTypes = map[string]string{
 	".png":  "image/png",
 	".wasm": "application/wasm",
 	".css":  "text/css",
-}
-
-func mkS3Client() *s3.Client {
-	s3Config := aws.Config{
-		Credentials:  credentials.NewStaticCredentialsProvider(*b2KeyID, *b2KeySecret, ""),
-		BaseEndpoint: aws.String("https://s3.us-west-001.backblazeb2.com"),
-		Region:       "us-west-001",
-	}
-	s3Client := s3.NewFromConfig(s3Config, (func(o *s3.Options) {
-		o.UsePathStyle = true
-	}))
-	return s3Client
 }
