@@ -1,0 +1,80 @@
+syntax = "proto3";
+package within.website.x.mimi.statuspage;
+option go_package = "within.website/x/proto/mimi/statuspage";
+
+import "google/protobuf/empty.proto";
+
+service Update { rpc Poke(StatusUpdate) returns (google.protobuf.Empty); }
+
+message Meta {
+  string unsubscribe = 1;
+  string documentation = 2;
+}
+
+message Page {
+  string id = 1;
+  string status_indicator = 2;
+  string status_description = 3;
+}
+
+message ComponentUpdate {
+  string created_at = 1;
+  string new_status = 2;
+  string old_status = 3;
+  string id = 4;
+  string component_id = 5;
+}
+
+message Component {
+  string created_at = 1;
+  string id = 2;
+  string name = 3;
+  string status = 4;
+}
+
+message IncidentUpdate {
+  string body = 1;
+  string created_at = 2;
+  string display_at = 3;
+  string status = 4;
+  string twitter_updated_at = 5;
+  string updated_at = 6;
+  bool wants_twitter_update = 7;
+  string id = 8;
+  string incident_id = 9;
+}
+
+message Incident {
+  bool backfilled = 1;
+  string created_at = 2;
+  string impact = 3;
+  string impact_override = 4;
+  string monitoring_at = 5;
+  string postmortem_body = 6;
+  string postmortem_body_last_updated_at = 7;
+  bool postmortem_ignored = 8;
+  bool postmortem_notified_subscribers = 9;
+  bool postmortem_notified_twitter = 10;
+  string postmortem_published_at = 11;
+  string resolved_at = 12;
+  bool scheduled_auto_transition = 13;
+  string scheduled_for = 14;
+  bool scheduled_remind_prior = 15;
+  string scheduled_reminded_at = 16;
+  string scheduled_until = 17;
+  string shortlink = 18;
+  string status = 19;
+  string updated_at = 20;
+  string id = 21;
+  string organization_id = 22;
+  repeated IncidentUpdate incident_updates = 23;
+  string name = 24;
+}
+
+message StatusUpdate {
+  Meta meta = 1;
+  Page page = 2;
+  Incident incident = 3;
+  Component component = 4;
+  ComponentUpdate component_update = 5;
+}
