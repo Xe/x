@@ -20,7 +20,6 @@ require (
 	github.com/expr-lang/expr v1.16.3
 	github.com/facebookgo/ensure v0.0.0-20160127193407-b4ab57deab51
 	github.com/fogleman/primitive v0.0.0-20190214200932-673f57e7b1b5
-	github.com/go-faker/faker/v4 v4.4.0
 	github.com/go-interpreter/wagon v0.6.0
 	github.com/go-shiori/go-readability v0.0.0-20230421032831-c66949dfc0ad
 	github.com/gomarkdown/markdown v0.0.0-20240328165702-4d01890c35c0
