@@ -1,0 +1,59 @@
+syntax = "proto3";
+package within.website.x.mi;
+option go_package = "within.website/x/cmd/mi/pb";
+
+import "google/protobuf/empty.proto";
+
+service SwitchTracker {
+  rpc Members(google.protobuf.Empty) returns (MembersResp);
+  rpc WhoIsFront(google.protobuf.Empty) returns (FrontChange);
+  rpc Switch(SwitchReq) returns (SwitchResp);
+  rpc GetSwitch(GetSwitchReq) returns (FrontChange);
+  rpc ListSwitches(ListSwitchesReq) returns (ListSwitchesResp);
+}
+
+message MembersResp {
+  repeated Member members = 1; // required
+}
+
+message Member {
+  int32 id = 1;          // required
+  string name = 2;       // required
+  string avatar_url = 3; // required
+}
+
+message Switch {
+  string id = 1;         // required
+  string member_id = 2;  // required
+  string started_at = 3; // RFC 3339, required
+  string ended_at = 4;   // RFC 3339, optional if switch is current
+}
+
+message SwitchReq {
+  string member_name = 1; // required
+}
+
+message SwitchResp {
+  Switch old = 1;     // required
+  Switch current = 2; // required
+}
+
+message GetSwitchReq {
+  string id = 1; // required
+}
+
+message FrontChange {
+  Switch switch = 1; // required
+  Member member = 2; // required
+}
+
+message ListSwitchesReq {
+  int32 count = 1; // required
+  int32 page = 2;  // required
+}
+
+message ListSwitchesResp { repeated Switch switches = 1; }
+
+service POSSE {
+  rpc RefreshBlog(google.protobuf.Empty) returns (google.protobuf.Empty);
+}

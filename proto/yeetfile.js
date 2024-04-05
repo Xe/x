@@ -11,6 +11,7 @@ const mkGoProtoFile = (name, kinds) => {
 const protoFiles = [
     mkGoProtoFile("uplodr", ["go", "go-grpc"]),
     mkGoProtoFile("sanguisuga", ["go", "twirp"]),
+    mkGoProtoFile("mi", ["go", "twirp", "go-grpc"]),
     mkGoProtoFile("mimi/statuspage", ["go", "twirp"]),
 ];
 

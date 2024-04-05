@@ -5,6 +5,7 @@ import (
 	"log"
 	"log/slog"
 	"net"
+	"net/http"
 
 	"google.golang.org/grpc"
 	"within.website/x/cmd/mimi/internal"
@@ -15,6 +16,7 @@ import (
 
 var (
 	grpcAddr = flag.String("grpc-addr", ":9001", "GRPC listen address")
+	httpAddr = flag.String("http-addr", ":9002", "HTTP listen address")
 )
 
 func main() {
@@ -43,8 +45,16 @@ func main() {
 
 	scheduling.RegisterSchedulingServer(gs, scheduling.New())
 
+	mux := http.NewServeMux()
+
+	b.RegisterHTTP(mux)
+
 	go func() {
 		log.Fatal(gs.Serve(lis))
+	}()
+
+	go func() {
+		log.Fatal(http.ListenAndServe(*httpAddr, mux))
 	}()
 
 	<-ctx.Done()

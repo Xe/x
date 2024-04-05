@@ -12,3 +12,22 @@ vm.size = "shared-cpu-2x"
 
 [build]
 image = "registry.fly.io/mimi:latest"
+
+[[services]]
+protocol = "tcp"
+internal_port = 9002
+processes = ["app"]
+
+[[services.ports]]
+port = 80
+handlers = ["http"]
+force_https = true
+
+[[services.ports]]
+port = 443
+handlers = ["tls", "http"]
+
+[[services.tcp_checks]]
+interval = "15s"
+timeout = "2s"
+grace_period = "1s"

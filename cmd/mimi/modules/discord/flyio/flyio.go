@@ -15,7 +15,9 @@ import (
 )
 
 var (
-	flyDiscordGuild = flag.String("fly-discord-guild", "1194719413732130866", "fly discord guild ID")
+	flyDiscordGuild  = flag.String("fly-discord-guild", "1194719413732130866", "fly discord guild ID")
+	flyDiscordXeID   = flag.String("fly-discord-xe", "72838115944828928", "fly discord xe ID")
+	flyDiscordTeamID = flag.String("fly-discord-team", "1197660035212394657", "fly discord team ID")
 )
 
 func p[T any](t T) *T {
@@ -24,7 +26,7 @@ func p[T any](t T) *T {
 
 func mentionsXe(m *discordgo.MessageCreate) bool {
 	for _, u := range m.Mentions {
-		if u.ID == "72838115944828928" {
+		if u.ID == *flyDiscordXeID {
 			return true
 		}
 	}
@@ -34,7 +36,7 @@ func mentionsXe(m *discordgo.MessageCreate) bool {
 
 func mentionsTeam(m *discordgo.MessageCreate) bool {
 	for _, u := range m.MentionRoles {
-		if u == "1197660035212394657" {
+		if u == *flyDiscordTeamID {
 			return true
 		}
 	}
@@ -45,6 +47,7 @@ func mentionsTeam(m *discordgo.MessageCreate) bool {
 type Module struct {
 	ola   *ollama.Client
 	model string
+	sess  *discordgo.Session
 }
 
 func New() *Module {
@@ -92,6 +95,8 @@ func (m *Module) judgeIfAboutFlyIO(ctx context.Context, msg string) (bool, error
 func (m *Module) Register(s *discordgo.Session) {
 	s.AddHandler(m.HandleMentionFlyIO)
 	s.AddHandler(m.ReactionAddFlyIO)
+
+	m.sess = s
 }
 
 func (m *Module) scoldMessage(ctx context.Context) (string, error) {
