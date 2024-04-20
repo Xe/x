@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"log/slog"
 	"os"
@@ -15,6 +16,7 @@ import (
 	"strings"
 
 	"github.com/dop251/goja"
+	"within.website/x/cmd/yeet/internal/mkrpm"
 	"within.website/x/internal"
 	"within.website/x/internal/appsluggr"
 	"within.website/x/internal/kahless"
@@ -23,8 +25,8 @@ import (
 )
 
 var (
-	fname  = flag.String("fname", "yeetfile.js", "filename for the yeetfile")
-	flyctl = flag.String("flyctl-path", flyctlPath(), "path to flyctl binary")
+	fname      = flag.String("fname", "yeetfile.js", "filename for the yeetfile")
+	flyctl     = flag.String("flyctl-path", flyctlPath(), "path to flyctl binary")
 	protocPath = flag.String("protoc-path", "protoc", "path to protoc binary")
 )
 
@@ -46,7 +48,7 @@ func flyctlPath() string {
 func runcmd(cmdName string, args ...string) string {
 	ctx := context.Background()
 
-	slog.Info("running command", "cmd", cmdName, "args", args)
+	slog.Debug("running command", "cmd", cmdName, "args", args)
 
 	result, err := yeet.Output(ctx, cmdName, args...)
 	if err != nil {
@@ -72,10 +74,6 @@ func dockerload(fname string) {
 		fname = "./result"
 	}
 	yeet.DockerLoadResult(context.Background(), fname)
-}
-
-func dockertag(org, repo, image string) string {
-	return yeet.DockerTag(context.Background(), org, repo, image)
 }
 
 func dockerbuild(tag string, args ...string) {
@@ -150,11 +148,11 @@ func hostname() string {
 }
 
 type protocInput struct {
-	Input string `json:"input"`
+	Input  string `json:"input"`
 	Output string `json:"output"`
-	Kinds []struct {
+	Kinds  []struct {
 		Kind string `json:"kind"`
-		Opt string `json:"opt"`
+		Opt  string `json:"opt"`
 	} `json:"kinds"`
 }
 
@@ -182,13 +180,50 @@ func main() {
 		"build": dockerbuild,
 		"load":  dockerload,
 		"push":  dockerpush,
-		"tag":   dockertag,
 	})
 
 	vm.Set("file", map[string]any{
+		"read": func(fname string) string {
+			data, err := os.ReadFile(fname)
+			if err != nil {
+				panic(err)
+			}
+			return string(data)
+		},
 		"write": func(fname, data string) {
 			if err := os.WriteFile(fname, []byte(data), 0660); err != nil {
 				panic(err)
+			}
+		},
+		"copy": func(from, to string) {
+			st, err := os.Stat(from)
+			if err != nil {
+				panic(err)
+			}
+
+			fin, err := os.Open(from)
+			if err != nil {
+				panic(err)
+			}
+			defer fin.Close()
+
+			dir := filepath.Dir(to)
+			os.MkdirAll(dir, 0777)
+
+			fout, err := os.OpenFile(to, os.O_CREATE, st.Mode())
+			if err != nil {
+				panic(err)
+			}
+			defer fout.Close()
+
+			n, err := io.Copy(fout, fin)
+			if err != nil {
+				panic(err)
+			}
+
+			if n != st.Size() {
+				slog.Error("wrong number of bytes written", "from", from, "to", to, "want", st.Size(), "got", n)
+				panic("copy failed")
 			}
 		},
 	})
@@ -201,15 +236,15 @@ func main() {
 		"repoRoot": func() string {
 			return runcmd("git", "rev-parse", "--show-toplevel")
 		},
+		"tag": gittag,
 	})
 
 	vm.Set("go", map[string]any{
-		"build":   func() { runcmd("go", "build") },
+		"build": func(args ...string) {
+			args = append([]string{"build"}, args...)
+			runcmd("go", args...)
+		},
 		"install": func() { runcmd("go", "install") },
-	})
-
-	vm.Set("git", map[string]any{
-		"tag": gittag,
 	})
 
 	vm.Set("log", map[string]any{
@@ -219,9 +254,19 @@ func main() {
 
 	vm.Set("nix", map[string]any{
 		"build":   nixbuild,
-		"hashURL": func(fileURL string) string { return strings.TrimSpace(runcmd("nix-prefetch-url", fileURL)) },
-		"expr":    buildNixExpr,
 		"eval":    evalNixExpr,
+		"expr":    buildNixExpr,
+		"hashURL": func(fileURL string) string { return strings.TrimSpace(runcmd("nix-prefetch-url", fileURL)) },
+	})
+
+	vm.Set("rpm", map[string]any{
+		"build": func(p mkrpm.Package) string {
+			foutpath, err := mkrpm.Build(p)
+			if err != nil {
+				panic(err)
+			}
+			return foutpath
+		},
 	})
 
 	vm.Set("slug", map[string]any{

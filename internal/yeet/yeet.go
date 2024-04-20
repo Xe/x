@@ -25,7 +25,7 @@ func init() {
 	}
 
 	WD = lwd
-	DateTag = time.Now().Format("200601021504")
+	DateTag = time.Now().UTC().Format("200601021504")
 }
 
 // ShouldWork explodes if the given command with the given env, working dir and context fails.
