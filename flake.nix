@@ -262,7 +262,7 @@
             sapientwindex = simple {
               name = "ghcr.io/Xe/x/sapientwindex";
               pkg = sapientwindex;
-              cmd = "${sapientwindex}/bin/sapientwindex";
+              cmd = ["${sapientwindex}/bin/sapientwindex"];
             };
             mimi = pkgs.dockerTools.buildLayeredImage {
               name = "registry.fly.io/mimi";
@@ -360,6 +360,7 @@
             bloaty
             rust
             flyctl
+            kubectl
 
             protobuf
             protoc-gen-go
