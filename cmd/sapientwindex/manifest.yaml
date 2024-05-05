@@ -1,0 +1,26 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sapientwindex
+  labels:
+    app.kubernetes.io/name: sapientwindex
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: sapientwindex
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: sapientwindex
+    spec:
+      containers:    
+        - name: bot
+          image: ghcr.io/xe/x/sapientwindex:latest
+          env:
+            - name: DISCORD_WEBHOOK_URL
+              valueFrom:
+                secretKeyRef:
+                  name: sapientwindex
+                  key: DISCORD_WEBHOOK_URL
