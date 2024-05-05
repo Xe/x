@@ -28,7 +28,8 @@
     iaso-fonts.url = "github:Xe/iosevka";
   };
 
-  outputs = { self, nixpkgs, utils, rust-overlay, naersk, xess, iaso-fonts }@inputs:
+  outputs =
+    { self, nixpkgs, utils, rust-overlay, naersk, xess, iaso-fonts }@inputs:
     utils.lib.eachSystem [
       "x86_64-linux"
       "aarch64-linux"
@@ -58,7 +59,11 @@
 
         rust = pkgs.rust-bin.stable.latest.default.override {
           extensions = [ "rust-src" "rust-analysis" "clippy" "rustfmt" ];
-          targets = [ "wasm32-wasi" "wasm32-unknown-unknown" "riscv64gc-unknown-linux-gnu" ];
+          targets = [
+            "wasm32-wasi"
+            "wasm32-unknown-unknown"
+            "riscv64gc-unknown-linux-gnu"
+          ];
         };
 
         naersk' = pkgs.callPackage naersk {
@@ -227,6 +232,7 @@
           prefix = copyFile { pname = "prefix"; };
           quickserv = copyFile { pname = "quickserv"; };
           sanguisuga = copyFile { pname = "sanguisuga"; };
+          sapientwindex = copyFile { pname = "sapientwindex"; };
           todayinmarch2020 = copyFile { pname = "todayinmarch2020"; };
           uploud = copyFile { pname = "uploud"; };
           vest-pit-near = copyFile { pname = "vest-pit-near"; };
@@ -240,8 +246,24 @@
             robocadey2 = self.packages.${system}.robocadey2;
             xedn = self.packages.${system}.xedn;
             mimi = self.packages.${system}.mimi;
+            sapientwindex = self.packages.${system}.sapientwindex;
             tourian = self.packages.${system}.tourian;
+
+            simple = { name, cmd, pkg, contents ? [ pkgs.cacert ] }:
+              pkgs.dockerTools.buildLayeredImage {
+                tag = "latest";
+                inherit contents name;
+                config = {
+                  Cmd = cmd;
+                  WorkingDir = "${pkg}";
+                };
+              };
           in {
+            sapientwindex = simple {
+              name = "ghcr.io/Xe/x/sapientwindex";
+              pkg = sapientwindex;
+              cmd = "${sapientwindex}/bin/sapientwindex";
+            };
             mimi = pkgs.dockerTools.buildLayeredImage {
               name = "registry.fly.io/mimi";
               tag = "latest";
@@ -272,23 +294,13 @@
             xedn = pkgs.dockerTools.buildLayeredImage {
               name = "registry.fly.io/xedn";
               tag = "latest";
-              contents = [ pkgs.cacert xedn self.packages.${system}.xedn-static ];
+              contents =
+                [ pkgs.cacert xedn self.packages.${system}.xedn-static ];
               config = {
                 Cmd = [ "${xedn}/bin/xedn" ];
                 WorkingDir = "${xedn}";
                 Env = [ "XEDN_STATIC=${self.packages.${system}.xedn-static}" ];
               };
-            };
-            xedn-squished = pkgs.dockerTools.buildLayeredImage {
-              name = "registry.fly.io/xedn";
-              tag = "latest";
-              contents = [ pkgs.cacert xedn self.packages.${system}.xedn-static ];
-              config = {
-                Cmd = [ "${xedn}/bin/xedn" ];
-                WorkingDir = "${xedn}";
-                Env = [ "XEDN_STATIC=${self.packages.${system}.xedn-static}" ];
-              };
-              maxLayers = 10;
             };
           };
           portable = {
@@ -330,9 +342,9 @@
 
             python3Packages.huggingface-hub
             python3Packages.datasets
-            
+
             perl
-            
+
             pkg-config
             libaom
             libavif
