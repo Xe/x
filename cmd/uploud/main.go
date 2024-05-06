@@ -256,6 +256,7 @@ var mimeTypes = map[string]string{
 	".webp": "image/webp",
 	".jpg":  "image/jpeg",
 	".png":  "image/png",
+	".svg":  "image/svg+xml",
 	".wasm": "application/wasm",
 	".css":  "text/css",
 }
