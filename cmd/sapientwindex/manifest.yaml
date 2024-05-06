@@ -5,6 +5,8 @@ metadata:
   name: sapientwindex
   labels:
     app.kubernetes.io/name: sapientwindex
+  annotations:
+    operator.1password.io/auto-restart: "true"
 spec:
   replicas: 1
   selector:
@@ -24,3 +26,10 @@ spec:
                 secretKeyRef:
                   name: sapientwindex
                   key: DISCORD_WEBHOOK_URL
+---
+apiVersion: onepassword.com/v1
+kind: OnePasswordItem
+metadata:
+  name: sapientwindex
+spec:
+  itemPath: "vaults/lc5zo4zjz3if3mkeuhufjmgmui/items/cqervqahekvmujrlhdaxgqaffi"
