@@ -17,14 +17,26 @@ import (
 )
 
 var (
-	userName  = flag.String("git-user-name", gitUserName(), "user name in Git")
-	userEmail = flag.String("git-user-email", gitUserEmail(), "user email in Git")
+	gpgKeyFile     = flag.String("gpg-key-file", gpgKeyFileLocation(), "GPG key file to sign the package")
+	gpgKeyID       = flag.String("gpg-key-id", "", "GPG key ID to sign the package")
+	gpgKeyPassword = flag.String("gpg-key-password", "", "GPG key password to sign the package")
+	userName       = flag.String("git-user-name", gitUserName(), "user name in Git")
+	userEmail      = flag.String("git-user-email", gitUserEmail(), "user email in Git")
 )
 
 const (
 	fallbackName  = "Mimi Yasomi"
 	fallbackEmail = "mimi@xeserv.us"
 )
+
+func gpgKeyFileLocation() string {
+	folder, err := os.UserConfigDir()
+	if err != nil {
+		return ""
+	}
+
+	return filepath.Join(folder, "within.website", "x", "yeet", "key.asc")
+}
 
 func gitUserName() string {
 	name, err := gitconfig.User()
@@ -76,8 +88,10 @@ func Build(p Package) (foutpath string, err error) {
 			switch r.(type) {
 			case error:
 				err = r.(error)
+				slog.Error("mkrpm: error while building", "err", err)
 			default:
 				err = fmt.Errorf("mkrpm: error while building: %v", r)
+				slog.Error("mkrpm: error while building", "err", err)
 			}
 		}
 	}()
@@ -91,6 +105,7 @@ func Build(p Package) (foutpath string, err error) {
 		return "", fmt.Errorf("mkrpm: can't make temporary directory")
 	}
 	defer os.RemoveAll(dir)
+	os.MkdirAll(dir, 0755)
 
 	defer func() {
 		os.Setenv("GOARCH", runtime.GOARCH)
@@ -151,12 +166,19 @@ func Build(p Package) (foutpath string, err error) {
 
 	info.Overridables.RPM.Group = p.Group
 
+	if *gpgKeyID != "" {
+		slog.Debug("using GPG key", "file", *gpgKeyFile, "id", gpgKeyID, "password", *gpgKeyPassword)
+		info.Overridables.RPM.Signature.KeyFile = *gpgKeyFile
+		info.Overridables.RPM.Signature.KeyID = gpgKeyID
+		info.Overridables.RPM.Signature.KeyPassphrase = *gpgKeyPassword
+	}
+
 	pkg, err := nfpm.Get("rpm")
 	if err != nil {
 		return "", fmt.Errorf("mkrpm: can't get RPM packager: %w", err)
 	}
 
-	foutpath = fmt.Sprintf("%s-%s-%s.rpm", p.Name, p.Version, p.Goarch)
+	foutpath = pkg.ConventionalFileName(info)
 	fout, err := os.Create(foutpath)
 	if err != nil {
 		return "", fmt.Errorf("mkrpm: can't create output file: %w", err)

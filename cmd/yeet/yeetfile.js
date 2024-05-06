@@ -8,6 +8,6 @@ go.install();
     goarch,
 
     build: (out) => {
-        go.build("-o", `${out}/usr/bin/`);
+        go.build("-o", `${out}/usr/bin/yeet`);
     },
 }));
