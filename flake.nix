@@ -360,7 +360,11 @@
             bloaty
             rust
             flyctl
+
+            # kubermemes
             kubectl
+            kubevirt
+            k9s
 
             protobuf
             protoc-gen-go
