@@ -12,7 +12,7 @@ require (
 	github.com/Songmu/gitconfig v0.2.0
 	github.com/aws/aws-sdk-go v1.51.13
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.53.0
-	github.com/bwmarrin/discordgo v0.27.1
+	github.com/bwmarrin/discordgo v0.28.1
 	github.com/cenkalti/backoff/v4 v4.3.0
 	github.com/chai2010/webp v1.1.1
 	github.com/disintegration/imaging v1.6.2
