@@ -26,10 +26,3 @@ spec:
                 secretKeyRef:
                   name: sapientwindex
                   key: DISCORD_WEBHOOK_URL
----
-apiVersion: onepassword.com/v1
-kind: OnePasswordItem
-metadata:
-  name: sapientwindex
-spec:
-  itemPath: "vaults/lc5zo4zjz3if3mkeuhufjmgmui/items/cqervqahekvmujrlhdaxgqaffi"
