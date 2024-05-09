@@ -1,11 +1,11 @@
 # sapientwindex
 
 sapientwindex is a Reddit -> Discord bot. It will monitor a subreddit
-(or group of subreddits) and then post any new posts to a given
-channel by webhook.
+(or group of subreddits) and then post any new posts it finds to a
+given webhook. Avatars are automatically created using Stable Diffusion.
 
 <details>
-  <summary>If you know what "Kubernetes" means and you have your own cluster</summary>
+  <summary>If you know what a Kubernetes cluster is and you have one already</summary>
 
 If you have a Kubernetes cluster, create a generic secret called
 `sapientwindex` in the default namespace with the following fields:
@@ -27,6 +27,12 @@ namespace is desired.
 
 </details>
 
+## Hosted option
+
+For a nominal fee, I can host a copy of this bot for you on my
+homelab. Please [contact me](sapientwindexsales@xeserv.us) to arrange
+terms for this hosted option.
+
 ## Prerequisites for self-hosting
 
 In order to host this yourself, you need the following things:
@@ -40,6 +46,7 @@ In order to host this yourself, you need the following things:
 
 1. Install [Docker
    Desktop](https://docs.docker.com/desktop/install/windows-install/)
+   to run the sapientwindex container.
 1. Run the following command to start the sapientwindex service:
    ```
    docker run --name sapientwindex -e DISCORD_WEBHOOK_URL=<paste webhook here> -e REDDIT_USERNAME=<your reddit username> -e SUBREDDITS=<list,of,subreddits> -dit ghcr.io/xe/x/sapientwindex:latest
@@ -72,12 +79,6 @@ To update the bot, run these commands:
    ```
    
 Updates to the bot will be done very infrequently.
-
-## Hosted option
-
-For a nominal fee, I can host a copy of this bot for you on my
-homelab. Please [contact me](sapientwindexsales@xeserv.us) to arrange
-terms for this hosted option.
 
 ## Support
 

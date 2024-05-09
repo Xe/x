@@ -180,6 +180,14 @@
           nativeBuildInputs = with pkgs; [ pkg-config ];
           subPackages = [ "cmd/robocadey2" ];
         };
+        
+        sapientwindex = pkgs.buildGo122Module {
+          pname = "sapientwindex";
+          inherit version vendorHash;
+          src = ./.;
+          nativeBuildInputs = with pkgs; [ pkg-config ];
+          subPackages = [ "cmd/sapientwindex" ];
+        };
 
         copyFile = { pname, path ? pname }:
           pkgs.stdenv.mkDerivation {
@@ -222,7 +230,7 @@
             path = "make-mastodon-app";
           };
 
-          inherit xedn xedn-static robocadey2 mimi tourian;
+          inherit xedn xedn-static robocadey2 mimi tourian sapientwindex;
 
           aegis = copyFile { pname = "aegis"; };
           cadeybot = copyFile { pname = "cadeybot"; };
@@ -232,7 +240,6 @@
           prefix = copyFile { pname = "prefix"; };
           quickserv = copyFile { pname = "quickserv"; };
           sanguisuga = copyFile { pname = "sanguisuga"; };
-          sapientwindex = copyFile { pname = "sapientwindex"; };
           todayinmarch2020 = copyFile { pname = "todayinmarch2020"; };
           uploud = copyFile { pname = "uploud"; };
           vest-pit-near = copyFile { pname = "vest-pit-near"; };
