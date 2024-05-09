@@ -17,10 +17,21 @@ spec:
       labels:
         app.kubernetes.io/name: sapientwindex
     spec:
-      containers:    
+      containers:
         - name: bot
           image: ghcr.io/xe/x/sapientwindex:latest
+          imagePullPolicy: "Always"
           env:
+            - name: REDDIT_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: sapientwindex
+                  key: REDDIT_USERNAME
+            - name: SUBREDDITS
+              valueFrom:
+                secretKeyRef:
+                  name: sapientwindex
+                  key: SUBREDDITS
             - name: DISCORD_WEBHOOK_URL
               valueFrom:
                 secretKeyRef:

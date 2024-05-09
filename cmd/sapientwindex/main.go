@@ -6,35 +6,54 @@ import (
 	"log"
 	"log/slog"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
 	"github.com/Marcel-ICMC/graw"
 	"github.com/Marcel-ICMC/graw/reddit"
 	"within.website/x/internal"
+	"within.website/x/internal/yeet"
 	"within.website/x/web/discordwebhook"
 )
 
 var (
-	discordWebhookURL = flag.String("discord-webhook-url", "", "discord webhook url")
-	redditUserAgent   = flag.String("reddit-user-agent", "graw:windex:0.0.1 by /u/shadowh511", "reddit user agent")
-	subreddit         = flag.String("subreddit", "tulpas", "subreddit to post to")
+	discordWebhookURL = flag.String("discord-webhook-url", "", "The Discord webhook url sapientwindex will post to")
+	redditUsername    = flag.String("reddit-username", "", "Your reddit username")
+	subreddits        = flag.String("subreddits", "", "subreddits to scan (separate multiple by commas)")
 	scanDuration      = flag.Duration("scan-duration", 30*time.Second, "scan frequency")
 )
 
 func main() {
 	internal.HandleStartup()
 
-	slog.Info("starting up", "subreddit", *subreddit, "scan_duration", (*scanDuration).String())
+	if *discordWebhookURL == "" {
+		slog.Error("you must set the discord webhook URL to use this bot")
+		os.Exit(2)
+	}
 
-	handle, err := reddit.NewScript(*redditUserAgent, *scanDuration)
+	if *redditUsername == "" {
+		slog.Error("you must set your reddit username to use this bot")
+		os.Exit(2)
+	}
+
+	if *subreddits == "" {
+		slog.Error("you must set the subreddit list to use this bot")
+		os.Exit(2)
+	}
+
+	redditUserAgent := fmt.Sprintf("graw:within.website/x/cmd/sapientwindex:%s by /u/%s", yeet.DateTag, *redditUsername)
+
+	slog.Info("starting up", "subreddits", *subreddits, "scan_duration", (*scanDuration).String())
+
+	handle, err := reddit.NewScript(redditUserAgent, *scanDuration)
 	if err != nil {
 		log.Fatal(err)
 	}
 	announce := &announcer{}
 
 	scriptCfg := graw.Config{
-		Subreddits: []string{*subreddit},
+		Subreddits: strings.Split(*subreddits, ","),
 		Logger:     slog.NewLogLogger(slog.Default().Handler(), slog.LevelInfo),
 	}
 
@@ -47,6 +66,7 @@ func main() {
 		wait()
 		stop()
 
+		slog.Info("connection lost, sleeping and retrying")
 		time.Sleep(5 * time.Second)
 	}
 }
@@ -73,7 +93,7 @@ func (a announcer) Post(post *reddit.Post) error {
 	wh := discordwebhook.Webhook{
 		Username:  post.Author,
 		Content:   fmt.Sprintf("## %s\n> %s\n<https://reddit.com%s>", post.Title, addMemeArrow(post.SelfText), post.Permalink),
-		AvatarURL: fmt.Sprintf("https://cdn.xeiaso.net/avatar/%s", internal.Hash(post.Author, *redditUserAgent)),
+		AvatarURL: fmt.Sprintf("https://cdn.xeiaso.net/avatar/%s", internal.Hash(post.Author, *redditUsername)),
 		AllowedMentions: map[string][]string{
 			"parse": {},
 		},
