@@ -30,7 +30,7 @@ namespace is desired.
 ## Hosted option
 
 For a nominal fee, I can host a copy of this bot for you on my
-homelab. Please [contact me](sapientwindexsales@xeserv.us) to arrange
+homelab. Please [contact me](mailto:sapientwindexsales@xeserv.us) to arrange
 terms for this hosted option.
 
 ## Prerequisites for self-hosting
