@@ -11,6 +11,7 @@ import (
 	"within.website/x/cmd/mimi/internal"
 	"within.website/x/cmd/mimi/modules/discord"
 	"within.website/x/cmd/mimi/modules/discord/flyio"
+	"within.website/x/cmd/mimi/modules/irc"
 	"within.website/x/cmd/mimi/modules/scheduling"
 )
 
@@ -39,6 +40,11 @@ func main() {
 
 	d.Open()
 
+	ircBot, err := irc.New(ctx)
+	if err != nil {
+		log.Fatalf("error creating irc module: %v", err)
+	}
+
 	slog.Info("bot started")
 
 	gs := grpc.NewServer()
@@ -48,6 +54,7 @@ func main() {
 	mux := http.NewServeMux()
 
 	b.RegisterHTTP(mux)
+	ircBot.RegisterHTTP(mux)
 
 	go func() {
 		log.Fatal(gs.Serve(lis))

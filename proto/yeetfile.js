@@ -13,6 +13,8 @@ const protoFiles = [
     mkGoProtoFile("sanguisuga", ["go", "twirp"]),
     mkGoProtoFile("mi", ["go", "twirp", "go-grpc"]),
     mkGoProtoFile("mimi/statuspage", ["go", "twirp"]),
+    mkGoProtoFile("mimi/announce", ["go", "twirp"]),
+    mkGoProtoFile("external/jsonfeed", ["go"]),
 ];
 
 protoFiles.forEach((protoFile) => {
@@ -20,6 +22,7 @@ protoFiles.forEach((protoFile) => {
 
     args = [
         `--proto_path=${yeet.cwd}`,
+        `--proto_path=${repoRoot}/proto`,
     ];
 
     protoFile.kinds.forEach((kind) => {
