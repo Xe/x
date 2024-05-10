@@ -21,6 +21,23 @@ spec:
         - name: bot
           image: ghcr.io/xe/x/sapientwindex:latest
           imagePullPolicy: "Always"
+          resources:
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
           env:
             - name: REDDIT_USERNAME
               valueFrom:
