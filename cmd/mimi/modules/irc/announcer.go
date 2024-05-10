@@ -2,6 +2,7 @@ package irc
 
 import (
 	"context"
+	"flag"
 	"log/slog"
 	"net/http"
 	"os"
@@ -12,12 +13,21 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 	"tailscale.com/jsondb"
 	"within.website/x/cmd/mimi/internal"
+	xinternal "within.website/x/internal"
 	"within.website/x/proto/external/jsonfeed"
 	"within.website/x/proto/mimi/announce"
 )
 
+var (
+	ircAnnouncerUsername = flag.String("irc-announcer-username", "mimi", "IRC announcer HTTP username")
+	ircAnnouncerPassword = flag.String("irc-announcer-password", "", "IRC announcer HTTP password")
+)
+
 func (m *Module) RegisterHTTP(mux *http.ServeMux) {
-	mux.Handle(announce.AnnouncePathPrefix, announce.NewAnnounceServer(&AnnounceService{Module: m}))
+	var h http.Handler = announce.NewAnnounceServer(&AnnounceService{Module: m})
+	h = xinternal.PasswordMiddleware(*ircAnnouncerUsername, *ircAnnouncerPassword, h)
+
+	mux.Handle(announce.AnnouncePathPrefix, h)
 }
 
 type AnnounceService struct {
