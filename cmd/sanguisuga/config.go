@@ -6,7 +6,7 @@ import (
 	"log/slog"
 	"net/netip"
 
-	"within.website/x/cmd/sanguisuga/internal/key2hex"
+	"within.website/x/internal/key2hex"
 )
 
 type IRC struct {
