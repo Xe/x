@@ -7,7 +7,6 @@ import (
 	"log"
 	"log/slog"
 	"net"
-	"net/netip"
 	"sync"
 
 	proxyproto "github.com/pires/go-proxyproto"
@@ -15,36 +14,38 @@ import (
 )
 
 var (
-	httpPort          = flag.Int("http-port", 80, "HTTP forwarding port")
-	httpsPort         = flag.Int("https-port", 443, "HTTPS forwarding port")
-	nodeIPHTTPTarget  = flag.String("nodeip-http-target", "100.83.230.34:32677", "NodeIP HTTP target")
-	nodeIPHTTPSTarget = flag.String("nodeip-https-target", "100.83.230.34:32537", "NodeIP HTTPS target")
-	ipv4Subnet        = flag.String("ipv4-subnet", "10.255.255.0/24", "IPv4 private subnet for the userspace WireGuard network")
+	httpPort    = flag.Int("http-port", 80, "HTTP forwarding port")
+	httpsPort   = flag.Int("https-port", 443, "HTTPS forwarding port")
+	httpTarget  = flag.String("http-target", "10.216.118.119:80", "target address for http traffic")
+	httpsTarget = flag.String("https-target", "10.216.118.119:443", "target address for https traffic")
 )
 
 func main() {
 	internal.HandleStartup()
 
-	slog.Info("starting up", "httpPort", *httpPort, "httpsPort", *httpsPort, "nodeIPHTTPTarget", *nodeIPHTTPTarget, "nodeIPHTTPSTarget", *nodeIPHTTPSTarget)
+	slog.Info("starting up", "httpPort", *httpPort, "httpsPort", *httpsPort, "httpTarget", *httpTarget, "httpsTarget", *httpsTarget)
 
-	ul, err := net.Listen("tcp", fmt.Sprintf(":%d", *httpPort))
+	s := &Server{}
+
+	httpLn, err := net.Listen("tcp", fmt.Sprintf(":%d", *httpPort))
 	if err != nil {
 		log.Fatalf("can't listen to HTTP port %d: %v", *httpPort, err)
 		return
 	}
 
-	s := &Server{
-		d: &net.Dialer{},
+	httpsLn, err := net.Listen("tcp", fmt.Sprintf(":%d", *httpsPort))
+	if err != nil {
+		log.Fatalf("can't listen to HTTPS port %d: %v", *httpsPort, err)
+		return
 	}
 
-	s.Handle(ul, netip.MustParseAddrPort(*nodeIPHTTPTarget))
+	go s.Handle(httpsLn, *httpsTarget)
+	s.Handle(httpLn, *httpTarget)
 }
 
-type Server struct {
-	d *net.Dialer
-}
+type Server struct{}
 
-func (s *Server) Handle(l net.Listener, dest netip.AddrPort) {
+func (s *Server) Handle(l net.Listener, dest string) {
 	defer l.Close()
 
 	for {
@@ -60,12 +61,12 @@ func (s *Server) Handle(l net.Listener, dest netip.AddrPort) {
 	}
 }
 
-func (s *Server) HandleConn(conn net.Conn, dest netip.AddrPort) {
+func (s *Server) HandleConn(conn net.Conn, dest string) {
 	defer conn.Close()
 
-	slog.Debug("dialing remote host", "remoteHost", dest.String())
+	slog.Debug("dialing remote host", "remoteHost", dest)
 
-	destConn, err := s.d.Dial("tcp", dest.String())
+	destConn, err := net.Dial("tcp", dest)
 	if err != nil {
 		slog.Error("can't dial downstream", "err", err)
 		return
@@ -91,6 +92,7 @@ func (s *Server) HandleConn(conn net.Conn, dest netip.AddrPort) {
 		io.Copy(conn, destConn)
 		// Signal peer that no more data is coming.
 		conn.(*net.TCPConn).CloseWrite()
+		slog.Debug("done copying from dest to src")
 	}()
 	go func() {
 		slog.Debug("copying from src to dest")
@@ -98,6 +100,7 @@ func (s *Server) HandleConn(conn net.Conn, dest netip.AddrPort) {
 		io.Copy(destConn, conn)
 		// Signal peer that no more data is coming.
 		destConn.(*net.TCPConn).CloseWrite()
+		slog.Debug("done copying from src to dest")
 	}()
 
 	wg.Wait()

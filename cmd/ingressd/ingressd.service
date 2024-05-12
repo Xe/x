@@ -1,0 +1,13 @@
+[Unit]
+Description="Xe Iaso's ingress daemon"
+Requires=tailscaled.service
+
+[Service]
+ExecStart=/usr/bin/ingressd
+Restart=always
+RestartSec=30s
+EnvironmentFile=/etc/ingressd/ingressd.env
+LimitNOFILE=infinity
+
+[Install]
+WantedBy=multi-user.target
