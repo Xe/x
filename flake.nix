@@ -1,4 +1,4 @@
-# nix-direnv cache busting line: sha256-2L8g1D0eqC8vLqoytxL8gmMxOrv2+9veJx+NQv5oI4M=
+# nix-direnv cache busting line: sha256-NOymNGq2Ea1DWMs/8L30tAEzqSvZcp7TvxV4a8tnuGM=
 
 {
   description = "/x/perimental code";
@@ -83,6 +83,13 @@
             libavif
             sqlite-interactive
           ];
+        };
+
+        mi = pkgs.buildGo122Module {
+          pname = "mi";
+          inherit version vendorHash;
+          src = ./.;
+          subPackages = [ "cmd/mi" ];
         };
 
         mimi = pkgs.buildGo122Module {
@@ -230,7 +237,7 @@
             path = "make-mastodon-app";
           };
 
-          inherit xedn xedn-static robocadey2 mimi tourian sapientwindex;
+          inherit xedn xedn-static robocadey2 mimi mi tourian sapientwindex;
 
           aegis = copyFile { pname = "aegis"; };
           cadeybot = copyFile { pname = "cadeybot"; };
@@ -252,6 +259,7 @@
           docker = let
             robocadey2 = self.packages.${system}.robocadey2;
             xedn = self.packages.${system}.xedn;
+            mi = self.packages.${system}.mi;
             mimi = self.packages.${system}.mimi;
             sapientwindex = self.packages.${system}.sapientwindex;
             tourian = self.packages.${system}.tourian;
@@ -266,8 +274,13 @@
                 };
               };
           in {
+            mi = simple {
+              name = "ghcr.io/xe/x/mi";
+              pkg = mi;
+              cmd = ["${mi}/bin/mi"];
+            };
             sapientwindex = simple {
-              name = "ghcr.io/Xe/x/sapientwindex";
+              name = "ghcr.io/xe/x/sapientwindex";
               pkg = sapientwindex;
               cmd = ["${sapientwindex}/bin/sapientwindex"];
             };

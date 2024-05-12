@@ -1,0 +1,32 @@
+[
+  {
+    "id": 0,
+    "name": "Cadey",
+    "avatar_url": "https://mi.within.website/static/img/cadey.png"
+  },
+  {
+    "id": 1,
+    "name": "Nicole",
+    "avatar_url": "https://mi.within.website/static/img/nicole.png"
+  },
+  {
+    "id": 2,
+    "name": "Jessie",
+    "avatar_url": "https://mi.within.website/static/img/jessie.png"
+  },
+  {
+    "id": 3,
+    "name": "Ashe",
+    "avatar_url": "https://mi.within.website/static/img/ashe.png"
+  },
+  {
+    "id": 4,
+    "name": "Sephie",
+    "avatar_url": "https://mi.within.website/static/img/sephie.png"
+  },
+  {
+    "id": 5,
+    "name": "Mai",
+    "avatar_url": "https://mi.within.website/static/img/mai.png"
+  }
+]

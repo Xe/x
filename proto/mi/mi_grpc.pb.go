@@ -4,7 +4,7 @@
 // - protoc             v4.25.3
 // source: mi.proto
 
-package pb
+package mi
 
 import (
 	context "context"
