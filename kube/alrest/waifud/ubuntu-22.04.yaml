@@ -1,0 +1,15 @@
+apiVersion: cdi.kubevirt.io/v1beta1
+kind: DataVolume
+metadata:
+  name: "ubuntu-22.04"
+  namespace: waifud
+  annotations:
+    xeiaso.net/project: waifud
+spec:
+  storage:
+    resources:
+      requests:
+        storage: 5Gi
+  source:
+    http:
+      url: "https://cloud-images.ubuntu.com/daily/server/jammy/current/jammy-server-cloudimg-amd64.img"

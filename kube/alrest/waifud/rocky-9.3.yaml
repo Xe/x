@@ -1,0 +1,19 @@
+apiVersion: cdi.kubevirt.io/v1beta1
+kind: DataVolume
+metadata:
+  name: "rocky-9.3"
+  namespace: waifud
+  annotations:
+    xeiaso.net/project: waifud
+spec:
+  storage:
+    storageClassName: longhorn
+    volumeMode: block # or filesystem
+    accessModes:
+      - ReadWriteOnce # Necessary as it's no longer has a default
+    resources:
+      requests:
+        storage: 10Gi
+  source:
+    http:
+      url: "https://download.rockylinux.org/pub/rocky/9/images/x86_64/Rocky-9-GenericCloud-Base.latest.x86_64.qcow2"

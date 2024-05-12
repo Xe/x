@@ -1,0 +1,124 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: mi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mi
+  namespace: mi
+  labels:
+    app.kubernetes.io/name: mi
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: longhorn
+  resources:
+    requests:
+      storage: 2Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mi
+  namespace: mi
+  labels:
+    app.kubernetes.io/name: mi
+  annotations:
+    operator.1password.io/auto-restart: "true"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: mi
+  template:
+    metadata:
+      namespace: mi
+      labels:
+        app.kubernetes.io/name: mi
+    spec:
+      volumes:
+        - name: vol
+          persistentVolumeClaim:
+            claimName: mi
+      securityContext:
+        fsGroup: 1000
+      containers:
+        - name: main
+          image: ghcr.io/xe/x/mi:latest
+          imagePullPolicy: "Always"
+          resources:
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+              httpHeaders:
+                - name: X-Kubernetes
+                  value: "is kinda okay"
+            initialDelaySeconds: 3
+            periodSeconds: 3
+          env:
+            - name: BIND
+              value: ":8080"
+            - name: DB_LOC
+              value: "/data/mi.db"
+            - name: INTERNAL_BIND
+              value: ":9195"
+          volumeMounts:
+            - name: vol
+              mountPath: "/data"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mi
+  namespace: mi
+spec:
+  selector:
+    app.kubernetes.io/name: mi
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+      name: http
+    - protocol: TCP
+      port: 9195
+      targetPort: 9195
+      name: metrics
+  type: ClusterIP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nginx
+  namespace: mi
+  labels:
+    app.kubernetes.io/name: mi
+spec:
+  defaultBackend:
+    service:
+      name: mi
+      port:
+        name: http
+  ingressClassName: tailscale
+  tls:
+    - hosts:
+        - mi

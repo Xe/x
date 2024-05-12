@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log/slog"
 	"net/http"
 	"os"
@@ -15,8 +16,9 @@ import (
 )
 
 var (
-	bind  = flag.String("bind", ":8080", "HTTP bind address")
-	dbLoc = flag.String("db-loc", "./var/data.db", "")
+	bind         = flag.String("bind", ":8080", "HTTP bind address")
+	dbLoc        = flag.String("db-loc", "./var/data.db", "")
+	internalBind = flag.String("internal-bind", ":9195", "HTTP internal routes bind address")
 )
 
 func main() {
@@ -44,6 +46,20 @@ func main() {
 
 	i := &Importer{db: db}
 	i.Mount(mux)
+
+	mux.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
+		if err := db.Exec("select 1+1").Error; err != nil {
+			http.Error(w, "database not healthy", http.StatusInternalServerError)
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+		fmt.Fprintln(w, "OK")
+	})
+
+	go func() {
+		slog.Info("starting internal server", "bind", *internalBind)
+		slog.Error("internal server stopped", "err", http.ListenAndServe(*internalBind, nil))
+	}()
 
 	slog.Info("starting server", "bind", *bind)
 	slog.Error("server stopped", "err", http.ListenAndServe(*bind, mux))
