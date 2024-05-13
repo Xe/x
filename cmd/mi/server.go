@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"log/slog"
 	"time"
 
 	"github.com/oklog/ulid/v2"
@@ -48,6 +49,11 @@ func (s *SwitchTracker) WhoIsFront(ctx context.Context, _ *emptypb.Empty) (*pb.F
 }
 
 func (s *SwitchTracker) Switch(ctx context.Context, req *pb.SwitchReq) (*pb.SwitchResp, error) {
+	if err := req.Valid(); err != nil {
+		slog.Error("can't switch", "req", req, "err", err)
+		return nil, twirp.InvalidArgumentError("member_name", err.Error())
+	}
+
 	var sw models.Switch
 
 	tx := s.db.Begin()
@@ -90,6 +96,8 @@ func (s *SwitchTracker) Switch(ctx context.Context, req *pb.SwitchReq) (*pb.Swit
 		return nil, twirp.InternalErrorf("failed to commit transaction: %w", err)
 	}
 
+	slog.Info("switched", "from", sw.AsProto(), "to", newSwitch.AsProto())
+
 	return &pb.SwitchResp{
 		Old:     sw.AsProto(),
 		Current: newSwitch.AsProto(),
@@ -97,6 +105,11 @@ func (s *SwitchTracker) Switch(ctx context.Context, req *pb.SwitchReq) (*pb.Swit
 }
 
 func (s *SwitchTracker) GetSwitch(ctx context.Context, req *pb.GetSwitchReq) (*pb.FrontChange, error) {
+	if err := req.Valid(); err != nil {
+		slog.Error("can't get switch by ID", "req", req, "err", err)
+		return nil, twirp.InvalidArgumentError("id", err.Error())
+	}
+
 	var sw models.Switch
 	if err := s.db.Joins("Member").Where("id = ?", req.Id).First(&sw).Error; err != nil {
 		return nil, twirp.NotFoundError("switch not found").WithMeta("id", req.Id)
