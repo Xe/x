@@ -45,7 +45,7 @@ func main() {
 	mux.Handle(pb.SwitchTrackerPathPrefix, pb.NewSwitchTrackerServer(NewSwitchTracker(db)))
 
 	i := &Importer{db: db}
-	i.Mount(mux)
+	i.Mount(http.DefaultServeMux)
 
 	mux.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
 		if err := db.Exec("select 1+1").Error; err != nil {
