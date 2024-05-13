@@ -35,8 +35,10 @@ require (
 	github.com/lib/pq v1.10.9
 	github.com/mndrix/golog v0.0.0-20170330170653-a28e2a269775
 	github.com/mymmrac/telego v0.29.2
+	github.com/orandin/slog-gorm v1.3.2
 	github.com/otiai10/copy v1.14.0
 	github.com/peterh/liner v1.2.2
+	github.com/pires/go-proxyproto v0.7.0
 	github.com/pkg/errors v0.9.1
 	github.com/posener/complete v1.2.3
 	github.com/rodaine/table v1.1.1
@@ -52,8 +54,10 @@ require (
 	go4.org v0.0.0-20190313082347-94abd6928b1d
 	golang.org/x/crypto v0.21.0
 	golang.org/x/oauth2 v0.18.0
-	golang.org/x/sync v0.6.0
+	golang.org/x/sync v0.7.0
 	google.golang.org/grpc v1.62.1
+	gorm.io/driver/sqlite v1.5.5
+	gorm.io/gorm v1.25.10
 	honnef.co/go/transmission v0.0.0-20200712215954-58262f0ca9c9
 	modernc.org/sqlite v1.29.5
 	nhooyr.io/websocket v1.8.10
@@ -133,8 +137,6 @@ require (
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
 	github.com/ncruces/go-strftime v0.1.9 // indirect
-	github.com/orandin/slog-gorm v1.3.2 // indirect
-	github.com/pires/go-proxyproto v0.7.0 // indirect
 	github.com/pjbgf/sha1cd v0.3.0 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	github.com/safchain/ethtool v0.3.0 // indirect
@@ -163,8 +165,6 @@ require (
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240123012728-ef4313101c80 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	gorm.io/driver/sqlite v1.5.5 // indirect
-	gorm.io/gorm v1.25.10 // indirect
 	modernc.org/gc/v3 v3.0.0-20240107210532-573471604cb6 // indirect
 	modernc.org/libc v1.41.0 // indirect
 	modernc.org/mathutil v1.6.0 // indirect
