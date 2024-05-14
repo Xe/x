@@ -92,6 +92,8 @@ kind: Service
 metadata:
   name: mi
   namespace: mi
+  labels:
+    app.kubernetes.io/name: mi
 spec:
   selector:
     app.kubernetes.io/name: mi
@@ -111,6 +113,8 @@ kind: OnePasswordItem
 metadata:
   name: public-http-auth
   namespace: mi
+  labels:
+    app.kubernetes.io/name: mi
 spec:
   itemPath: "vaults/lc5zo4zjz3if3mkeuhufjmgmui/items/4ytaobocixjfaoje7rhrtidg4m"
 ---
