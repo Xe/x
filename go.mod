@@ -60,7 +60,7 @@ require (
 	gorm.io/gorm v1.25.10
 	honnef.co/go/transmission v0.0.0-20200712215954-58262f0ca9c9
 	modernc.org/sqlite v1.29.5
-	nhooyr.io/websocket v1.8.10
+	nhooyr.io/websocket v1.8.11
 	tailscale.com v1.62.1
 	tulpa.dev/cadey/jvozba v0.0.0-20200326200349-f0ebe310be06
 	within.website/johaus v1.1.0
