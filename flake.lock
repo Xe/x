@@ -1,5 +1,17 @@
 {
   "nodes": {
+    "alpineLinux": {
+      "flake": false,
+      "locked": {
+        "narHash": "sha256-5GM+4nNrWrE3idQiWlAq7bghb7IE6j/JncEfG1qM4jM=",
+        "type": "file",
+        "url": "https://cdn.xeiaso.net/file/christine-static/hack/alpine-amd64-3.19.0-1.tar"
+      },
+      "original": {
+        "type": "file",
+        "url": "https://cdn.xeiaso.net/file/christine-static/hack/alpine-amd64-3.19.0-1.tar"
+      }
+    },
     "iaso-fonts": {
       "inputs": {
         "nixpkgs": "nixpkgs",
@@ -71,6 +83,7 @@
     },
     "root": {
       "inputs": {
+        "alpineLinux": "alpineLinux",
         "iaso-fonts": "iaso-fonts",
         "naersk": "naersk",
         "nixpkgs": "nixpkgs_2",

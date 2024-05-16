@@ -11,6 +11,7 @@ import (
 	"within.website/x/cmd/mimi/internal"
 	"within.website/x/cmd/mimi/modules/discord"
 	"within.website/x/cmd/mimi/modules/discord/flyio"
+	"within.website/x/cmd/mimi/modules/discord/heic2jpeg"
 	"within.website/x/cmd/mimi/modules/irc"
 	"within.website/x/cmd/mimi/modules/scheduling"
 )
@@ -37,6 +38,7 @@ func main() {
 	b := flyio.New()
 
 	d.Register(b)
+	d.Register(heic2jpeg.New())
 
 	d.Open()
 

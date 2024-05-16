@@ -26,16 +26,22 @@
 
     ## don't follow nixpkgs because that causes a very long font build process.
     iaso-fonts.url = "github:Xe/iosevka";
+
+    alpineLinux = {
+      flake = false;
+      url = "file+https://cdn.xeiaso.net/file/christine-static/hack/alpine-amd64-3.19.0-1.tar";
+    };
   };
 
   outputs =
-    { self, nixpkgs, utils, rust-overlay, naersk, xess, iaso-fonts }@inputs:
+    { self, nixpkgs, utils, rust-overlay, naersk, xess, iaso-fonts, alpineLinux }@inputs:
     utils.lib.eachSystem [
       "x86_64-linux"
       "aarch64-linux"
       "x86_64-darwin"
       "aarch64-darwin"
-    ] (system:
+    ]
+      (system:
       let
         graft = pkgs: pkg:
           pkg.override { buildGoModule = pkgs.buildGo122Module; };
@@ -97,6 +103,14 @@
           inherit version vendorHash;
           src = ./.;
           subPackages = [ "cmd/mimi" ];
+          buildInputs = with pkgs; [
+            cmake
+            libheif
+            x265
+            libde265
+            libjpeg
+            libtool
+          ];
         };
 
         tourian = pkgs.buildGo122Module {
@@ -187,7 +201,7 @@
           nativeBuildInputs = with pkgs; [ pkg-config ];
           subPackages = [ "cmd/robocadey2" ];
         };
-        
+
         sapientwindex = pkgs.buildGo122Module {
           pname = "sapientwindex";
           inherit version vendorHash;
@@ -213,12 +227,14 @@
           export GOARCH=wasm
           exec ${pkgs.go}/bin/go $*
         '';
-      in {
+      in
+      {
         overlays.default = final: prev:
           let
             system = prev.system;
             selfpkgs = self.packages.${system};
-          in { xeserv = selfpkgs; };
+          in
+          { xeserv = selfpkgs; };
 
         packages = rec {
           default = everything;
@@ -256,91 +272,98 @@
         };
 
         legacyPackages = {
-          docker = let
-            robocadey2 = self.packages.${system}.robocadey2;
-            xedn = self.packages.${system}.xedn;
-            mi = self.packages.${system}.mi;
-            mimi = self.packages.${system}.mimi;
-            sapientwindex = self.packages.${system}.sapientwindex;
-            tourian = self.packages.${system}.tourian;
+          docker =
+            let
+              robocadey2 = self.packages.${system}.robocadey2;
+              xedn = self.packages.${system}.xedn;
+              mi = self.packages.${system}.mi;
+              mimi = self.packages.${system}.mimi;
+              sapientwindex = self.packages.${system}.sapientwindex;
+              tourian = self.packages.${system}.tourian;
 
-            simple = { name, cmd, pkg, contents ? [ pkgs.cacert ] }:
-              pkgs.dockerTools.buildLayeredImage {
+              simple = { name, cmd, pkg, contents ? [ pkgs.cacert ] }:
+                pkgs.dockerTools.buildLayeredImage {
+                  tag = "latest";
+                  inherit contents name;
+                  fromImage = alpineLinux;
+                  config = {
+                    Cmd = cmd;
+                    WorkingDir = "${pkg}";
+                  };
+                };
+            in
+            {
+              mi = simple {
+                name = "ghcr.io/xe/x/mi";
+                pkg = mi;
+                contents = with pkgs; [ cacert ];
+                cmd = [ "${mi}/bin/mi" ];
+              };
+              sapientwindex = simple {
+                name = "ghcr.io/xe/x/sapientwindex";
+                pkg = sapientwindex;
+                cmd = [ "${sapientwindex}/bin/sapientwindex" ];
+              };
+              mimi = pkgs.dockerTools.buildLayeredImage {
+                name = "registry.fly.io/mimi";
                 tag = "latest";
-                inherit contents name;
+                contents = with pkgs; [ cacert imagemagick ];
+                fromImage = alpineLinux;
                 config = {
-                  Cmd = cmd;
-                  WorkingDir = "${pkg}";
+                  Cmd = [ "${mimi}/bin/mimi" ];
+                  WorkingDir = "${mimi}";
                 };
               };
-          in {
-            mi = simple {
-              name = "ghcr.io/xe/x/mi";
-              pkg = mi;
-              cmd = ["${mi}/bin/mi"];
-            };
-            sapientwindex = simple {
-              name = "ghcr.io/xe/x/sapientwindex";
-              pkg = sapientwindex;
-              cmd = ["${sapientwindex}/bin/sapientwindex"];
-            };
-            mimi = pkgs.dockerTools.buildLayeredImage {
-              name = "registry.fly.io/mimi";
-              tag = "latest";
-              contents = [ pkgs.cacert ];
-              config = {
-                Cmd = [ "${mimi}/bin/mimi" ];
-                WorkingDir = "${mimi}";
+              robocadey2 = pkgs.dockerTools.buildLayeredImage {
+                name = "registry.fly.io/xe-robocadey2";
+                tag = "latest";
+                contents = [ pkgs.cacert ];
+                config = {
+                  Cmd = [ "${robocadey2}/bin/robocadey2" ];
+                  WorkingDir = "${robocadey2}";
+                };
+              };
+              tourian = pkgs.dockerTools.buildLayeredImage {
+                name = "registry.fly.io/tourian";
+                tag = "latest";
+                contents = [ pkgs.cacert ];
+                config = {
+                  Cmd = [ "${tourian}/bin/tourian" ];
+                  WorkingDir = "${tourian}";
+                };
+              };
+              xedn = pkgs.dockerTools.buildLayeredImage {
+                name = "registry.fly.io/xedn";
+                tag = "latest";
+                contents =
+                  [ pkgs.cacert xedn self.packages.${system}.xedn-static ];
+                config = {
+                  Cmd = [ "${xedn}/bin/xedn" ];
+                  WorkingDir = "${xedn}";
+                  Env = [ "XEDN_STATIC=${self.packages.${system}.xedn-static}" ];
+                };
               };
             };
-            robocadey2 = pkgs.dockerTools.buildLayeredImage {
-              name = "registry.fly.io/xe-robocadey2";
-              tag = "latest";
-              contents = [ pkgs.cacert ];
-              config = {
-                Cmd = [ "${robocadey2}/bin/robocadey2" ];
-                WorkingDir = "${robocadey2}";
-              };
-            };
-            tourian = pkgs.dockerTools.buildLayeredImage {
-              name = "registry.fly.io/tourian";
-              tag = "latest";
-              contents = [ pkgs.cacert ];
-              config = {
-                Cmd = [ "${tourian}/bin/tourian" ];
-                WorkingDir = "${tourian}";
-              };
-            };
-            xedn = pkgs.dockerTools.buildLayeredImage {
-              name = "registry.fly.io/xedn";
-              tag = "latest";
-              contents =
-                [ pkgs.cacert xedn self.packages.${system}.xedn-static ];
-              config = {
-                Cmd = [ "${xedn}/bin/xedn" ];
-                WorkingDir = "${xedn}";
-                Env = [ "XEDN_STATIC=${self.packages.${system}.xedn-static}" ];
-              };
-            };
-          };
           portable = {
-            xedn = let
-              service = pkgs.substituteAll {
-                name = "xedn.service";
-                src = ./run/xedn.service.in;
-                xedn = self.packages.${system}.xedn;
+            xedn =
+              let
+                service = pkgs.substituteAll {
+                  name = "xedn.service";
+                  src = ./run/xedn.service.in;
+                  xedn = self.packages.${system}.xedn;
+                };
+              in
+              pkgs.portableService {
+                inherit (self.packages.${system}.xedn) version;
+                pname = "xedn";
+                description = "Xe's CDN service";
+                homepage = "https://xeiaso.net";
+                units = [ service ];
+                symlinks = [{
+                  object = "${pkgs.cacert}/etc/ssl";
+                  symlink = "/etc/ssl";
+                }];
               };
-            in pkgs.portableService {
-              inherit (self.packages.${system}.xedn) version;
-              pname = "xedn";
-              description = "Xe's CDN service";
-              homepage = "https://xeiaso.net";
-              units = [ service ];
-              symlinks = [{
-                object = "${pkgs.cacert}/etc/ssl";
-                symlink = "/etc/ssl";
-              }];
-            };
           };
         };
 
@@ -369,6 +392,7 @@
             libaom
             libavif
             sqlite-interactive
+            imagemagick
 
             jq
             jo
@@ -398,38 +422,40 @@
           XEDN_STATIC = self.packages.${system}.xedn-static;
         };
       }) // {
-        nixosModules = {
-          overlay = { ... }: {
-            nixpkgs.overlays = [
-              (final: prev:
-                let
-                  system = prev.system;
-                  selfpkgs = self.packages.${system};
-                in { xeserv = selfpkgs; })
-            ];
-          };
-
-          default = { ... }: {
-            imports = with self.nixosModules; [
-              overlay
-              aegis
-              hlang
-              todayinmarch2020
-              sanguisuga
-              vest-pit-near
-              within-website
-            ];
-          };
-
-          aegis = import ./nix/aegis.nix self;
-          hlang = import ./nix/hlang.nix self;
-          todayinmarch2020 = import ./nix/todayinmarch2020.nix self;
-          sanguisuga = import ./nix/sanguisuga.nix self;
-          vest-pit-near = import ./nix/vest-pit-near.nix self;
-          within-website = import ./nix/within-website.nix self;
+      nixosModules = {
+        overlay = { ... }: {
+          nixpkgs.overlays = [
+            (final: prev:
+              let
+                system = prev.system;
+                selfpkgs = self.packages.${system};
+              in
+              { xeserv = selfpkgs; })
+          ];
         };
 
-        checks.x86_64-linux = let
+        default = { ... }: {
+          imports = with self.nixosModules; [
+            overlay
+            aegis
+            hlang
+            todayinmarch2020
+            sanguisuga
+            vest-pit-near
+            within-website
+          ];
+        };
+
+        aegis = import ./nix/aegis.nix self;
+        hlang = import ./nix/hlang.nix self;
+        todayinmarch2020 = import ./nix/todayinmarch2020.nix self;
+        sanguisuga = import ./nix/sanguisuga.nix self;
+        vest-pit-near = import ./nix/vest-pit-near.nix self;
+        within-website = import ./nix/within-website.nix self;
+      };
+
+      checks.x86_64-linux =
+        let
           pkgs = nixpkgs.legacyPackages.x86_64-linux;
           common = { pkgs, ... }: {
             users.groups.within = { };
@@ -449,7 +475,8 @@
               '';
             };
           };
-        in {
+        in
+        {
           basic = pkgs.nixosTest ({
             name = "basic-tests";
             nodes.default = { config, pkgs, ... }: {
@@ -491,5 +518,5 @@
             '';
           });
         };
-      };
+    };
 }
