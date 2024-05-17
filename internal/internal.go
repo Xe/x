@@ -10,6 +10,7 @@ import (
 
 	"github.com/posener/complete"
 	"go4.org/legal"
+	"within.website/x/flagfolder"
 	"within.website/x/internal/confyg/flagconfyg"
 	"within.website/x/internal/flagenv"
 	"within.website/x/internal/manpage"
@@ -48,14 +49,16 @@ func configFileLocation() string {
 //
 //   - command line flags (to get -config)
 //   - environment variables
+//   - any secrets mounted to /run/secrets
 //   - configuration file (if -config is set)
 //   - command line flags
 //
 // This is done this way to ensure that command line flags always are the deciding
-// factor as an escape hatch.
+// factor as an escape hatch, at the cost of potentially evaluating flags twice.
 func HandleStartup() {
 	flag.Parse()
 	flagenv.Parse()
+	flagfolder.Parse()
 
 	ctx := context.Background()
 

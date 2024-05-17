@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: shell
+  namespace: default
+data:
+  foo: Zm9v
+  bar: YmFy
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: shell
+  namespace: default
+spec:
+  volumes:
+    - name: secret-volume
+      secret:
+        secretName: shell
+  containers:
+    - name: shell
+      image: ubuntu:latest
+      command:
+        - sleep
+        - "infinity"
+      imagePullPolicy: IfNotPresent
+      volumeMounts:
+        - name: secret-volume
+          readOnly: true
+          mountPath: "/run/secrets/shell"
+  restartPolicy: Always
