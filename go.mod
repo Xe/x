@@ -43,7 +43,7 @@ require (
 	github.com/posener/complete v1.2.3
 	github.com/rodaine/table v1.1.1
 	github.com/rogpeppe/go-internal v1.12.0
-	github.com/rs/cors v1.10.1
+	github.com/rs/cors v1.11.0
 	github.com/sebest/xff v0.0.0-20210106013422-671bd2870b3a
 	github.com/tetratelabs/wazero v1.7.0
 	github.com/thoj/go-ircevent v0.0.0-20210723090443-73e444401d64
