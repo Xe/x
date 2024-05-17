@@ -42,19 +42,19 @@ func ParseSet(secretLocation string, set *flag.FlagSet) error {
 			filepath.Join(secretLocation, strcase.SnakeCase(f.Name)),
 			filepath.Join(secretLocation, strcase.UpperSnakeCase(f.Name)),
 		} {
-			data, err = os.ReadFile(fname)
-			if err != nil {
+			var ferr error
+			data, ferr = os.ReadFile(fname)
+			if ferr != nil {
 				slog.Debug("can't read", "fname", fname, "err", err)
-				if os.IsNotExist(err) {
-					err = nil
+				if os.IsNotExist(ferr) {
 					continue
 				}
 				continue
 			}
-		}
 
-		if ferr := f.Value.Set(string(data)); ferr != nil {
-			err = fmt.Errorf("flagfolder: failed to set flag %q with value %q", f.Name, string(data))
+			if ferr := f.Value.Set(string(data)); ferr != nil {
+				err = fmt.Errorf("flagfolder: failed to set flag %q in %s with value %q", f.Name, fname, string(data))
+			}
 		}
 	})
 
