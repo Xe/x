@@ -17,6 +17,10 @@ spec:
       labels:
         app.kubernetes.io/name: sapientwindex
     spec:
+      volumes:
+        - name: 1password
+          secret:
+            secretName: sapientwindex
       containers:
         - name: bot
           image: ghcr.io/xe/x/sapientwindex:latest
@@ -38,19 +42,7 @@ spec:
                 - ALL
             seccompProfile:
               type: RuntimeDefault
-          env:
-            - name: REDDIT_USERNAME
-              valueFrom:
-                secretKeyRef:
-                  name: sapientwindex
-                  key: REDDIT_USERNAME
-            - name: SUBREDDITS
-              valueFrom:
-                secretKeyRef:
-                  name: sapientwindex
-                  key: SUBREDDITS
-            - name: DISCORD_WEBHOOK_URL
-              valueFrom:
-                secretKeyRef:
-                  name: sapientwindex
-                  key: DISCORD_WEBHOOK_URL
+          volumeMounts:
+            - name: 1password
+              readOnly: true
+              mountPath: "/run/secrets/1password"
