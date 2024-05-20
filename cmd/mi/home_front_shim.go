@@ -15,6 +15,7 @@ func (hfs *HomeFrontShim) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	sw, err := hfs.dao.WhoIsFront(r.Context())
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	fmt.Fprint(w, sw.Member.Name)
