@@ -185,21 +185,3 @@ kind: ConfigMap
 metadata:
   name: mi-front-public-headers
   namespace: ingress-nginx
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: mi-tango-sierra
-  namespace: mi
-  labels:
-    app.kubernetes.io/name: mi
-spec:
-  defaultBackend:
-    service:
-      name: mi
-      port:
-        name: http
-  ingressClassName: tailscale
-  tls:
-    - hosts:
-        - mi
