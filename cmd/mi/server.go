@@ -2,10 +2,9 @@ package main
 
 import (
 	"context"
+	"errors"
 	"log/slog"
-	"time"
 
-	"github.com/oklog/ulid/v2"
 	"github.com/twitchtv/twirp"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"gorm.io/gorm"
@@ -13,22 +12,22 @@ import (
 	pb "within.website/x/proto/mi"
 )
 
-func p[T any](v T) *T {
-	return &v
-}
-
 type SwitchTracker struct {
-	db *gorm.DB
+	db  *gorm.DB
+	dao *models.DAO
 }
 
 func NewSwitchTracker(db *gorm.DB) *SwitchTracker {
-	return &SwitchTracker{db: db}
+	return &SwitchTracker{
+		db:  db,
+		dao: models.New(db),
+	}
 }
 
 func (s *SwitchTracker) Members(ctx context.Context, _ *emptypb.Empty) (*pb.MembersResp, error) {
-	var members []models.Member
-	if err := s.db.Find(&members).Error; err != nil {
-		return nil, err
+	members, err := s.dao.Members(ctx)
+	if err != nil {
+		return nil, twirp.InternalErrorWith(err)
 	}
 
 	var resp pb.MembersResp
@@ -40,67 +39,45 @@ func (s *SwitchTracker) Members(ctx context.Context, _ *emptypb.Empty) (*pb.Memb
 }
 
 func (s *SwitchTracker) WhoIsFront(ctx context.Context, _ *emptypb.Empty) (*pb.FrontChange, error) {
-	var sw models.Switch
-	if err := s.db.Joins("Member").Order("created_at DESC").First(&sw).Error; err != nil {
-		return nil, twirp.InternalErrorWith(err)
+	sw, err := s.dao.WhoIsFront(ctx)
+	if err != nil {
+		slog.Error("can't find who is front", "err", err)
+		switch {
+		case errors.Is(err, gorm.ErrRecordNotFound):
+			return nil, twirp.NotFoundError("can't find current switch")
+		default:
+			return nil, twirp.InternalErrorWith(err)
+		}
 	}
+
+	slog.Info("current front", "sw", sw)
 
 	return sw.AsFrontChange(), nil
 }
 
 func (s *SwitchTracker) Switch(ctx context.Context, req *pb.SwitchReq) (*pb.SwitchResp, error) {
 	if err := req.Valid(); err != nil {
-		slog.Error("can't switch", "req", req, "err", err)
+		slog.Error("can't switch without a member", "req", req, "err", err)
 		return nil, twirp.InvalidArgumentError("member_name", err.Error())
 	}
 
-	var sw models.Switch
-
-	tx := s.db.Begin()
-
-	if err := tx.Joins("Member").Where("ended_at IS NULL").First(&sw).Error; err != nil {
-		tx.Rollback()
-		return nil, twirp.InternalErrorf("failed to find current switch: %w", err)
+	old, new, err := s.dao.SwitchFront(ctx, req.GetMemberName())
+	if err != nil {
+		slog.Error("can't switch front", "req", req, "err", err)
+		switch {
+		case errors.Is(err, models.ErrCantSwitchToYourself):
+			twirp.InvalidArgumentError("member_name", "cannot switch to yourself").
+				WithMeta("member_name", req.GetMemberName())
+		case errors.Is(err, gorm.ErrRecordNotFound):
+			return nil, twirp.NotFoundError("can't find current switch")
+		default:
+			return nil, twirp.InternalErrorWith(err)
+		}
 	}
-
-	if sw.Member.Name == req.MemberName {
-		tx.Rollback()
-		return nil, twirp.InvalidArgumentError("member_name", "cannot switch to the same member").
-			WithMeta("member_name", req.MemberName).
-			WithMeta("current_member", sw.Member.Name)
-	}
-
-	sw.EndedAt = p(time.Now())
-	if err := tx.Save(&sw).Error; err != nil {
-		tx.Rollback()
-		return nil, twirp.InternalErrorf("failed to save current switch: %w", err)
-	}
-
-	var newMember models.Member
-	if err := tx.Where("name = ?", req.MemberName).First(&newMember).Error; err != nil {
-		tx.Rollback()
-		return nil, twirp.NotFoundError("member not found").WithMeta("member_name", req.MemberName)
-	}
-
-	newSwitch := models.Switch{
-		ID:       ulid.MustNew(ulid.Now(), nil).String(),
-		MemberID: newMember.ID,
-	}
-
-	if err := tx.Create(&newSwitch).Error; err != nil {
-		tx.Rollback()
-		return nil, twirp.InternalErrorf("failed to create new switch: %w", err)
-	}
-
-	if err := tx.Commit().Error; err != nil {
-		return nil, twirp.InternalErrorf("failed to commit transaction: %w", err)
-	}
-
-	slog.Info("switched", "from", sw.AsProto(), "to", newSwitch.AsProto())
 
 	return &pb.SwitchResp{
-		Old:     sw.AsProto(),
-		Current: newSwitch.AsProto(),
+		Old:     old.AsProto(),
+		Current: new.AsProto(),
 	}, nil
 }
 
@@ -110,9 +87,16 @@ func (s *SwitchTracker) GetSwitch(ctx context.Context, req *pb.GetSwitchReq) (*p
 		return nil, twirp.InvalidArgumentError("id", err.Error())
 	}
 
-	var sw models.Switch
-	if err := s.db.Joins("Member").Where("id = ?", req.Id).First(&sw).Error; err != nil {
-		return nil, twirp.NotFoundError("switch not found").WithMeta("id", req.Id)
+	sw, err := s.dao.GetSwitch(ctx, req.GetId())
+	if err != nil {
+		slog.Error("can't get switch", "req", req, "err", err)
+		switch {
+		case errors.Is(err, gorm.ErrRecordNotFound):
+			return nil, twirp.NotFoundError("can't find switch").
+				WithMeta("id", req.GetId())
+		default:
+			return nil, twirp.InternalErrorWith(err)
+		}
 	}
 
 	return sw.AsFrontChange(), nil
@@ -125,8 +109,19 @@ func (s *SwitchTracker) ListSwitches(ctx context.Context, req *pb.ListSwitchesRe
 		req.Count = 30
 	}
 
-	if err := s.db.Joins("Member").Order("rowid DESC").Limit(int(req.GetCount())).Offset(int(req.GetCount() * req.GetPage())).Find(&switches).Error; err != nil {
-		return nil, err
+	switches, err := s.dao.ListSwitches(ctx, int(req.GetCount()), int(req.GetPage()))
+	if err != nil {
+		slog.Error("can't get switches", "req", req, "err", err)
+		switch {
+		case errors.Is(err, gorm.ErrRecordNotFound):
+			return nil, twirp.NotFoundError("can't find switch info")
+		default:
+			return nil, twirp.InternalErrorWith(err)
+		}
+	}
+
+	if len(switches) == 0 {
+		return nil, twirp.NotFoundError("no switches returned")
 	}
 
 	var resp pb.ListSwitchesResp

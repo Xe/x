@@ -152,6 +152,43 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
+  name: mi-front-public
+  namespace: mi
+  labels:
+    app.kubernetes.io/name: mi
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/custom-headers: "mi-front-public-headers"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+      - home.cetacean.club
+      secretName: home-cetacean-club-tls
+  rules:
+  - host: home.cetacean.club
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/front"
+        backend:
+          service:
+            name: mi
+            port: 
+              name: http
+---
+apiVersion: v1
+data:
+  Server: "within.website/x/cmd/mi + within.website/x/cmd/ingressd"
+kind: ConfigMap
+metadata:
+  name: mi-front-public-headers
+  namespace: ingress-nginx
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
   name: mi-tango-sierra
   namespace: mi
   labels:

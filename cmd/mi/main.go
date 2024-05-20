@@ -40,9 +40,12 @@ func main() {
 		os.Exit(1)
 	}
 
+	dao := models.New(db)
+
 	mux := http.NewServeMux()
 
 	mux.Handle(pb.SwitchTrackerPathPrefix, pb.NewSwitchTrackerServer(NewSwitchTracker(db)))
+	mux.Handle("/front", &HomeFrontShim{dao: dao})
 
 	i := &Importer{db: db}
 	i.Mount(http.DefaultServeMux)
