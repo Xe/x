@@ -14,18 +14,6 @@ spec:
   storageClassName: longhorn
   volumeMode: Filesystem
 ---
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: mc-vanilla
-spec:
-  defaultBackend:
-    service:
-      name: vanilla
-      port:
-        number: 25565
-  ingressClassName: tailscale
----
 apiVersion: v1
 kind: Service
 metadata:
@@ -72,15 +60,15 @@ spec:
         - name: "USE_AIKAR_FLAGS"
           value: "true"
         securityContext:
-            runAsUser: 1000
-            runAsGroup: 1000
-            runAsNonRoot: true
-            allowPrivilegeEscalation: false
-            capabilities:
-              drop:
-                - ALL
-            seccompProfile:
-              type: RuntimeDefault
+          runAsUser: 1000
+          runAsGroup: 1000
+          runAsNonRoot: true
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - ALL
+          seccompProfile:
+            type: RuntimeDefault
         ports:
         - containerPort: 25565
           name: main
