@@ -18,7 +18,7 @@ spec:
         app.kubernetes.io/name: sapientwindex
     spec:
       volumes:
-        - name: 1password
+        - name: sapientwindex
           secret:
             secretName: sapientwindex
       containers:
@@ -43,6 +43,6 @@ spec:
             seccompProfile:
               type: RuntimeDefault
           volumeMounts:
-            - name: 1password
+            - name: sapientwindex
               readOnly: true
-              mountPath: "/run/secrets/1password"
+              mountPath: "/run/secrets/sapientwindex"
