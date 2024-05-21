@@ -3,17 +3,17 @@ kind: DataVolume
 metadata:
   name: "arch-linux"
   namespace: waifud
-  annotations:
+  labels:
     xeiaso.net/project: waifud
 spec:
   storage:
     storageClassName: longhorn
-    volumeMode: block # or filesystem
+    volumeMode: Block # or filesystem
     accessModes:
       - ReadWriteOnce # Necessary as it's no longer has a default
     resources:
       requests:
-        storage: 2Gi
+        storage: 32Gi
   source:
     http:
       url: "https://geo.mirror.pkgbuild.com/images/latest/Arch-Linux-x86_64-cloudimg.qcow2"

@@ -1,27 +1,27 @@
 apiVersion: cdi.kubevirt.io/v1beta1
 kind: DataVolume
 metadata:
-  name: "ubuntu-24.04"
+  name: "fedora-40"
   namespace: waifud
 spec:
   storage:
     storageClassName: longhorn
-    volumeMode: Block # or filesystem
+    volumeMode: Block
     accessModes:
-      - ReadWriteOnce # Necessary as it's no longer has a default
+      - ReadWriteOnce
     resources:
       requests:
         storage: 32Gi
   source:
     http:
-      url: "https://cloud-images.ubuntu.com/daily/server/noble/current/noble-server-cloudimg-amd64.img"
+      url: "https://mirror.xenyth.net/fedora/linux/releases/40/Cloud/x86_64/images/Fedora-Cloud-Base-Generic.x86_64-40-1.14.qcow2"
 ---
 apiVersion: kubevirt.io/v1
 kind: VirtualMachine
 metadata:
   labels:
     kubevirt.io/os: linux
-  name: "ubuntu-24.04"
+  name: fedora-40
   namespace: waifud
 spec:
   running: true
@@ -29,7 +29,7 @@ spec:
     metadata:
       creationTimestamp: null
       labels:
-        kubevirt.io/domain: "ubuntu-22.04"
+        kubevirt.io/domain: fedora-40
     spec:
       domain:
         cpu:
@@ -51,11 +51,11 @@ spec:
       volumes:
       - name: disk0
         persistentVolumeClaim:
-          claimName: "ubuntu-24.04"
+          claimName: fedora-40
       - cloudInitNoCloud:
           userData: |
             #cloud-config
-            hostname: noble
+            hostname: fedora-40
             ssh_pwauth: True
             disable_root: false
             ssh_authorized_keys:

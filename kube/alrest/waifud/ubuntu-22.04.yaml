@@ -7,9 +7,13 @@ metadata:
     xeiaso.net/project: waifud
 spec:
   storage:
+    storageClassName: longhorn
+    volumeMode: Block # or filesystem
+    accessModes:
+      - ReadWriteOnce # Necessary as it's no longer has a default
     resources:
       requests:
-        storage: 5Gi
+        storage: 32Gi
   source:
     http:
       url: "https://cloud-images.ubuntu.com/daily/server/jammy/current/jammy-server-cloudimg-amd64.img"
