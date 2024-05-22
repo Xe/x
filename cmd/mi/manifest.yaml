@@ -20,6 +20,22 @@ spec:
     requests:
       storage: 2Gi
 ---
+apiVersion: onepassword.com/v1
+kind: OnePasswordItem
+metadata:
+  name: mi-bluesky
+  namespace: mi
+spec:
+  itemPath: "vaults/Kubernetes/items/Bluesky xeiaso.net"
+---
+apiVersion: onepassword.com/v1
+kind: OnePasswordItem
+metadata:
+  name: mi-mastodon
+  namespace: mi
+spec:
+  itemPath: "vaults/Kubernetes/items/@cadey@pony.social token"
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -44,6 +60,12 @@ spec:
         - name: vol
           persistentVolumeClaim:
             claimName: mi
+        - name: bluesky
+          secret:
+            secretName: mi-bluesky
+        - name: mastodon
+          secret:
+            secretName: mi-mastodon
       securityContext:
         fsGroup: 1000
       containers:
@@ -86,6 +108,12 @@ spec:
           volumeMounts:
             - name: vol
               mountPath: "/data"
+            - name: bluesky
+              readOnly: true
+              mountPath: "/run/secrets/bluesky"
+            - name: mastodon
+              readOnly: true
+              mountPath: "/run/secrets/mastodon"
 ---
 apiVersion: v1
 kind: Service

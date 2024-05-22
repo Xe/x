@@ -1,57 +1,73 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"log/slog"
 	"net/http"
 	"os"
 
-	slogGorm "github.com/orandin/slog-gorm"
-	"gorm.io/driver/sqlite"
-	"gorm.io/gorm"
 	"within.website/x/cmd/mi/models"
 	"within.website/x/internal"
 	pb "within.website/x/proto/mi"
+	"within.website/x/proto/mimi/announce"
 )
 
 var (
 	bind         = flag.String("bind", ":8080", "HTTP bind address")
 	dbLoc        = flag.String("db-loc", "./var/data.db", "")
 	internalBind = flag.String("internal-bind", ":9195", "HTTP internal routes bind address")
+
+	// POSSE flags
+	blueskyAuthkey   = flag.String("bsky-authkey", "", "Bluesky authkey")
+	blueskyHandle    = flag.String("bsky-handle", "", "Bluesky handle")
+	blueskyPDS       = flag.String("bsky-pds", "https://bsky.social", "Bluesky PDS")
+	mastodonToken    = flag.String("mastodon-token", "", "Mastodon token")
+	mastodonURL      = flag.String("mastodon-url", "", "Mastodon URL")
+	mastodonUsername = flag.String("mastodon-username", "", "Mastodon username")
 )
 
 func main() {
 	internal.HandleStartup()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
-	db, err := gorm.Open(sqlite.Open(*dbLoc), &gorm.Config{
-		Logger: slogGorm.New(
-			slogGorm.WithErrorField("err"),
-			slogGorm.WithRecordNotFoundError(),
-		),
-	})
+	slog.Info(
+		"starting up",
+		"bind", *bind,
+		"db-loc", *dbLoc,
+		"internal-bind", *internalBind,
+		"bsky-handle", *blueskyHandle,
+		"bsky-pds", *blueskyPDS,
+		"mastodon-url", *mastodonURL,
+		"mastodon-username", *mastodonUsername,
+	)
+
+	dao, err := models.New(*dbLoc)
 	if err != nil {
-		slog.Error("failed to connect to database", "err", err)
+		slog.Error("failed to create dao", "err", err)
 		os.Exit(1)
 	}
-
-	if err := db.AutoMigrate(&models.Member{}, &models.Switch{}); err != nil {
-		slog.Error("failed to migrate schema", "err", err)
-		os.Exit(1)
-	}
-
-	dao := models.New(db)
 
 	mux := http.NewServeMux()
 
-	mux.Handle(pb.SwitchTrackerPathPrefix, pb.NewSwitchTrackerServer(NewSwitchTracker(db)))
+	ann, err := NewAnnouncer(ctx, dao)
+	if err != nil {
+		slog.Error("failed to create announcer", "err", err)
+		os.Exit(1)
+	}
+
+	mux.Handle(announce.AnnouncePathPrefix, announce.NewAnnounceServer(ann))
+	mux.Handle(pb.SwitchTrackerPathPrefix, pb.NewSwitchTrackerServer(NewSwitchTracker(dao)))
 	mux.Handle("/front", &HomeFrontShim{dao: dao})
 
-	i := &Importer{db: db}
+	i := &Importer{db: dao.DB()}
 	i.Mount(http.DefaultServeMux)
 
 	mux.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
-		if err := db.Exec("select 1+1").Error; err != nil {
+		if err := dao.Ping(r.Context()); err != nil {
+			slog.Error("database not healthy", "err", err)
 			http.Error(w, "database not healthy", http.StatusInternalServerError)
 			return
 		}

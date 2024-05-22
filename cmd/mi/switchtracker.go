@@ -17,10 +17,9 @@ type SwitchTracker struct {
 	dao *models.DAO
 }
 
-func NewSwitchTracker(db *gorm.DB) *SwitchTracker {
+func NewSwitchTracker(dao *models.DAO) *SwitchTracker {
 	return &SwitchTracker{
-		db:  db,
-		dao: models.New(db),
+		dao: dao,
 	}
 }
 

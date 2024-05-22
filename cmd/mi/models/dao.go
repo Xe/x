@@ -4,9 +4,13 @@ import (
 	"context"
 	"crypto/rand"
 	"errors"
+	"log/slog"
+	"os"
 	"time"
 
 	"github.com/oklog/ulid/v2"
+	slogGorm "github.com/orandin/slog-gorm"
+	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
@@ -18,8 +22,36 @@ type DAO struct {
 	db *gorm.DB
 }
 
-func New(db *gorm.DB) *DAO {
-	return &DAO{db: db}
+func (d *DAO) DB() *gorm.DB {
+	return d.db
+}
+
+func (d *DAO) Ping(ctx context.Context) error {
+	if err := d.db.WithContext(ctx).Exec("select 1+1").Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func New(dbLoc string) (*DAO, error) {
+	db, err := gorm.Open(sqlite.Open(dbLoc), &gorm.Config{
+		Logger: slogGorm.New(
+			slogGorm.WithErrorField("err"),
+			slogGorm.WithRecordNotFoundError(),
+		),
+	})
+	if err != nil {
+		slog.Error("failed to connect to database", "err", err)
+		os.Exit(1)
+	}
+
+	if err := db.AutoMigrate(&Member{}, &Switch{}, &Blogpost{}); err != nil {
+		slog.Error("failed to migrate schema", "err", err)
+		os.Exit(1)
+	}
+
+	return &DAO{db: db}, nil
 }
 
 func (d *DAO) Members(ctx context.Context) ([]Member, error) {
