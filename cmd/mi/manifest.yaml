@@ -103,7 +103,7 @@ spec:
           livenessProbe:
             httpGet:
               path: /healthz
-              port: 8080
+              port: 9195
               httpHeaders:
                 - name: X-Kubernetes
                   value: "is kinda okay"
@@ -226,4 +226,4 @@ data:
 kind: ConfigMap
 metadata:
   name: mi-front-public-headers
-  namespace: ingress-nginx
+  namespace: mi

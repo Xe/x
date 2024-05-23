@@ -9,12 +9,26 @@ import (
 	"strings"
 
 	bsky "github.com/danrusei/gobot-bsky"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"within.website/x/cmd/mi/models"
 	"within.website/x/proto/external/jsonfeed"
 	"within.website/x/proto/mimi/announce"
 	"within.website/x/web/mastodon"
+)
+
+var (
+	possePosts = promauto.NewGaugeVec(prometheus.GaugeOpts{
+		Name: "mi_posse_posts",
+		Help: "Number of posts sent to social networks.",
+	}, []string{"service"})
+
+	posseErrors = promauto.NewCounterVec(prometheus.CounterOpts{
+		Name: "mi_posse_errors",
+		Help: "Number of errors encountered while sending posts to social networks.",
+	}, []string{"service"})
 )
 
 type Announcer struct {
@@ -60,21 +74,26 @@ func (a *Announcer) Announce(ctx context.Context, it *jsonfeed.Item) (*emptypb.E
 			Status: sb.String(),
 		})
 		if err != nil {
+			posseErrors.WithLabelValues("mastodon").Inc()
 			slog.Error("failed to announce to mastodon", "err", err)
 			return err
 		}
+		possePosts.WithLabelValues("mastodon").Inc()
 		slog.Info("posted to mastodon", "blogpost_url", it.GetUrl(), "mastodon_url", post.URL)
 		return nil
 	})
 
 	g.Go(func() error {
 		if err := a.bluesky.Connect(gCtx); err != nil {
+			posseErrors.WithLabelValues("bluesky").Inc()
 			slog.Error("failed to connect to bluesky", "err", err)
 			return err
 		}
 
 		u, err := url.Parse(it.GetUrl())
 		if err != nil {
+			posseErrors.WithLabelValues("bluesky").Inc()
+			slog.Error("failed to parse url", "err", err)
 			return err
 		}
 		post, err := bsky.NewPostBuilder(sb.String()).
@@ -82,16 +101,19 @@ func (a *Announcer) Announce(ctx context.Context, it *jsonfeed.Item) (*emptypb.E
 			WithFacet(bsky.Facet_Link, it.GetUrl(), it.GetUrl()).
 			Build()
 		if err != nil {
+			posseErrors.WithLabelValues("bluesky").Inc()
 			slog.Error("failed to build bluesky post", "err", err)
 			return err
 		}
 
 		cid, uri, err := a.bluesky.PostToFeed(ctx, post)
 		if err != nil {
+			posseErrors.WithLabelValues("bluesky").Inc()
 			slog.Error("failed to post to bluesky", "err", err)
 			return err
 		}
 
+		possePosts.WithLabelValues("bluesky").Inc()
 		slog.Info("posted to bluesky", "blogpost_url", it.GetUrl(), "bluesky_cid", cid, "bluesky_uri", uri)
 		return nil
 	})
@@ -101,6 +123,7 @@ func (a *Announcer) Announce(ctx context.Context, it *jsonfeed.Item) (*emptypb.E
 			slog.Error("failed to announce to mimi", "err", err)
 			return err
 		}
+		possePosts.WithLabelValues("irc").Inc()
 		return nil
 	})
 

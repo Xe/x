@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"golang.org/x/sync/errgroup"
 	"within.website/x/cmd/mi/models"
 	"within.website/x/internal"
@@ -67,7 +68,7 @@ func main() {
 	i := &Importer{db: dao.DB()}
 	i.Mount(http.DefaultServeMux)
 
-	mux.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
 		if err := dao.Ping(r.Context()); err != nil {
 			slog.Error("database not healthy", "err", err)
 			http.Error(w, "database not healthy", http.StatusInternalServerError)
@@ -76,6 +77,7 @@ func main() {
 		w.WriteHeader(http.StatusOK)
 		fmt.Fprintln(w, "OK")
 	})
+	http.Handle("/metrics", promhttp.Handler())
 
 	g, _ := errgroup.WithContext(ctx)
 

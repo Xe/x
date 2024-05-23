@@ -4,19 +4,26 @@ import (
 	"context"
 	"crypto/rand"
 	"errors"
-	"log/slog"
-	"os"
+	"fmt"
 	"time"
 
 	_ "github.com/ncruces/go-sqlite3/embed"
 	"github.com/ncruces/go-sqlite3/gormlite"
 	"github.com/oklog/ulid/v2"
 	slogGorm "github.com/orandin/slog-gorm"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
 	"gorm.io/gorm"
+	gormPrometheus "gorm.io/plugin/prometheus"
 )
 
 var (
 	ErrCantSwitchToYourself = errors.New("models: you can't switch to yourself")
+
+	pingCount = promauto.NewGauge(prometheus.GaugeOpts{
+		Name: "mi_db_ping",
+		Help: "Number of times the database has been pinged.",
+	})
 )
 
 type DAO struct {
@@ -32,6 +39,8 @@ func (d *DAO) Ping(ctx context.Context) error {
 		return err
 	}
 
+	pingCount.Inc()
+
 	return nil
 }
 
@@ -43,14 +52,16 @@ func New(dbLoc string) (*DAO, error) {
 		),
 	})
 	if err != nil {
-		slog.Error("failed to connect to database", "err", err)
-		os.Exit(1)
+		return nil, fmt.Errorf("failed to connect to database: %w", err)
 	}
 
 	if err := db.AutoMigrate(&Member{}, &Switch{}, &Blogpost{}); err != nil {
-		slog.Error("failed to migrate schema", "err", err)
-		os.Exit(1)
+		return nil, fmt.Errorf("failed to migrate schema: %w", err)
 	}
+
+	db.Use(gormPrometheus.New(gormPrometheus.Config{
+		DBName: "mi",
+	}))
 
 	return &DAO{db: db}, nil
 }

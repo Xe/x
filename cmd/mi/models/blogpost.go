@@ -17,6 +17,7 @@ type Blogpost struct {
 	URL         string    `gorm:"uniqueIndex"` // URL of the blogpost
 	Title       string    // title of the blogpost
 	BodyHTML    string    // HTML body of the blogpost
+	Image       string    // URL of the image for the blogpost
 	PublishedAt time.Time // when the blogpost was published
 }
 
