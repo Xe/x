@@ -7,10 +7,13 @@ import (
 	"fmt"
 	"log/slog"
 
+	"github.com/bwmarrin/discordgo"
 	ircevent "github.com/thoj/go-ircevent"
 )
 
 var (
+	discordAnnounceChannel = flag.String("discord-announce-channel", "", "Discord channel to announce in")
+
 	ircServer   = flag.String("irc-server", "irc.libera.chat:6697", "IRC server to connect to")
 	ircUsername = flag.String("irc-username", "[Mara]", "IRC username")
 	ircIdent    = flag.String("irc-ident", "mara", "IRC ident")
@@ -20,9 +23,10 @@ var (
 
 type Module struct {
 	conn *ircevent.Connection
+	dg   *discordgo.Session
 }
 
-func New(ctx context.Context) (*Module, error) {
+func New(ctx context.Context, dg *discordgo.Session) (*Module, error) {
 	conn := ircevent.IRC(*ircUsername, *ircIdent)
 	conn.UseTLS = true
 	conn.UseSASL = false
@@ -64,5 +68,6 @@ func New(ctx context.Context) (*Module, error) {
 
 	return &Module{
 		conn: conn,
+		dg:   dg,
 	}, nil
 }

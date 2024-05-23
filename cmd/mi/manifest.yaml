@@ -36,6 +36,14 @@ metadata:
 spec:
   itemPath: "vaults/Kubernetes/items/@cadey@pony.social token"
 ---
+apiVersion: onepassword.com/v1
+kind: OnePasswordItem
+metadata:
+  name: mi-irc
+  namespace: mi
+spec:
+  itemPath: "vaults/Kubernetes/items/IRC [Mara]"
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -63,6 +71,9 @@ spec:
         - name: bluesky
           secret:
             secretName: mi-bluesky
+        - name: irc
+          secret:
+            secretName: mi-irc
         - name: mastodon
           secret:
             secretName: mi-mastodon
@@ -75,10 +86,10 @@ spec:
           resources:
             limits:
               cpu: "500m"
-              memory: "512Mi"
+              memory: "1024Mi"
             requests:
               cpu: "100m"
-              memory: "256Mi"
+              memory: "512Mi"
           securityContext:
             runAsUser: 1000
             runAsGroup: 1000
@@ -111,6 +122,9 @@ spec:
             - name: bluesky
               readOnly: true
               mountPath: "/run/secrets/bluesky"
+            - name: irc
+              readOnly: true
+              mountPath: "/run/secrets/irc"
             - name: mastodon
               readOnly: true
               mountPath: "/run/secrets/mastodon"

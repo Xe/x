@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 
+	"golang.org/x/sync/errgroup"
 	"within.website/x/cmd/mi/models"
 	"within.website/x/internal"
 	pb "within.website/x/proto/mi"
@@ -26,6 +27,7 @@ var (
 	mastodonToken    = flag.String("mastodon-token", "", "Mastodon token")
 	mastodonURL      = flag.String("mastodon-url", "", "Mastodon URL")
 	mastodonUsername = flag.String("mastodon-username", "", "Mastodon username")
+	mimiAnnounceURL  = flag.String("mimi-announce-url", "", "Mimi announce URL")
 )
 
 func main() {
@@ -75,11 +77,25 @@ func main() {
 		fmt.Fprintln(w, "OK")
 	})
 
-	go func() {
-		slog.Info("starting internal server", "bind", *internalBind)
-		slog.Error("internal server stopped", "err", http.ListenAndServe(*internalBind, nil))
-	}()
+	g, _ := errgroup.WithContext(ctx)
 
-	slog.Info("starting server", "bind", *bind)
-	slog.Error("server stopped", "err", http.ListenAndServe(*bind, mux))
+	g.Go(func() error {
+		slog.Info("starting internal server", "bind", *internalBind)
+		return http.ListenAndServe(*internalBind, nil)
+	})
+
+	g.Go(func() error {
+		slog.Info("starting server", "bind", *bind)
+		return http.ListenAndServe(*bind, mux)
+	})
+
+	g.Go(func() error {
+		<-ctx.Done()
+		return ctx.Err()
+	})
+
+	if err := g.Wait(); err != nil {
+		slog.Error("error doing work", "err", err)
+		os.Exit(1)
+	}
 }

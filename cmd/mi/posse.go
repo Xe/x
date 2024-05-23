@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"net/http"
 	"net/url"
 	"strings"
 
@@ -12,6 +13,7 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 	"within.website/x/cmd/mi/models"
 	"within.website/x/proto/external/jsonfeed"
+	"within.website/x/proto/mimi/announce"
 	"within.website/x/web/mastodon"
 )
 
@@ -19,6 +21,7 @@ type Announcer struct {
 	dao      *models.DAO
 	mastodon *mastodon.Client
 	bluesky  *bsky.BskyAgent
+	mimi     announce.Announce
 }
 
 func NewAnnouncer(ctx context.Context, dao *models.DAO) (*Announcer, error) {
@@ -36,6 +39,7 @@ func NewAnnouncer(ctx context.Context, dao *models.DAO) (*Announcer, error) {
 		dao:      dao,
 		mastodon: mas,
 		bluesky:  &blueAgent,
+		mimi:     announce.NewAnnounceProtobufClient(*mimiAnnounceURL, &http.Client{}),
 	}, nil
 }
 
@@ -64,6 +68,11 @@ func (a *Announcer) Announce(ctx context.Context, it *jsonfeed.Item) (*emptypb.E
 	})
 
 	g.Go(func() error {
+		if err := a.bluesky.Connect(gCtx); err != nil {
+			slog.Error("failed to connect to bluesky", "err", err)
+			return err
+		}
+
 		u, err := url.Parse(it.GetUrl())
 		if err != nil {
 			return err
@@ -84,6 +93,14 @@ func (a *Announcer) Announce(ctx context.Context, it *jsonfeed.Item) (*emptypb.E
 		}
 
 		slog.Info("posted to bluesky", "blogpost_url", it.GetUrl(), "bluesky_cid", cid, "bluesky_uri", uri)
+		return nil
+	})
+
+	g.Go(func() error {
+		if _, err := a.mimi.Announce(gCtx, it); err != nil {
+			slog.Error("failed to announce to mimi", "err", err)
+			return err
+		}
 		return nil
 	})
 
