@@ -8,9 +8,10 @@ import (
 	"os"
 	"time"
 
+	_ "github.com/ncruces/go-sqlite3/embed"
+	"github.com/ncruces/go-sqlite3/gormlite"
 	"github.com/oklog/ulid/v2"
 	slogGorm "github.com/orandin/slog-gorm"
-	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
@@ -35,7 +36,7 @@ func (d *DAO) Ping(ctx context.Context) error {
 }
 
 func New(dbLoc string) (*DAO, error) {
-	db, err := gorm.Open(sqlite.Open(dbLoc), &gorm.Config{
+	db, err := gorm.Open(gormlite.Open(dbLoc), &gorm.Config{
 		Logger: slogGorm.New(
 			slogGorm.WithErrorField("err"),
 			slogGorm.WithRecordNotFoundError(),

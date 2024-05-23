@@ -36,6 +36,8 @@ require (
 	github.com/lib/pq v1.10.9
 	github.com/mndrix/golog v0.0.0-20170330170653-a28e2a269775
 	github.com/mymmrac/telego v0.29.2
+	github.com/ncruces/go-sqlite3 v0.15.0
+	github.com/ncruces/go-sqlite3/gormlite v0.14.0
 	github.com/orandin/slog-gorm v1.3.2
 	github.com/otiai10/copy v1.14.0
 	github.com/peterh/liner v1.2.2
@@ -47,7 +49,7 @@ require (
 	github.com/rs/cors v1.11.0
 	github.com/sebest/xff v0.0.0-20210106013422-671bd2870b3a
 	github.com/stoewer/go-strcase v1.3.0
-	github.com/tetratelabs/wazero v1.7.0
+	github.com/tetratelabs/wazero v1.7.1
 	github.com/thoj/go-ircevent v0.0.0-20210723090443-73e444401d64
 	github.com/tmc/scp v0.0.0-20170824174625-f7b48647feef
 	github.com/twitchtv/twirp v8.1.3+incompatible
@@ -58,7 +60,6 @@ require (
 	golang.org/x/oauth2 v0.18.0
 	golang.org/x/sync v0.7.0
 	google.golang.org/grpc v1.62.1
-	gorm.io/driver/sqlite v1.5.5
 	gorm.io/gorm v1.25.10
 	honnef.co/go/transmission v0.0.0-20200712215954-58262f0ca9c9
 	modernc.org/sqlite v1.29.10
@@ -168,6 +169,7 @@ require (
 	github.com/multiformats/go-multihash v0.2.3 // indirect
 	github.com/multiformats/go-varint v0.0.7 // indirect
 	github.com/ncruces/go-strftime v0.1.9 // indirect
+	github.com/ncruces/julianday v1.0.0 // indirect
 	github.com/opentracing/opentracing-go v1.2.0 // indirect
 	github.com/pjbgf/sha1cd v0.3.0 // indirect
 	github.com/polydawn/refmt v0.89.1-0.20221221234430-40501e09de1f // indirect
