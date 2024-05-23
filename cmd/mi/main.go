@@ -68,7 +68,7 @@ func main() {
 	i := &Importer{db: dao.DB()}
 	i.Mount(http.DefaultServeMux)
 
-	http.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
 		if err := dao.Ping(r.Context()); err != nil {
 			slog.Error("database not healthy", "err", err)
 			http.Error(w, "database not healthy", http.StatusInternalServerError)
