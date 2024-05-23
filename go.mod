@@ -15,6 +15,7 @@ require (
 	github.com/bwmarrin/discordgo v0.28.1
 	github.com/cenkalti/backoff/v4 v4.3.0
 	github.com/chai2010/webp v1.1.1
+	github.com/danrusei/gobot-bsky v0.1.0
 	github.com/disintegration/imaging v1.6.2
 	github.com/dop251/goja v0.0.0-20230531210528-d7324b2d74f7
 	github.com/eaburns/peggy v1.0.2
@@ -97,7 +98,6 @@ require (
 	github.com/cloudflare/circl v1.3.7 // indirect
 	github.com/coreos/go-systemd/v22 v22.5.0 // indirect
 	github.com/cyphar/filepath-securejoin v0.2.4 // indirect
-	github.com/danrusei/gobot-bsky v0.1.0 // indirect
 	github.com/dblohm7/wingoes v0.0.0-20240119213807-a09d6be7affa // indirect
 	github.com/digitalocean/go-smbios v0.0.0-20180907143718-390a4f403a8e // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
@@ -220,7 +220,7 @@ require (
 	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/akutz/memconn v0.1.0 // indirect
 	github.com/alexbrainman/sspi v0.0.0-20231016080023-1a75b4708caa // indirect
-	github.com/aws/aws-sdk-go-v2 v1.26.1
+	github.com/aws/aws-sdk-go-v2 v1.27.0
 	github.com/aws/aws-sdk-go-v2/config v1.27.10
 	github.com/aws/aws-sdk-go-v2/credentials v1.17.10
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.16.1 // indirect
