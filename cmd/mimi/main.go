@@ -42,7 +42,7 @@ func main() {
 
 	d.Open()
 
-	ircBot, err := irc.New(ctx)
+	ircBot, err := irc.New(ctx, d.Session())
 	if err != nil {
 		log.Fatalf("error creating irc module: %v", err)
 	}

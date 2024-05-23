@@ -33,6 +33,10 @@ func New(ctx context.Context) (*Module, error) {
 	}, nil
 }
 
+func (m *Module) Session() *discordgo.Session {
+	return m.dg
+}
+
 func (m *Module) Open() {
 	go func() {
 		if err := m.dg.Open(); err != nil {
