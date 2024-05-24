@@ -134,9 +134,9 @@ func (le *miListEvents) Execute(ctx context.Context, f *flag.FlagSet, _ ...inter
 		return subcommands.ExitFailure
 	}
 
-	tbl := table.New("Name", "Start Date", "End Date", "Location")
+	tbl := table.New("ID", "Name", "Start Date", "End Date", "Location")
 	for _, ev := range resp.Events {
-		tbl.AddRow(ev.Name, ev.StartDate.AsTime().Format("2006-01-02"), ev.EndDate.AsTime().Format("2006-01-02"), ev.Location)
+		tbl.AddRow(ev.Id, ev.Name, ev.StartDate.AsTime().Format("2006-01-02"), ev.EndDate.AsTime().Format("2006-01-02"), ev.Location)
 	}
 
 	tbl.Print()
