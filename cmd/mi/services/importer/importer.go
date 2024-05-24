@@ -1,4 +1,4 @@
-package main
+package importer
 
 import (
 	"encoding/csv"
@@ -14,6 +14,10 @@ import (
 )
 
 const timeLayout = "2006-01-02 15:04:05"
+
+func New(dao *models.DAO) *Importer {
+	return &Importer{db: dao.DB()}
+}
 
 type Importer struct {
 	db *gorm.DB

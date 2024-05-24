@@ -1,4 +1,4 @@
-package main
+package switchtracker
 
 import (
 	"context"
@@ -17,7 +17,7 @@ type SwitchTracker struct {
 	dao *models.DAO
 }
 
-func NewSwitchTracker(dao *models.DAO) *SwitchTracker {
+func New(dao *models.DAO) *SwitchTracker {
 	return &SwitchTracker{
 		dao: dao,
 	}

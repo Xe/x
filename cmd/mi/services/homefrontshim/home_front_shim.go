@@ -1,4 +1,4 @@
-package main
+package homefrontshim
 
 import (
 	"fmt"
@@ -6,6 +6,10 @@ import (
 
 	"within.website/x/cmd/mi/models"
 )
+
+func New(dao *models.DAO) *HomeFrontShim {
+	return &HomeFrontShim{dao: dao}
+}
 
 type HomeFrontShim struct {
 	dao *models.DAO

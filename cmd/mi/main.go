@@ -11,6 +11,10 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"golang.org/x/sync/errgroup"
 	"within.website/x/cmd/mi/models"
+	"within.website/x/cmd/mi/services/homefrontshim"
+	"within.website/x/cmd/mi/services/importer"
+	"within.website/x/cmd/mi/services/posse"
+	"within.website/x/cmd/mi/services/switchtracker"
 	"within.website/x/internal"
 	pb "within.website/x/proto/mi"
 	"within.website/x/proto/mimi/announce"
@@ -55,17 +59,24 @@ func main() {
 
 	mux := http.NewServeMux()
 
-	ann, err := NewAnnouncer(ctx, dao)
+	ann, err := posse.New(ctx, dao, posse.Config{
+		BlueskyAuthkey:  *blueskyAuthkey,
+		BlueskyHandle:   *blueskyHandle,
+		BlueskyPDS:      *blueskyPDS,
+		MastodonToken:   *mastodonToken,
+		MastodonURL:     *mastodonURL,
+		MimiAnnounceURL: *mimiAnnounceURL,
+	})
 	if err != nil {
 		slog.Error("failed to create announcer", "err", err)
 		os.Exit(1)
 	}
 
 	mux.Handle(announce.AnnouncePathPrefix, announce.NewAnnounceServer(ann))
-	mux.Handle(pb.SwitchTrackerPathPrefix, pb.NewSwitchTrackerServer(NewSwitchTracker(dao)))
-	mux.Handle("/front", &HomeFrontShim{dao: dao})
+	mux.Handle(pb.SwitchTrackerPathPrefix, pb.NewSwitchTrackerServer(switchtracker.New(dao)))
+	mux.Handle("/front", homefrontshim.New(dao))
 
-	i := &Importer{db: dao.DB()}
+	i := importer.New(dao)
 	i.Mount(http.DefaultServeMux)
 
 	mux.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {

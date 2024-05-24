@@ -1,4 +1,4 @@
-package main
+package posse
 
 import (
 	"context"
@@ -38,13 +38,22 @@ type Announcer struct {
 	mimi     announce.Announce
 }
 
-func NewAnnouncer(ctx context.Context, dao *models.DAO) (*Announcer, error) {
-	mas, err := mastodon.Authenticated("mi_irl", "https://xeiaso.net", *mastodonURL, *mastodonToken)
+type Config struct {
+	BlueskyAuthkey  string
+	BlueskyHandle   string
+	BlueskyPDS      string
+	MastodonToken   string
+	MastodonURL     string
+	MimiAnnounceURL string
+}
+
+func New(ctx context.Context, dao *models.DAO, cfg Config) (*Announcer, error) {
+	mas, err := mastodon.Authenticated("mi_irl", "https://xeiaso.net", cfg.MastodonURL, cfg.MastodonToken)
 	if err != nil {
 		return nil, fmt.Errorf("failed to authenticate to mastodon: %w", err)
 	}
 
-	blueAgent := bsky.NewAgent(ctx, *blueskyPDS, *blueskyHandle, *blueskyAuthkey)
+	blueAgent := bsky.NewAgent(ctx, cfg.BlueskyPDS, cfg.BlueskyHandle, cfg.BlueskyAuthkey)
 	if err := blueAgent.Connect(ctx); err != nil {
 		return nil, fmt.Errorf("failed to connect to bluesky: %w", err)
 	}
@@ -53,7 +62,7 @@ func NewAnnouncer(ctx context.Context, dao *models.DAO) (*Announcer, error) {
 		dao:      dao,
 		mastodon: mas,
 		bluesky:  &blueAgent,
-		mimi:     announce.NewAnnounceProtobufClient(*mimiAnnounceURL, &http.Client{}),
+		mimi:     announce.NewAnnounceProtobufClient(cfg.MimiAnnounceURL, &http.Client{}),
 	}, nil
 }
 
