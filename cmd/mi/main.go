@@ -50,6 +50,7 @@ func main() {
 		"bsky-pds", *blueskyPDS,
 		"mastodon-url", *mastodonURL,
 		"mastodon-username", *mastodonUsername,
+		"have-mimi-announce-url", *mimiAnnounceURL != "",
 	)
 
 	dao, err := models.New(*dbLoc)
