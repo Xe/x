@@ -294,7 +294,7 @@
               mi = simple {
                 name = "ghcr.io/xe/x/mi";
                 pkg = mi;
-                contents = with pkgs; [ cacert ];
+                contents = with pkgs; [ cacert sqlite-interactive ];
                 cmd = [ "${mi}/bin/mi" ];
               };
               sapientwindex = simple {
