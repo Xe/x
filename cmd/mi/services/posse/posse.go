@@ -67,6 +67,13 @@ func New(ctx context.Context, dao *models.DAO, cfg Config) (*Announcer, error) {
 }
 
 func (a *Announcer) Announce(ctx context.Context, it *jsonfeed.Item) (*emptypb.Empty, error) {
+	switch {
+	case strings.Contains(it.GetUrl(), "svc.alrest.xeserv.us"),
+		strings.Contains(it.GetUrl(), "shark-harmonic.ts.net"):
+		slog.Info("skipping announcement", "url", it.GetUrl(), "reason", "staging URLs")
+		return &emptypb.Empty{}, nil
+	}
+
 	if has, err := a.dao.HasBlogpost(ctx, it.GetUrl()); err != nil {
 		return nil, err
 	} else if has {
