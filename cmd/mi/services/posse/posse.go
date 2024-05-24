@@ -100,8 +100,8 @@ func (a *Announcer) Announce(ctx context.Context, it *jsonfeed.Item) (*emptypb.E
 	})
 
 	g.Go(func() error {
-		bluesky := bsky.NewAgent(ctx, a.cfg.BlueskyPDS, a.cfg.BlueskyHandle, a.cfg.BlueskyAuthkey)
-		if err := bluesky.Connect(ctx); err != nil {
+		bluesky := bsky.NewAgent(gCtx, a.cfg.BlueskyPDS, a.cfg.BlueskyHandle, a.cfg.BlueskyAuthkey)
+		if err := bluesky.Connect(gCtx); err != nil {
 			posseErrors.WithLabelValues("bluesky").Inc()
 			slog.Error("failed to connect to bluesky", "err", err)
 			return err
