@@ -13,6 +13,10 @@ func main() {
 	subcommands.Register(subcommands.FlagsCommand(), "")
 	subcommands.Register(subcommands.CommandsCommand(), "")
 
+	subcommands.Register(&miListSwitches{}, "mi")
+	subcommands.Register(&miSwitch{}, "mi")
+	subcommands.Register(&miWhoIsFront{}, "mi")
+
 	subcommands.Register(&sanguisugaAnimeList{}, "sanguisuga")
 	subcommands.Register(&sanguisugaAnimeTrack{}, "sanguisuga")
 	subcommands.Register(&sanguisugaTVList{}, "sanguisuga")

@@ -15,7 +15,7 @@ import (
 )
 
 var (
-	sanguisugaURL = flag.String("url", "http://sanguisuga", "Base sanguisuga URL")
+	sanguisugaURL = flag.String("sanguisuga-url", "http://sanguisuga", "Base sanguisuga URL")
 )
 
 type Show struct {
@@ -29,8 +29,9 @@ type sanguisugaAnimeList struct{}
 func (*sanguisugaAnimeList) Name() string     { return "anime-list" }
 func (*sanguisugaAnimeList) Synopsis() string { return "Print list of anime tracked by sanguisuga." }
 func (*sanguisugaAnimeList) Usage() string {
-	return `anime-list [--url]:
-  Print list of anime tracked by sanguisuga.`
+	return `anime-list:
+Print list of anime tracked by sanguisuga
+`
 }
 
 func (sal *sanguisugaAnimeList) SetFlags(f *flag.FlagSet) {}
@@ -67,7 +68,8 @@ func (*sanguisugaAnimeTrack) Synopsis() string {
 }
 func (*sanguisugaAnimeTrack) Usage() string {
 	return `anime-track <title> <dataDir>:
-  Add a new anime to the tracklist for XDCC.`
+Add a new anime to the tracklist for XDCC.
+`
 }
 
 func (sal *sanguisugaAnimeTrack) SetFlags(f *flag.FlagSet) {}
@@ -107,7 +109,8 @@ func (*sanguisugaTVList) Name() string     { return "tv-list" }
 func (*sanguisugaTVList) Synopsis() string { return "Print list of tv tracked by sanguisuga." }
 func (*sanguisugaTVList) Usage() string {
 	return `tv-list [--url]:
-  Print list of tv tracked by sanguisuga.`
+Print list of tv tracked by sanguisuga.
+`
 }
 
 func (sal *sanguisugaTVList) SetFlags(f *flag.FlagSet) {}
@@ -144,7 +147,8 @@ func (*sanguisugaTVTrack) Synopsis() string {
 }
 func (*sanguisugaTVTrack) Usage() string {
 	return `tv-track <title> <dataDir>:
-  Add a new tv to the tracklist for XDCC.`
+Add a new tv to the tracklist.
+`
 }
 
 func (sal *sanguisugaTVTrack) SetFlags(f *flag.FlagSet) {}
