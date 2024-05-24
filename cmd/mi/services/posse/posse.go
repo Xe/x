@@ -11,6 +11,7 @@ import (
 	bsky "github.com/danrusei/gobot-bsky"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
+	"github.com/twitchtv/twirp"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"within.website/x/cmd/mi/models"
@@ -34,8 +35,8 @@ var (
 type Announcer struct {
 	dao      *models.DAO
 	mastodon *mastodon.Client
-	bluesky  *bsky.BskyAgent
 	mimi     announce.Announce
+	cfg      Config
 }
 
 type Config struct {
@@ -53,16 +54,11 @@ func New(ctx context.Context, dao *models.DAO, cfg Config) (*Announcer, error) {
 		return nil, fmt.Errorf("failed to authenticate to mastodon: %w", err)
 	}
 
-	blueAgent := bsky.NewAgent(ctx, cfg.BlueskyPDS, cfg.BlueskyHandle, cfg.BlueskyAuthkey)
-	if err := blueAgent.Connect(ctx); err != nil {
-		return nil, fmt.Errorf("failed to connect to bluesky: %w", err)
-	}
-
 	return &Announcer{
 		dao:      dao,
 		mastodon: mas,
-		bluesky:  &blueAgent,
 		mimi:     announce.NewAnnounceProtobufClient(cfg.MimiAnnounceURL, &http.Client{}),
+		cfg:      cfg,
 	}, nil
 }
 
@@ -83,6 +79,10 @@ func (a *Announcer) Announce(ctx context.Context, it *jsonfeed.Item) (*emptypb.E
 	var sb strings.Builder
 	fmt.Fprintf(&sb, "%s\n\n%s", it.GetTitle(), it.GetUrl())
 
+	if _, err := a.dao.InsertBlogpost(ctx, it); err != nil {
+		return nil, twirp.InternalErrorWith(err)
+	}
+
 	// announce to bluesky and mastodon
 	g, gCtx := errgroup.WithContext(ctx)
 	g.Go(func() error {
@@ -100,7 +100,14 @@ func (a *Announcer) Announce(ctx context.Context, it *jsonfeed.Item) (*emptypb.E
 	})
 
 	g.Go(func() error {
-		if err := a.bluesky.Connect(gCtx); err != nil {
+		bluesky := bsky.NewAgent(ctx, a.cfg.BlueskyPDS, a.cfg.BlueskyHandle, a.cfg.BlueskyAuthkey)
+		if err := bluesky.Connect(ctx); err != nil {
+			posseErrors.WithLabelValues("bluesky").Inc()
+			slog.Error("failed to connect to bluesky", "err", err)
+			return err
+		}
+
+		if err := bluesky.Connect(gCtx); err != nil {
 			posseErrors.WithLabelValues("bluesky").Inc()
 			slog.Error("failed to connect to bluesky", "err", err)
 			return err
@@ -122,7 +129,7 @@ func (a *Announcer) Announce(ctx context.Context, it *jsonfeed.Item) (*emptypb.E
 			return err
 		}
 
-		cid, uri, err := a.bluesky.PostToFeed(ctx, post)
+		cid, uri, err := bluesky.PostToFeed(ctx, post)
 		if err != nil {
 			posseErrors.WithLabelValues("bluesky").Inc()
 			slog.Error("failed to post to bluesky", "err", err)
@@ -147,6 +154,5 @@ func (a *Announcer) Announce(ctx context.Context, it *jsonfeed.Item) (*emptypb.E
 		return nil, err
 	}
 
-	_, err := a.dao.InsertBlogpost(ctx, it)
-	return &emptypb.Empty{}, err
+	return &emptypb.Empty{}, nil
 }
