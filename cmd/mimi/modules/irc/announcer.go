@@ -3,7 +3,6 @@ package irc
 import (
 	"context"
 	"flag"
-	"fmt"
 	"net/http"
 
 	"github.com/twitchtv/twirp"
@@ -36,7 +35,7 @@ type State struct {
 func (a *AnnounceService) Announce(ctx context.Context, msg *jsonfeed.Item) (*emptypb.Empty, error) {
 	a.conn.Privmsgf(*ircChannel, "New article :: %s :: %s", msg.Title, msg.Url)
 
-	if _, err := a.dg.ChannelMessageSend(*discordAnnounceChannel, fmt.Sprintf("New article :: %s :: %s", msg.Title, msg.Url)); err != nil {
+	if _, err := a.dg.ChannelMessageSend(*discordAnnounceChannel, msg.GetUrl()); err != nil {
 		return nil, twirp.InternalErrorWith(err).WithMeta("step", "discord")
 	}
 
