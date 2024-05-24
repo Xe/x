@@ -11,19 +11,12 @@ import (
 	"github.com/ncruces/go-sqlite3/gormlite"
 	"github.com/oklog/ulid/v2"
 	slogGorm "github.com/orandin/slog-gorm"
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/promauto"
 	"gorm.io/gorm"
 	gormPrometheus "gorm.io/plugin/prometheus"
 )
 
 var (
 	ErrCantSwitchToYourself = errors.New("models: you can't switch to yourself")
-
-	pingCount = promauto.NewGauge(prometheus.GaugeOpts{
-		Name: "mi_db_ping",
-		Help: "Number of times the database has been pinged.",
-	})
 )
 
 type DAO struct {
@@ -38,8 +31,6 @@ func (d *DAO) Ping(ctx context.Context) error {
 	if err := d.db.WithContext(ctx).Exec("select 1+1").Error; err != nil {
 		return err
 	}
-
-	pingCount.Inc()
 
 	return nil
 }
@@ -145,7 +136,7 @@ func (d *DAO) ListSwitches(ctx context.Context, count, page int) ([]Switch, erro
 	var switches []Switch
 	if err := d.db.WithContext(ctx).
 		Joins("Member").
-		Order("rowid DESC").
+		Order("created_at DESC").
 		Limit(count).
 		Offset(count * page).
 		Find(&switches).Error; err != nil {
