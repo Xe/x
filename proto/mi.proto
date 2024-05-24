@@ -73,6 +73,8 @@ message Event {
   string location = 5;
   // Id of the event
   int32 id = 6;
+  // The description of the event
+  string description = 7;
 }
 
 // A feed of events, result from mi query.

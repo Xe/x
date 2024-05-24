@@ -11,6 +11,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"golang.org/x/sync/errgroup"
 	"within.website/x/cmd/mi/models"
+	"within.website/x/cmd/mi/services/events"
 	"within.website/x/cmd/mi/services/homefrontshim"
 	"within.website/x/cmd/mi/services/importer"
 	"within.website/x/cmd/mi/services/posse"
@@ -74,6 +75,7 @@ func main() {
 
 	mux.Handle(announce.AnnouncePathPrefix, announce.NewAnnounceServer(ann))
 	mux.Handle(pb.SwitchTrackerPathPrefix, pb.NewSwitchTrackerServer(switchtracker.New(dao)))
+	mux.Handle(pb.EventsPathPrefix, pb.NewEventsServer(events.New(dao)))
 	mux.Handle("/front", homefrontshim.New(dao))
 
 	i := importer.New(dao)

@@ -46,7 +46,12 @@ func New(dbLoc string) (*DAO, error) {
 		return nil, fmt.Errorf("failed to connect to database: %w", err)
 	}
 
-	if err := db.AutoMigrate(&Member{}, &Switch{}, &Blogpost{}); err != nil {
+	if err := db.AutoMigrate(
+		&Member{},
+		&Switch{},
+		&Blogpost{},
+		&Event{},
+	); err != nil {
 		return nil, fmt.Errorf("failed to migrate schema: %w", err)
 	}
 
