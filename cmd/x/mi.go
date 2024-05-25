@@ -70,11 +70,48 @@ func (s *miSwitch) SetFlags(f *flag.FlagSet) {
 func (s *miSwitch) Execute(ctx context.Context, f *flag.FlagSet, _ ...interface{}) subcommands.ExitStatus {
 	cli := mi.NewSwitchTrackerProtobufClient(*miURL, http.DefaultClient)
 
-	_, err := cli.Switch(ctx, &mi.SwitchReq{MemberName: s.member})
+	if s.member == "" {
+		s.member = prompt.Input("Member to switch to: ", func(d prompt.Document) []prompt.Suggest {
+			s := []prompt.Suggest{
+				{Text: "Cadey"},
+				{Text: "Nicole"},
+				{Text: "Jessie"},
+				{Text: "Ashe"},
+				{Text: "Sephie"},
+				{Text: "Mai"},
+			}
+			return prompt.FilterHasPrefix(s, d.GetWordBeforeCursor(), true)
+		})
+	}
+
+	sr := &mi.SwitchReq{MemberName: s.member}
+
+	if err := sr.Valid(); err != nil {
+		fmt.Printf("error: %v\n", err)
+		return subcommands.ExitFailure
+	}
+
+	members, err := cli.Members(ctx, &emptypb.Empty{})
 	if err != nil {
 		fmt.Printf("error: %v\n", err)
 		return subcommands.ExitFailure
 	}
+
+	sw, err := cli.Switch(ctx, sr)
+	if err != nil {
+		fmt.Printf("error: %v\n", err)
+		return subcommands.ExitFailure
+	}
+
+	var oldMember string
+	for _, m := range members.Members {
+		if m.Id == sw.Old.MemberId {
+			oldMember = m.Name
+			break
+		}
+	}
+
+	fmt.Printf("switched from %s to %s\n", oldMember, s.member)
 
 	return subcommands.ExitSuccess
 }
