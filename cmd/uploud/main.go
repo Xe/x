@@ -3,6 +3,9 @@ package main
 
 import (
 	"context"
+	"crypto/md5"
+	"crypto/sha256"
+	"encoding/base64"
 	"flag"
 	"fmt"
 	"image"
@@ -20,6 +23,7 @@ import (
 	"github.com/disintegration/imaging"
 	"within.website/x/internal"
 	"within.website/x/internal/avif"
+	"within.website/x/tigris"
 )
 
 var (
@@ -226,7 +230,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	s3c, err := internal.TigrisClient(context.Background())
+	s3c, err := tigris.Client(context.Background())
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -239,12 +243,33 @@ func main() {
 		}
 		defer fin.Close()
 
-		_, err = s3c.PutObject(ctx, &s3.PutObjectInput{
-			Body:        fin,
-			Bucket:      b2Bucket,
-			Key:         aws.String(flag.Arg(1) + "/" + finfo.Name()),
-			ContentType: aws.String(mimeTypes[filepath.Ext(finfo.Name())]),
-		})
+		st, err := fin.Stat()
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		shaSum, err := hashFileSha256(fin)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		md5Sum, err := hashFileMD5(fin)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		_, err = s3c.PutObject(ctx,
+			&s3.PutObjectInput{
+				Body:           fin,
+				Bucket:         b2Bucket,
+				Key:            aws.String(flag.Arg(1) + "/" + finfo.Name()),
+				ContentType:    aws.String(mimeTypes[filepath.Ext(finfo.Name())]),
+				ContentLength:  aws.Int64(st.Size()),
+				ChecksumSHA256: aws.String(shaSum),
+				ContentMD5:     aws.String(md5Sum),
+			},
+			tigris.WithCreateObjectIfNotExists(),
+		)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -252,11 +277,67 @@ func main() {
 }
 
 var mimeTypes = map[string]string{
-	".avif": "image/avif",
-	".webp": "image/webp",
-	".jpg":  "image/jpeg",
-	".png":  "image/png",
-	".svg":  "image/svg+xml",
-	".wasm": "application/wasm",
-	".css":  "text/css",
+	".avif":  "image/avif",
+	".webp":  "image/webp",
+	".jpg":   "image/jpeg",
+	".png":   "image/png",
+	".svg":   "image/svg+xml",
+	".wasm":  "application/wasm",
+	".css":   "text/css",
+	".ts":    "video/mp2t",
+	".js":    "application/javascript",
+	".html":  "text/html",
+	".json":  "application/json",
+	".txt":   "text/plain",
+	".md":    "text/markdown",
+	".xml":   "application/xml",
+	".zip":   "application/zip",
+	".gz":    "application/gzip",
+	".tar":   "application/x-tar",
+	".pdf":   "application/pdf",
+	".mp4":   "video/mp4",
+	".webm":  "video/webm",
+	".ogg":   "audio/ogg",
+	".mp3":   "audio/mpeg",
+	".wav":   "audio/wav",
+	".flac":  "audio/flac",
+	".aac":   "audio/aac",
+	".m4a":   "audio/mp4",
+	".opus":  "audio/opus",
+	".ico":   "image/x-icon",
+	".otf":   "font/otf",
+	".ttf":   "font/ttf",
+	".woff":  "font/woff",
+	".woff2": "font/woff2",
+	".eot":   "application/vnd.ms-fontobject",
+}
+
+// hashFileSha256 hashes a file with Sha256 and returns the hash as a base64 encoded string.
+func hashFileSha256(fin *os.File) (string, error) {
+	h := sha256.New()
+	if _, err := io.Copy(h, fin); err != nil {
+		return "", err
+	}
+
+	// rewind the file
+	if _, err := fin.Seek(0, io.SeekStart); err != nil {
+		return "", err
+	}
+
+	return base64.StdEncoding.EncodeToString(h.Sum(nil)), nil
+}
+
+// hashFileMD5 hashes a file with MD5 and returns the hash as a base64 encoded string.
+func hashFileMD5(fin *os.File) (string, error) {
+	h := md5.New()
+	if _, err := io.Copy(h, fin); err != nil {
+		return "", err
+	}
+
+	// rewind the file
+	if _, err := fin.Seek(0, io.SeekStart); err != nil {
+		return "", err
+	}
+
+	return base64.StdEncoding.EncodeToString(h.Sum(nil)), nil
 }

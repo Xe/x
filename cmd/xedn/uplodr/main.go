@@ -18,7 +18,6 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/chai2010/webp"
@@ -27,6 +26,7 @@ import (
 	"within.website/x/cmd/xedn/uplodr/pb"
 	"within.website/x/internal"
 	"within.website/x/internal/avif"
+	"within.website/x/tigris"
 )
 
 var (
@@ -89,7 +89,7 @@ type Server struct {
 }
 
 func New(ctx context.Context) (*Server, error) {
-	tc, err := mkTigrisClient(ctx)
+	tc, err := tigris.Client(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create Tigris client: %w", err)
 	}
@@ -301,19 +301,6 @@ var mimeTypes = map[string]string{
 	".png":  "image/png",
 	".wasm": "application/wasm",
 	".css":  "text/css",
-}
-
-func mkTigrisClient(ctx context.Context) (*s3.Client, error) {
-	cfg, err := config.LoadDefaultConfig(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("failed to load Tigris config: %w", err)
-	}
-	cfg.Region = "auto"
-
-	return s3.NewFromConfig(cfg, func(o *s3.Options) {
-		o.BaseEndpoint = aws.String("https://fly.storage.tigris.dev")
-		o.Region = "auto"
-	}), nil
 }
 
 func mkB2Client() *s3.Client {
