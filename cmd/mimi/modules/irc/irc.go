@@ -12,8 +12,6 @@ import (
 )
 
 var (
-	discordAnnounceChannel = flag.String("discord-announce-channel", "1191450220731584532", "Discord channel to announce in")
-
 	ircServer   = flag.String("irc-server", "irc.libera.chat:6697", "IRC server to connect to")
 	ircUsername = flag.String("irc-username", "[Mara]", "IRC username")
 	ircIdent    = flag.String("irc-ident", "mara", "IRC ident")

@@ -13,6 +13,8 @@ import (
 )
 
 var (
+	discordPOSSEAnnounceChannel = flag.String("discord-posse-announce-channel", "1191450220731584532", "Discord channel to announce in")
+
 	ircAnnouncerUsername = flag.String("irc-announcer-username", "mimi", "IRC announcer HTTP username")
 	ircAnnouncerPassword = flag.String("irc-announcer-password", "", "IRC announcer HTTP password")
 )
@@ -35,7 +37,7 @@ type State struct {
 func (a *AnnounceService) Announce(ctx context.Context, msg *jsonfeed.Item) (*emptypb.Empty, error) {
 	a.conn.Privmsgf(*ircChannel, "New article :: %s :: %s", msg.Title, msg.Url)
 
-	if _, err := a.dg.ChannelMessageSend(*discordAnnounceChannel, msg.GetUrl()); err != nil {
+	if _, err := a.dg.ChannelMessageSend(*discordPOSSEAnnounceChannel, msg.GetUrl()); err != nil {
 		return nil, twirp.InternalErrorWith(err).WithMeta("step", "discord")
 	}
 
