@@ -129,7 +129,7 @@ func (d *DAO) GetSwitch(ctx context.Context, id string) (*Switch, error) {
 	var sw Switch
 	if err := d.db.WithContext(ctx).
 		Joins("Member").
-		Where("id = ?", id).
+		Where("switches.id = ?", id).
 		First(&sw).Error; err != nil {
 		return nil, err
 	}

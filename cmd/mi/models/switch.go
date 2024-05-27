@@ -17,7 +17,11 @@ type Switch struct {
 }
 
 // AsProto converts a Switch to its protobuf representation.
-func (s Switch) AsProto() *pb.Switch {
+func (s *Switch) AsProto() *pb.Switch {
+	if s == nil {
+		return nil
+	}
+
 	var endedAt string
 
 	if s.EndedAt != nil {

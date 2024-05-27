@@ -13,7 +13,6 @@ import (
 )
 
 type SwitchTracker struct {
-	db  *gorm.DB
 	dao *models.DAO
 }
 
@@ -65,7 +64,7 @@ func (s *SwitchTracker) Switch(ctx context.Context, req *pb.SwitchReq) (*pb.Swit
 		slog.Error("can't switch front", "req", req, "err", err)
 		switch {
 		case errors.Is(err, models.ErrCantSwitchToYourself):
-			twirp.InvalidArgumentError("member_name", "cannot switch to yourself").
+			return nil, twirp.InvalidArgumentError("member_name", "cannot switch to yourself").
 				WithMeta("member_name", req.GetMemberName())
 		case errors.Is(err, gorm.ErrRecordNotFound):
 			return nil, twirp.NotFoundError("can't find current switch")
