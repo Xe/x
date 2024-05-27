@@ -4,6 +4,7 @@ package ent
 
 import (
 	"within.website/x/cmd/tourian/ent/chatmessage"
+	"within.website/x/cmd/tourian/ent/conversation"
 	"within.website/x/cmd/tourian/ent/schema"
 )
 
@@ -29,4 +30,14 @@ func init() {
 	chatmessageDescID := chatmessageFields[0].Descriptor()
 	// chatmessage.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	chatmessage.IDValidator = chatmessageDescID.Validators[0].(func(string) error)
+	conversationFields := schema.Conversation{}.Fields()
+	_ = conversationFields
+	// conversationDescPageURL is the schema descriptor for page_url field.
+	conversationDescPageURL := conversationFields[1].Descriptor()
+	// conversation.PageURLValidator is a validator for the "page_url" field. It is called by the builders before save.
+	conversation.PageURLValidator = conversationDescPageURL.Validators[0].(func(string) error)
+	// conversationDescID is the schema descriptor for id field.
+	conversationDescID := conversationFields[0].Descriptor()
+	// conversation.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	conversation.IDValidator = conversationDescID.Validators[0].(func(string) error)
 }

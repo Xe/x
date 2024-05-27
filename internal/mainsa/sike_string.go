@@ -4,6 +4,15 @@ package mainsa
 
 import "strconv"
 
+func _() {
+	// An "invalid array index" compiler error signifies that the constant values have changed.
+	// Re-run the stringer command to generate them again.
+	var x [1]struct{}
+	_ = x[Kama-1]
+	_ = x[Poka-2]
+	_ = x[Monsi-3]
+}
+
 const _Sike_name = "KamaPokaMonsi"
 
 var _Sike_index = [...]uint8{0, 4, 8, 13}

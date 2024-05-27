@@ -14,6 +14,8 @@ type Tx struct {
 	config
 	// ChatMessage is the client for interacting with the ChatMessage builders.
 	ChatMessage *ChatMessageClient
+	// Conversation is the client for interacting with the Conversation builders.
+	Conversation *ConversationClient
 
 	// lazily loaded.
 	client     *Client
@@ -146,6 +148,7 @@ func (tx *Tx) Client() *Client {
 
 func (tx *Tx) init() {
 	tx.ChatMessage = NewChatMessageClient(tx.config)
+	tx.Conversation = NewConversationClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.

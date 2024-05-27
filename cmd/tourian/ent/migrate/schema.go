@@ -21,9 +21,21 @@ var (
 		Columns:    ChatMessagesColumns,
 		PrimaryKey: []*schema.Column{ChatMessagesColumns[0]},
 	}
+	// ConversationsColumns holds the columns for the "conversations" table.
+	ConversationsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString},
+		{Name: "page_url", Type: field.TypeString},
+	}
+	// ConversationsTable holds the schema information for the "conversations" table.
+	ConversationsTable = &schema.Table{
+		Name:       "conversations",
+		Columns:    ConversationsColumns,
+		PrimaryKey: []*schema.Column{ConversationsColumns[0]},
+	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		ChatMessagesTable,
+		ConversationsTable,
 	}
 )
 

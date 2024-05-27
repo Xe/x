@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"within.website/x/cmd/tourian/ent/chatmessage"
+	"within.website/x/cmd/tourian/ent/conversation"
 )
 
 // ent aliases to avoid import conflicts in user's code.
@@ -73,7 +74,8 @@ var (
 func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			chatmessage.Table: chatmessage.ValidColumn,
+			chatmessage.Table:  chatmessage.ValidColumn,
+			conversation.Table: conversation.ValidColumn,
 		})
 	})
 	return columnCheck(table, column)
