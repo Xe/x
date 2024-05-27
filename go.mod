@@ -13,6 +13,7 @@ require (
 	github.com/aws/aws-sdk-go v1.53.6
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.54.3
 	github.com/bwmarrin/discordgo v0.28.1
+	github.com/c-bata/go-prompt v0.2.6
 	github.com/cenkalti/backoff/v4 v4.3.0
 	github.com/chai2010/webp v1.1.1
 	github.com/danrusei/gobot-bsky v0.1.0
@@ -49,7 +50,7 @@ require (
 	github.com/rs/cors v1.11.0
 	github.com/sebest/xff v0.0.0-20210106013422-671bd2870b3a
 	github.com/stoewer/go-strcase v1.3.0
-	github.com/tetratelabs/wazero v1.7.1
+	github.com/tetratelabs/wazero v1.7.2
 	github.com/thoj/go-ircevent v0.0.0-20210723090443-73e444401d64
 	github.com/tmc/scp v0.0.0-20170824174625-f7b48647feef
 	github.com/twitchtv/twirp v8.1.3+incompatible
@@ -92,7 +93,6 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.17.7 // indirect
 	github.com/bluesky-social/indigo v0.0.0-20240313175749-733547c2ba2c // indirect
 	github.com/bytedance/sonic v1.11.3 // indirect
-	github.com/c-bata/go-prompt v0.2.6 // indirect
 	github.com/carlmjohnson/versioninfo v0.22.5 // indirect
 	github.com/cavaliergopher/cpio v1.0.1 // indirect
 	github.com/chenzhuoyu/base64x v0.0.0-20230717121745-296ad89f973d // indirect
@@ -238,7 +238,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/sso v1.20.4 // indirect
 	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.23.4 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sts v1.28.6 // indirect
-	github.com/aws/smithy-go v1.20.2 // indirect
+	github.com/aws/smithy-go v1.20.2
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/coreos/go-iptables v0.7.0 // indirect
