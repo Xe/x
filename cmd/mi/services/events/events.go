@@ -5,22 +5,35 @@ import (
 	"errors"
 	"log/slog"
 
+	_ "github.com/lib/pq"
 	"github.com/twitchtv/twirp"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"gorm.io/gorm"
 	"within.website/x/cmd/mi/models"
+	"within.website/x/cmd/mi/services/events/flyghttracker"
 	pb "within.website/x/proto/mi"
 )
 
 type Events struct {
-	dao *models.DAO
+	dao           *models.DAO
+	flyghtTracker *flyghttracker.Client
 }
 
 var _ pb.Events = &Events{}
 
 // New creates a new Events service.
-func New(dao *models.DAO) *Events {
-	return &Events{dao: dao}
+func New(dao *models.DAO, flyghtTrackerURL string) *Events {
+	result := &Events{
+		dao: dao,
+	}
+
+	if flyghtTrackerURL != "" {
+		result.flyghtTracker = flyghttracker.New(flyghtTrackerURL)
+	} else {
+		slog.Warn("no flyght tracker database URL provided, not syndicating events to flyght tracker")
+	}
+
+	return result
 }
 
 // Get fetches upcoming events.
@@ -57,6 +70,7 @@ func (e *Events) Add(ctx context.Context, ev *pb.Event) (*emptypb.Empty, error) 
 		EndDate:     ev.EndDate.AsTime(),
 		Location:    ev.Location,
 		Description: ev.Description,
+		Syndicate:   ev.Syndicate,
 	}
 
 	_, err := e.dao.CreateEvent(ctx, event)
@@ -65,6 +79,12 @@ func (e *Events) Add(ctx context.Context, ev *pb.Event) (*emptypb.Empty, error) 
 	}
 
 	slog.Info("tracking new event", "event", event)
+
+	if e.flyghtTracker != nil {
+		if err := e.syndicateToFlyghtTracker(ctx, ev); err != nil {
+			slog.Error("can't syndicate event to flyght tracker", "err", err)
+		}
+	}
 
 	return &emptypb.Empty{}, nil
 }

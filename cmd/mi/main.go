@@ -26,6 +26,9 @@ var (
 	dbLoc        = flag.String("db-loc", "./var/data.db", "")
 	internalBind = flag.String("internal-bind", ":9195", "HTTP internal routes bind address")
 
+	// Events flags
+	flyghtTrackerURL = flag.String("flyght-tracker-url", "", "Flyght Tracker URL")
+
 	// POSSE flags
 	blueskyAuthkey   = flag.String("bsky-authkey", "", "Bluesky authkey")
 	blueskyHandle    = flag.String("bsky-handle", "", "Bluesky handle")
@@ -51,6 +54,7 @@ func main() {
 		"mastodon-url", *mastodonURL,
 		"mastodon-username", *mastodonUsername,
 		"have-mimi-announce-url", *mimiAnnounceURL != "",
+		"have-flyght-tracker-url", *flyghtTrackerURL != "",
 	)
 
 	dao, err := models.New(*dbLoc)
@@ -76,7 +80,7 @@ func main() {
 
 	mux.Handle(announce.AnnouncePathPrefix, announce.NewAnnounceServer(ann))
 	mux.Handle(pb.SwitchTrackerPathPrefix, pb.NewSwitchTrackerServer(switchtracker.New(dao)))
-	mux.Handle(pb.EventsPathPrefix, pb.NewEventsServer(events.New(dao)))
+	mux.Handle(pb.EventsPathPrefix, pb.NewEventsServer(events.New(dao, *flyghtTrackerURL)))
 	mux.Handle("/front", homefrontshim.New(dao))
 
 	i := importer.New(dao)

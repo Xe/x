@@ -188,12 +188,13 @@ type miAddEvent struct {
 	endDate     string
 	location    string
 	description string
+	syndicate   bool
 }
 
 func (*miAddEvent) Name() string     { return "add-event" }
 func (*miAddEvent) Synopsis() string { return "Add an event to be attended." }
 func (*miAddEvent) Usage() string {
-	return `add-event [--name] [--url] [--start-date] [--end-date] [--location] [--description]:
+	return `add-event [--name] [--url] [--start-date] [--end-date] [--location] [--description] [--syndicate]:
 Add an event to be attended.
 `
 }
@@ -204,6 +205,7 @@ func (ae *miAddEvent) SetFlags(f *flag.FlagSet) {
 	f.StringVar(&ae.endDate, "end-date", "", "End date of the event.")
 	f.StringVar(&ae.location, "location", "", "Location of the event.")
 	f.StringVar(&ae.description, "description", "", "Description of the event.")
+	f.BoolVar(&ae.syndicate, "syndicate", false, "Syndicate this event to other services.")
 }
 
 func (ae *miAddEvent) Execute(ctx context.Context, f *flag.FlagSet, _ ...interface{}) subcommands.ExitStatus {
@@ -292,6 +294,7 @@ func (ae *miAddEvent) Execute(ctx context.Context, f *flag.FlagSet, _ ...interfa
 		EndDate:     timestamppb.New(endDate),
 		Location:    ae.location,
 		Description: ae.description,
+		Syndicate:   ae.syndicate,
 	}
 
 	slog.Info("adding event", "event", ev)

@@ -19,6 +19,7 @@ type Event struct {
 	EndDate     time.Time
 	Location    string `gorm:"index"`
 	Description string
+	Syndicate   bool
 }
 
 func (e *Event) AsProto() *pb.Event {
@@ -30,6 +31,7 @@ func (e *Event) AsProto() *pb.Event {
 		EndDate:     timestamppb.New(e.EndDate),
 		Location:    e.Location,
 		Description: e.Description,
+		Syndicate:   e.Syndicate,
 	}
 }
 
