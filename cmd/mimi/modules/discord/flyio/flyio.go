@@ -16,22 +16,11 @@ import (
 
 var (
 	flyDiscordGuild  = flag.String("fly-discord-guild", "1194719413732130866", "fly discord guild ID")
-	flyDiscordXeID   = flag.String("fly-discord-xe", "72838115944828928", "fly discord xe ID")
 	flyDiscordTeamID = flag.String("fly-discord-team", "1197660035212394657", "fly discord team ID")
 )
 
 func p[T any](t T) *T {
 	return &t
-}
-
-func mentionsXe(m *discordgo.MessageCreate) bool {
-	for _, u := range m.Mentions {
-		if u.ID == *flyDiscordXeID {
-			return true
-		}
-	}
-
-	return false
 }
 
 func mentionsTeam(m *discordgo.MessageCreate) bool {
@@ -142,7 +131,7 @@ func (m *Module) HandleMentionFlyIO(s *discordgo.Session, mc *discordgo.MessageC
 	}
 
 	switch {
-	case mentionsXe(mc), mentionsTeam(mc):
+	case mentionsTeam(mc):
 	default:
 		return
 	}
