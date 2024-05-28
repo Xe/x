@@ -15,7 +15,6 @@ require (
 	github.com/bwmarrin/discordgo v0.28.1
 	github.com/c-bata/go-prompt v0.2.6
 	github.com/cenkalti/backoff/v4 v4.3.0
-	github.com/chai2010/webp v1.1.1
 	github.com/danrusei/gobot-bsky v0.1.0
 	github.com/disintegration/imaging v1.6.2
 	github.com/dop251/goja v0.0.0-20230531210528-d7324b2d74f7
@@ -23,6 +22,10 @@ require (
 	github.com/expr-lang/expr v1.16.3
 	github.com/facebookgo/ensure v0.0.0-20160127193407-b4ab57deab51
 	github.com/fogleman/primitive v0.0.0-20190214200932-673f57e7b1b5
+	github.com/gen2brain/avif v0.3.1
+	github.com/gen2brain/heic v0.3.0
+	github.com/gen2brain/jpegxl v0.3.0
+	github.com/gen2brain/webp v0.4.4
 	github.com/go-interpreter/wagon v0.6.0
 	github.com/go-shiori/go-readability v0.0.0-20230421032831-c66949dfc0ad
 	github.com/gomarkdown/markdown v0.0.0-20240328165702-4d01890c35c0
@@ -104,6 +107,7 @@ require (
 	github.com/dblohm7/wingoes v0.0.0-20240119213807-a09d6be7affa // indirect
 	github.com/digitalocean/go-smbios v0.0.0-20180907143718-390a4f403a8e // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
+	github.com/ebitengine/purego v0.7.1 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/evanw/esbuild v0.19.11 // indirect
 	github.com/fasthttp/router v1.5.0 // indirect

@@ -14,18 +14,19 @@ import (
 	"net"
 	"os"
 	"path/filepath"
-	"runtime"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
-	"github.com/chai2010/webp"
 	"github.com/disintegration/imaging"
+	"github.com/gen2brain/avif"
+	_ "github.com/gen2brain/heic"
+	"github.com/gen2brain/jpegxl"
+	"github.com/gen2brain/webp"
 	"google.golang.org/grpc"
 	"within.website/x/cmd/xedn/uplodr/pb"
 	"within.website/x/internal"
-	"within.website/x/internal/avif"
 	"within.website/x/tigris"
 )
 
@@ -40,12 +41,10 @@ var (
 
 	tigrisBucket = flag.String("bucket-name", "xedn", "Tigris bucket to dump things to")
 
-	avifQuality      = flag.Int("avif-quality", 8, "AVIF quality (higher is worse quality)")
 	avifEncoderSpeed = flag.Int("avif-encoder-speed", 0, "AVIF encoder speed (higher is faster)")
-
-	jpegQuality = flag.Int("jpeg-quality", 90, "JPEG quality (lower means lower file size)")
-
-	webpQuality = flag.Int("webp-quality", 9, "WEBP quality (higher is worse quality)")
+	jxlEffort        = flag.Int("jxl-effort", 7, "JPEG XL encoding effort in the range [1,10]. Sets encoder effort/speed level without affecting decoding speed. Default is 7.")
+	imageQuality     = flag.Int("image-quality", 85, "image quality (lower means lower file size)")
+	webpMethod       = flag.Int("webp-method", 4, "WebP encoding method (0-6, 0 is fastest-worst, 6 is slowest-best)")
 )
 
 func main() {
@@ -195,7 +194,7 @@ func (s *Server) Upload(ctx context.Context, ur *pb.UploadReq) (*pb.UploadResp, 
 			errs = append(errs, fmt.Errorf("while uploading %s to b2: %w", path, err))
 			continue
 		}
-		slog.Debug("uploaded", "to", "tigris", "key", key)
+		slog.Debug("uploaded", "to", "b2", "key", key)
 
 		result = append(result, &pb.Variant{
 			Url:      fmt.Sprintf("https://cdn.xeiaso.net/file/christine-static/%s/%s", ur.GetFolder(), fname),
@@ -221,16 +220,36 @@ func doAVIF(src image.Image, dstPath string) error {
 	}
 	defer dst.Close()
 
-	err = avif.Encode(dst, src, &avif.Options{
-		Threads: runtime.GOMAXPROCS(0),
-		Speed:   *avifEncoderSpeed,
-		Quality: *avifQuality,
-	})
-	if err != nil {
+	if err := avif.Encode(dst, src, avif.Options{
+		Quality:      *imageQuality,
+		QualityAlpha: *imageQuality,
+		Speed:        *avifEncoderSpeed,
+	}); err != nil {
 		return err
 	}
 
 	log.Printf("Encoded AVIF at %s", dstPath)
+
+	return nil
+}
+
+func doJXL(src image.Image, dstPath string) error {
+	dst, err := os.Create(dstPath)
+	if err != nil {
+		log.Fatalf("Can't create destination file: %v", err)
+	}
+	defer dst.Close()
+
+	err = jpegxl.Encode(dst, src, jpegxl.Options{
+		Quality: *imageQuality,
+		Effort:  *jxlEffort,
+	})
+
+	if err != nil {
+		return err
+	}
+
+	log.Printf("Encoded JPEG XL at %s", dstPath)
 
 	return nil
 }
@@ -242,7 +261,10 @@ func doWEBP(src image.Image, dstPath string) error {
 	}
 	defer fout.Close()
 
-	err = webp.Encode(fout, src, &webp.Options{Quality: float32(*webpQuality)})
+	err = webp.Encode(fout, src, webp.Options{
+		Quality: *imageQuality,
+		Method:  *webpMethod,
+	})
 	if err != nil {
 		return err
 	}
@@ -263,7 +285,9 @@ func doJPEG(src image.Image, dstPath string) error {
 	}
 	defer fout.Close()
 
-	if err := jpeg.Encode(fout, src, &jpeg.Options{Quality: *jpegQuality}); err != nil {
+	if err := jpeg.Encode(fout, src, &jpeg.Options{
+		Quality: *imageQuality,
+	}); err != nil {
 		return err
 	}
 

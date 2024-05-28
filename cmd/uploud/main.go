@@ -15,165 +15,28 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"runtime"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
-	"github.com/chai2010/webp"
 	"github.com/disintegration/imaging"
+	"github.com/gen2brain/avif"
+	_ "github.com/gen2brain/heic"
+	"github.com/gen2brain/jpegxl"
+	"github.com/gen2brain/webp"
+	"golang.org/x/sync/errgroup"
 	"within.website/x/internal"
-	"within.website/x/internal/avif"
 	"within.website/x/tigris"
 )
 
 var (
-	b2Bucket = flag.String("tigris-bucket", "xedn", "Tigris bucket to dump things to")
-
-	avifQuality      = flag.Int("avif-quality", 24, "AVIF quality (higher is worse quality)")
 	avifEncoderSpeed = flag.Int("avif-encoder-speed", 0, "AVIF encoder speed (higher is faster)")
-
-	jpegQuality = flag.Int("jpeg-quality", 85, "JPEG quality (lower means lower file size)")
-
-	webpQuality = flag.Int("webp-quality", 50, "WEBP quality (higher is worse quality)")
+	jxlEffort        = flag.Int("jxl-effort", 7, "JPEG XL encoding effort in the range [1,10]. Sets encoder effort/speed level without affecting decoding speed. Default is 7.")
+	imageQuality     = flag.Int("image-quality", 85, "image quality (lower means lower file size)")
+	tigrisBucket     = flag.String("tigris-bucket", "xedn", "Tigris bucket to dump things to")
+	webpMethod       = flag.Int("webp-method", 4, "WebP encoding method (0-6, 0 is fastest-worst, 6 is slowest-best)")
 
 	noEncode = flag.Bool("no-encode", false, "if set, just upload the file directly without encoding")
 )
-
-func doAVIF(src image.Image, dstPath string) error {
-	dst, err := os.Create(dstPath)
-	if err != nil {
-		log.Fatalf("Can't create destination file: %v", err)
-	}
-	defer dst.Close()
-
-	err = avif.Encode(dst, src, &avif.Options{
-		Threads: runtime.GOMAXPROCS(0),
-		Speed:   *avifEncoderSpeed,
-		Quality: *avifQuality,
-	})
-	if err != nil {
-		return err
-	}
-
-	log.Printf("Encoded AVIF at %s", dstPath)
-
-	return nil
-}
-
-func doWEBP(src image.Image, dstPath string) error {
-	fout, err := os.Create(dstPath)
-	if err != nil {
-		return err
-	}
-	defer fout.Close()
-
-	err = webp.Encode(fout, src, &webp.Options{Quality: float32(*webpQuality)})
-	if err != nil {
-		return err
-	}
-
-	log.Printf("Encoded WEBP at %s", dstPath)
-
-	return nil
-}
-
-func fileNameWithoutExt(fileName string) string {
-	return filepath.Base(fileName[:len(fileName)-len(filepath.Ext(fileName))])
-}
-
-func doJPEG(src image.Image, dstPath string) error {
-	fout, err := os.Create(dstPath)
-	if err != nil {
-		return err
-	}
-	defer fout.Close()
-
-	if err := jpeg.Encode(fout, src, &jpeg.Options{Quality: *jpegQuality}); err != nil {
-		return err
-	}
-
-	log.Printf("Encoded JPEG at %s", dstPath)
-
-	return nil
-}
-
-func resizeSmol(src image.Image, dstPath string) error {
-	fout, err := os.Create(dstPath)
-	if err != nil {
-		return err
-	}
-	defer fout.Close()
-
-	dstImg := imaging.Resize(src, 800, 0, imaging.Lanczos)
-
-	enc := png.Encoder{
-		CompressionLevel: png.BestCompression,
-	}
-
-	if err := enc.Encode(fout, dstImg); err != nil {
-		return err
-	}
-
-	log.Printf("Encoded smol PNG at %s", dstPath)
-
-	return nil
-}
-
-func processImage(fname, tempDir string) error {
-	fnameBase := fileNameWithoutExt(fname)
-	fin, err := os.Open(fname)
-	if err != nil {
-		return err
-	}
-
-	src, _, err := image.Decode(fin)
-	if err != nil {
-		return err
-	}
-
-	if err := doAVIF(src, filepath.Join(tempDir, fnameBase+".avif")); err != nil {
-		return err
-	}
-
-	if err := doWEBP(src, filepath.Join(tempDir, fnameBase+".webp")); err != nil {
-		return err
-	}
-
-	if err := doJPEG(src, filepath.Join(tempDir, fnameBase+".jpg")); err != nil {
-		return err
-	}
-
-	if err := resizeSmol(src, filepath.Join(tempDir, fnameBase+"-smol.png")); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func copyFile(src, dst string) (int64, error) {
-	sourceFileStat, err := os.Stat(src)
-	if err != nil {
-		return 0, err
-	}
-
-	if !sourceFileStat.Mode().IsRegular() {
-		return 0, fmt.Errorf("%s is not a regular file", src)
-	}
-
-	source, err := os.Open(src)
-	if err != nil {
-		return 0, err
-	}
-	defer source.Close()
-
-	destination, err := os.Create(dst)
-	if err != nil {
-		return 0, err
-	}
-	defer destination.Close()
-	nBytes, err := io.Copy(destination, source)
-	return nBytes, err
-}
 
 func main() {
 	internal.HandleStartup()
@@ -261,7 +124,7 @@ func main() {
 		_, err = s3c.PutObject(ctx,
 			&s3.PutObjectInput{
 				Body:           fin,
-				Bucket:         b2Bucket,
+				Bucket:         tigrisBucket,
 				Key:            aws.String(flag.Arg(1) + "/" + finfo.Name()),
 				ContentType:    aws.String(mimeTypes[filepath.Ext(finfo.Name())]),
 				ContentLength:  aws.Int64(st.Size()),
@@ -276,10 +139,207 @@ func main() {
 	}
 }
 
+func doAVIF(src image.Image, dstPath string) error {
+	dst, err := os.Create(dstPath)
+	if err != nil {
+		log.Fatalf("Can't create destination file: %v", err)
+	}
+	defer dst.Close()
+
+	err = avif.Encode(dst, src, avif.Options{
+		Quality:      *imageQuality,
+		QualityAlpha: *imageQuality,
+		Speed:        *avifEncoderSpeed,
+	})
+
+	if err != nil {
+		return err
+	}
+
+	log.Printf("Encoded AVIF at %s", dstPath)
+
+	return nil
+}
+
+func doJXL(src image.Image, dstPath string) error {
+	dst, err := os.Create(dstPath)
+	if err != nil {
+		log.Fatalf("Can't create destination file: %v", err)
+	}
+	defer dst.Close()
+
+	err = jpegxl.Encode(dst, src, jpegxl.Options{
+		Quality: *imageQuality,
+		Effort:  *jxlEffort,
+	})
+
+	if err != nil {
+		return err
+	}
+
+	log.Printf("Encoded JPEG XL at %s", dstPath)
+
+	return nil
+}
+
+func doWEBP(src image.Image, dstPath string) error {
+	fout, err := os.Create(dstPath)
+	if err != nil {
+		return err
+	}
+	defer fout.Close()
+
+	err = webp.Encode(fout, src, webp.Options{
+		Quality: *imageQuality,
+		Method:  *webpMethod,
+	})
+	if err != nil {
+		return err
+	}
+
+	log.Printf("Encoded WEBP at %s", dstPath)
+
+	return nil
+}
+
+func fileNameWithoutExt(fileName string) string {
+	return filepath.Base(fileName[:len(fileName)-len(filepath.Ext(fileName))])
+}
+
+func doJPEG(src image.Image, dstPath string) error {
+	fout, err := os.Create(dstPath)
+	if err != nil {
+		return err
+	}
+	defer fout.Close()
+
+	if err := jpeg.Encode(fout, src, &jpeg.Options{Quality: *imageQuality}); err != nil {
+		return err
+	}
+
+	log.Printf("Encoded JPEG at %s", dstPath)
+
+	return nil
+}
+
+func resizeSmol(src image.Image, dstPath string) error {
+	fout, err := os.Create(dstPath)
+	if err != nil {
+		return err
+	}
+	defer fout.Close()
+
+	dstImg := src
+	if src.Bounds().Dx() > 800 {
+		dstImg = imaging.Resize(src, 800, 0, imaging.Lanczos)
+	}
+
+	enc := png.Encoder{
+		CompressionLevel: png.BestCompression,
+	}
+
+	if err := enc.Encode(fout, dstImg); err != nil {
+		return err
+	}
+
+	log.Printf("Encoded smol PNG at %s", dstPath)
+
+	return nil
+}
+
+func processImage(fname, tempDir string) error {
+	fnameBase := fileNameWithoutExt(fname)
+	fin, err := os.Open(fname)
+	if err != nil {
+		return err
+	}
+
+	src, _, err := image.Decode(fin)
+	if err != nil {
+		return err
+	}
+
+	eg, _ := errgroup.WithContext(context.Background())
+
+	eg.Go(func() error {
+		if err := doAVIF(src, filepath.Join(tempDir, fnameBase+".avif")); err != nil {
+			return fmt.Errorf("avif: %w", err)
+		}
+
+		return nil
+	})
+
+	eg.Go(func() error {
+		if err := doJXL(src, filepath.Join(tempDir, fnameBase+".jxl")); err != nil {
+			return fmt.Errorf("jxl: %w", err)
+		}
+
+		return nil
+	})
+
+	eg.Go(func() error {
+		if err := doWEBP(src, filepath.Join(tempDir, fnameBase+".webp")); err != nil {
+			return fmt.Errorf("webp: %w", err)
+		}
+
+		return nil
+	})
+
+	eg.Go(func() error {
+		if err := doJPEG(src, filepath.Join(tempDir, fnameBase+".jpg")); err != nil {
+			return fmt.Errorf("webp: %w", err)
+		}
+
+		return nil
+	})
+
+	eg.Go(func() error {
+		if err := resizeSmol(src, filepath.Join(tempDir, fnameBase+"-smol.png")); err != nil {
+			return fmt.Errorf("smol: %w", err)
+		}
+
+		return nil
+	})
+
+	if err := eg.Wait(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func copyFile(src, dst string) (int64, error) {
+	sourceFileStat, err := os.Stat(src)
+	if err != nil {
+		return 0, err
+	}
+
+	if !sourceFileStat.Mode().IsRegular() {
+		return 0, fmt.Errorf("%s is not a regular file", src)
+	}
+
+	source, err := os.Open(src)
+	if err != nil {
+		return 0, err
+	}
+	defer source.Close()
+
+	destination, err := os.Create(dst)
+	if err != nil {
+		return 0, err
+	}
+	defer destination.Close()
+	nBytes, err := io.Copy(destination, source)
+	return nBytes, err
+}
+
 var mimeTypes = map[string]string{
 	".avif":  "image/avif",
 	".webp":  "image/webp",
 	".jpg":   "image/jpeg",
+	".jpeg":  "image/jpeg",
+	".heic":  "image/heic",
+	".jxl":   "image/jxl",
 	".png":   "image/png",
 	".svg":   "image/svg+xml",
 	".wasm":  "application/wasm",

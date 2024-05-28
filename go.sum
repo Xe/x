@@ -213,8 +213,6 @@ github.com/cespare/xxhash/v2 v2.1.1/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XL
 github.com/cespare/xxhash/v2 v2.1.2/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XLFGgcrjCOs=
 github.com/cespare/xxhash/v2 v2.2.0 h1:DC2CZ1Ep5Y4k3ZQ899DldepgrayRUGE6BBZ/cd9Cj44=
 github.com/cespare/xxhash/v2 v2.2.0/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XLFGgcrjCOs=
-github.com/chai2010/webp v1.1.1 h1:jTRmEccAJ4MGrhFOrPMpNGIJ/eybIgwKpcACsrTEapk=
-github.com/chai2010/webp v1.1.1/go.mod h1:0XVwvZWdjjdxpUEIf7b9g9VkHFnInUSYujwqTLEuldU=
 github.com/chenzhuoyu/base64x v0.0.0-20211019084208-fb5309c8db06/go.mod h1:DH46F32mSOjUmXrMHnKwZdA8wcEefY7UVqBKYGjpdQY=
 github.com/chenzhuoyu/base64x v0.0.0-20221115062448-fe3a3abad311/go.mod h1:b583jCggY9gE99b6G5LEC39OIiVsWj+R97kbl5odCEk=
 github.com/chenzhuoyu/base64x v0.0.0-20230717121745-296ad89f973d h1:77cEq6EriyTZ0g/qfRdp61a3Uu/AWrgIq2s0ClJV1g0=
@@ -288,6 +286,8 @@ github.com/eaburns/peggy v1.0.2/go.mod h1:X2pbl0EV5erfnK8kSGwo0lBCgMGokvR1E6KerA
 github.com/eaburns/pretty v0.0.0-20170305202417-362524b72369/go.mod h1:iW/TU1T4mA4w2KzqNbBCjacPFdJ9PfGvNSxr8ajT/iM=
 github.com/eaburns/pretty v1.0.0 h1:00W1wrrtMXUSqLPN0txS8j7g9qFXy6nA5vZVqVQOo6w=
 github.com/eaburns/pretty v1.0.0/go.mod h1:retcK8A0KEgdmb0nuxhvyxixwCmEPO7SKlK0IJhjg8A=
+github.com/ebitengine/purego v0.7.1 h1:6/55d26lG3o9VCZX8lping+bZcmShseiqlh2bnUDiPA=
+github.com/ebitengine/purego v0.7.1/go.mod h1:ah1In8AOtksoNK6yk5z1HTJeUkC1Ez4Wk2idgGslMwQ=
 github.com/edsrzf/mmap-go v1.0.0/go.mod h1:YO35OhQPt3KJa3ryjFM5Bs14WD66h8eGKpfaBNrHW5M=
 github.com/elazarl/goproxy v0.0.0-20230808193330-2592e75ae04a h1:mATvB/9r/3gvcejNsXKSkQ6lcIaNec2nyfOdlTBR2lU=
 github.com/elazarl/goproxy v0.0.0-20230808193330-2592e75ae04a/go.mod h1:Ro8st/ElPeALwNFlcTpWmkr6IoMFfkjXAvTHpevnDsM=
@@ -331,6 +331,14 @@ github.com/fxamacker/cbor/v2 v2.5.0 h1:oHsG0V/Q6E/wqTS2O1Cozzsy69nqCiguo5Q1a1ADi
 github.com/fxamacker/cbor/v2 v2.5.0/go.mod h1:TA1xS00nchWmaBnEIxPSE5oHLuJBAVvqrtAnWBwBCVo=
 github.com/gaissmai/bart v0.4.1 h1:G1t58voWkNmT47lBDawH5QhtTDsdqRIO+ftq5x4P9Ls=
 github.com/gaissmai/bart v0.4.1/go.mod h1:KHeYECXQiBjTzQz/om2tqn3sZF1J7hw9m6z41ftj3fg=
+github.com/gen2brain/avif v0.3.1 h1:womS2LKvhS/dSR3zIKUxtJW+riGlY48akGWqc+YgHtE=
+github.com/gen2brain/avif v0.3.1/go.mod h1:s9sI2zo2cF6EdyRVCtnIfwL/Qb3k0TkOIEsz6ovK1ms=
+github.com/gen2brain/heic v0.3.0 h1:YDw7cerzjnxmb+/o5RAEpRy9j4jsFYCh9DuP1NDOc7Q=
+github.com/gen2brain/heic v0.3.0/go.mod h1:+x0Y/m2EP1kd6mWvC131B3IK4eoKtLBBqJJ1uJB8CT8=
+github.com/gen2brain/jpegxl v0.3.0 h1:hfnZykNPnyVksr6gtHVoiEuOHfJwXnrJLtP4RN1B7Lk=
+github.com/gen2brain/jpegxl v0.3.0/go.mod h1:zi+BuuV3cTYRG3dt6dS0nT3DxVLZXkQUCIOirPEzKXk=
+github.com/gen2brain/webp v0.4.4 h1:1cpydwbHid5ReumxE3kHWua9eimKONjeEo5CxeUcAtE=
+github.com/gen2brain/webp v0.4.4/go.mod h1:4B2bZAeutMBvabnV96t3S06eW3wWfr6uU5nw4X5j+zc=
 github.com/ghodss/yaml v1.0.0/go.mod h1:4dBDuWmgqj2HViK6kFavaiC9ZROes6MMH2rRYeMEF04=
 github.com/github/fakeca v0.1.0 h1:Km/MVOFvclqxPM9dZBC4+QE564nU4gz4iZ0D9pMw28I=
 github.com/github/fakeca v0.1.0/go.mod h1:+bormgoGMMuamOscx7N91aOuUST7wdaJ2rNjeohylyo=

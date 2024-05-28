@@ -15,12 +15,14 @@ import (
 	"strings"
 	"time"
 
-	"github.com/chai2010/webp"
 	"github.com/disintegration/imaging"
+	"github.com/gen2brain/avif"
+	_ "github.com/gen2brain/heic"
+	_ "github.com/gen2brain/jpegxl"
+	"github.com/gen2brain/webp"
 	"go.etcd.io/bbolt"
 	"golang.org/x/sync/singleflight"
 	"tailscale.com/metrics"
-	"within.website/x/internal/avif"
 )
 
 type OptimizedImageServer struct {
@@ -138,11 +140,11 @@ func (ois *OptimizedImageServer) ResizeTo(widthPixels int, character, mood, form
 				return nil, err
 			}
 		case "webp":
-			if err := webp.Encode(&result, dstImg, &webp.Options{Quality: 95}); err != nil {
+			if err := webp.Encode(&result, dstImg, webp.Options{Quality: 95}); err != nil {
 				return nil, err
 			}
 		case "avif":
-			if err := avif.Encode(&result, dstImg, &avif.Options{Quality: 48, Speed: avif.MaxSpeed}); err != nil {
+			if err := avif.Encode(&result, dstImg, avif.Options{Quality: 95, Speed: 7}); err != nil {
 				return nil, err
 			}
 		default:
