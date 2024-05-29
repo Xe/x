@@ -19,7 +19,7 @@ require (
 	github.com/disintegration/imaging v1.6.2
 	github.com/dop251/goja v0.0.0-20230531210528-d7324b2d74f7
 	github.com/eaburns/peggy v1.0.2
-	github.com/expr-lang/expr v1.16.3
+	github.com/expr-lang/expr v1.16.9
 	github.com/facebookgo/ensure v0.0.0-20160127193407-b4ab57deab51
 	github.com/fogleman/primitive v0.0.0-20190214200932-673f57e7b1b5
 	github.com/gen2brain/avif v0.3.1
