@@ -63,7 +63,7 @@ require (
 	golang.org/x/crypto v0.23.0
 	golang.org/x/oauth2 v0.18.0
 	golang.org/x/sync v0.7.0
-	google.golang.org/grpc v1.62.1
+	google.golang.org/grpc v1.64.0
 	gorm.io/gorm v1.25.10
 	gorm.io/plugin/prometheus v0.1.0
 	honnef.co/go/transmission v0.0.0-20200712215954-58262f0ca9c9
@@ -216,7 +216,7 @@ require (
 	go.uber.org/zap v1.26.0 // indirect
 	golang.org/x/arch v0.6.0 // indirect
 	golang.org/x/xerrors v0.0.0-20231012003039-104605ab7028 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20240123012728-ef4313101c80 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20240318140521-94a12d6c2237 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	lukechampine.com/blake3 v1.2.1 // indirect
@@ -258,7 +258,7 @@ require (
 	github.com/godbus/dbus/v5 v5.1.1-0.20230522191255-76236955d466 // indirect
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
-	github.com/golang/protobuf v1.5.3 // indirect
+	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/google/btree v1.1.2 // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
