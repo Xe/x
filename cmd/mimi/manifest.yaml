@@ -1,0 +1,149 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: mimi
+  labels:
+    app.kubernetes.io/name: mimi
+---
+apiVersion: onepassword.com/v1
+kind: OnePasswordItem
+metadata:
+  name: irc
+  namespace: mimi
+  labels:
+    app.kubernetes.io/name: mimi
+spec:
+  itemPath: "vaults/Kubernetes/items/IRC [Mara]"
+---
+apiVersion: onepassword.com/v1
+kind: OnePasswordItem
+metadata:
+  name: mimi
+  namespace: mimi
+  labels:
+    app.kubernetes.io/name: mimi
+spec:
+  itemPath: "vaults/Kubernetes/items/Mimi"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mimi
+  namespace: mimi
+  labels:
+    app.kubernetes.io/name: mimi
+  annotations:
+    operator.1password.io/auto-restart: "true"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: mimi
+  template:
+    metadata:
+      namespace: mimi
+      labels:
+        app.kubernetes.io/name: mimi
+    spec:
+      volumes:
+        - name: mimi
+          secret:
+            secretName: mimi
+        - name: irc
+          secret:
+            secretName: irc
+      securityContext:
+        fsGroup: 1000
+      containers:
+        - name: main
+          image: ghcr.io/xe/x/mimi:latest
+          imagePullPolicy: "Always"
+          resources:
+            limits:
+              cpu: "4"
+              memory: "1024Mi"
+            requests:
+              cpu: "2"
+              memory: "1025Mi"
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+              httpHeaders:
+                - name: X-Kubernetes
+                  value: "is kinda okay"
+            initialDelaySeconds: 3
+            periodSeconds: 3
+          env:
+            - name: BIND
+              value: ":8080"
+            - name: DB_LOC
+              value: "/data/mi.db"
+            - name: INTERNAL_BIND
+              value: ":9195"
+          volumeMounts:
+            - name: mimi
+              readOnly: true
+              mountPath: "/run/secrets/mimi"
+            - name: irc
+              readOnly: true
+              mountPath: "/run/secrets/irc"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mimi
+  namespace: mimi
+  labels:
+    app.kubernetes.io/name: mimi
+spec:
+  selector:
+    app.kubernetes.io/name: mimi
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 9002
+      name: http
+    - protocol: TCP
+      port: 9001
+      targetPort: 9001
+      name: grpc
+  type: ClusterIP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: mi-public
+  namespace: mi
+  labels:
+    app.kubernetes.io/name: mimi
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+      - mimi.cetacean.club
+      secretName: mimi-public-tls
+  rules:
+  - host: mimi.cetacean.club
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: mi
+            port: 
+              name: http

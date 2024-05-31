@@ -303,7 +303,7 @@
                 cmd = [ "${sapientwindex}/bin/sapientwindex" ];
               };
               mimi = pkgs.dockerTools.buildLayeredImage {
-                name = "registry.fly.io/mimi";
+                name = "ghcr.io/xe/x/mimi";
                 tag = "latest";
                 contents = with pkgs; [ cacert imagemagick ];
                 fromImage = alpineLinux;
