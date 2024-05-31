@@ -1,4 +1,5 @@
 nix.build(".#docker.mimi")
 docker.load("./result")
-docker.push("registry.fly.io/mimi:latest")
-fly.deploy()
+docker.push(`ghcr.io/xe/x/mimi`);
+yeet.run("kubectl", "apply", "-f=manifest.yaml");
+yeet.run("sh", "-c", "kubectl rollout restart -n mimi deployments/mimi");

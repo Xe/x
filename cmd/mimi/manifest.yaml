@@ -62,10 +62,10 @@ spec:
           resources:
             limits:
               cpu: "4"
-              memory: "1024Mi"
+              memory: "2Gi"
             requests:
               cpu: "2"
-              memory: "1025Mi"
+              memory: "1Gi"
           securityContext:
             runAsUser: 1000
             runAsGroup: 1000
@@ -79,19 +79,17 @@ spec:
           livenessProbe:
             httpGet:
               path: /healthz
-              port: 8080
+              port: 9002
               httpHeaders:
                 - name: X-Kubernetes
                   value: "is kinda okay"
             initialDelaySeconds: 3
             periodSeconds: 3
           env:
-            - name: BIND
-              value: ":8080"
-            - name: DB_LOC
-              value: "/data/mi.db"
-            - name: INTERNAL_BIND
-              value: ":9195"
+            - name: GRPC_ADDR
+              value: ":9001"
+            - name: HTTP_ADDR
+              value: ":9002"
           volumeMounts:
             - name: mimi
               readOnly: true
@@ -124,8 +122,8 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: mi-public
-  namespace: mi
+  name: mimi-public
+  namespace: mimi
   labels:
     app.kubernetes.io/name: mimi
   annotations:
@@ -134,16 +132,16 @@ spec:
   ingressClassName: nginx
   tls:
     - hosts:
-      - mimi.cetacean.club
-      secretName: mimi-public-tls
+      - mimi.techaro.lol
+      secretName: mimi-techaro-lol-public-tls
   rules:
-  - host: mimi.cetacean.club
+  - host: mimi.techaro.lol
     http:
       paths:
       - pathType: Prefix
         path: "/"
         backend:
           service:
-            name: mi
+            name: mimi
             port: 
               name: http

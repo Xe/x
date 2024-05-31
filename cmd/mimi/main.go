@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"log/slog"
 	"net"
@@ -47,13 +48,17 @@ func main() {
 		log.Fatalf("error creating irc module: %v", err)
 	}
 
-	slog.Info("bot started")
+	slog.Info("bot started", "grpcAddr", *grpcAddr, "httpAddr", *httpAddr)
 
 	gs := grpc.NewServer()
 
 	scheduling.RegisterSchedulingServer(gs, scheduling.New())
 
 	mux := http.NewServeMux()
+
+	mux.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintln(w, "OK")
+	})
 
 	b.RegisterHTTP(mux)
 	ircBot.RegisterHTTP(mux)
