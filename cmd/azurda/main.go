@@ -5,13 +5,13 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"embed"
 	"flag"
 	"fmt"
 	"image"
 	"image/jpeg"
 	_ "image/png"
-	"log"
 	"log/slog"
 	"net/http"
 	"os"
@@ -20,6 +20,8 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"golang.org/x/sync/errgroup"
 	"within.website/x/internal"
 	"within.website/x/web/stablediffusion"
 )
@@ -89,15 +91,31 @@ func main() {
 		http.ServeFileFS(w, r, static, "static/index.html")
 	})
 	mux.Handle("/static/", http.FileServerFS(static))
-	mux.HandleFunc("GET /fallthrough/{hash}", ServeStableDiffusion)
+	mux.HandleFunc("GET fallthrough.azurda.within.website/{hash}", ServeStableDiffusion)
 
-	log.Fatal(http.ListenAndServe(*bind, mux))
+	http.Handle("/metrics", promhttp.Handler())
+
+	g, _ := errgroup.WithContext(context.Background())
+
+	g.Go(func() error {
+		slog.Info("starting internal server", "bind", *internalBind)
+		return http.ListenAndServe(*internalBind, nil)
+	})
+
+	g.Go(func() error {
+		slog.Info("starting server", "bind", *bind)
+		return http.ListenAndServe(*bind, SpewMiddleware(mux))
+	})
+
+	if err := g.Wait(); err != nil {
+		slog.Error("error doing work", "err", err)
+		os.Exit(1)
+	}
 }
 
 func SpewMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		r.Write(os.Stdout)
-		fmt.Println()
+		slog.Info("got request", "method", r.Method, "url", r.URL.String(), "headers", r.Header)
 		next.ServeHTTP(w, r)
 	})
 }

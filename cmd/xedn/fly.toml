@@ -28,6 +28,11 @@ url_prefix = "/file/christine-static"
 guest_path = "/"
 tigris_bucket = "xedn"
 
+[[statics]]
+url_prefix = "/avatar"
+guest_path = "/"
+tigris_bucket = "azurda"
+
 [[services]]
 protocol = "tcp"
 internal_port = 8080
@@ -52,5 +57,5 @@ timeout = "2s"
 grace_period = "1s"
 
 [[metrics]]
-port = 8081
+port = 8086
 path = "/metrics"

@@ -110,6 +110,13 @@
             libtool
           ];
         };
+        
+        azurda = pkgs.buildGo122Module {
+          pname = "azurda";
+          inherit version vendorHash;
+          src = ./.;
+          subPackages = [ "cmd/azurda" ];
+        };
 
         tourian = pkgs.buildGo122Module {
           pname = "tourian";
@@ -251,7 +258,7 @@
             path = "make-mastodon-app";
           };
 
-          inherit xedn xedn-static robocadey2 mimi mi tourian sapientwindex;
+          inherit xedn xedn-static robocadey2 azurda mimi mi tourian sapientwindex;
 
           aegis = copyFile { pname = "aegis"; };
           cadeybot = copyFile { pname = "cadeybot"; };
@@ -278,6 +285,7 @@
               mimi = self.packages.${system}.mimi;
               sapientwindex = self.packages.${system}.sapientwindex;
               tourian = self.packages.${system}.tourian;
+              azurda = self.packages.${system}.azurda;
 
               simple = { name, cmd, pkg, contents ? [ pkgs.cacert ] }:
                 pkgs.dockerTools.buildLayeredImage {
@@ -291,6 +299,12 @@
                 };
             in
             {
+              azurda = simple {
+                name = "registry.fly.io/azurda";
+                pkg = azurda;
+                contents = with pkgs; [ cacert ];
+                cmd = [ "${azurda}/bin/azurda" ];
+              };
               mi = simple {
                 name = "ghcr.io/xe/x/mi";
                 pkg = mi;
