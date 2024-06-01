@@ -2,7 +2,7 @@ module within.website/x
 
 go 1.22.0
 
-toolchain go1.22.1
+toolchain go1.22.3
 
 require (
 	cirello.io/goherokuname v0.0.0-20190914093443-b436bae8c2c5

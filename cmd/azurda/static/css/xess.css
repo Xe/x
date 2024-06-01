@@ -1,0 +1,83 @@
+@import url(https://cdn.xeiaso.net/static/css/iosevka/family.css);
+@font-face {
+  font-family: "Podkova";
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url("podkova.woff2") format("woff2");
+}
+main {
+  font-family: Iosevka Aile Iaso, sans-serif;
+  max-width: 50rem;
+  padding: 2rem;
+  margin: auto;
+}
+@media only screen and (max-device-width: 736px) {
+  main {
+    padding: 0;
+  }
+}
+::selection {
+  background: #d3869b;
+}
+body {
+  background: #1d2021;
+  color: #f9f5d7;
+}
+pre {
+  background-color: #3c3836;
+  padding: 1em;
+  border: 0;
+  font-family: Iosevka Curly Iaso, monospace;
+}
+a,
+a:active,
+a:visited {
+  color: #b16286;
+  background-color: #282828;
+}
+h1,
+h2,
+h3,
+h4,
+h5 {
+  margin-bottom: 0.1rem;
+  font-family: Podkova, serif;
+}
+blockquote {
+  border-left: 1px solid #bdae93;
+  margin: 0.5em 10px;
+  padding: 0.5em 10px;
+}
+footer {
+  align: center;
+}
+@media (prefers-color-scheme: light) {
+  body {
+    background: #f9f5d7;
+    color: #1d2021;
+  }
+  pre {
+    background-color: #ebdbb2;
+    padding: 1em;
+    border: 0;
+  }
+  a,
+  a:active,
+  a:visited {
+    color: #b16286;
+    background-color: #fbf1c7;
+  }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5 {
+    margin-bottom: 0.1rem;
+  }
+  blockquote {
+    border-left: 1px solid #655c54;
+    margin: 0.5em 10px;
+    padding: 0.5em 10px;
+  }
+}
