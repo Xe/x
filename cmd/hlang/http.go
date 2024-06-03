@@ -24,7 +24,7 @@ var (
 func doHTTP() error {
 	http.Handle("/{$}", templ.Handler(xess.Base("The h Programming Language", nil, navbar(), homePage(), footer())))
 	http.Handle("/docs", templ.Handler(xess.Base("Documentation", nil, navbar(), docsPage(), footer())))
-	http.Handle("/faq", templ.Handler(xess.Base("FAQ", nil, navbar(), docsPage(), footer())))
+	http.Handle("/faq", templ.Handler(xess.Base("FAQ", nil, navbar(), faqPage(), footer())))
 	http.Handle("/play", templ.Handler(xess.Base("Playground", nil, navbar(), playgroundPage(), footer())))
 	http.HandleFunc("/api/playground", runPlayground)
 
