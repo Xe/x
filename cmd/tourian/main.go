@@ -6,7 +6,6 @@ import (
 	"embed"
 	"encoding/json"
 	"flag"
-	"html/template"
 	"log"
 	"log/slog"
 	"net/http"
@@ -32,9 +31,6 @@ var (
 	//go:embed static
 	static embed.FS
 
-	//go:embed tmpl
-	tmpl embed.FS
-
 	upgrader = websocket.Upgrader{}
 )
 
@@ -55,11 +51,9 @@ func main() {
 		log.Fatalf("failed creating schema resources: %v", err)
 	}
 
-	tmpls := template.Must(template.ParseFS(tmpl, "tmpl/*.html"))
-
 	ol := ollama.NewClient(*ollamaHost)
 
-	srv := NewServer(client, tmpls, ol)
+	srv := NewServer(client, ol)
 
 	mux := http.NewServeMux()
 
@@ -102,14 +96,12 @@ func main() {
 
 type Server struct {
 	DB     *ent.Client
-	Tmpls  *template.Template
 	Ollama *ollama.Client
 }
 
-func NewServer(db *ent.Client, tmpls *template.Template, ollama *ollama.Client) *Server {
+func NewServer(db *ent.Client, ollama *ollama.Client) *Server {
 	return &Server{
 		DB:     db,
-		Tmpls:  tmpls,
 		Ollama: ollama,
 	}
 }
