@@ -8,6 +8,7 @@ import (
 	"flag"
 	"log"
 	"log/slog"
+	"math/rand"
 	"net/http"
 
 	"github.com/a-h/templ"
@@ -235,7 +236,10 @@ func (s *Server) WebsocketHandler(w http.ResponseWriter, r *http.Request) {
 
 		buf.Reset()
 
-		if err := s.ExecTemplate(r.Context(), conn, chatBubble(avatarURL, mid, "Mimi", olresp.Message.Content)); err != nil {
+		moods := []string{"coffee", "happy", "think", "yawn"}
+		mood := moods[rand.Intn(len(moods))]
+
+		if err := s.ExecTemplate(r.Context(), conn, chatBubble(mimiAvatar(mood), mid, "Mimi", mdToHTML([]byte(olresp.Message.Content)))); err != nil {
 			slog.Error("failed to execute template", "err", err)
 			break
 		}
