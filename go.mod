@@ -10,6 +10,7 @@ require (
 	github.com/Marcel-ICMC/graw v0.0.0-20230411090719-e24cd8592d25
 	github.com/McKael/madon/v2 v2.4.0
 	github.com/Songmu/gitconfig v0.2.0
+	github.com/a-h/templ v0.2.707
 	github.com/aws/aws-sdk-go v1.53.12
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.54.3
 	github.com/bwmarrin/discordgo v0.28.1
@@ -85,7 +86,6 @@ require (
 	github.com/Microsoft/go-winio v0.6.1 // indirect
 	github.com/ProtonMail/go-crypto v1.0.0 // indirect
 	github.com/PuerkitoBio/rehttp v1.3.0 // indirect
-	github.com/a-h/templ v0.2.707 // indirect
 	github.com/agext/levenshtein v1.2.1 // indirect
 	github.com/andybalholm/brotli v1.1.0 // indirect
 	github.com/andybalholm/cascadia v1.3.2 // indirect
