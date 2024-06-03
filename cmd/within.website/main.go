@@ -2,26 +2,24 @@
 package main
 
 import (
-	"embed"
 	"flag"
-	"html/template"
+	"fmt"
 	"log/slog"
 	"net/http"
 	"os"
 
+	"github.com/a-h/templ"
 	"go.jetpack.io/tyson"
 	"tailscale.com/tsweb"
 	"within.website/x/internal"
 	"within.website/x/web/vanity"
+	"within.website/x/xess"
 )
 
 var (
 	domain      = flag.String("domain", "within.website", "domain this is run on")
 	port        = flag.String("port", "2134", "HTTP port to listen on")
 	tysonConfig = flag.String("tyson-config", "./config.ts", "TySON config file")
-
-	//go:embed tmpl/*
-	templateFiles embed.FS
 )
 
 type Repo struct {
@@ -30,6 +28,18 @@ type Repo struct {
 	User        string `json:"user"`
 	Repo        string `json:"repo"`
 	Description string `json:"description"`
+}
+
+func (r Repo) URL() string {
+	return fmt.Sprintf("https://%s/%s/%s", r.Domain, r.User, r.Repo)
+}
+
+func (r Repo) GodocURL() string {
+	return fmt.Sprintf("https://pkg.go.dev/within.website/%s", r.Repo)
+}
+
+func (r Repo) GodocBadge() string {
+	return fmt.Sprintf("https://pkg.go.dev/badge/within.website/%s.svg", r.Repo)
 }
 
 func (r Repo) LogValue() slog.Value {
@@ -53,12 +63,12 @@ func (r Repo) RegisterHandlers(lg *slog.Logger) {
 	lg.Debug("registered repo handler", "repo", r)
 }
 
+//go:generate go run github.com/a-h/templ/cmd/templ@latest generate
+
 func main() {
 	internal.HandleStartup()
 
 	lg := slog.Default().With("domain", *domain, "configPath", *tysonConfig)
-
-	tmpls := template.Must(template.ParseFS(templateFiles, "tmpl/*.tmpl"))
 
 	var repos []Repo
 	if err := tyson.Unmarshal(*tysonConfig, &repos); err != nil {
@@ -70,37 +80,30 @@ func main() {
 		repo.RegisterHandlers(lg)
 	}
 
-	http.HandleFunc("/debug/varz", tsweb.VarzHandler)
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Add("Content-Type", "text/html")
-		if r.URL.Path != "/" {
-			w.WriteHeader(http.StatusNotFound)
-			tmpls.ExecuteTemplate(w, "404.tmpl", struct {
-				Title string
-			}{
-				Title: "Not found: " + r.URL.Path,
-			})
+	mux := http.NewServeMux()
 
-			return
-		}
-		tmpls.ExecuteTemplate(w, "index.tmpl", struct {
-			Title string
-			Repos []Repo
-		}{
-			Title: "within.website Go packages",
-			Repos: repos,
-		})
-	})
+	xess.Mount(mux)
+	mux.HandleFunc("/debug/varz", tsweb.VarzHandler)
 
-	http.HandleFunc("/.x.botinfo", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Add("Content-Type", "text/html")
-		tmpls.ExecuteTemplate(w, "botinfo.tmpl", struct {
-			Title string
-		}{
-			Title: "x repo bots",
-		})
-	})
+	mux.Handle("/{$}", templ.Handler(
+		xess.Base(
+			"within.website Go packages",
+			nil,
+			nil,
+			Index(repos),
+			footer(),
+		),
+	))
+
+	mux.Handle("/", templ.Handler(
+		xess.Simple("Not found", NotFound()),
+		templ.WithStatus(http.StatusNotFound)),
+	)
+
+	mux.Handle("/.x.botinfo", templ.Handler(
+		xess.Simple("x repo bots", BotInfo()),
+	))
 
 	lg.Info("listening", "port", *port)
-	http.ListenAndServe(":"+*port, http.DefaultServeMux)
+	http.ListenAndServe(":"+*port, mux)
 }

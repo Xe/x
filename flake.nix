@@ -110,7 +110,7 @@
             libtool
           ];
         };
-        
+
         azurda = pkgs.buildGo122Module {
           pname = "azurda";
           inherit version vendorHash;
@@ -196,6 +196,10 @@
             for file in ${xess.packages.${system}.combined}/*; do
               ln -s $file $out/static/pkg/xess
             done
+
+            mkdir -p $out/static/pkg/podkova
+            cp ${./xess/static/podkova.css} $out/static/pkg/podkova/family.css
+            cp ${./xess/static/podkova.woff2} $out/static/pkg/podkova/podkova.woff2
           '';
         };
 

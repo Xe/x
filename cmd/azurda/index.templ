@@ -1,0 +1,47 @@
+package main
+
+templ headerJS() {
+	<script src="/static/js/alpine.js" defer></script>
+	<script src="/static/js/md5.min.js" defer></script>
+	<script>
+        document.addEventListener("alpine:init", () => {
+            Alpine.data("azurda", () => ({
+                str: "", // The input string
+                md5: "", // md5 hash of the string
+                url: "/static/img/azurda.png", // image for user
+                md5sum() {
+                    return new Promise((resolve) => {
+                        this.md5 = md5(this.str);
+                        this.url = `https://cdn.xeiaso.net/avatar/${this.md5}`;
+                        resolve(this.md5);
+                    });
+                },
+            }));
+        });
+    </script>
+}
+
+templ body() {
+	<p>Type in some text and get a randomly generated avatar!</p>
+	<div x-data="azurda">
+		<input
+			@input.debounce.500ms="md5sum().then((hash) => console.log(hash))"
+			type="text"
+			x-model="str"
+		/>
+		<br/>
+		<img
+			style="margin-top: 2rem"
+			x-bind:src="url"
+			alt="Azurda"
+			width="256px"
+		/>
+	</div>
+}
+
+templ footer() {
+	<p>
+		From <a href="https://within.website">Within</a> with ❤️ -
+		<a href="">Source code</a>
+	</p>
+}

@@ -1,0 +1,38 @@
+package main
+
+import (
+	"fmt"
+)
+
+templ headArea() {
+	<style>
+     main {
+         text-align: center;
+     }
+    </style>
+}
+
+templ body(day int, quip string) {
+	<br/>
+	<big>Today is March <big>{ fmt.Sprint(day) }</big>, 2020</big>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<p>{ quip }</p>
+	<br/>
+	<br/>
+}
+
+templ footer() {
+	<p>
+		From <a href="https://xeiaso.net">Within</a> - 
+		<a
+			href="https://pony.social/@cadey"
+		>
+			{ "@cadey@pony.social" }
+		</a> - <a
+	href="https://github.com/Xe/x/tree/master/cmd/todayinmarch2020"
+>Source Code</a>
+	</p>
+}

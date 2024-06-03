@@ -1,0 +1,303 @@
+package main
+
+templ base(meta pageMeta, body templ.Component) {
+	<html lang="en">
+		<head>
+			<meta charset="UTF-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+			<title>{ meta.Title }</title>
+			<link
+				rel="stylesheet"
+				href="https://cdn.xeiaso.net/static/pkg/iosevka/family.css"
+			/>
+			<link
+				rel="stylesheet"
+				href="https://cdn.xeiaso.net/file/christine-static/static/font/inter/inter.css"
+			/>
+			<link rel="stylesheet" href="/static/font/podkova.css"/>
+			<link href="/static/styles.css" rel="stylesheet"/>
+			<script src="/static/js/htmx.min.js"></script>
+			<script src="/static/js/ws.js"></script>
+			<link
+				rel="icon"
+				type="image/png"
+				href="https://cdn.xeiaso.net/sticker/mimi/happy/256"
+			/>
+			<!-- Open Graph meta tags for social media previews -->
+			<meta property="og:title" content={ meta.SocialTitle }/>
+			<meta
+				property="og:description"
+				content={ meta.Description }
+			/>
+			<meta
+				property="og:image"
+				content={ meta.Image }
+			/>
+		</head>
+		@body
+	</html>
+}
+
+templ indexPage() {
+	<body class="bg-gray-100 h-screen flex justify-center items-center">
+		<div
+			hx-ext="ws"
+			ws-connect="/ws"
+			id="parent"
+			class="max-w-3xl w-full bg-white shadow-md rounded-lg overflow-hidden"
+		>
+			<div class="bg-gray-200 px-4 py-2 border-b">
+				<h2 class="text-lg font-semibold font-serif text-gray-800 mb-0 pb-0">
+					Mimi
+				</h2>
+				<p class="ml-auto mr-4 text-xs text-gray-600" id="conversation_id">
+					Connecting...
+				</p>
+			</div>
+			<div
+				class="px-4 py-6 h-[40em] overflow-y-auto"
+				hx-trigger="load"
+				id="messages"
+			>
+				<!-- Messages will be dynamically added here -->
+				<div
+					id="welcome-message"
+					class="max-w-md mx-auto m-4 p-4 rounded-lg bg-gray-300"
+				>
+					<h1 class="text-3xl font-bold font-serif mb-4">
+						Welcome to ChatMimi
+					</h1>
+					<p class="text-lg mb-4">
+						Start chatting with our intelligent AI bot to get assistance, ask
+						questions, or simply have a conversation. It's all up to you!
+					</p>
+					<p class="mb-2">
+						If it takes a moment for Mimi to reply, she may be having a cat-nap.
+						Stay patient and she'll be back soon!
+					</p>
+				</div>
+			</div>
+			<form
+				id="form"
+				class="bg-gray-200 px-4 py-2 border-t flex items-center"
+				ws-send
+			>
+				<input name="role" type="hidden" value="user"/>
+				<input
+					name="content"
+					type="text"
+					autofocus
+					autocomplete="off"
+					placeholder="Type your message..."
+					class="flex-1 px-2 py-1 rounded-md focus:outline-none focus:ring focus:ring-blue-300"
+				/>
+				<button
+					type="submit"
+					class="bg-blue-500 text-white px-4 py-1 rounded-md ml-2"
+				>
+					Send
+				</button>
+			</form>
+		</div>
+	</body>
+	<script>
+    document
+      .getElementById("messages")
+      .addEventListener("htmx:load", function (event) {
+        event.target.scrollIntoView(false);
+      });
+  </script>
+}
+
+templ messagePage() {
+	<body class="bg-gray-50 flex justify-center items-center">
+		<div class="max-w-3xl bg-gray-100 p-4">
+			<div class="p-4 mb-4 bg-gray-200 rounded-lg">
+				<nav class="flex flex-row items-center">
+					<a
+						class="text-blue-700 hover:text-blue-500 px-4 text-lg font-serif"
+						href="/"
+					>
+						ChatMimi
+					</a>
+					<span class="mx-auto"></span>
+					<a
+						class="text-blue-700 hover:text-blue-500 px-4 text-lg font-serif"
+						href="https://xeiaso.net"
+					>
+						Xe Iaso
+					</a>
+				</nav>
+			</div>
+			<article class="prose max-x-none">
+				<h1 class="font-heavy font-serif">Can we really trust AI chatbots?</h1>
+				<p class="font-bold text-2xl font-serif">
+					AI chatbots are cool and all, but can we really trust them in action?
+				</p>
+				<p>
+					AI chatbots have become ubiquitous. It's hard to go anywhere without seeing them or the influence they leave behind. They're in our phones, our computers, our search queries, our slack channels, and even our homes. They're everywhere, and they're the next big hype cycle in tech.
+				</p>
+				<p class="font-bold text-2xl font-serif">
+					But can we really trust them?
+				</p>
+				<p>
+					I made ChatMimi as an absurd example of how easy it is to manipulate AI chatbots to push you towards a given view or belief. Sure, any particular attack is going to be a lot more elaborate than this, but I was able to create this somewhat absurd example in an afternoon of hacking.
+				</p>
+				<p class="font-bold text-2xl font-serif">
+					If ChatMimi can nudge you towards vegetable consumption, what else could the chatbots you use be nudging you towards?
+				</p>
+				<p>
+					Sure ChatMimi is not subtle, but GPT-5 could very well be extremely subtle.
+				</p>
+				<p>
+					If you’re relying on chatbots that you can’t host yourself with your own models, you are relying on a time bomb. Sure the bots will be available today, but someone could decide that the bot isn’t worth the effort to run and turn it off and then you’re left to pick up the pieces without it. And that’s not even considering the privacy implications of sending all your chat data to a third party.
+				</p>
+				<p>
+					The good news is that if you have a decently modern gaming PC or an Apple Silicon Mac, you can run large language models locally. Here’s a few to choose between:
+				</p>
+				<table>
+					<tr>
+						<th>Amount of ram/vram you have</th>
+						<th>Ollama model you should run</th>
+					</tr>
+					<tr>
+						<td>8 GB</td>
+						<td>
+							<a
+								href="https://ollama.com/library/phi:2.7b-chat-v2-q5_K_M"
+								target="_blank"
+							>{ "Phi 2 3B @ Q5_K_M" }</a>
+						</td>
+					</tr>
+					<tr>
+						<td>16 GB</td>
+						<td>
+							<a href="https://ollama.com/library/llama-pro:8b-instruct-q5_K_M" target="_blank">{ "Llama Pro 7B @ Q5_K_M" }</a>
+						</td>
+					</tr>
+					<tr>
+						<td>32 GB</td>
+						<td>
+							Any 7B model @ float16,
+							<a href="https://ollama.com/library/command-r" target="_blank">{ "command-r @ Q4_0" }</a>
+						</td>
+					</tr>
+					<tr>
+						<td>64 GB</td>
+						<td>
+							<a href="https://ollama.com/library/nous-hermes2-mixtral:8x7b-dpo-q5_K_M" target="_blank">Nous Hermes 2 Mixtral</a>
+						</td>
+					</tr>
+				</table>
+				<p>All of these models are freely available from Ollama. You can run them with the <code>ollama</code> command.</p>
+				<img
+					src="https://cdn.xeiaso.net/file/christine-static/shitpost/NotYourWeights.jpg"
+				/>
+				<p>
+					ChatMimi’s stack is very basic. It’s Go, Ollama, and HTMX. Go serves the HTML/JS/CSS assets, HTMX glues the interactivity together, Ollama runs Nous Hermes Mixtral. I have a PostgreSQL database in the mix so that I can store what you say and use that to do data analysis later when I figure out how to do that.
+				</p>
+				<p>
+					If you want to see ChatMimi’s code, <a href="https://github.com/Xe/x/tree/master/cmd/tourian">it's on GitHub</a>. You probably shouldn’t set it up for yourself, but should you want to, you will need Nix installed. I won’t help you if you do.
+				</p>
+				<p>
+					If you have to have a chatbot in the mix, it should be a chatbot that you run. You should be able to see the code that it runs and you should be able to see the data that it uses. If you can’t, you’re at the mercy of the person who does. And that’s not a good place to be.
+				</p>
+				<p>
+					Especially with technology that can be taken away at a moment's notice.
+				</p>
+				<hr/>
+				<p>
+					For the love of god can we also just stop putting AI stuff where it doesn't belong? I make toast because I want to make toast, not argue with my toaster about existentialism.
+				</p>
+			</article>
+			<div class="mt-6 p-4 mb-4 bg-gray-200 text-gray-800 rounded-lg">
+				<p class="prose">
+					ChatMimi is the product of <a href="https://xeiaso.net">Xe Iaso</a>. If you want to support them, you can do so on <a href="https://patreon.com/cadey" target="_blank">Patreon</a>.
+				</p>
+			</div>
+		</div>
+		<script>
+      document.write(
+        '<script async src="https://media.ethicalads.io/media/client/ethicalads.min.js"><\/script>'
+      );
+    </script>
+		<div
+			data-ea-publisher="christinewebsite"
+			data-ea-type="text"
+			data-ea-style="fixedfooter"
+		></div>
+	</body>
+}
+
+templ chatBubble(avatarURL, id, name, content string) {
+	<div class="flex items-start mt-4 mb-8" id="messages" hx-swap-oob="beforeend">
+		<!-- Sender's Profile Picture (Optional) -->
+		<img
+			src={ avatarURL }
+			alt="Profile Picture"
+			class="w-8 h-8 rounded-full"
+		/>
+		<!-- Message Container -->
+		<div class="ml-2 bg-gray-100 px-4 py-2 rounded-lg" id={ id }>
+			<!-- Sender's Name -->
+			<div class="flex justify-between items-center mb-1">
+				<p class="text-gray-600 font-semibold">{ name }</p>
+			</div>
+			<div class="prose max-w-none text-gray-800">{ content }</div>
+		</div>
+	</div>
+	<script>
+  // Scroll to the bottom of the messages container
+  const messages = document.getElementById("messages");
+  messages.scrollIntoView(false);
+</script>
+}
+
+templ setConvID(convID string, avatarURL string) {
+	<div id="conversation_id" hx-swap-oob="morphdom">
+		{ convID } <img src={ avatarURL } class="hidden"/>
+	</div>
+}
+
+templ formReset() {
+	<form id="form" class="bg-gray-200 px-4 py-2 border-t flex items-center" ws-send>
+		<input name="role" type="hidden" value="user"/>
+		<input name="content" type="text" autofocus autocomplete="off" placeholder="Type your message..." class="flex-1 px-2 py-1 rounded-md focus:outline-none focus:ring focus:ring-blue-300"/>
+		<button type="submit" class="bg-blue-500 text-white px-4 py-1 rounded-md ml-2">Send</button>
+	</form>
+}
+
+templ showMessage() {
+	<style>
+  #parent.htmx-added {
+    opacity: 0;
+  }
+  #parent {
+    opacity: 1;
+    transition: opacity 1s ease-out;
+  }
+</style>
+	<div
+		class="max-w-3xl w-full bg-white shadow-md rounded-lg overflow-hidden"
+		id="parent"
+		hx-swap="innerHTML settle:1s"
+	>
+		<div class="bg-gray-200 px-4 py-2 border-b">
+			<h2 class="text-lg font-semibold font-serif text-gray-800">Mimi</h2>
+			<p class="ml-auto mr-4 text-xs text-gray-600" id="conversation_id">
+				An experiment by Xe Iaso
+			</p>
+		</div>
+		<div class="p-6 prose max-w-none">
+			<h1 class="font-heavy font-serif">Can we really trust AI chatbots?</h1>
+			<p class="font-bold text-2xl font-serif">
+				AI chatbots are cool and all, but can we really trust them in action?
+			</p>
+			<p>Please see the writeup at <a href="/message">/message</a>.</p>
+		</div>
+	</div>
+}
+
+templ removeWelcome() {
+	<div id="welcome-message" hx-swap="delete" class="hidden"></div>
+}

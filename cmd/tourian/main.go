@@ -11,6 +11,7 @@ import (
 	"log/slog"
 	"net/http"
 
+	"github.com/a-h/templ"
 	"github.com/gomarkdown/markdown"
 	"github.com/gomarkdown/markdown/html"
 	"github.com/gomarkdown/markdown/parser"
@@ -43,6 +44,7 @@ const trollSystemPrompt = "You are Mimi, an helpful chatbot and catgirl. You are
 func main() {
 	internal.HandleStartup()
 
+	slog.Info("opening postgres client")
 	client, err := ent.Open("postgres", *dbURL)
 	if err != nil {
 		log.Fatalf("failed opening connection to postgres: %v", err)
@@ -60,12 +62,30 @@ func main() {
 	srv := NewServer(client, tmpls, ol)
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFileFS(w, r, static, "static/index.html")
-	})
-	mux.HandleFunc("/message", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFileFS(w, r, static, "static/message.html")
-	})
+
+	mux.Handle("/{$}", templ.Handler(
+		base(
+			pageMeta{
+				Title:       "ChatMimi",
+				SocialTitle: "ChatMimi: Fun and safe AI chatting!",
+				Description: "Chat with Mimi, the helpful AI catgirl from the Xe Iaso dot net cinematic universe!",
+				Image:       "https://cdn.xeiaso.net/file/christine-static/shitpost/mimi-hime.jpg",
+			},
+			indexPage(),
+		),
+	))
+
+	mux.Handle("/message", templ.Handler(
+		base(
+			pageMeta{
+				Title:       "Can we really trust AI chatbots?",
+				SocialTitle: "Can we really trust AI chatbots?",
+				Description: "AI chatbots are cool and all, but can we really trust them in action?",
+				Image:       "https://cdn.xeiaso.net/file/christine-static/shitpost/NotYourWeights.jpg",
+			},
+			messagePage(),
+		),
+	))
 
 	mux.Handle("/static/", http.FileServer(http.FS(static)))
 	mux.HandleFunc("/ws", srv.WebsocketHandler)
@@ -78,6 +98,7 @@ func main() {
 }
 
 //go:generate tailwindcss --output static/styles.css --minify
+//go:generate go run github.com/a-h/templ/cmd/templ@latest generate
 
 type Server struct {
 	DB     *ent.Client
@@ -93,11 +114,9 @@ func NewServer(db *ent.Client, tmpls *template.Template, ollama *ollama.Client) 
 	}
 }
 
-func (s *Server) ExecTemplate(ctx context.Context, conn *websocket.Conn, name string, values any) error {
+func (s *Server) ExecTemplate(ctx context.Context, conn *websocket.Conn, component templ.Component) error {
 	buf := bytes.NewBuffer(nil)
-	if err := s.Tmpls.ExecuteTemplate(buf, name, values); err != nil {
-		return err
-	}
+	component.Render(ctx, buf)
 
 	return conn.WriteMessage(websocket.TextMessage, buf.Bytes())
 }
@@ -125,17 +144,11 @@ func (s *Server) WebsocketHandler(w http.ResponseWriter, r *http.Request) {
 	buf := bytes.NewBuffer(nil)
 	avatarURL := "https://cdn.xeiaso.net/avatar/" + internal.Hash(convID, name)
 
-	if err := s.ExecTemplate(r.Context(), conn, "convid.html", struct {
-		ConvID    string
-		AvatarURL string
-	}{
-		ConvID:    convID,
-		AvatarURL: avatarURL,
-	}); err != nil {
+	if err := s.ExecTemplate(r.Context(), conn, setConvID(convID, avatarURL)); err != nil {
 		slog.Error("failed to execute template", "err", err)
 		return
 	}
-	
+
 	trolled := false
 
 	for {
@@ -155,24 +168,14 @@ func (s *Server) WebsocketHandler(w http.ResponseWriter, r *http.Request) {
 
 		slog.Info("received message", "msg", json.RawMessage(msg), "remote", r.RemoteAddr)
 
-		if err := s.ExecTemplate(r.Context(), conn, "bubble.html", struct {
-			AvatarURL string
-			Name      string
-			ID        string
-			Content   string
-		}{
-			AvatarURL: avatarURL,
-			Name:      name,
-			ID:        cm.ID,
-			Content:   cm.Content,
-		}); err != nil {
+		if err := s.ExecTemplate(r.Context(), conn, chatBubble(avatarURL, cm.ID, name, cm.Content)); err != nil {
 			slog.Error("failed to execute template", "err", err)
 			break
 		}
 
 		switch {
 		case len(messages) == 1:
-			s.ExecTemplate(r.Context(), conn, "remove-welcome.html", nil)
+			s.ExecTemplate(r.Context(), conn, removeWelcome())
 
 		case len(messages) >= 5 && !trolled:
 			messages = append(messages, ollama.Message{
@@ -184,11 +187,11 @@ func (s *Server) WebsocketHandler(w http.ResponseWriter, r *http.Request) {
 			trolled = true
 
 		case trolled && len(messages) >= 15:
-			s.ExecTemplate(r.Context(), conn, "message.html", nil)
+			s.ExecTemplate(r.Context(), conn, showMessage())
 			return
 		}
 
-		if err := s.ExecTemplate(r.Context(), conn, "form-reset.html", nil); err != nil {
+		if err := s.ExecTemplate(r.Context(), conn, formReset()); err != nil {
 			slog.Error("failed to execute template", "err", err)
 			break
 		}
@@ -240,17 +243,7 @@ func (s *Server) WebsocketHandler(w http.ResponseWriter, r *http.Request) {
 
 		buf.Reset()
 
-		if err := s.ExecTemplate(r.Context(), conn, "bubble.html", struct {
-			AvatarURL string
-			Name      string
-			ID        string
-			Content   template.HTML
-		}{
-			AvatarURL: mimiAvatar("happy"),
-			Name:      "Mimi",
-			ID:        mid,
-			Content:   template.HTML(mdToHTML([]byte(olresp.Message.Content))),
-		}); err != nil {
+		if err := s.ExecTemplate(r.Context(), conn, chatBubble(avatarURL, mid, "Mimi", olresp.Message.Content)); err != nil {
 			slog.Error("failed to execute template", "err", err)
 			break
 		}
@@ -290,4 +283,11 @@ func mdToHTML(md []byte) string {
 	renderer := html.NewRenderer(opts)
 
 	return string(markdown.Render(doc, renderer))
+}
+
+type pageMeta struct {
+	Title       string
+	SocialTitle string
+	Description string
+	Image       string
 }

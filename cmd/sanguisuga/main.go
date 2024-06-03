@@ -7,7 +7,6 @@ import (
 	"expvar"
 	"flag"
 	"fmt"
-	"html/template"
 	"io"
 	"log"
 	"log/slog"
@@ -20,6 +19,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/a-h/templ"
 	"github.com/mymmrac/telego"
 	tu "github.com/mymmrac/telego/telegoutil"
 	"github.com/tailscale/wireguard-go/conn"
@@ -34,6 +34,9 @@ import (
 	"within.website/x/internal"
 	"within.website/x/web/parsetorrentname"
 )
+
+//go:generate tailwindcss --output static/styles.css --minify
+//go:generate go run github.com/a-h/templ/cmd/templ@latest generate
 
 var (
 	dbLoc        = flag.String("db-loc", "./data.json", "path to data file")
@@ -202,16 +205,16 @@ func main() {
 		cl:     cl,
 		db:     db,
 		bot:    bot,
-		tmpl:   template.Must(template.ParseFS(templates, "tmpl/*.html")),
 		tnet:   tnet,
 		srv:    srv,
 
 		animeInFlight: map[string]*SubspleaseAnnouncement{},
 	}
 
-	http.HandleFunc("/", s.AdminIndex)
-	http.HandleFunc("/anime", s.AdminAnimeList)
-	http.HandleFunc("/tv", s.AdminTVList)
+	http.Handle("/{$}", templ.Handler(base("sanguisuga", indexPage())))
+	http.Handle("/", templ.Handler(base("Not found", notFoundPage())))
+	http.Handle("/anime", templ.Handler(base("Anime", animePage())))
+	http.Handle("/tv", templ.Handler(base("TV", tvPage())))
 
 	http.HandleFunc("/api/anime/list", s.ListAnime)
 	http.HandleFunc("/api/anime/snatches", s.ListAnimeSnatches)
@@ -250,7 +253,6 @@ type Sanguisuga struct {
 	db     *jsondb.DB[State]
 	dbLock sync.Mutex
 	bot    *telego.Bot
-	tmpl   *template.Template
 	tnet   *netstack.Net
 	srv    *tsnet.Server
 

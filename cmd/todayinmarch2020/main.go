@@ -4,20 +4,24 @@ import (
 	"embed"
 	"encoding/json"
 	"flag"
-	"html/template"
 	"log"
 	"math/rand"
 	"net"
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/a-h/templ"
+	"within.website/x/xess"
 )
+
+//go:generate go run github.com/a-h/templ/cmd/templ@latest generate
 
 var (
 	port     = flag.String("port", "23698", "TCP port to listen on")
 	sockPath = flag.String("socket", "", "Unix socket to listen on")
 
-	//go:embed templates/* quips.json
+	//go:embed quips.json
 	content embed.FS
 
 	quips []string
@@ -25,8 +29,6 @@ var (
 
 func main() {
 	flag.Parse()
-
-	tmpl := template.Must(template.ParseFS(content, "templates/index.html"))
 
 	fin, err := content.Open("quips.json")
 	if err != nil {
@@ -39,8 +41,9 @@ func main() {
 	}
 
 	mux := http.NewServeMux()
-	mux.Handle("/", index(tmpl))
-	mux.Handle("/api", api(tmpl))
+	xess.Mount(mux)
+	mux.Handle("/{$}", index())
+	mux.Handle("/api", api())
 
 	var l net.Listener
 	if *sockPath != "" {
@@ -60,7 +63,7 @@ func main() {
 	log.Fatal(srv.Serve(l))
 }
 
-func api(tmpl *template.Template) http.Handler {
+func api() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Content-Type", "application/json")
 
@@ -78,20 +81,21 @@ func api(tmpl *template.Template) http.Handler {
 	})
 }
 
-func index(tmpl *template.Template) http.Handler {
+func index() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Add("Content-Type", "text/html")
-
 		then := time.Date(2020, time.March, 1, 0, 0, 0, 0, time.UTC)
 		now := time.Now().UTC()
 		dur := now.Sub(then)
 
-		tmpl.Execute(w, struct {
-			Day  int
-			Quip string
-		}{
-			Day:  int(dur.Hours()/24) + 1,
-			Quip: quips[rand.Intn(len(quips))],
-		})
+		day := int(dur.Hours()/24) + 1
+		quip := quips[rand.Intn(len(quips))]
+
+		templ.Handler(xess.Base(
+			"What day of 2020 is it?",
+			headArea(),
+			nil,
+			body(day, quip),
+			footer(),
+		)).ServeHTTP(w, r)
 	})
 }

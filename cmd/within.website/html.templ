@@ -1,0 +1,34 @@
+package main
+
+templ BotInfo() {
+	<p>Hello, if you are reading this, you have found this URL in your access logs.</p>
+	<p>If one of these programs is doing something you don't want them to do, please <a href="https://xeiaso.net/contact">contact me</a> or open an issue <a href="https://github.com/Xe/x">here</a>.</p>
+}
+
+templ NotFound() {
+	<p>The URL you requested could not be found. Please check your URL and hang up to try your call again.</p>
+}
+
+func anchor(name string) string {
+	return "#" + name
+}
+
+templ Index(repos []Repo) {
+	<img src="https://pride-badges.pony.workers.dev/static/v1?label=enbyware&labelColor=%23555&stripeWidth=8&stripeColors=FCF434%2CFFFFFF%2C9C59D1%2C2C2C2C"/>
+	<p>This vanity domain houses a lot of <a href="https://xeiaso.net">Xe Iaso's</a> custom Go packages. Here is a list of all of the packages currently tracked:</p>
+	<ul>
+		for _, repo := range repos {
+			<li><a href={ templ.SafeURL(anchor(repo.Repo)) }>{ repo.Repo }</a></li>
+		}
+	</ul>
+	for _, repo := range repos {
+		<h2 id={ repo.Repo }>{ repo.Repo }</h2>
+		<p><a href={ templ.SafeURL(repo.GodocURL()) }><img src={ repo.GodocBadge() } alt="GoDoc"/></a> <a href={ templ.SafeURL(repo.URL()) }><img alt="Source code link" src="https://img.shields.io/badge/source-link-green"/></a></p>
+		<p>{ repo.Description }</p>
+		<code><pre>go get within.website/{ repo.Repo }</pre></code>
+	}
+}
+
+templ footer() {
+	<p>Need help with these packages? Inquire <a href="https://github.com/Xe">Within</a>.</p>
+}

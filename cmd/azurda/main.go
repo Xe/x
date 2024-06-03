@@ -18,13 +18,17 @@ import (
 	"regexp"
 	"time"
 
+	"github.com/a-h/templ"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"golang.org/x/sync/errgroup"
 	"within.website/x/internal"
 	"within.website/x/web/stablediffusion"
+	"within.website/x/xess"
 )
+
+//go:generate go run github.com/a-h/templ/cmd/templ@latest generate
 
 var (
 	accessKey    = flag.String("access-key", "", "Access key for the client to use")
@@ -87,9 +91,15 @@ func main() {
 
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("/{$}", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFileFS(w, r, static, "static/index.html")
-	})
+	xess.Mount(mux)
+
+	mux.Handle("/{$}", templ.Handler(xess.Base(
+		"Azurda",
+		headerJS(),
+		nil,
+		body(),
+		footer(),
+	)))
 	mux.Handle("/static/", http.FileServerFS(static))
 	mux.HandleFunc("GET fallthrough.azurda.within.website/{hash}", ServeStableDiffusion)
 
@@ -115,7 +125,7 @@ func main() {
 
 func SpewMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		slog.Info("got request", "method", r.Method, "url", r.URL.String(), "headers", r.Header)
+		slog.Debug("got request", "method", r.Method, "url", r.URL.String(), "headers", r.Header)
 		next.ServeHTTP(w, r)
 	})
 }
