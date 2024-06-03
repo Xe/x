@@ -4,7 +4,7 @@ package main
 import (
 	"encoding/json"
 	"flag"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 
@@ -33,7 +33,7 @@ func main() {
 }
 
 func lujvo(w http.ResponseWriter, r *http.Request) {
-	data, err := ioutil.ReadAll(r.Body)
+	data, err := io.ReadAll(r.Body)
 	if err != nil {
 		http.Error(w, "can't read: "+err.Error(), http.StatusBadRequest)
 		return
@@ -51,7 +51,7 @@ func lujvo(w http.ResponseWriter, r *http.Request) {
 }
 
 func braces(w http.ResponseWriter, r *http.Request) {
-	data, err := ioutil.ReadAll(r.Body)
+	data, err := io.ReadAll(r.Body)
 	if err != nil {
 		http.Error(w, "can't parse: "+err.Error(), http.StatusBadRequest)
 		return
@@ -73,7 +73,7 @@ func braces(w http.ResponseWriter, r *http.Request) {
 }
 
 func tree(w http.ResponseWriter, r *http.Request) {
-	data, err := ioutil.ReadAll(r.Body)
+	data, err := io.ReadAll(r.Body)
 	if err != nil {
 		http.Error(w, "can't parse: "+err.Error(), http.StatusBadRequest)
 		return

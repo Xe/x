@@ -290,6 +290,7 @@
               sapientwindex = self.packages.${system}.sapientwindex;
               tourian = self.packages.${system}.tourian;
               azurda = self.packages.${system}.azurda;
+              hlang = self.packages.${system}.hlang;
 
               simple = { name, cmd, pkg, contents ? [ pkgs.cacert ] }:
                 pkgs.dockerTools.buildLayeredImage {
@@ -314,6 +315,16 @@
                 pkg = mi;
                 contents = with pkgs; [ cacert sqlite-interactive ];
                 cmd = [ "${mi}/bin/mi" ];
+              };
+              johaus = simple {
+                name = "ghcr.io/xe/x/johaus";
+                pkg = hlang;
+                cmd = [ "${hlang}/bin/johaus" "-port=8080" ];
+              };
+              hlang = simple {
+                name = "ghcr.io/xe/x/hlang";
+                pkg = hlang;
+                cmd = [ "${hlang}/bin/hlang" "-port=8080" ];
               };
               sapientwindex = simple {
                 name = "ghcr.io/xe/x/sapientwindex";
