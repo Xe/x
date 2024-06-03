@@ -3,10 +3,16 @@ package h
 //go:generate peggy -o h_gen.go h.peg
 
 import (
+	"embed"
 	"fmt"
 
 	"github.com/eaburns/peggy/peg"
 	"within.website/x/langs/jbo/namcu"
+)
+
+var (
+	//go:embed h.peg
+	Grammar embed.FS
 )
 
 func (p *_Parser) Parse() (int, bool) {

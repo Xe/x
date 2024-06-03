@@ -11,6 +11,7 @@ import (
 
 	"github.com/a-h/templ"
 	"github.com/rs/cors"
+	"within.website/x/cmd/hlang/h"
 	"within.website/x/cmd/hlang/run"
 	"within.website/x/xess"
 )
@@ -27,6 +28,8 @@ func doHTTP() error {
 	http.Handle("/faq", templ.Handler(xess.Base("FAQ", nil, navbar(), faqPage(), footer())))
 	http.Handle("/play", templ.Handler(xess.Base("Playground", nil, navbar(), playgroundPage(), footer())))
 	http.HandleFunc("/api/playground", runPlayground)
+
+	http.Handle("/grammar/", http.StripPrefix("/grammar/", http.FileServer(http.FS(h.Grammar))))
 
 	srv := &http.Server{
 		Addr:    ":" + *port,
