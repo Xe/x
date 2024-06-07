@@ -68,7 +68,7 @@ require (
 	gorm.io/gorm v1.25.10
 	gorm.io/plugin/prometheus v0.1.0
 	honnef.co/go/transmission v0.0.0-20200712215954-58262f0ca9c9
-	modernc.org/sqlite v1.29.10
+	modernc.org/sqlite v1.30.0
 	nhooyr.io/websocket v1.8.11
 	tailscale.com v1.66.4
 	tulpa.dev/cadey/jvozba v0.0.0-20200326200349-f0ebe310be06
@@ -222,7 +222,7 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	lukechampine.com/blake3 v1.2.1 // indirect
 	modernc.org/gc/v3 v3.0.0-20240107210532-573471604cb6 // indirect
-	modernc.org/libc v1.49.3 // indirect
+	modernc.org/libc v1.50.9 // indirect
 	modernc.org/mathutil v1.6.0 // indirect
 	modernc.org/memory v1.8.0 // indirect
 	modernc.org/strutil v1.2.0 // indirect
