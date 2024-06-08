@@ -11,7 +11,7 @@ import (
 //go:generate go run github.com/a-h/templ/cmd/templ@latest generate
 
 var (
-	//go:embed xess.css static
+	//go:embed xess.css
 	Static embed.FS
 )
 
