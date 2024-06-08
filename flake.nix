@@ -111,6 +111,13 @@
           ];
         };
 
+        within-website = pkgs.buildGo122Module {
+          pname = "within.website";
+          inherit version vendorHash;
+          src = ./.;
+          subPackages = [ "cmd/within.website" ];
+        };
+
         azurda = pkgs.buildGo122Module {
           pname = "azurda";
           inherit version vendorHash;
@@ -262,7 +269,7 @@
             path = "make-mastodon-app";
           };
 
-          inherit xedn xedn-static robocadey2 azurda mimi mi tourian sapientwindex;
+          inherit xedn xedn-static robocadey2 azurda mimi mi tourian sapientwindex within-website;
 
           aegis = copyFile { pname = "aegis"; };
           cadeybot = copyFile { pname = "cadeybot"; };
@@ -276,7 +283,6 @@
           uploud = copyFile { pname = "uploud"; };
           vest-pit-near = copyFile { pname = "vest-pit-near"; };
           whoisfront = copyFile { pname = "whoisfront"; };
-          within-website = copyFile { pname = "within.website"; };
           yeet = copyFile { pname = "yeet"; };
         };
 
@@ -290,6 +296,7 @@
               sapientwindex = self.packages.${system}.sapientwindex;
               tourian = self.packages.${system}.tourian;
               azurda = self.packages.${system}.azurda;
+              within-website = self.packages.${system}.within-website;
               hlang = self.packages.${system}.hlang;
 
               simple = { name, cmd, pkg, contents ? [ pkgs.cacert ] }:
@@ -304,6 +311,12 @@
                 };
             in
             {
+              within-website = simple {
+                name = "ghcr.io/xe/x/within-website";
+                pkg = within-website;
+                contents = with pkgs; [ cacert ];
+                cmd = [ "${within-website}/bin/within.website" ];
+              };
               azurda = simple {
                 name = "registry.fly.io/azurda";
                 pkg = azurda;

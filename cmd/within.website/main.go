@@ -51,14 +51,14 @@ func (r Repo) LogValue() slog.Value {
 	)
 }
 
-func (r Repo) RegisterHandlers(lg *slog.Logger) {
+func (r Repo) RegisterHandlers(mux *http.ServeMux, lg *slog.Logger) {
 	switch r.Kind {
 	case "gitea":
-		http.Handle("/"+r.Repo, vanity.GogsHandler(*domain+"/"+r.Repo, r.Domain, r.User, r.Repo, "https"))
-		http.Handle("/"+r.Repo+"/", vanity.GogsHandler(*domain+"/"+r.Repo, r.Domain, r.User, r.Repo, "https"))
+		mux.Handle("/"+r.Repo, vanity.GogsHandler(*domain+"/"+r.Repo, r.Domain, r.User, r.Repo, "https"))
+		mux.Handle("/"+r.Repo+"/", vanity.GogsHandler(*domain+"/"+r.Repo, r.Domain, r.User, r.Repo, "https"))
 	case "github":
-		http.Handle("/"+r.Repo, vanity.GitHubHandler(*domain+"/"+r.Repo, r.User, r.Repo, "https"))
-		http.Handle("/"+r.Repo+"/", vanity.GitHubHandler(*domain+"/"+r.Repo, r.User, r.Repo, "https"))
+		mux.Handle("/"+r.Repo, vanity.GitHubHandler(*domain+"/"+r.Repo, r.User, r.Repo, "https"))
+		mux.Handle("/"+r.Repo+"/", vanity.GitHubHandler(*domain+"/"+r.Repo, r.User, r.Repo, "https"))
 	}
 	lg.Debug("registered repo handler", "repo", r)
 }
@@ -76,11 +76,11 @@ func main() {
 		os.Exit(1)
 	}
 
-	for _, repo := range repos {
-		repo.RegisterHandlers(lg)
-	}
-
 	mux := http.NewServeMux()
+
+	for _, repo := range repos {
+		repo.RegisterHandlers(mux, lg)
+	}
 
 	xess.Mount(mux)
 	mux.HandleFunc("/debug/varz", tsweb.VarzHandler)
