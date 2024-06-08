@@ -89,6 +89,13 @@
           ];
         };
 
+        future-sight = pkgs.buildGo122Module {
+          pname = "future-sight";
+          inherit version vendorHash;
+          src = ./.;
+          subPackages = [ "cmd/future-sight" ];
+        };
+
         mi = pkgs.buildGo122Module {
           pname = "mi";
           inherit version vendorHash;
@@ -269,7 +276,7 @@
             path = "make-mastodon-app";
           };
 
-          inherit xedn xedn-static robocadey2 azurda mimi mi tourian sapientwindex within-website;
+          inherit xedn xedn-static future-sight robocadey2 azurda mimi mi tourian sapientwindex within-website;
 
           aegis = copyFile { pname = "aegis"; };
           cadeybot = copyFile { pname = "cadeybot"; };
@@ -298,6 +305,7 @@
               azurda = self.packages.${system}.azurda;
               within-website = self.packages.${system}.within-website;
               hlang = self.packages.${system}.hlang;
+              future-sight = self.packages.${system}.future-sight;
 
               simple = { name, cmd, pkg, contents ? [ pkgs.cacert ] }:
                 pkgs.dockerTools.buildLayeredImage {
@@ -311,6 +319,11 @@
                 };
             in
             {
+              future-sight = simple {
+                name = "ghcr.io/xe/x/future-sight";
+                pkg = future-sight;
+                cmd = [ "${future-sight}/bin/future-sight" ];
+              };
               within-website = simple {
                 name = "ghcr.io/xe/x/within-website";
                 pkg = within-website;

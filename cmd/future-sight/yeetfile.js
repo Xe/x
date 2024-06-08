@@ -1,0 +1,5 @@
+nix.build(".#docker.future-sight");
+docker.load("./result");
+docker.push(`ghcr.io/xe/x/future-sight`);
+yeet.run("kubectl", "apply", "-f=manifest.yaml");
+yeet.run("sh", "-c", "kubectl rollout restart -n future-sight deployments/future-sight");

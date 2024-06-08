@@ -26,8 +26,8 @@ import (
 	"tailscale.com/metrics"
 	"tailscale.com/tsnet"
 	"tailscale.com/tsweb"
-	"within.website/x/cmd/xedn/internal/xesite"
 	"within.website/x/internal"
+	"within.website/x/internal/xesite"
 	"within.website/x/web/fly/flymachines"
 	"within.website/x/web/stablediffusion"
 )

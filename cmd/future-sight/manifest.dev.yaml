@@ -1,0 +1,195 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: future-sight
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nats
+  namespace: future-sight
+spec:
+  replicas: 1
+  strategy: {}
+  selector:
+    matchLabels:
+      app: nats
+  template:
+    metadata:
+      labels:
+        app: nats
+    spec:
+      containers:
+        - name: nats
+          image: nats:2-alpine
+          ports:
+            - containerPort: 4222
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nats
+  namespace: future-sight
+spec:
+  selector:
+    app: nats
+  ports:
+    - port: 4222
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: valkey-secret
+  namespace: future-sight
+  labels:
+    app: valkey
+data:
+  VALKEY_PASSWORD: hunter2
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: valkey
+  namespace: future-sight
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: valkey
+  template:
+    metadata:
+      labels:
+        app: valkey
+    spec:
+      containers:
+        - name: valkey
+          image: 'docker.io/bitnami/valkey:latest'
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 6379
+          envFrom:
+            - configMapRef:
+                name: valkey-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: valkey
+  namespace: future-sight
+  labels:
+    app: valkey
+spec:
+  type: ClusterIP
+  ports:
+    - port: 6379
+  selector:
+    app: valkey
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: minio
+  namespace: future-sight
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minio
+  namespace: future-sight
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: minio
+  template:
+    metadata:
+      labels:
+        app: minio
+    spec:
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: minio
+      containers:
+      - name: minio
+        volumeMounts:
+        - name: data 
+          mountPath: /data
+        image: minio/minio
+        args:
+        - server
+        - /data
+        - --console-address=:9001
+        env:
+        - name: MINIO_ACCESS_KEY
+          value: "minio"
+        - name: MINIO_SECRET_KEY
+          value: "minio123"
+        - name: MINIO_ROOT_USER
+          value: root
+        - name: MINIO_ROOT_PASSWORD
+          value: hunter22
+        ports:
+        - containerPort: 9000
+          name: http
+        - containerPort: 9001
+          name: webui
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: create-bucket
+  namespace: future-sight
+spec:
+  template:
+    spec:
+      containers:
+      - name: create-bucket
+        image: minio/mc
+        command: ["/bin/sh"]
+        args:
+          - "-c"
+          - |
+                  /usr/bin/mc config host add k8s http://minio:9000 minio minio123;
+                  /usr/bin/mc rm -r --force myminio/xesite-preview-versions;
+                  /usr/bin/mc mb myminio/xesite-preview-versions;
+                  /usr/bin/mc policy download myminio/xesite-preview-versions;
+                  exit 0;
+      restartPolicy: Never
+  backoffLimit: 4
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio
+  namespace: future-sight
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 80
+      targetPort: 9000
+      protocol: TCP
+  selector:
+    app: minio
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio-webui
+  namespace: future-sight
+spec:
+  type: ClusterIP
+  ports:
+    - name: webui
+      port: 80
+      targetPort: 9001
+      protocol: TCP
+  selector:
+    app: minio
