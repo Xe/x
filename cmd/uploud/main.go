@@ -256,7 +256,7 @@ func processImage(fname, tempDir string) error {
 
 	src, _, err := image.Decode(fin)
 	if err != nil {
-		return err
+		return fmt.Errorf("decoding image %s: %w", fname, err)
 	}
 
 	eg, _ := errgroup.WithContext(context.Background())
