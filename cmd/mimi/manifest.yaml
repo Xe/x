@@ -53,6 +53,8 @@ spec:
         - name: irc
           secret:
             secretName: irc
+        - name: tmp
+          emptyDir: {}
       securityContext:
         fsGroup: 1000
       containers:
@@ -97,6 +99,8 @@ spec:
             - name: irc
               readOnly: true
               mountPath: "/run/secrets/irc"
+            - name: tmp
+              mountPath: "/tmp"
 ---
 apiVersion: v1
 kind: Service

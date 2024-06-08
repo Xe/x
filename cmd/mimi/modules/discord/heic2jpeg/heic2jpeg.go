@@ -51,7 +51,7 @@ func (m *Module) heic2jpeg(s *discordgo.Session, mc *discordgo.MessageCreate) {
 	}
 
 	os.MkdirAll(filepath.Join(internal.DataDir(), "heic2jpeg"), 0755)
-	dir, err := os.MkdirTemp(filepath.Join(internal.DataDir(), "heic2jpeg"), "heic2jpeg")
+	dir, err := os.MkdirTemp("", "heic2jpeg")
 	if err != nil {
 		s.ChannelMessageSend(mc.ChannelID, "failed to create temp dir")
 		slog.Error("failed to create temp dir", "err", err)
