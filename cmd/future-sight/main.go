@@ -191,6 +191,8 @@ func (s *Server) UploadVersion(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	fout.Seek(0, 0)
+
 	hash, err := hashFileSha256(fout)
 	if err != nil {
 		slog.Error("failed to hash file", "err", err)

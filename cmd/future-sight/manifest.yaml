@@ -223,4 +223,4 @@ spec:
           service:
             name: future-sight
             port: 
-              name: http
+              name: web
