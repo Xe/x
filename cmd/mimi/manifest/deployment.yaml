@@ -1,50 +1,12 @@
----
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: mimi
-  labels:
-    app.kubernetes.io/name: mimi
----
-apiVersion: onepassword.com/v1
-kind: OnePasswordItem
-metadata:
-  name: irc
-  namespace: mimi
-  labels:
-    app.kubernetes.io/name: mimi
-spec:
-  itemPath: "vaults/Kubernetes/items/IRC [Mara]"
----
-apiVersion: onepassword.com/v1
-kind: OnePasswordItem
-metadata:
-  name: mimi
-  namespace: mimi
-  labels:
-    app.kubernetes.io/name: mimi
-spec:
-  itemPath: "vaults/Kubernetes/items/Mimi"
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: mimi
-  namespace: mimi
-  labels:
-    app.kubernetes.io/name: mimi
   annotations:
     operator.1password.io/auto-restart: "true"
 spec:
   replicas: 1
-  selector:
-    matchLabels:
-      app.kubernetes.io/name: mimi
   template:
-    metadata:
-      namespace: mimi
-      labels:
-        app.kubernetes.io/name: mimi
     spec:
       volumes:
         - name: mimi
@@ -101,51 +63,3 @@ spec:
               mountPath: "/run/secrets/irc"
             - name: tmp
               mountPath: "/tmp"
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: mimi
-  namespace: mimi
-  labels:
-    app.kubernetes.io/name: mimi
-spec:
-  selector:
-    app.kubernetes.io/name: mimi
-  ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 9002
-      name: http
-    - protocol: TCP
-      port: 9001
-      targetPort: 9001
-      name: grpc
-  type: ClusterIP
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: mimi-public
-  namespace: mimi
-  labels:
-    app.kubernetes.io/name: mimi
-  annotations:
-    cert-manager.io/cluster-issuer: "letsencrypt-prod"
-spec:
-  ingressClassName: nginx
-  tls:
-    - hosts:
-      - mimi.techaro.lol
-      secretName: mimi-techaro-lol-public-tls
-  rules:
-  - host: mimi.techaro.lol
-    http:
-      paths:
-      - pathType: Prefix
-        path: "/"
-        backend:
-          service:
-            name: mimi
-            port: 
-              name: http

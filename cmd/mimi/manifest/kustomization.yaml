@@ -1,0 +1,10 @@
+resources:
+  - namespace.yaml
+  - inference-proxy.yaml
+  - mimi-1password.yaml
+  - deployment.yaml
+  - service.yaml
+  - ingress.yaml
+namespace: mimi
+commonLabels:
+  app.kubernetes.io/name: mimi

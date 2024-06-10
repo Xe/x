@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mimi
+spec:
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 9002
+      name: http
+    - protocol: TCP
+      port: 9001
+      targetPort: 9001
+      name: grpc
+  type: ClusterIP

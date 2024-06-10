@@ -1,0 +1,9 @@
+apiVersion: glaceon.friendshipcastle.zip/v1alpha1
+kind: MachineProxy
+metadata:
+  name: ollama
+spec:
+  org: personal
+  region: yyz
+  target: http://xe-inference.flycast
+  port: 80
