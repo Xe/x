@@ -54,6 +54,8 @@ spec:
               value: ":9001"
             - name: HTTP_ADDR
               value: ":9002"
+            - name: OLLAMA_HOST
+              value: "http://ollama"
           volumeMounts:
             - name: mimi
               readOnly: true

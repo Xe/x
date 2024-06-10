@@ -13,7 +13,7 @@ import (
 
 var (
 	dataDir     = flag.String("data-dir", "./var", "data directory for the bot")
-	ollamaModel = flag.String("ollama-model", "nous-hermes2-mixtral:8x7b-dpo-q5_K_M", "ollama model tag")
+	ollamaModel = flag.String("ollama-model", "llama3", "ollama model tag")
 	ollamaHost  = flag.String("ollama-host", "http://xe-inference.flycast:80", "ollama host")
 )
 
