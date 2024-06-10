@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mi
+  annotations:
+    operator.1password.io/auto-restart: "true"
+spec:
+  replicas: 1
+  template:
+    spec:
+      volumes:
+        - name: vol
+          persistentVolumeClaim:
+            claimName: mi
+        - name: bluesky
+          secret:
+            secretName: mi-bluesky
+        - name: irc
+          secret:
+            secretName: mi-irc
+        - name: mastodon
+          secret:
+            secretName: mi-mastodon
+      securityContext:
+        fsGroup: 1000
+      containers:
+        - name: main
+          image: ghcr.io/xe/x/mi:latest
+          imagePullPolicy: "Always"
+          resources:
+            limits:
+              cpu: "500m"
+              memory: "1024Mi"
+            requests:
+              cpu: "100m"
+              memory: "512Mi"
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+              httpHeaders:
+                - name: X-Kubernetes
+                  value: "is kinda okay"
+            initialDelaySeconds: 3
+            periodSeconds: 3
+          env:
+            - name: BIND
+              value: ":8080"
+            - name: DB_LOC
+              value: "/data/mi.db"
+            - name: INTERNAL_BIND
+              value: ":9195"
+          volumeMounts:
+            - name: vol
+              mountPath: "/data"
+            - name: bluesky
+              readOnly: true
+              mountPath: "/run/secrets/bluesky"
+            - name: irc
+              readOnly: true
+              mountPath: "/run/secrets/irc"
+            - name: mastodon
+              readOnly: true
+              mountPath: "/run/secrets/mastodon"

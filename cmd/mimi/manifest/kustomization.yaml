@@ -1,6 +1,7 @@
 resources:
   - namespace.yaml
   - inference-proxy.yaml
+  - irc-1password.yaml
   - mimi-1password.yaml
   - deployment.yaml
   - service.yaml
