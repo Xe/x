@@ -54,6 +54,7 @@ func (d *DAO) UpcomingEvents(ctx context.Context, count int) ([]Event, error) {
 		WithContext(ctx).
 		Where("end_date >= ?", time.Now()).
 		Limit(count).
+		Order("start_date").
 		Find(&events).Error; err != nil {
 		return nil, err
 	}
