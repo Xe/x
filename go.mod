@@ -11,7 +11,7 @@ require (
 	github.com/McKael/madon/v2 v2.4.0
 	github.com/Songmu/gitconfig v0.2.0
 	github.com/a-h/templ v0.2.707
-	github.com/aws/aws-sdk-go v1.53.14
+	github.com/aws/aws-sdk-go v1.54.0
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.55.1
 	github.com/bwmarrin/discordgo v0.28.1
 	github.com/c-bata/go-prompt v0.2.6
