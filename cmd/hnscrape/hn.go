@@ -219,6 +219,24 @@ func (h *HNClient) getItem(ctx context.Context, id int) (*HNItem, error) {
 	return &item, nil
 }
 
+func (h *HNClient) PathToRoot(ctx context.Context, id int) ([]int, error) {
+	item, err := h.GetItem(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	if item.Parent == nil {
+		return []int{id}, nil
+	}
+
+	parents, err := h.PathToRoot(ctx, *item.Parent)
+	if err != nil {
+		return nil, err
+	}
+
+	return append(parents, id), nil
+}
+
 func (h *HNClient) GetUltimateParent(ctx context.Context, id int) (*HNItem, error) {
 	item, err := h.GetItem(ctx, id)
 	if err != nil {

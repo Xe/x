@@ -42,7 +42,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	slog.Info("got user", "user", u)
+	slog.Info("got user", "user", u.Created.String(), "karma", u.Karma, "submitted", len(u.Submitted))
 
 	// itemsCommentedIn := make([]int, 0)
 	//
@@ -142,6 +142,14 @@ func main() {
 			os.Exit(1)
 		}
 	*/
+
+	pathToRoot, err := hn.PathToRoot(ctx, 40699123)
+	if err != nil {
+		slog.Error("failed to get path to root", "err", err)
+		os.Exit(1)
+	}
+
+	slog.Info("got path to root", "pathToRoot", pathToRoot)
 }
 
 func ControlCContext() (context.Context, context.CancelFunc) {
