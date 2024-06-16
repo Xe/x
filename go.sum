@@ -878,6 +878,10 @@ github.com/sacOO7/gowebsocket v0.0.0-20221109081133-70ac927be105 h1:WgzGzpeh4gpY
 github.com/sacOO7/gowebsocket v0.0.0-20221109081133-70ac927be105/go.mod h1:h00QywbM5Le22ESUiI8Yz2/9TVGD8eAz/cAk55Kcz/E=
 github.com/safchain/ethtool v0.3.0 h1:gimQJpsI6sc1yIqP/y8GYgiXn/NjgvpM0RNoWLVVmP0=
 github.com/safchain/ethtool v0.3.0/go.mod h1:SA9BwrgyAqNo7M+uaL6IYbxpm5wk3L7Mm6ocLW+CJUs=
+github.com/samber/go-gpt-3-encoder v0.3.1 h1:YWb9GsGYUgSX/wPtsEHjyNGRQXsQ9vDCg9SU2x9uMeU=
+github.com/samber/go-gpt-3-encoder v0.3.1/go.mod h1:27nvdvk9ZtALyNtgs9JsPCMYja0Eleow/XzgjqwRtLU=
+github.com/samber/lo v1.38.1 h1:j2XEAqXKb09Am4ebOg31SpvzUTTs6EN3VfgeLUhPdXM=
+github.com/samber/lo v1.38.1/go.mod h1:+m/ZKRl6ClXCE2Lgf3MsQlWfh4bn1bz6CXEOxnEXnEA=
 github.com/sassoftware/go-rpmutils v0.4.0 h1:ojND82NYBxgwrV+mX1CWsd5QJvvEZTKddtCdFLPWhpg=
 github.com/sassoftware/go-rpmutils v0.4.0/go.mod h1:3goNWi7PGAT3/dlql2lv3+MSN5jNYPjT5mVcQcIsYzI=
 github.com/savsgio/gotils v0.0.0-20240303185622-093b76447511 h1:KanIMPX0QdEdB4R3CiimCAbxFrhB3j7h0/OvpYGVQa8=

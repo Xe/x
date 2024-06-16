@@ -13,6 +13,7 @@ import (
 	"syscall"
 	"time"
 
+	gpt3encoder "github.com/samber/go-gpt-3-encoder"
 	"jaytaylor.com/html2text"
 	"within.website/x/internal"
 	"within.website/x/llm"
@@ -95,7 +96,7 @@ func main() {
 		conversations[conversationID] = pathToRoot
 	}
 
-	fout, err := os.Create(filepath.Join(*cacheFolder, "train.jsonl"))
+	fout, err := os.Create(filepath.Join(*cacheFolder, *hnUser+".jsonl"))
 	if err != nil {
 		slog.Error("failed to create train file", "err", err)
 		os.Exit(1)
@@ -124,7 +125,7 @@ func main() {
 
 			if item.Type == "story" {
 				role = "system"
-				text = systemMessage + "\n\n" + item.URL + ": " + item.Title
+				text = systemMessage
 			}
 
 			if item.By == *hnUser {
@@ -149,29 +150,77 @@ func main() {
 			})
 		}
 
-		if err := json.NewEncoder(fout).Encode(messages); err != nil {
+		if err := json.NewEncoder(fout).Encode(Conversation{Messages: messages}); err != nil {
 			slog.Error("failed to write conversation", "err", err, "conversationID", conversationID)
 			os.Exit(1)
 		}
 	}
 
-	if err := json.NewEncoder(fout).Encode([]llm.Message{
-		{
-			Role:    "system",
-			Content: systemMessage + "\n\nhttps://xeiaso.net: Xe Iaso",
-		},
-		{
-			Role:    "user",
-			Content: "What is your name?",
-		},
-		{
-			Role:    "assistant",
-			Content: "My name is Mimi, duh!",
-		},
-	}); err != nil {
+	if err := json.NewEncoder(fout).Encode(Conversation{
+		Messages: []llm.Message{
+			{
+				Role:    "system",
+				Content: systemMessage,
+			},
+			{
+				Role:    "user",
+				Content: "What is your name?",
+			},
+			{
+				Role:    "assistant",
+				Content: "My name is Mimi, duh!",
+			},
+		}}); err != nil {
 		slog.Error("failed to write conversation", "err", err)
 		os.Exit(1)
 	}
+
+	slog.Info("wrote training data to", "file", fout.Name())
+
+	// rewind fout
+	fout.Seek(0, 0)
+
+	tokenEncoder, err := gpt3encoder.NewEncoder()
+	if err != nil {
+		slog.Error("failed to create token encoder", "err", err)
+		os.Exit(1)
+	}
+
+	mostTokens := 0
+
+	// read it back
+	dec := json.NewDecoder(fout)
+	for {
+		var c Conversation
+		if err := dec.Decode(&c); err != nil {
+			break
+		}
+
+		sess := llm.Session{
+			Messages: []llm.ChatMLer{},
+		}
+
+		for _, m := range c.Messages {
+			sess.Messages = append(sess.Messages, m)
+		}
+
+		chatml := sess.ChatML()
+		tokens, err := tokenEncoder.Encode(chatml)
+		if err != nil {
+			slog.Error("failed to encode tokens", "err", err)
+			os.Exit(1)
+		}
+
+		if len(tokens) > mostTokens {
+			mostTokens = len(tokens)
+		}
+	}
+
+	slog.Info("most tokens", "tokens", mostTokens)
+}
+
+type Conversation struct {
+	Messages []llm.Message `json:"messages"`
 }
 
 func getConversationIDName(path []int) (string, error) {

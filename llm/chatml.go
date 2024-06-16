@@ -32,5 +32,5 @@ func (m Message) ChatML() string {
 	if m.Content == "" {
 		return fmt.Sprintf("<|im_start|>%s\n", m.Role)
 	}
-	return fmt.Sprintf("<|im_start|>%s\n%s<|im_end|>", m.Role, m.Content)
+	return fmt.Sprintf("<|im_start|>%s\n%s\n<|im_end|>", m.Role, m.Content)
 }
