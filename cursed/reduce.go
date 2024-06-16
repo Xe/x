@@ -2,6 +2,18 @@ package cursed
 
 import "golang.org/x/exp/constraints"
 
+func Map[D any](data []D, doer func(D) bool) []D {
+	var result []D
+
+	for _, d := range data {
+		if doer(d) {
+			result = append(result, d)
+		}
+	}
+
+	return result
+}
+
 func Reduce[D any](data []D, doer func(D, D) D) D {
 	var initial D
 
