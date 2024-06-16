@@ -1,0 +1,81 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: future-sight
+  namespace: future-sight
+  labels:
+    app.kubernetes.io/name: future-sight
+data:
+  BUCKET_NAME: xesite-preview-versions
+  DATA_DIR: /cache
+  NATS_URL: nats://nats:4222
+  VALKEY_HOST: valkey:6379
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: future-sight
+  namespace: future-sight
+  labels:
+    app.kubernetes.io/name: future-sight
+  annotations:
+    operator.1password.io/auto-restart: "true"
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: future-sight
+  template:
+    metadata:
+      namespace: future-sight
+      labels:
+        app.kubernetes.io/name: future-sight
+    spec:
+      volumes:
+        - name: tigris
+          secret:
+            secretName: tigris-creds
+        - name: cache
+          emptyDir: {}
+      securityContext:
+        fsGroup: 1000
+      containers:
+        - name: main
+          image: ghcr.io/xe/x/future-sight:latest
+          imagePullPolicy: Always
+          resources:
+            limits:
+              cpu: "250m"
+              memory: "512Mi"
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+              httpHeaders:
+                - name: X-Kubernetes
+                  value: "is kinda okay"
+            initialDelaySeconds: 3
+            periodSeconds: 3
+          volumeMounts:
+            - name: tigris
+              mountPath: /run/secrets/tigris
+            - name: cache
+              mountPath: /cache
+          envFrom:
+            - configMapRef:
+                name: valkey-secret
+            - configMapRef:
+                name: future-sight

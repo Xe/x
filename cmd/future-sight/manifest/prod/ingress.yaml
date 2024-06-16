@@ -1,0 +1,26 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: future-sight
+  namespace: future-sight
+  labels:
+    app.kubernetes.io/name: future-sight
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+      - preview.xeiaso.net
+      secretName: preview-xeiaso-net-tls
+  rules:
+  - host: preview.xeiaso.net
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: future-sight
+            port: 
+              name: web

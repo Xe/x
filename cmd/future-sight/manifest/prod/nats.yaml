@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nats
+  namespace: future-sight
+  labels:
+    xeiaso.net/role: nats
+spec:
+  replicas: 1
+  strategy: {}
+  selector:
+    matchLabels:
+      xeiaso.net/role: nats
+  template:
+    metadata:
+      labels:
+        xeiaso.net/role: nats
+    spec:
+      containers:
+        - name: nats
+          image: nats:2-alpine
+          ports:
+            - containerPort: 4222
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nats
+  namespace: future-sight
+  labels:
+    xeiaso.net/role: valkey
+spec:
+  selector:
+    xeiaso.net/role: nats
+  ports:
+    - port: 4222

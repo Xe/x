@@ -1,0 +1,8 @@
+resources:
+  - ./prod/namespace.yaml
+  - ./prod/nats.yaml
+  - ./prod/valkey.yaml
+  - ./dev/minio.yaml
+namespace: future-sight
+commonLabels:
+  app.kubernetes.io/name: future-sight
