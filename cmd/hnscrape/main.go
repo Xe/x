@@ -2,7 +2,10 @@ package main
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/json"
 	"flag"
+	"fmt"
 	"log/slog"
 	"os"
 	"os/signal"
@@ -10,7 +13,9 @@ import (
 	"syscall"
 	"time"
 
+	"jaytaylor.com/html2text"
 	"within.website/x/internal"
+	"within.website/x/llm"
 )
 
 var (
@@ -19,20 +24,23 @@ var (
 	scrapeDelay = flag.Duration("scrape-delay", 50*time.Millisecond, "Delay between scraping items")
 )
 
+const systemMessage = `You are a commenter on the website "Hacker News". If asked for your name, you will respond with "Mimi". You should be friendly unless people are being mean to you, then you can be mean back.`
+
 func main() {
 	internal.HandleStartup()
 	ctx, cancel := ControlCContext()
 	defer cancel()
 
-	slog.Info("starting hnscrape", "scrapeDelay", scrapeDelay.String(), "hnUser", *hnUser)
+	slog.Debug("starting hnscrape", "scrapeDelay", scrapeDelay.String(), "hnUser", *hnUser)
 
 	hn := NewHNClient(*scrapeDelay)
 
 	if *cacheFolder != "" {
-		slog.Info("caching items to", "cacheFolder", *cacheFolder)
+		slog.Debug("caching items to", "cacheFolder", *cacheFolder)
 		os.MkdirAll(*cacheFolder, 0755)
 		os.MkdirAll(filepath.Join(*cacheFolder, "items"), 0755)
 		os.MkdirAll(filepath.Join(*cacheFolder, "indices"), 0755)
+		os.MkdirAll(filepath.Join(*cacheFolder, "conversations"), 0755)
 		hn = hn.WithCacheFolder(*cacheFolder)
 	}
 
@@ -42,114 +50,141 @@ func main() {
 		os.Exit(1)
 	}
 
-	slog.Info("got user", "user", u.Created.String(), "karma", u.Karma, "submitted", len(u.Submitted))
+	slog.Debug("got user", "user", u.Created.String(), "karma", u.Karma, "submitted", len(u.Submitted))
 
-	// itemsCommentedIn := make([]int, 0)
-	//
-	// wg := sync.WaitGroup{}
-	//
-	// wg.Add(len(u.Submitted))
-	//
-	// for _, itemID := range u.Submitted {
-	// 	itemID := itemID
-	//
-	// 	item, err := hn.GetItem(ctx, itemID)
-	// 	if err != nil {
-	// 		slog.Error("failed to get item", "err", err, "itemID", itemID)
-	// 		continue
-	// 	}
-	//
-	// 	slog.Debug("got item", "item", item.ID)
-	//
-	// 	go func(hn *HNClient, item *HNItem) {
-	// 		defer wg.Done()
-	//
-	// 		if item.Type != "comment" {
-	// 			return
-	// 		}
-	//
-	// 		if item.Parent == nil {
-	// 			return
-	// 		}
-	//
-	// 		/*
-	// 			if len(item.Kids) != 0 {
-	// 				slog.Info("getting comment kids", "item", item.ID)
-	// 				for _, kid := range item.Kids {
-	// 					kid, err := hn.GetItem(ctx, kid)
-	// 					if err != nil {
-	// 						slog.Error("failed to get kid", "err", err, "kid", kid)
-	// 						continue
-	// 					}
-	//
-	// 					slog.Info("got kid", "kid", kid.ID)
-	// 				}
-	// 			}*/
-	//
-	// 		slog.Debug("getting comment parent", "parent", item.Parent)
-	//
-	// 		parent, err := hn.GetItem(ctx, *item.Parent)
-	// 		if err != nil {
-	// 			if err == context.Canceled {
-	// 				return
-	// 			}
-	// 			slog.Error("failed to get parent", "err", err, "parent", item.Parent)
-	// 			return
-	// 		}
-	//
-	// 		slog.Debug("got parent", "parent", parent.ID)
-	// 		/*
-	// 			for _, kid := range parent.Kids {
-	// 				kid, err := hn.GetItem(ctx, kid)
-	// 				if err != nil {
-	// 					slog.Error("failed to get kid", "err", err, "kid", kid)
-	// 					continue
-	// 				}
-	//
-	// 				slog.Info("got kid", "kid", kid.ID)
-	// 			}*/
-	// 	}(hn, item)
-	//
-	// 	/*
-	// 		if item.Type == "comment" {
-	// 			ultimateParent, err := hn.GetUltimateParent(ctx, item.ID)
-	// 			if err != nil {
-	// 				if err == context.Canceled {
-	// 					break
-	// 				}
-	// 				slog.Error("failed to get ultimate parent", "err", err, "item", item.ID)
-	// 				continue
-	// 			}
-	// 			itemsCommentedIn = append(itemsCommentedIn, ultimateParent.ID)
-	// 		}
-	// 	*/
-	// }
-	//
-	// wg.Wait()
+	reverseIntSlice(u.Submitted)
 
-	/*
-		slog.Info("done", "itemsCommentedIn", len(itemsCommentedIn))
+	conversations := map[string][]int{}
 
-		fout, err := os.Create(filepath.Join(*cacheFolder, "indices", "itemsCommentedIn"))
+	for _, itemID := range u.Submitted {
+		item, err := hn.GetItem(ctx, itemID)
 		if err != nil {
-			slog.Error("failed to create itemsCommentedIn file", "err", err)
+			slog.Error("failed to get item", "err", err, "itemID", itemID)
 			os.Exit(1)
 		}
-		defer fout.Close()
 
-		if err := json.NewEncoder(fout).Encode(itemsCommentedIn); err != nil {
-			slog.Error("failed to write itemsCommentedIn", "err", err)
-			os.Exit(1)
+		if item.Type != "comment" {
+			continue
 		}
-	*/
 
-	pathToRoot, err := hn.PathToRoot(ctx, 40699123)
-	if err != nil {
-		slog.Error("failed to get path to root", "err", err)
-		os.Exit(1)
+		if item.Parent == nil {
+			continue
+		}
+
+		parent, err := hn.GetItem(ctx, *item.Parent)
+		if err != nil {
+			slog.Error("failed to get parent", "err", err, "itemID", item.ID)
+			continue
+		}
+		_ = parent
+
+		pathToRoot, err := hn.PathToRoot(ctx, item.ID)
+		if err != nil {
+			slog.Error("failed to get path to root", "err", err, "itemID", item.ID)
+			continue
+		}
+
+		conversationID, err := getConversationIDName(pathToRoot)
+		if err != nil {
+			slog.Error("failed to get conversation ID", "err", err, "itemID", item.ID)
+			continue
+		}
+
+		slog.Info("got conversation ID", "itemID", item.ID, "conversationID", conversationID)
+
+		conversations[conversationID] = pathToRoot
 	}
 
-	slog.Info("got path to root", "pathToRoot", pathToRoot)
+	fout, err := os.Create(filepath.Join(*cacheFolder, "train.jsonl"))
+	if err != nil {
+		slog.Error("failed to create train file", "err", err)
+		os.Exit(1)
+	}
+	defer fout.Close()
+
+	for conversationID, path := range conversations {
+		items := []*HNItem{}
+
+		for _, itemID := range path {
+			item, err := hn.GetItem(ctx, itemID)
+			if err != nil {
+				slog.Error("failed to get item", "err", err, "itemID", itemID)
+				os.Exit(1)
+			}
+
+			items = append(items, item)
+		}
+
+		messages := []llm.Message{}
+
+		for i, item := range items {
+			_ = i
+			text := item.Text
+			role := "user"
+
+			if item.Type == "story" {
+				role = "system"
+				text = systemMessage + "\n\n" + item.URL + ": " + item.Title
+			}
+
+			if item.By == *hnUser {
+				role = "assistant"
+			}
+
+			if role == "user" && len(items) > i+1 && items[i+1].By != *hnUser {
+				next := items[i+1]
+				next.Text = text + "\n\n" + next.Text
+				continue
+			}
+
+			plainText, err := html2text.FromString(text, html2text.Options{OmitLinks: true})
+			if err != nil {
+				slog.Error("failed to convert HTML to text", "err", err, "itemID", item.ID)
+				os.Exit(1)
+			}
+
+			messages = append(messages, llm.Message{
+				Role:    role,
+				Content: plainText,
+			})
+		}
+
+		if err := json.NewEncoder(fout).Encode(messages); err != nil {
+			slog.Error("failed to write conversation", "err", err, "conversationID", conversationID)
+			os.Exit(1)
+		}
+	}
+
+	if err := json.NewEncoder(fout).Encode([]llm.Message{
+		{
+			Role:    "system",
+			Content: systemMessage + "\n\nhttps://xeiaso.net: Xe Iaso",
+		},
+		{
+			Role:    "user",
+			Content: "What is your name?",
+		},
+		{
+			Role:    "assistant",
+			Content: "My name is Mimi, duh!",
+		},
+	}); err != nil {
+		slog.Error("failed to write conversation", "err", err)
+		os.Exit(1)
+	}
+}
+
+func getConversationIDName(path []int) (string, error) {
+	if len(path) == 0 {
+		return "", fmt.Errorf("path is empty you goofus")
+	}
+
+	h := sha256.New()
+	if err := json.NewEncoder(h).Encode(path); err != nil {
+		return "", fmt.Errorf("failed to encode path: %w", err)
+	}
+
+	return fmt.Sprintf("%x", h.Sum(nil)), nil
 }
 
 func ControlCContext() (context.Context, context.CancelFunc) {
@@ -165,4 +200,11 @@ func ControlCContext() (context.Context, context.CancelFunc) {
 	}()
 
 	return ctx, cancel
+}
+
+func reverseIntSlice(s []int) {
+	for i := len(s)/2 - 1; i >= 0; i-- {
+		opp := len(s) - 1 - i
+		s[i], s[opp] = s[opp], s[i]
+	}
 }
