@@ -17,10 +17,18 @@ jobs:
       uses: actions/cache@v4
       with:
         path: |
-          /home/linuxbrew/.linuxbrew/
-        key: ${{ runner.os }}-homebrew-${{ hashFiles('Brewfile.lock.json') }}
+          /home/linuxbrew/.linuxbrew/Cellar
+          /home/linuxbrew/.linuxbrew/bin
+          /home/linuxbrew/.linuxbrew/etc
+          /home/linuxbrew/.linuxbrew/include
+          /home/linuxbrew/.linuxbrew/lib
+          /home/linuxbrew/.linuxbrew/opt
+          /home/linuxbrew/.linuxbrew/sbin
+          /home/linuxbrew/.linuxbrew/share
+          /home/linuxbrew/.linuxbrew/var
+        key: ${{ runner.os }}-homebrew-cellar-${{ hashFiles('Brewfile.lock.json') }}
         restore-keys: |
-          ${{ runner.os }}-homebrew-
+          ${{ runner.os }}-homebrew-cellar-
     
     - name: Set up Homebrew
       uses: Homebrew/actions/setup-homebrew@master
