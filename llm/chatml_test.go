@@ -19,7 +19,8 @@ func TestChatML(t *testing.T) {
 	}
 
 	expected := `<|im_start|>user
-hello<|im_end|>
+hello
+<|im_end|>
 <|im_start|>assistant`
 
 	if strings.TrimSpace(session.ChatML()) != strings.TrimSpace(expected) {
