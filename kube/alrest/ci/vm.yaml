@@ -1,0 +1,63 @@
+apiVersion: cdi.kubevirt.io/v1beta1
+kind: DataVolume
+metadata:
+  name: "ci-xe-site"
+  namespace: ci
+spec:
+  storage:
+    storageClassName: longhorn
+    volumeMode: Block # or filesystem
+    accessModes:
+      - ReadWriteOnce # Necessary as it's no longer has a default
+    resources:
+      requests:
+        storage: 64Gi
+  source:
+    http:
+      url: "https://cloud-images.ubuntu.com/daily/server/noble/current/noble-server-cloudimg-amd64.img"
+---
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  labels:
+    kubevirt.io/os: linux
+  name: "ci-xe-site"
+  namespace: ci
+spec:
+  running: true
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        kubevirt.io/domain: "ubuntu-22.04"
+    spec:
+      domain:
+        cpu:
+          cores: 4
+        devices:
+          disks:
+          - disk:
+              bus: virtio
+            name: disk0
+          - cdrom:
+              bus: sata
+              readonly: true
+            name: cloudinitdisk
+        machine:
+          type: q35
+        resources:
+          requests:
+            memory: 4096M
+      volumes:
+      - name: disk0
+        persistentVolumeClaim:
+          claimName: "ci-xe-site"
+      - cloudInitNoCloud:
+          userData: |
+            #cloud-config
+            hostname: ci-xe-site
+            ssh_pwauth: True
+            disable_root: false
+            ssh_authorized_keys:
+            - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIF6/+q2dBHEfETomAH7rvDPXHulSXnhcV/szxTAWiKZA cadey@defoko.local
+        name: cloudinitdisk
