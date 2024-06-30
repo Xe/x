@@ -1,0 +1,5 @@
+[toolchain]
+channel = "stable"
+components = ["rustfmt", "rust-analyzer", "clippy"]
+targets = ["wasm32-wasip1"]
+profile = "default"

@@ -1528,6 +1528,16 @@
         "Homebrew/homebrew-core": "api",
         "GCC": "11.4.0"
       }
+    },
+    "macos": {
+      "sonoma": {
+        "HOMEBREW_VERSION": "4.3.7-47-g09223c7",
+        "HOMEBREW_PREFIX": "/opt/homebrew",
+        "Homebrew/homebrew-core": "api",
+        "CLT": "15.3.0.0.1.1708646388",
+        "Xcode": "15.4",
+        "macOS": "14.5"
+      }
     }
   }
 }

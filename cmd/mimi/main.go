@@ -14,7 +14,6 @@ import (
 	"within.website/x/cmd/mimi/modules/discord/flyio"
 	"within.website/x/cmd/mimi/modules/discord/heic2jpeg"
 	"within.website/x/cmd/mimi/modules/irc"
-	"within.website/x/cmd/mimi/modules/scheduling"
 )
 
 var (
@@ -51,8 +50,6 @@ func main() {
 	slog.Info("bot started", "grpcAddr", *grpcAddr, "httpAddr", *httpAddr)
 
 	gs := grpc.NewServer()
-
-	scheduling.RegisterSchedulingServer(gs, scheduling.New())
 
 	mux := http.NewServeMux()
 

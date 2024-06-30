@@ -1,6 +1,6 @@
 package h
 
-//go:generate peggy -o h_gen.go h.peg
+//go:generate go run github.com/eaburns/peggy@v1.0.2 -o h_gen.go h.peg
 
 import (
 	"embed"
@@ -35,7 +35,10 @@ func (p *_Parser) ParseTree() *peg.Node {
 // On success, the parseTree is returned.
 // On failure, both the word-level and the raw, morphological errors are returned.
 func Parse(text string) (*peg.Node, error) {
-	p := _NewParser(text)
+	p, err := _NewParser(text)
+	if err != nil {
+		return nil, err
+	}
 	if perr, ok := p.Parse(); !ok {
 		return nil, fmt.Errorf("h: gentoldra fi'o zvati fe li %s", namcu.Lerfu(perr))
 	}
