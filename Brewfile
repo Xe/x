@@ -36,6 +36,7 @@ brew "jo"
 # frontend tools
 brew "esbuild"
 brew "tailwindcss"
+brew "templ"
 
 # kubernetes
 brew "kubectl"
