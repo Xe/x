@@ -5,6 +5,7 @@ brew "go@1.22"
 brew "node@20"
 brew "deno"
 brew "python@3.11"
+brew "rustup-init"
 
 # build tools / libraries
 brew "cmake"
