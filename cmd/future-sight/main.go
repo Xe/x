@@ -21,9 +21,9 @@ import (
 	"github.com/redis/go-redis/v9"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/protobuf/proto"
+	pb "within.website/x/buf/x/future-sight"
 	"within.website/x/internal"
 	"within.website/x/internal/xesite"
-	pb "within.website/x/proto/future-sight"
 	"within.website/x/web/useragent"
 )
 

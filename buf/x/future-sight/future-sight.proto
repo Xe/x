@@ -1,0 +1,5 @@
+syntax = "proto3";
+package x.future_sight;
+option go_package = "within.website/x/buf/x/future-sight";
+
+message NewVersion { string slug = 1; }

@@ -36,14 +36,18 @@ brew "jo"
 # frontend tools
 brew "esbuild"
 brew "tailwindcss"
-brew "templ"
+brew "xe/pkgs/templ"
 
 # kubernetes
 brew "kubectl"
 brew "k9s"
 
 # protocol buffers
+brew "buf"
+brew "grpcurl"
 brew "protobuf"
 brew "protoc-gen-go"
 brew "protoc-gen-go-grpc"
 brew "xe/pkgs/protoc-gen-twirp"
+brew "xe/pkgs/protoc-gen-connect-go"
+brew "xe/pkgs/protoc-gen-connect-openapi"
