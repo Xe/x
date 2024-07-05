@@ -14,6 +14,8 @@ import (
 
 type SwitchTracker struct {
 	dao *models.DAO
+
+	pb.UnimplementedSwitchTrackerServer
 }
 
 func New(dao *models.DAO) *SwitchTracker {

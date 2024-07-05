@@ -7,5 +7,3 @@ resources:
   - nats.yaml
   - valkey.yaml
 namespace: future-sight
-commonLabels:
-  app.kubernetes.io/name: future-sight

@@ -17,6 +17,8 @@ import (
 type Events struct {
 	dao           *models.DAO
 	flyghtTracker *flyghttracker.Client
+
+	pb.UnimplementedEventsServer
 }
 
 var _ pb.Events = &Events{}

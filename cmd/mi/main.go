@@ -5,11 +5,13 @@ import (
 	"flag"
 	"fmt"
 	"log/slog"
+	"net"
 	"net/http"
 	"os"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"golang.org/x/sync/errgroup"
+	"google.golang.org/grpc"
 	"within.website/x/cmd/mi/models"
 	"within.website/x/cmd/mi/services/events"
 	"within.website/x/cmd/mi/services/homefrontshim"
@@ -24,6 +26,7 @@ import (
 var (
 	bind         = flag.String("bind", ":8080", "HTTP bind address")
 	dbLoc        = flag.String("db-loc", "./var/data.db", "")
+	grpcBind     = flag.String("grpc-bind", ":8081", "GRPC bind address")
 	internalBind = flag.String("internal-bind", ":9195", "HTTP internal routes bind address")
 
 	// Events flags
@@ -78,9 +81,18 @@ func main() {
 		os.Exit(1)
 	}
 
+	st := switchtracker.New(dao)
+	es := events.New(dao, *flyghtTrackerURL)
+
+	gs := grpc.NewServer()
+
+	announce.RegisterAnnounceServer(gs, ann)
+	pb.RegisterSwitchTrackerServer(gs, st)
+	pb.RegisterEventsServer(gs, es)
+
 	mux.Handle(announce.AnnouncePathPrefix, announce.NewAnnounceServer(ann))
-	mux.Handle(pb.SwitchTrackerPathPrefix, pb.NewSwitchTrackerServer(switchtracker.New(dao)))
-	mux.Handle(pb.EventsPathPrefix, pb.NewEventsServer(events.New(dao, *flyghtTrackerURL)))
+	mux.Handle(pb.SwitchTrackerPathPrefix, pb.NewSwitchTrackerServer(st))
+	mux.Handle(pb.EventsPathPrefix, pb.NewEventsServer(es))
 	mux.Handle("/front", homefrontshim.New(dao))
 
 	i := importer.New(dao)
@@ -98,6 +110,16 @@ func main() {
 	http.Handle("/metrics", promhttp.Handler())
 
 	g, _ := errgroup.WithContext(ctx)
+
+	g.Go(func() error {
+		slog.Info("starting private grpc server", "bind", *grpcBind)
+		lis, err := net.Listen("tcp", *grpcBind)
+		if err != nil {
+			return err
+		}
+
+		return gs.Serve(lis)
+	})
 
 	g.Go(func() error {
 		slog.Info("starting internal server", "bind", *internalBind)

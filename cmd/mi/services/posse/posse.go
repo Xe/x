@@ -37,6 +37,8 @@ type Announcer struct {
 	mastodon *mastodon.Client
 	mimi     announce.Announce
 	cfg      Config
+
+	announce.UnimplementedAnnounceServer
 }
 
 type Config struct {
@@ -88,7 +90,7 @@ func (a *Announcer) Announce(ctx context.Context, it *jsonfeed.Item) (*emptypb.E
 	g, gCtx := errgroup.WithContext(ctx)
 	g.Go(func() error {
 		post, err := a.mastodon.CreateStatus(gCtx, mastodon.CreateStatusParams{
-			Status: sb.String(),
+			Status: sb.String() + "?utm_campaign=mi_irl&utm_medium=social&utm_source=mastodon",
 		})
 		if err != nil {
 			posseErrors.WithLabelValues("mastodon").Inc()
@@ -120,6 +122,13 @@ func (a *Announcer) Announce(ctx context.Context, it *jsonfeed.Item) (*emptypb.E
 			slog.Error("failed to parse url", "err", err)
 			return err
 		}
+
+		q := u.Query()
+		q.Set("utm_campaign", "mi_irl")
+		q.Set("utm_medium", "social")
+		q.Set("utm_source", "bluesky")
+		u.RawQuery = q.Encode()
+
 		post, err := bsky.NewPostBuilder(sb.String()).
 			WithExternalLink(it.GetTitle(), *u, "The newest post on Xe Iaso's blog").
 			WithFacet(bsky.Facet_Link, it.GetUrl(), it.GetUrl()).

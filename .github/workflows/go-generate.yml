@@ -1,0 +1,43 @@
+name: Regenerate generated files
+
+on:
+  push:
+    branches: [ "master" ]
+
+permissions:
+  pull-requests: write
+  contents: write
+
+jobs:
+  regenerate:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Clone code
+        uses: actions/checkout@v4
+      
+      - uses: Homebrew/actions/setup-homebrew@master
+
+      - name: Setup Homebrew cellar cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            /home/linuxbrew/.linuxbrew/Cellar
+            /home/linuxbrew/.linuxbrew/bin
+            /home/linuxbrew/.linuxbrew/etc
+            /home/linuxbrew/.linuxbrew/include
+            /home/linuxbrew/.linuxbrew/lib
+            /home/linuxbrew/.linuxbrew/opt
+            /home/linuxbrew/.linuxbrew/sbin
+            /home/linuxbrew/.linuxbrew/share
+            /home/linuxbrew/.linuxbrew/var
+          key: ${{ runner.os }}-homebrew-cellar-${{ hashFiles('Brewfile.lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-homebrew-cellar-
+
+      - name: Install Brew dependencies
+        run: |
+           brew bundle
+      
+      - name: Generate generated files
+        run: |
+          go generate ./...

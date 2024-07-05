@@ -4,10 +4,10 @@ metadata:
   name: future-sight
   namespace: future-sight
   labels:
-    app.kubernetes.io/name: future-sight
+    xeiaso.net/role: web
 spec:
   selector:
-    app.kubernetes.io/name: future-sight
+    xeiaso.net/role: web
   ports:
     - protocol: TCP
       port: 80

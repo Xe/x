@@ -18,6 +18,7 @@ metadata:
   namespace: future-sight
   labels:
     app.kubernetes.io/name: future-sight
+    xeiaso.net/role: web
   annotations:
     operator.1password.io/auto-restart: "true"
 spec:
@@ -25,11 +26,13 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/name: future-sight
+      xeiaso.net/role: web
   template:
     metadata:
       namespace: future-sight
       labels:
         app.kubernetes.io/name: future-sight
+        xeiaso.net/role: web
     spec:
       volumes:
         - name: tigris
