@@ -23,8 +23,9 @@ import (
 var (
 	flyAPIBaseURL = flag.String("fly-base-url", "https://api.fly.io", "Fly API base URL")
 	flyToken      = flag.String("fly-token", "", "Fly API token")
-	openAIToken   = flag.String("openai-token", "", "OpenAI API token")
 	openAIModel   = flag.String("openai-model", "gpt-3.5-turbo-16k", "OpenAI model to use")
+	openAIToken   = flag.String("openai-token", "", "OpenAI API token")
+	openAIURL     = flag.String("openai-url", "", "OpenAI API base URL")
 
 	//go:embed playbooks/*
 	playbooks embed.FS
@@ -42,6 +43,10 @@ func main() {
 	}
 
 	cli := chatgpt.NewClient(*openAIToken)
+
+	if *openAIURL != "" {
+		cli = cli.WithBaseURL(*openAIURL)
+	}
 
 	flyapi.SetBaseURL(*flyAPIBaseURL)
 	fly := flyapi.NewClient(*flyToken, "alvis", "devel", flySlogger{})

@@ -83,12 +83,19 @@ type Response struct {
 type Client struct {
 	httpCli *http.Client
 	apiKey  string
+	baseURL string
+}
+
+func (c Client) WithBaseURL(baseURL string) Client {
+	c.baseURL = baseURL
+	return c
 }
 
 func NewClient(apiKey string) Client {
 	return Client{
 		httpCli: &http.Client{},
 		apiKey:  apiKey,
+		baseURL: "https://api.openai.com",
 	}
 }
 
@@ -102,7 +109,7 @@ func (c Client) Complete(ctx context.Context, r Request) (*Response, error) {
 		return nil, err
 	}
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, "https://api.openai.com/v1/chat/completions", bytes.NewBuffer(data))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, c.baseURL+"/v1/chat/completions", bytes.NewBuffer(data))
 	if err != nil {
 		return nil, fmt.Errorf("chatgpt: [unexpected] can't make request???: %w", err)
 	}
