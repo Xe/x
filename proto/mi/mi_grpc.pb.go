@@ -354,8 +354,9 @@ var POSSE_ServiceDesc = grpc.ServiceDesc{
 }
 
 const (
-	Events_Get_FullMethodName = "/within.website.x.mi.Events/Get"
-	Events_Add_FullMethodName = "/within.website.x.mi.Events/Add"
+	Events_Get_FullMethodName    = "/within.website.x.mi.Events/Get"
+	Events_Add_FullMethodName    = "/within.website.x.mi.Events/Add"
+	Events_Remove_FullMethodName = "/within.website.x.mi.Events/Remove"
 )
 
 // EventsClient is the client API for Events service.
@@ -368,6 +369,8 @@ type EventsClient interface {
 	Get(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*EventFeed, error)
 	// Add adds an event to the feed.
 	Add(ctx context.Context, in *Event, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// Remove removes an event from the feed.
+	Remove(ctx context.Context, in *Event, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type eventsClient struct {
@@ -398,6 +401,16 @@ func (c *eventsClient) Add(ctx context.Context, in *Event, opts ...grpc.CallOpti
 	return out, nil
 }
 
+func (c *eventsClient) Remove(ctx context.Context, in *Event, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, Events_Remove_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // EventsServer is the server API for Events service.
 // All implementations must embed UnimplementedEventsServer
 // for forward compatibility
@@ -408,6 +421,8 @@ type EventsServer interface {
 	Get(context.Context, *emptypb.Empty) (*EventFeed, error)
 	// Add adds an event to the feed.
 	Add(context.Context, *Event) (*emptypb.Empty, error)
+	// Remove removes an event from the feed.
+	Remove(context.Context, *Event) (*emptypb.Empty, error)
 	mustEmbedUnimplementedEventsServer()
 }
 
@@ -420,6 +435,9 @@ func (UnimplementedEventsServer) Get(context.Context, *emptypb.Empty) (*EventFee
 }
 func (UnimplementedEventsServer) Add(context.Context, *Event) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Add not implemented")
+}
+func (UnimplementedEventsServer) Remove(context.Context, *Event) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Remove not implemented")
 }
 func (UnimplementedEventsServer) mustEmbedUnimplementedEventsServer() {}
 
@@ -470,6 +488,24 @@ func _Events_Add_Handler(srv interface{}, ctx context.Context, dec func(interfac
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Events_Remove_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Event)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(EventsServer).Remove(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Events_Remove_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(EventsServer).Remove(ctx, req.(*Event))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Events_ServiceDesc is the grpc.ServiceDesc for Events service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -484,6 +520,10 @@ var Events_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Add",
 			Handler:    _Events_Add_Handler,
+		},
+		{
+			MethodName: "Remove",
+			Handler:    _Events_Remove_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

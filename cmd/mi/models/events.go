@@ -61,3 +61,7 @@ func (d *DAO) UpcomingEvents(ctx context.Context, count int) ([]Event, error) {
 
 	return events, nil
 }
+
+func (d *DAO) RemoveEvent(ctx context.Context, id int) error {
+	return d.db.WithContext(ctx).Delete(&Event{}, id).Error
+}

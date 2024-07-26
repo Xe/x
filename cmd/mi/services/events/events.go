@@ -90,3 +90,12 @@ func (e *Events) Add(ctx context.Context, ev *pb.Event) (*emptypb.Empty, error) 
 
 	return &emptypb.Empty{}, nil
 }
+
+func (e *Events) Remove(ctx context.Context, req *pb.Event) (*emptypb.Empty, error) {
+	err := e.dao.RemoveEvent(ctx, int(req.Id))
+	if err != nil {
+		return nil, err
+	}
+
+	return &emptypb.Empty{}, nil
+}

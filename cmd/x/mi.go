@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/c-bata/go-prompt"
@@ -300,6 +301,46 @@ func (ae *miAddEvent) Execute(ctx context.Context, f *flag.FlagSet, _ ...interfa
 	slog.Info("adding event", "event", ev)
 
 	_, err = cli.Add(ctx, ev)
+	if err != nil {
+		fmt.Printf("error: %v\n", err)
+		return subcommands.ExitFailure
+	}
+
+	return subcommands.ExitSuccess
+}
+
+type miRemoveEvent struct {
+	id int
+}
+
+func (*miRemoveEvent) Name() string     { return "remove-event" }
+func (*miRemoveEvent) Synopsis() string { return "Remove an event to be attended by ID." }
+func (*miRemoveEvent) Usage() string {
+	return `remove-event [--id]:
+
+Remove an event to be attended by ID.
+`
+}
+func (re *miRemoveEvent) SetFlags(f *flag.FlagSet) {
+	f.IntVar(&re.id, "id", -1, "ID of the event to remove.")
+}
+
+func (re *miRemoveEvent) Execute(ctx context.Context, f *flag.FlagSet, _ ...interface{}) subcommands.ExitStatus {
+	if re.id == -1 {
+		idStr := prompt.Input("Event ID: ", func(d prompt.Document) []prompt.Suggest {
+			return nil
+		})
+		id, err := strconv.Atoi(idStr)
+		if err != nil {
+			fmt.Printf("error parsing ID: %v\n", err)
+			return subcommands.ExitFailure
+		}
+		re.id = id
+	}
+
+	cli := mi.NewEventsProtobufClient(*miURL, http.DefaultClient)
+
+	_, err := cli.Remove(ctx, &mi.Event{Id: int32(re.id)})
 	if err != nil {
 		fmt.Printf("error: %v\n", err)
 		return subcommands.ExitFailure

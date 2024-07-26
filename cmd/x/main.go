@@ -21,6 +21,7 @@ func main() {
 	// Events
 	subcommands.Register(&miListEvents{}, "events")
 	subcommands.Register(&miAddEvent{}, "events")
+	subcommands.Register(&miRemoveEvent{}, "events")
 
 	// Sanguisuga
 	subcommands.Register(&sanguisugaAnimeList{}, "sanguisuga")

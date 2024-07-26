@@ -91,4 +91,6 @@ service Events {
   rpc Get(google.protobuf.Empty) returns (EventFeed);
   // Add adds an event to the feed.
   rpc Add(Event) returns (google.protobuf.Empty);
+  // Remove removes an event from the feed.
+  rpc Remove(Event) returns (google.protobuf.Empty);
 }
