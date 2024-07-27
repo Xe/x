@@ -19,7 +19,7 @@ import (
 )
 
 var (
-	chatChannels    = flag.String("jufra-chat-channels", "217096701771513856", "comma-separated list of channels to allow chat in")
+	chatChannels    = flag.String("jufra-chat-channels", "217096701771513856,1266740925137289287", "comma-separated list of channels to allow chat in")
 	llamaGuardModel = flag.String("jufra-llama-guard-model", "xe/llamaguard3", "ollama model tag for llama guard")
 	mimiModel       = flag.String("jufra-mimi-model", "xe/mimi:llama3.1", "ollama model tag for mimi")
 )
