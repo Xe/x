@@ -98,6 +98,8 @@ func (m *Module) messageCreate(s *discordgo.Session, mc *discordgo.MessageCreate
 		Content: mc.Content,
 	})
 
+	slog.Info("message count", "len", len(conv))
+
 	lgResp, err := m.llamaGuardCheck(context.Background(), "user", conv)
 	if err != nil {
 		slog.Error("error checking message", "err", err, "message_id", mc.ID, "channel_id", mc.ChannelID)
