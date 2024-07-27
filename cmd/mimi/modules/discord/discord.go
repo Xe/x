@@ -28,6 +28,8 @@ func New(ctx context.Context) (*Module, error) {
 		dg.Close()
 	}()
 
+	dg.StateEnabled = true
+
 	return &Module{
 		dg: dg,
 	}, nil

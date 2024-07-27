@@ -4,7 +4,9 @@
 package jufra
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"flag"
 	"log/slog"
 	"strings"
@@ -92,9 +94,21 @@ func (m *Module) messageCreate(s *discordgo.Session, mc *discordgo.MessageCreate
 
 	conv := m.convHistory[mc.ChannelID]
 
+	nick := mc.Author.Username
+
+	gu, err := s.State.Member(mc.GuildID, mc.Author.ID)
+	if err != nil {
+		slog.Error("error getting member", "err", err, "message_id", mc.ID, "channel_id", mc.ChannelID)
+	} else {
+		nick = gu.Nick
+	}
+
 	conv = append(conv, ollama.Message{
-		Role:    "user",
-		Content: mc.Content,
+		Role: "user",
+		Content: jsonString(map[string]any{
+			"content": mc.Content,
+			"user":    nick,
+		}),
 	})
 
 	slog.Info("message count", "len", len(conv))
@@ -173,4 +187,15 @@ func (m *Module) llamaGuardComplain(ctx context.Context, from string, lgResp *ll
 	}
 
 	return sb.String(), nil
+}
+
+func jsonString(val any) string {
+	var buf bytes.Buffer
+	enc := json.NewEncoder(&buf)
+	if err := enc.Encode(val); err != nil {
+		slog.Error("error encoding json", "err", err)
+		return ""
+	}
+
+	return buf.String()
 }
