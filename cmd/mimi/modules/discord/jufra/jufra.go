@@ -125,6 +125,10 @@ func (m *Module) messageCreate(s *discordgo.Session, mc *discordgo.MessageCreate
 		return
 	}
 
+	if strings.HasPrefix(mc.Content, "!") {
+		return
+	}
+
 	m.lock.Lock()
 	defer m.lock.Unlock()
 
