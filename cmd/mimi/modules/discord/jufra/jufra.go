@@ -23,6 +23,7 @@ var (
 	chatChannels    = flag.String("jufra-chat-channels", "217096701771513856,1266740925137289287", "comma-separated list of channels to allow chat in")
 	llamaGuardModel = flag.String("jufra-llama-guard-model", "xe/llamaguard3", "ollama model tag for llama guard")
 	mimiModel       = flag.String("jufra-mimi-model", "xe/mimi:llama3.1", "ollama model tag for mimi")
+	mimiNames       = flag.String("jufra-mimi-names", "Mimi", "comma-separated list of names for mimi")
 )
 
 type Module struct {
@@ -30,8 +31,13 @@ type Module struct {
 	cli    chatgpt.Client
 	ollama *ollama.Client
 
-	convHistory map[string][]ollama.Message
+	convHistory map[string]state
 	lock        sync.Mutex
+}
+
+type state struct {
+	conv []ollama.Message
+	aa   *AttentionAttenuator
 }
 
 func New(sess *discordgo.Session) *Module {
@@ -39,7 +45,7 @@ func New(sess *discordgo.Session) *Module {
 		sess:        sess,
 		cli:         chatgpt.NewClient("").WithBaseURL(internal.OllamaHost()),
 		ollama:      internal.OllamaClient(),
-		convHistory: make(map[string][]ollama.Message),
+		convHistory: make(map[string]state),
 	}
 
 	sess.AddHandler(result.messageCreate)
@@ -53,9 +59,39 @@ func New(sess *discordgo.Session) *Module {
 		slog.Error("error creating clearconv command", "err", err)
 	}
 
+	if _, err := sess.ApplicationCommandCreate("1119055490882732105", "", &discordgo.ApplicationCommand{
+		Name:                     "unpoke",
+		Type:                     discordgo.ChatApplicationCommand,
+		Description:              "Have Mimi stop paying attention to the current channel",
+		DefaultMemberPermissions: &[]int64{discordgo.PermissionSendMessages}[0],
+	}); err != nil {
+		slog.Error("error creating clearconv command", "err", err)
+	}
+
 	sess.AddHandler(result.clearConv)
+	sess.AddHandler(result.unpoke)
 
 	return result
+}
+
+func (m *Module) unpoke(s *discordgo.Session, i *discordgo.InteractionCreate) {
+	if i.ApplicationCommandData().Name != "unpoke" {
+		return
+	}
+
+	m.lock.Lock()
+	defer m.lock.Unlock()
+
+	st := m.convHistory[i.ChannelID]
+	st.aa.Reset()
+	m.convHistory[i.ChannelID] = st
+
+	s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+		Type: discordgo.InteractionResponseChannelMessageWithSource,
+		Data: &discordgo.InteractionResponseData{
+			Content: "Mimi will no longer pay attention to this channel",
+		},
+	})
 }
 
 func (m *Module) clearConv(s *discordgo.Session, i *discordgo.InteractionCreate) {
@@ -92,7 +128,22 @@ func (m *Module) messageCreate(s *discordgo.Session, mc *discordgo.MessageCreate
 	m.lock.Lock()
 	defer m.lock.Unlock()
 
-	conv := m.convHistory[mc.ChannelID]
+	st := m.convHistory[mc.ChannelID]
+	conv := st.conv
+
+	if st.aa == nil {
+		st.aa = NewAttentionAttenuator()
+	}
+
+	if strings.Contains(strings.ToLower(mc.Content), *mimiNames) {
+		st.aa.Poke()
+	}
+
+	st.aa.Update()
+
+	if !st.aa.Attention() {
+		return
+	}
 
 	nick := mc.Author.Username
 
@@ -170,7 +221,8 @@ func (m *Module) messageCreate(s *discordgo.Session, mc *discordgo.MessageCreate
 
 	s.ChannelMessageSend(mc.ChannelID, resp.Message.Content)
 
-	m.convHistory[mc.ChannelID] = conv
+	st.conv = conv
+	m.convHistory[mc.ChannelID] = st
 }
 
 func (m *Module) llamaGuardCheck(ctx context.Context, role string, messages []ollama.Message) (*llamaguard.Response, error) {
