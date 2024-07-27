@@ -233,3 +233,64 @@ func (c *Client) Embeddings(ctx context.Context, er *EmbedRequest) (*EmbedRespon
 
 	return &result, nil
 }
+
+type GenerateRequest struct {
+	Model   string         `json:"model"`
+	Prompt  string         `json:"prompt"`
+	Images  [][]byte       `json:"images,omitempty"`
+	Options map[string]any `json:"options"`
+
+	Context   []int   `json:"context,omitempty"`
+	Format    *string `json:"format,omitempty"`
+	Template  *string `json:"template,omitempty"`
+	System    *string `json:"system,omitempty"`
+	Stream    bool    `json:"stream"`
+	Raw       bool    `json:"raw"`
+	KeepAlive string  `json:"keep_alive"`
+}
+
+type GenerateResponse struct {
+	Model              string    `json:"model"`
+	CreatedAt          time.Time `json:"created_at"`
+	Response           string    `json:"response"`
+	Done               bool      `json:"done"`
+	Context            []int     `json:"context"`
+	TotalDuration      int64     `json:"total_duration"`
+	LoadDuration       int64     `json:"load_duration"`
+	PromptEvalCount    int       `json:"prompt_eval_count"`
+	PromptEvalDuration int64     `json:"prompt_eval_duration"`
+	EvalCount          int       `json:"eval_count"`
+	EvalDuration       int64     `json:"eval_duration"`
+}
+
+func (c *Client) Generate(ctx context.Context, gr *GenerateRequest) (*GenerateResponse, error) {
+	buf := &bytes.Buffer{}
+	if err := json.NewEncoder(buf).Encode(gr); err != nil {
+		return nil, fmt.Errorf("ollama: error encoding request: %w", err)
+	}
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, c.baseURL+"/api/generate", buf)
+	if err != nil {
+		return nil, fmt.Errorf("ollama: error creating request: %w", err)
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "application/json")
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("ollama: error making request: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, web.NewError(http.StatusOK, resp)
+	}
+
+	var result GenerateResponse
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return nil, fmt.Errorf("ollama: error decoding response: %w", err)
+	}
+
+	return &result, nil
+}

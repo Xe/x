@@ -13,13 +13,17 @@ import (
 
 var (
 	dataDir     = flag.String("data-dir", "./var", "data directory for the bot")
-	ollamaModel = flag.String("ollama-model", "llama3", "ollama model tag")
+	ollamaModel = flag.String("ollama-model", "llama3.1", "ollama model tag")
 	ollamaHost  = flag.String("ollama-host", "http://xe-inference.flycast:80", "ollama host")
 )
 
 func DataDir() string {
 	os.MkdirAll(*dataDir, 0755)
 	return *dataDir
+}
+
+func OllamaHost() string {
+	return *ollamaHost
 }
 
 func OllamaClient() *ollama.Client {

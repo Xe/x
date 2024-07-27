@@ -13,12 +13,14 @@ import (
 	"within.website/x/cmd/mimi/modules/discord"
 	"within.website/x/cmd/mimi/modules/discord/flyio"
 	"within.website/x/cmd/mimi/modules/discord/heic2jpeg"
+	"within.website/x/cmd/mimi/modules/discord/jufra"
 	"within.website/x/cmd/mimi/modules/irc"
 )
 
 var (
-	grpcAddr = flag.String("grpc-addr", ":9001", "GRPC listen address")
-	httpAddr = flag.String("http-addr", ":9002", "HTTP listen address")
+	grpcAddr   = flag.String("grpc-addr", ":9001", "GRPC listen address")
+	httpAddr   = flag.String("http-addr", ":9002", "HTTP listen address")
+	ircEnabled = flag.Bool("irc-enabled", true, "enable IRC module")
 )
 
 func main() {
@@ -37,15 +39,13 @@ func main() {
 
 	b := flyio.New()
 
+	juf := jufra.New(d.Session())
+	_ = juf
+
 	d.Register(b)
 	d.Register(heic2jpeg.New())
 
 	d.Open()
-
-	ircBot, err := irc.New(ctx, d.Session())
-	if err != nil {
-		log.Fatalf("error creating irc module: %v", err)
-	}
 
 	slog.Info("bot started", "grpcAddr", *grpcAddr, "httpAddr", *httpAddr)
 
@@ -58,7 +58,14 @@ func main() {
 	})
 
 	b.RegisterHTTP(mux)
-	ircBot.RegisterHTTP(mux)
+
+	if *ircEnabled {
+		ircBot, err := irc.New(ctx, d.Session())
+		if err != nil {
+			log.Fatalf("error creating irc module: %v", err)
+		}
+		ircBot.RegisterHTTP(mux)
+	}
 
 	go func() {
 		log.Fatal(gs.Serve(lis))
