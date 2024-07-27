@@ -6,7 +6,6 @@ package jufra
 import (
 	"context"
 	"flag"
-	"fmt"
 	"log/slog"
 	"strings"
 	"sync"
@@ -120,13 +119,8 @@ func (m *Module) messageCreate(s *discordgo.Session, mc *discordgo.MessageCreate
 	}
 
 	cr := &ollama.CompleteRequest{
-		Model: *mimiModel,
-		Messages: []ollama.Message{
-			{
-				Role:    "user",
-				Content: fmt.Sprintf("%s: %s", mc.Author.Username, mc.Content),
-			},
-		},
+		Model:    *mimiModel,
+		Messages: conv,
 	}
 
 	resp, err := m.ollama.Chat(context.Background(), cr)
