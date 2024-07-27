@@ -103,6 +103,8 @@ func (m *Module) messageCreate(s *discordgo.Session, mc *discordgo.MessageCreate
 		nick = gu.Nick
 	}
 
+	s.ChannelTyping(mc.ChannelID)
+
 	conv = append(conv, ollama.Message{
 		Role: "user",
 		Content: jsonString(map[string]any{
