@@ -90,7 +90,7 @@ func (m *Module) messageCreate(s *discordgo.Session, mc *discordgo.MessageCreate
 	m.lock.Lock()
 	defer m.lock.Unlock()
 
-	conv := m.convHistory[mc.Author.ID]
+	conv := m.convHistory[mc.ChannelID]
 
 	conv = append(conv, ollama.Message{
 		Role:    "user",
@@ -154,7 +154,7 @@ func (m *Module) messageCreate(s *discordgo.Session, mc *discordgo.MessageCreate
 
 	s.ChannelMessageSend(mc.ChannelID, resp.Message.Content)
 
-	m.convHistory[mc.Author.ID] = conv
+	m.convHistory[mc.ChannelID] = conv
 }
 
 func (m *Module) llamaGuardCheck(ctx context.Context, role string, messages []ollama.Message) (*llamaguard.Response, error) {
