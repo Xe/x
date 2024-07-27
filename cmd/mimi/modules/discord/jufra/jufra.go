@@ -125,6 +125,10 @@ func (m *Module) messageCreate(s *discordgo.Session, mc *discordgo.MessageCreate
 		return
 	}
 
+	if mc.Author.ID == s.State.User.ID {
+		return
+	}
+
 	m.lock.Lock()
 	defer m.lock.Unlock()
 
