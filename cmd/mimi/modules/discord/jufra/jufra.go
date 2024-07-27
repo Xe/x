@@ -106,7 +106,7 @@ func (m *Module) messageCreate(s *discordgo.Session, mc *discordgo.MessageCreate
 	}
 
 	if !lgResp.IsSafe {
-		msg, err := m.llamaGuardComplain(context.Background(), lgResp)
+		msg, err := m.llamaGuardComplain(context.Background(), "user", lgResp)
 		if err != nil {
 			slog.Error("error generating response", "err", err, "message_id", mc.ID, "channel_id", mc.ChannelID)
 			s.ChannelMessageSend(mc.ChannelID, "error generating response")
@@ -144,7 +144,8 @@ func (m *Module) messageCreate(s *discordgo.Session, mc *discordgo.MessageCreate
 	}
 
 	if !lgResp.IsSafe {
-		msg, err := m.llamaGuardComplain(context.Background(), lgResp)
+		slog.Error("rule violation detected", "message_id", mc.ID, "channel_id", mc.ChannelID, "categories", lgResp.ViolationCategories, "message", resp.Message.Content)
+		msg, err := m.llamaGuardComplain(context.Background(), "assistant", lgResp)
 		if err != nil {
 			slog.Error("error generating response", "err", err, "message_id", mc.ID, "channel_id", mc.ChannelID)
 			s.ChannelMessageSend(mc.ChannelID, "error generating response")
