@@ -142,6 +142,7 @@ func (m *Module) messageCreate(s *discordgo.Session, mc *discordgo.MessageCreate
 	st.aa.Update()
 
 	if !st.aa.Attention() {
+		slog.Info("not paying attention", "channel_id", mc.ChannelID, "message_id", mc.ID, "probability", st.aa.GetProbability())
 		return
 	}
 
