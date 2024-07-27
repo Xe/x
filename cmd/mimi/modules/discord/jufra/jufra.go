@@ -113,10 +113,6 @@ func (m *Module) clearConv(s *discordgo.Session, i *discordgo.InteractionCreate)
 }
 
 func (m *Module) messageCreate(s *discordgo.Session, mc *discordgo.MessageCreate) {
-	if mc.Author.Bot {
-		return
-	}
-
 	if !strings.Contains(*chatChannels, mc.ChannelID) {
 		return
 	}
