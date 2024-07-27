@@ -43,7 +43,7 @@ func New(sess *discordgo.Session) *Module {
 
 	sess.AddHandler(result.messageCreate)
 
-	if _, err := sess.ApplicationCommandCreate("1251716018771066902", "", &discordgo.ApplicationCommand{
+	if _, err := sess.ApplicationCommandCreate("1119055490882732105", "", &discordgo.ApplicationCommand{
 		Name:                     "clearconv",
 		Type:                     discordgo.ChatApplicationCommand,
 		Description:              "Clear the conversation history for the current channel",
