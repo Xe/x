@@ -164,9 +164,11 @@ func (m *Module) llamaGuardCheck(ctx context.Context, role string, messages []ol
 	return llamaguard.Check(ctx, m.ollama, role, *llamaGuardModel, messages)
 }
 
-func (m *Module) llamaGuardComplain(ctx context.Context, lgResp *llamaguard.Response) (string, error) {
+func (m *Module) llamaGuardComplain(ctx context.Context, from string, lgResp *llamaguard.Response) (string, error) {
 	var sb strings.Builder
-	sb.WriteString("⚠️ Rule violation detected ⚠️\n")
+	sb.WriteString("⚠️ Rule violation detected from ")
+	sb.WriteString(from)
+	sb.WriteString(":\n")
 	for _, cat := range lgResp.ViolationCategories {
 		sb.WriteString("- ")
 		sb.WriteString(cat.String())
