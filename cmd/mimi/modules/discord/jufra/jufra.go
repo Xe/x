@@ -150,6 +150,8 @@ func (m *Module) messageCreate(s *discordgo.Session, mc *discordgo.MessageCreate
 		return
 	}
 
+	st.aa.Poke()
+
 	nick := mc.Author.Username
 
 	gu, err := s.State.Member(mc.GuildID, mc.Author.ID)
