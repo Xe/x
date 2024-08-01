@@ -225,6 +225,7 @@ func (m *Module) messageCreate(s *discordgo.Session, mc *discordgo.MessageCreate
 		Options: map[string]any{
 			"num_ctx": 131072,
 		},
+		Tools: m.getTools(),
 	}
 
 	resp, err := m.ollama.Chat(context.Background(), cr)
@@ -235,6 +236,37 @@ func (m *Module) messageCreate(s *discordgo.Session, mc *discordgo.MessageCreate
 	}
 
 	conv = append(conv, resp.Message)
+
+	if len(resp.Message.ToolCalls) != 0 {
+		for _, tc := range resp.Message.ToolCalls {
+			if tc.Name == "run_python_code" {
+				msg, err := m.runPythonCode(context.Background(), tc)
+				if err != nil {
+					slog.Error("error running python code", "err", err, "message_id", mc.ID, "channel_id", mc.ChannelID)
+					s.ChannelMessageSend(mc.ChannelID, "error running python code")
+					return
+				}
+
+				conv = append(conv, *msg)
+
+				resp, err = m.ollama.Chat(context.Background(), &ollama.CompleteRequest{
+					Model:    *mimiModel,
+					Messages: conv,
+					Options: map[string]any{
+						"num_ctx": 131072,
+					},
+					Tools: m.getTools(),
+				})
+				if err != nil {
+					slog.Error("error chatting", "err", err, "message_id", mc.ID, "channel_id", mc.ChannelID)
+					s.ChannelMessageSend(mc.ChannelID, "error chatting")
+					return
+				}
+
+				conv = append(conv, resp.Message)
+			}
+		}
+	}
 
 	if !*disableLlamaguard {
 		lgResp, err := m.llamaGuardCheck(context.Background(), "assistant", conv)
