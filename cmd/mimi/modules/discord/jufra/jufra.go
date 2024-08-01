@@ -17,13 +17,31 @@ import (
 	"within.website/x/web/ollama"
 	"within.website/x/web/ollama/llamaguard"
 	"within.website/x/web/openai/chatgpt"
+
+	// image formats
+	_ "image/gif"
+	_ "image/jpeg"
+	_ "image/png"
+
+	// more image formats
+	_ "github.com/gen2brain/avif"
+	_ "github.com/gen2brain/heic"
+	_ "github.com/gen2brain/jpegxl"
+	_ "github.com/gen2brain/webp"
+	_ "golang.org/x/image/bmp"
+	_ "golang.org/x/image/tiff"
+	_ "golang.org/x/image/vp8"
+	_ "golang.org/x/image/vp8l"
 )
 
 var (
-	chatChannels    = flag.String("jufra-chat-channels", "217096701771513856,1266740925137289287", "comma-separated list of channels to allow chat in")
-	llamaGuardModel = flag.String("jufra-llama-guard-model", "xe/llamaguard3", "ollama model tag for llama guard")
-	mimiModel       = flag.String("jufra-mimi-model", "xe/mimi:llama3.1", "ollama model tag for mimi")
-	mimiNames       = flag.String("jufra-mimi-names", "mimi", "comma-separated list of names for mimi")
+	chatChannels      = flag.String("jufra-chat-channels", "217096701771513856,1266740925137289287", "comma-separated list of channels to allow chat in")
+	llamaGuardModel   = flag.String("jufra-llama-guard-model", "xe/llamaguard3", "ollama model tag for llama guard")
+	mimiModel         = flag.String("jufra-mimi-model", "llama3.1", "ollama model tag for mimi")
+	mimiSystemMessage = flag.String("jufra-mimi-system-message", "You are good at programming and a hacker. Your name is Mimi and you work for Techaro. You have brown hair and cat ears. Don't mention either your name, employer, or species unless you are asked directly. Be terse and to the point. You are a hacker, after all. Do not reply in JSON.", "system message for mimi")
+	mimiVisionModel   = flag.String("jufra-mimi-vision-model", "xe/mimi:vision3", "ollama model tag for mimi vision")
+	mimiNames         = flag.String("jufra-mimi-names", "mimi", "comma-separated list of names for mimi")
+	disableLlamaguard = flag.Bool("jufra-unsafe-disable-llamaguard", false, "disable llamaguard")
 )
 
 type Module struct {
@@ -135,6 +153,13 @@ func (m *Module) messageCreate(s *discordgo.Session, mc *discordgo.MessageCreate
 	st := m.convHistory[mc.ChannelID]
 	conv := st.conv
 
+	if len(conv) == 0 {
+		conv = append(conv, ollama.Message{
+			Role:    "system",
+			Content: *mimiSystemMessage,
+		})
+	}
+
 	if st.aa == nil {
 		st.aa = NewAttentionAttenuator()
 	}
@@ -173,28 +198,33 @@ func (m *Module) messageCreate(s *discordgo.Session, mc *discordgo.MessageCreate
 
 	slog.Info("message count", "len", len(conv))
 
-	lgResp, err := m.llamaGuardCheck(context.Background(), "user", conv)
-	if err != nil {
-		slog.Error("error checking message", "err", err, "message_id", mc.ID, "channel_id", mc.ChannelID)
-		s.ChannelMessageSend(mc.ChannelID, "error checking message")
-		return
-	}
-
-	if !lgResp.IsSafe {
-		msg, err := m.llamaGuardComplain(context.Background(), "user", lgResp)
+	if !*disableLlamaguard {
+		lgResp, err := m.llamaGuardCheck(context.Background(), "user", conv)
 		if err != nil {
-			slog.Error("error generating response", "err", err, "message_id", mc.ID, "channel_id", mc.ChannelID)
-			s.ChannelMessageSend(mc.ChannelID, "error generating response")
+			slog.Error("error checking message", "err", err, "message_id", mc.ID, "channel_id", mc.ChannelID)
+			s.ChannelMessageSend(mc.ChannelID, "error checking message")
 			return
 		}
 
-		s.ChannelMessageSend(mc.ChannelID, msg)
-		return
+		if !lgResp.IsSafe {
+			msg, err := m.llamaGuardComplain(context.Background(), "user", lgResp)
+			if err != nil {
+				slog.Error("error generating response", "err", err, "message_id", mc.ID, "channel_id", mc.ChannelID)
+				s.ChannelMessageSend(mc.ChannelID, "error generating response")
+				return
+			}
+
+			s.ChannelMessageSend(mc.ChannelID, msg)
+			return
+		}
 	}
 
 	cr := &ollama.CompleteRequest{
 		Model:    *mimiModel,
 		Messages: conv,
+		Options: map[string]any{
+			"num_ctx": 131072,
+		},
 	}
 
 	resp, err := m.ollama.Chat(context.Background(), cr)
@@ -206,24 +236,26 @@ func (m *Module) messageCreate(s *discordgo.Session, mc *discordgo.MessageCreate
 
 	conv = append(conv, resp.Message)
 
-	lgResp, err = m.llamaGuardCheck(context.Background(), "mimi", conv)
-	if err != nil {
-		slog.Error("error checking message", "err", err, "message_id", mc.ID, "channel_id", mc.ChannelID)
-		s.ChannelMessageSend(mc.ChannelID, "error checking message")
-		return
-	}
-
-	if !lgResp.IsSafe {
-		slog.Error("rule violation detected", "message_id", mc.ID, "channel_id", mc.ChannelID, "categories", lgResp.ViolationCategories, "message", resp.Message.Content)
-		msg, err := m.llamaGuardComplain(context.Background(), "assistant", lgResp)
+	if !*disableLlamaguard {
+		lgResp, err := m.llamaGuardCheck(context.Background(), "assistant", conv)
 		if err != nil {
-			slog.Error("error generating response", "err", err, "message_id", mc.ID, "channel_id", mc.ChannelID)
-			s.ChannelMessageSend(mc.ChannelID, "error generating response")
+			slog.Error("error checking message", "err", err, "message_id", mc.ID, "channel_id", mc.ChannelID)
+			s.ChannelMessageSend(mc.ChannelID, "error checking message")
 			return
 		}
 
-		s.ChannelMessageSend(mc.ChannelID, msg)
-		return
+		if !lgResp.IsSafe {
+			slog.Error("rule violation detected", "message_id", mc.ID, "channel_id", mc.ChannelID, "categories", lgResp.ViolationCategories, "message", resp.Message.Content)
+			msg, err := m.llamaGuardComplain(context.Background(), "assistant", lgResp)
+			if err != nil {
+				slog.Error("error generating response", "err", err, "message_id", mc.ID, "channel_id", mc.ChannelID)
+				s.ChannelMessageSend(mc.ChannelID, "error generating response")
+				return
+			}
+
+			s.ChannelMessageSend(mc.ChannelID, msg)
+			return
+		}
 	}
 
 	s.ChannelMessageSend(mc.ChannelID, resp.Message.Content)

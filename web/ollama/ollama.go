@@ -29,10 +29,45 @@ func NewLocalClient() *Client {
 	return NewClient("http://localhost:11434")
 }
 
+type Function struct {
+	Name        string `json:"name"`
+	Description string `json:"description,omitempty"`
+	Parameters  Param  `json:"parameters"`
+}
+
+type Param struct {
+	Type        string     `json:"type"`
+	Description string     `json:"description,omitempty"`
+	Enum        []string   `json:"enum,omitempty"`
+	Properties  Properties `json:"properties"`
+	Required    []string   `json:"required,omitempty"`
+}
+
+type Properties map[string]Param
+
+func (p Properties) MarshalJSON() ([]byte, error) {
+	if len(p) == 0 {
+		return []byte("{}"), nil
+	}
+
+	return json.Marshal(map[string]Param(p))
+}
+
+type ToolCall struct {
+	Name      string          `json:"name"`
+	Arguments json.RawMessage `json:"arguments"`
+}
+
+type Tool struct {
+	Type     string   `json:"type"` // "function"
+	Function Function `json:"function"`
+}
+
 type Message struct {
-	Content string   `json:"content"`
-	Role    string   `json:"role"`
-	Images  [][]byte `json:"images"`
+	Content   string     `json:"content"`
+	Role      string     `json:"role"`
+	Images    [][]byte   `json:"images"`
+	ToolCalls []ToolCall `json:"tool_calls"`
 }
 
 type CompleteRequest struct {
@@ -42,6 +77,7 @@ type CompleteRequest struct {
 	Template *string        `json:"template,omitempty"`
 	Stream   bool           `json:"stream"`
 	Options  map[string]any `json:"options"`
+	Tools    []Tool         `json:"tools"`
 }
 
 type CompleteResponse struct {
