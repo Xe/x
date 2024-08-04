@@ -12,7 +12,7 @@ import (
 
 var normalTools = []ollama.Function{
 	{
-		Name:        "run_python_code",
+		Name:        "code_interpreter",
 		Description: "Run the given Python code in a sandboxed environment",
 		Parameters: ollama.Param{
 			Type: "object",
@@ -25,6 +25,24 @@ var normalTools = []ollama.Function{
 			Required: []string{"code"},
 		},
 	},
+	{
+		Name:        "none",
+		Description: "No tools are relevant for this message",
+	},
+	// {
+	// 	Name:        "reply",
+	// 	Description: "Reply to the message",
+	// 	Parameters: ollama.Param{
+	// 		Type: "object",
+	// 		Properties: ollama.Properties{
+	// 			"message": {
+	// 				Type:        "string",
+	// 				Description: "The message to send",
+	// 			},
+	// 		},
+	// 		Required: []string{"message"},
+	// 	},
+	// },
 }
 
 type pythonCodeArgs struct {
@@ -54,7 +72,10 @@ func (m *Module) runPythonCode(ctx context.Context, tc ollama.ToolCall) (*ollama
 
 	res, err := python.Run(ctx, tmpdir, args.Code)
 	if err != nil {
-		return nil, nil
+		return &ollama.Message{
+			Role:    "tool",
+			Content: jsonString(map[string]string{"error": err.Error(), "stdout": res.Stdout, "stderr": res.Stderr}),
+		}, nil
 	}
 
 	return &ollama.Message{

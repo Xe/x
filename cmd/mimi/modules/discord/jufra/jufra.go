@@ -6,6 +6,7 @@ package jufra
 import (
 	"bytes"
 	"context"
+	_ "embed"
 	"encoding/json"
 	"flag"
 	"log/slog"
@@ -37,11 +38,13 @@ import (
 var (
 	chatChannels      = flag.String("jufra-chat-channels", "217096701771513856,1266740925137289287", "comma-separated list of channels to allow chat in")
 	llamaGuardModel   = flag.String("jufra-llama-guard-model", "xe/llamaguard3", "ollama model tag for llama guard")
-	mimiModel         = flag.String("jufra-mimi-model", "llama3.1", "ollama model tag for mimi")
-	mimiSystemMessage = flag.String("jufra-mimi-system-message", "You are good at programming and a hacker. Your name is Mimi and you work for Techaro. You have brown hair and cat ears. Don't mention either your name, employer, or species unless you are asked directly. Be terse and to the point. You are a hacker, after all. Do not reply in JSON.", "system message for mimi")
+	mimiModel         = flag.String("jufra-mimi-model", "xe/mimi:llama3.1", "ollama model tag for mimi")
 	mimiVisionModel   = flag.String("jufra-mimi-vision-model", "xe/mimi:vision3", "ollama model tag for mimi vision")
 	mimiNames         = flag.String("jufra-mimi-names", "mimi", "comma-separated list of names for mimi")
 	disableLlamaguard = flag.Bool("jufra-unsafe-disable-llamaguard", false, "disable llamaguard")
+
+	//go:embed system-prompt.txt
+	mimiSystemMessage string
 )
 
 type Module struct {
@@ -156,7 +159,7 @@ func (m *Module) messageCreate(s *discordgo.Session, mc *discordgo.MessageCreate
 	if len(conv) == 0 {
 		conv = append(conv, ollama.Message{
 			Role:    "system",
-			Content: *mimiSystemMessage,
+			Content: mimiSystemMessage,
 		})
 	}
 
@@ -223,9 +226,9 @@ func (m *Module) messageCreate(s *discordgo.Session, mc *discordgo.MessageCreate
 		Model:    *mimiModel,
 		Messages: conv,
 		Options: map[string]any{
-			"num_ctx": 131072,
+			"num_ctx": 65536,
 		},
-		Tools: m.getTools(),
+		//Tools: m.getTools(),
 	}
 
 	resp, err := m.ollama.Chat(context.Background(), cr)
@@ -238,9 +241,27 @@ func (m *Module) messageCreate(s *discordgo.Session, mc *discordgo.MessageCreate
 	conv = append(conv, resp.Message)
 
 	if len(resp.Message.ToolCalls) != 0 {
+		slog.Info("got tool calls!", "msg", resp.Message)
 		for _, tc := range resp.Message.ToolCalls {
-			if tc.Name == "run_python_code" {
-				msg, err := m.runPythonCode(context.Background(), tc)
+			switch tc.Function.Name {
+			case "reply":
+				type replyArgs struct {
+					Message string `json:"message"`
+				}
+
+				var args replyArgs
+
+				if err := json.Unmarshal(tc.Function.Arguments, &args); err != nil {
+					slog.Error("error decoding reply args", "err", err, "message_id", mc.ID, "channel_id", mc.ChannelID)
+					s.ChannelMessageSend(mc.ChannelID, "error decoding reply args")
+					return
+				}
+
+				s.ChannelMessageSend(mc.ChannelID, args.Message)
+
+			case "code_interpreter":
+				slog.Info("got run_python_code tool call", "message_id", mc.ID, "channel_id", mc.ChannelID, "tc", tc)
+				msg, err := m.runPythonCode(context.Background(), tc.Function)
 				if err != nil {
 					slog.Error("error running python code", "err", err, "message_id", mc.ID, "channel_id", mc.ChannelID)
 					s.ChannelMessageSend(mc.ChannelID, "error running python code")
@@ -253,7 +274,7 @@ func (m *Module) messageCreate(s *discordgo.Session, mc *discordgo.MessageCreate
 					Model:    *mimiModel,
 					Messages: conv,
 					Options: map[string]any{
-						"num_ctx": 131072,
+						"num_ctx": 65536,
 					},
 					Tools: m.getTools(),
 				})
@@ -264,6 +285,9 @@ func (m *Module) messageCreate(s *discordgo.Session, mc *discordgo.MessageCreate
 				}
 
 				conv = append(conv, resp.Message)
+
+			default:
+				slog.Error("unknown tool call", "message_id", mc.ID, "channel_id", mc.ChannelID, "tool_call", tc)
 			}
 		}
 	}
