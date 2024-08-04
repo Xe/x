@@ -9,6 +9,7 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
+	"os"
 	"time"
 
 	"within.website/x/valid"
@@ -63,11 +64,15 @@ type Tool struct {
 	Function Function `json:"function"`
 }
 
+type ToolInvocation struct {
+	Function ToolCall `json:"function"`
+}
+
 type Message struct {
-	Content   string     `json:"content"`
-	Role      string     `json:"role"`
-	Images    [][]byte   `json:"images"`
-	ToolCalls []ToolCall `json:"tool_calls"`
+	Content   string           `json:"content"`
+	Role      string           `json:"role"`
+	Images    [][]byte         `json:"images"`
+	ToolCalls []ToolInvocation `json:"tool_calls"`
 }
 
 type CompleteRequest struct {
@@ -118,9 +123,10 @@ func (c *Client) Chat(ctx context.Context, inp *CompleteRequest) (*CompleteRespo
 	}
 
 	var result CompleteResponse
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+	if err := json.NewDecoder(io.TeeReader(resp.Body, os.Stderr)).Decode(&result); err != nil {
 		return nil, fmt.Errorf("ollama: error decoding response: %w", err)
 	}
+	fmt.Fprintln(os.Stderr)
 
 	return &result, nil
 }

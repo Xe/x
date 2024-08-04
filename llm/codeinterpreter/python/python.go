@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	_ "embed"
-	"fmt"
 	"os"
 
 	"github.com/tetratelabs/wazero"
@@ -63,9 +62,11 @@ func Run(ctx context.Context, tmpDir, userCode string) (*Result, error) {
 
 	mod, err := r.InstantiateModule(ctx, code, config)
 	if err != nil {
-		fmt.Println(fout.String())
-		fmt.Println(ferr.String())
-		return nil, err
+		result := &Result{
+			Stdout: fout.String(),
+			Stderr: ferr.String(),
+		}
+		return result, err
 	}
 
 	defer mod.Close(ctx)
