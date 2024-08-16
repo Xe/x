@@ -38,7 +38,7 @@ import (
 var (
 	chatChannels      = flag.String("jufra-chat-channels", "217096701771513856,1266740925137289287", "comma-separated list of channels to allow chat in")
 	llamaGuardModel   = flag.String("jufra-llama-guard-model", "xe/llamaguard3", "ollama model tag for llama guard")
-	mimiModel         = flag.String("jufra-mimi-model", "xe/mimi:llama3.1", "ollama model tag for mimi")
+	mimiModel         = flag.String("jufra-mimi-model", "xe/hermes3:70b", "ollama model tag for mimi")
 	mimiVisionModel   = flag.String("jufra-mimi-vision-model", "xe/mimi:vision3", "ollama model tag for mimi vision")
 	mimiNames         = flag.String("jufra-mimi-names", "mimi", "comma-separated list of names for mimi")
 	disableLlamaguard = flag.Bool("jufra-unsafe-disable-llamaguard", false, "disable llamaguard")
