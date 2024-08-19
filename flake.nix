@@ -42,12 +42,12 @@
       (system:
       let
         graft = pkgs: pkg:
-          pkg.override { buildGoModule = pkgs.buildGo122Module; };
+          pkg.override { buildGoModule = pkgs.buildGo123Module; };
         pkgs = import nixpkgs {
           inherit system;
           overlays = [
             (final: prev: {
-              go = prev.go_1_22;
+              go = prev.go_1_23;
               go-tools = graft prev prev.go-tools;
               gotools = graft prev prev.gotools;
               gopls = graft prev prev.gopls;
@@ -75,7 +75,7 @@
           rustc = rust;
         };
 
-        everything = pkgs.buildGo122Module {
+        everything = pkgs.buildGo123Module {
           pname = "xe-x-composite";
           inherit version vendorHash;
           src = ./.;
@@ -89,21 +89,21 @@
           ];
         };
 
-        future-sight = pkgs.buildGo122Module {
+        future-sight = pkgs.buildGo123Module {
           pname = "future-sight";
           inherit version vendorHash;
           src = ./.;
           subPackages = [ "cmd/future-sight" ];
         };
 
-        mi = pkgs.buildGo122Module {
+        mi = pkgs.buildGo123Module {
           pname = "mi";
           inherit version vendorHash;
           src = ./.;
           subPackages = [ "cmd/mi" ];
         };
 
-        mimi = pkgs.buildGo122Module {
+        mimi = pkgs.buildGo123Module {
           pname = "mimi";
           inherit version vendorHash;
           src = ./.;
@@ -118,28 +118,28 @@
           ];
         };
 
-        within-website = pkgs.buildGo122Module {
+        within-website = pkgs.buildGo123Module {
           pname = "within.website";
           inherit version vendorHash;
           src = ./.;
           subPackages = [ "cmd/within.website" ];
         };
 
-        azurda = pkgs.buildGo122Module {
+        azurda = pkgs.buildGo123Module {
           pname = "azurda";
           inherit version vendorHash;
           src = ./.;
           subPackages = [ "cmd/azurda" ];
         };
 
-        tourian = pkgs.buildGo122Module {
+        tourian = pkgs.buildGo123Module {
           pname = "tourian";
           inherit version vendorHash;
           src = ./.;
           subPackages = [ "cmd/tourian" ];
         };
 
-        xedn = pkgs.buildGo122Module {
+        xedn = pkgs.buildGo123Module {
           pname = "xedn";
           inherit version vendorHash;
           src = ./.;
@@ -217,7 +217,7 @@
           '';
         };
 
-        robocadey2 = pkgs.buildGo122Module {
+        robocadey2 = pkgs.buildGo123Module {
           pname = "robocadey2";
           inherit version vendorHash;
           src = ./.;
@@ -225,7 +225,7 @@
           subPackages = [ "cmd/robocadey2" ];
         };
 
-        sapientwindex = pkgs.buildGo122Module {
+        sapientwindex = pkgs.buildGo123Module {
           pname = "sapientwindex";
           inherit version vendorHash;
           src = ./.;
