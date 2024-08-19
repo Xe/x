@@ -11,6 +11,8 @@ kind: PersistentVolumeClaim
 metadata:
   name: ollama
   namespace: ollama
+  labels:
+    xeiaso.net/project: ollama
 spec:
   accessModes:
     - ReadWriteOnce

@@ -29,7 +29,7 @@ spec:
     metadata:
       creationTimestamp: null
       labels:
-        kubevirt.io/domain: "ubuntu-22.04"
+        kubevirt.io/domain: "ubuntu-24.04"
     spec:
       domain:
         cpu:
