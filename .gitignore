@@ -28,3 +28,6 @@ _testmain.go
 result
 
 *.gob
+
+bin
+.DS_Store

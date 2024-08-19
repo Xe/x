@@ -1,7 +1,7 @@
 tap "xe/pkgs"
 
 # programming languages
-brew "go@1.22"
+brew "go@1.23"
 brew "node@20"
 brew "deno"
 brew "python@3.11"
