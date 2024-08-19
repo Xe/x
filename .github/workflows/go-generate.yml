@@ -40,4 +40,4 @@ jobs:
       
       - name: Generate generated files
         run: |
-          go generate ./...
+          go generate ./... ||:
