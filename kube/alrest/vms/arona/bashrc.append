@@ -1,0 +1,1 @@
+alias chats='tmux -L weechat attach'
