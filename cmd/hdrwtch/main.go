@@ -26,11 +26,12 @@ var (
 	botToken     = flag.String("bot-token", "", "Telegram bot token")
 	botUsername  = flag.String("bot-username", "", "Telegram bot username")
 	cookieSecret = flag.String("cookie-secret", "", "Secret key for cookie store")
-	dbURL        = flag.String("database-url", "", "Database URL")
 	dbLoc        = flag.String("database-loc", "./var/hdrwtch.db", "Database location")
 	domain       = flag.String("domain", "shiroko-wsl.shark-harmonic.ts.net", "Domain to use for user agent")
 	port         = flag.String("port", "8080", "Port to listen on")
 	region       = flag.String("fly-region", "yow-dev", "Region of this instance")
+
+	//dbURL        = flag.String("database-url", "", "Database URL")
 
 	//go:embed static
 	staticFS embed.FS
@@ -71,7 +72,7 @@ func main() {
 
 	mux.Handle("/static/", http.FileServer(http.FS(staticFS)))
 
-	mux.Handle("/{$}", templ.Handler(base("Home", nil, anonNavBar(true), homePage())))
+	mux.HandleFunc("/{$}", s.index)
 	mux.HandleFunc("/login", s.loginHandler)
 	mux.HandleFunc("/login/callback", s.loginCallbackHandler)
 	mux.HandleFunc("/logout", s.logoutHandler)
@@ -126,6 +127,19 @@ type Server struct {
 	store *sessions.CookieStore
 	dao   *DAO
 	tg    *telego.Bot
+}
+
+func (s *Server) index(w http.ResponseWriter, r *http.Request) {
+	var navbar templ.Component
+
+	tu, ok := s.getTelegramUserData(r)
+	if ok {
+		navbar = authedNavBar(tu)
+	} else {
+		navbar = anonNavBar(true)
+	}
+
+	templ.Handler(base("hdrwtch", nil, navbar, homePage())).ServeHTTP(w, r)
 }
 
 func (s *Server) logoutHandler(w http.ResponseWriter, r *http.Request) {

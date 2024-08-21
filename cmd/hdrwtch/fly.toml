@@ -1,0 +1,36 @@
+# fly.toml app configuration file generated for hdrwtch on 2024-08-21T19:45:53-04:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'hdrwtch'
+primary_region = 'yul'
+
+[env]
+  DATABASE_LOC = "/data/hdrwtch.db"
+  DOMAIN = "hdrwtch.xeserv.us"
+
+[mounts]
+  source = "data"
+  destination = "/data"
+  auto_extend_size_threshold = 80
+  auto_extend_size_increment = "1GB"
+  auto_extend_size_limit = "10GB"
+
+[build]
+  image = "registry.fly.io/hdrwtch:latest"
+
+[services.concurrency]
+  type = "connections"
+  hard_limit = 1000
+  soft_limit = 750
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  processes = ['app']
+
+[[vm]]
+  memory = '1gb'
+  cpu_kind = 'shared'
+  cpus = 1

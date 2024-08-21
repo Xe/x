@@ -52,6 +52,16 @@ future-sight:
 
     SAVE IMAGE --push ghcr.io/xe/x/future-sight:latest
 
+hdrwtch:
+    FROM +runtime
+
+    COPY +everything/bin/hdrwtch /app/bin/hdrwtch
+    CMD ["/app/bin/hdrwtch", "--port=8080", "--database-loc=/data/hdrwtch.db"]
+
+    LABEL org.opencontainers.image.source="https://github.com/Xe/x"
+
+    SAVE IMAGE --push registry.fly.io/hdrwtch:latest
+
 hlang:
     FROM +runtime
 
@@ -217,6 +227,7 @@ xedn:
 all:
     BUILD --platform=linux/amd64 +azurda
     BUILD --platform=linux/amd64 +future-sight
+    BUILD --platform=linux/amd64 +hdrwtch
     BUILD --platform=linux/amd64 +hlang
     BUILD --platform=linux/amd64 +johaus
     BUILD --platform=linux/amd64 +mi
