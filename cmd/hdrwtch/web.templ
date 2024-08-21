@@ -1,0 +1,182 @@
+package main
+
+import "within.website/x/htmx"
+
+templ telegramWidget(botUsername string, avatarSize string, redirectURL string, requestAccess string) {
+	<script async src="https://telegram.org/js/telegram-widget.js?22" data-telegram-login={ botUsername } data-size={ avatarSize } data-auth-url={ redirectURL } data-request-access={ requestAccess }></script>
+}
+
+templ notFoundPage() {
+	<p class="my-4">If you expected to find a page here, this ain't it chief. Try <a href="/">going home</a>.</p>
+}
+
+templ base(title string, head, navbar, body templ.Component) {
+	<!DOCTYPE html>
+	<html lang="en">
+		<head>
+			<meta charset="UTF-8"/>
+			<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+			<link rel="stylesheet" href="/static/css/styles.css"/>
+			<title>{ title }</title>
+			if head != nil {
+				@head
+			}
+			@htmx.Use("remove-me")
+		</head>
+		<body class="flex items-start justify-center h-full bg-gray-50 my-4">
+			<div class="w-full max-w-4xl px-2">
+				if navbar != nil {
+					@navbar
+				}
+				<h1 class="my-2 pt-4 mt-0 text-3xl font-medium leading-tight text-primary">
+					{ title }
+				</h1>
+				@body
+				<footer class="mt-2 bg-neutral-200 text-center dark:bg-neutral-700 lg:text-left">
+					<div class="p-4 text-neutral-700 dark:text-neutral-200">
+						Made by <a class="text-neutral-800 dark:text-neutral-400" href="https://xeiaso.net">Xe Iaso</a>.
+					</div>
+				</footer>
+			</div>
+		</body>
+	</html>
+}
+
+templ loginPage(redirURL string) {
+	<p class="my-4">Use the widget below to authenticate to hdrwtch:</p>
+	@telegramWidget(*botUsername, "large", redirURL, "read")
+}
+
+templ anonNavBar(showLogin bool) {
+	<nav class="relative flex items-center justify-between sm:h-10 md:justify-center pb-4" aria-label="Global">
+		<div class="flex items-center flex-1 md:absolute md:inset-y-0 md:left-0">
+			<div class="flex items-center justify-between w-full md:w-auto">
+				<a href="/">
+					<span class="sr-only">hdrwtch</span>
+					<img class="w-auto h-8 sm:h-10" src="https://www.svgrepo.com/show/448244/pack.svg" loading="lazy" width="202" height="40"/>
+				</a>
+				<div class="flex -mr-2 md:hidden">
+					<button
+						class="inline-flex items-center justify-center p-2 text-gray-400 bg-gray-50 rounded-md hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-gray-50"
+						type="button"
+						aria-expanded="false"
+					>
+						<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true" class="w-6 h-6">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"></path>
+						</svg>
+					</button>
+				</div>
+			</div>
+		</div>
+		<div class="hidden md:flex md:space-x-10 list-none">
+			<li>
+				<a
+					href="/pricing"
+					class="text-base font-normal text-gray-500 list-none hover:text-gray-900"
+				>Pricing</a>
+			</li>
+			<li>
+				<a
+					href="/docs/"
+					class="text-base font-normal text-gray-500 list-none hover:text-gray-900"
+				>
+					Docs
+				</a>
+			</li>
+		</div>
+		<div class="hidden md:absolute md:flex md:items-center md:justify-end md:inset-y-0 md:right-0">
+			if showLogin {
+				<div class="inline-flex rounded-full shadow">
+					<a
+						href="/login"
+						class="inline-flex items-center px-4 py-2 text-base text-gray-900 bg-white border border-transparent rounded-full cursor-pointer font-base hover:bg-gray-50 "
+					>
+						Sign in
+					</a>
+				</div>
+			}
+		</div>
+	</nav>
+}
+
+templ authedNavBar(userData *TelegramUser) {
+	<nav class="relative flex items-center justify-between sm:h-10 md:justify-center pb-4" aria-label="Global">
+		<div class="flex items-center flex-1 md:absolute md:inset-y-0 md:left-0">
+			<div class="flex items-center justify-between w-full md:w-auto">
+				<a href="/">
+					<span class="sr-only">hdrwtch</span>
+					<img class="w-auto h-8 sm:h-10" src="https://www.svgrepo.com/show/448244/pack.svg" loading="lazy" width="202" height="40"/>
+				</a>
+				<div class="flex -mr-2 md:hidden">
+					<button
+						class="inline-flex items-center justify-center p-2 text-gray-400 bg-gray-50 rounded-md hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-gray-50"
+						type="button"
+						aria-expanded="false"
+					>
+						<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true" class="w-6 h-6">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"></path>
+						</svg>
+					</button>
+				</div>
+			</div>
+		</div>
+		<div class="hidden md:flex md:space-x-10 list-none">
+			<li>
+				<a
+					href="/probe"
+					class="text-base font-normal text-gray-500 list-none hover:text-gray-900"
+				>
+					Probes
+				</a>
+			</li>
+			<li>
+				<a
+					href="/pricing"
+					class="text-base font-normal text-gray-500 list-none hover:text-gray-900"
+				>
+					Pricing
+				</a>
+			</li>
+		</div>
+		<div class="hidden md:absolute md:flex md:items-center md:justify-end md:inset-y-0 md:right-0">
+			<div class="inline-flex rounded-full shadow">
+				<a
+					href="/user"
+					class="inline-flex items-center px-4 py-2 text-base text-gray-900 bg-white border border-transparent rounded-full cursor-pointer font-base hover:bg-gray-50"
+				>
+					<div class="flex items-center">
+						<img
+							class="inline-block h-10 w-10 rounded-full"
+							src={ userData.PhotoURL }
+						/>
+						<span class="pl-2">
+							<div>{ userData.FirstName } { userData.LastName }</div>
+							<div class="text-xs">{ "@" }{ userData.Username }</div>
+						</span>
+					</div>
+				</a>
+			</div>
+		</div>
+	</nav>
+}
+
+templ homePage() {
+	<p class="my-4">WIP</p>
+}
+
+templ userPage(tu *TelegramUser) {
+	<div class="flex">
+		<div class="mr-4 flex-shrink-0">
+			<img
+				class="inline-block h-16 w-16 rounded-full"
+				src={ tu.PhotoURL }
+			/>
+		</div>
+		<div>
+			<h4 class="text-lg font-bold">{ tu.FirstName } { tu.LastName }</h4>
+			<p class="mt-1">{ "@" }{ tu.Username }</p>
+		</div>
+	</div>
+	<a href="/logout">Logout</a>
+}

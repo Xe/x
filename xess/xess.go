@@ -19,8 +19,8 @@ func init() {
 	Mount(http.DefaultServeMux)
 }
 
-const URL = "/.xess/xess.css"
+const URL = "/.within.website/x/xess/xess.css"
 
 func Mount(mux *http.ServeMux) {
-	mux.Handle("/.xess/", http.StripPrefix("/.xess/", http.FileServerFS(Static)))
+	mux.Handle("/.within/x/xess/", http.StripPrefix("/.within/x/xess/", http.FileServerFS(Static)))
 }

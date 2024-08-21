@@ -1,8 +1,8 @@
 module within.website/x
 
-go 1.22.0
+go 1.23
 
-toolchain go1.22.3
+toolchain go1.23.0
 
 require (
 	cirello.io/goherokuname v0.0.0-20190914093443-b436bae8c2c5
@@ -11,7 +11,7 @@ require (
 	github.com/Marcel-ICMC/graw v0.0.0-20230411090719-e24cd8592d25
 	github.com/McKael/madon/v2 v2.4.0
 	github.com/Songmu/gitconfig v0.2.0
-	github.com/a-h/templ v0.2.731
+	github.com/a-h/templ v0.2.747
 	github.com/aws/aws-sdk-go v1.54.0
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.55.1
 	github.com/bwmarrin/discordgo v0.28.1
@@ -28,6 +28,7 @@ require (
 	github.com/gen2brain/heic v0.3.0
 	github.com/gen2brain/jpegxl v0.3.0
 	github.com/gen2brain/webp v0.4.4
+	github.com/go-gorm/caches/v4 v4.0.5
 	github.com/go-interpreter/wagon v0.6.0
 	github.com/go-shiori/go-readability v0.0.0-20230421032831-c66949dfc0ad
 	github.com/gomarkdown/markdown v0.0.0-20240328165702-4d01890c35c0
@@ -36,6 +37,7 @@ require (
 	github.com/google/subcommands v1.2.0
 	github.com/google/uuid v1.6.0
 	github.com/goreleaser/nfpm/v2 v2.37.1
+	github.com/gorilla/sessions v1.4.0
 	github.com/hullerob/go.farbfeld v0.0.0-20181222022525-3661193c725f
 	github.com/jaytaylor/html2text v0.0.0-20190408195923-01ec452cbe43
 	github.com/joho/godotenv v1.5.1
@@ -71,6 +73,7 @@ require (
 	golang.org/x/sync v0.7.0
 	google.golang.org/api v0.186.0
 	google.golang.org/grpc v1.64.1
+	gorm.io/driver/postgres v1.5.0
 	gorm.io/gorm v1.25.10
 	gorm.io/plugin/prometheus v0.1.0
 	honnef.co/go/transmission v0.0.0-20200712215954-58262f0ca9c9
@@ -172,6 +175,10 @@ require (
 	github.com/ipfs/go-log v1.0.5 // indirect
 	github.com/ipfs/go-log/v2 v2.5.1 // indirect
 	github.com/ipfs/go-metrics-interface v0.0.1 // indirect
+	github.com/jackc/pgpassfile v1.0.0 // indirect
+	github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a // indirect
+	github.com/jackc/pgx/v5 v5.5.0 // indirect
+	github.com/jackc/puddle/v2 v2.2.1 // indirect
 	github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 // indirect
 	github.com/jbenet/goprocess v0.1.4 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
@@ -334,7 +341,7 @@ require (
 	go4.org/mem v0.0.0-20220726221520-4f986261bf13 // indirect
 	go4.org/netipx v0.0.0-20231129151722-fdeea329fbba // indirect
 	golang.org/x/exp v0.0.0-20240119083558-1b970713d09a
-	golang.org/x/image v0.18.0 // indirect
+	golang.org/x/image v0.18.0
 	golang.org/x/mod v0.17.0 // indirect
 	golang.org/x/net v0.26.0 // indirect
 	golang.org/x/sys v0.21.0 // indirect
