@@ -8,11 +8,11 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/a-h/templ"
 	"github.com/gorilla/securecookie"
 	"github.com/gorilla/sessions"
-	"gorm.io/gorm/clause"
 	"within.website/x/htmx"
 	"within.website/x/internal"
 )
@@ -26,7 +26,9 @@ var (
 	cookieSecret = flag.String("cookie-secret", "", "Secret key for cookie store")
 	dbURL        = flag.String("database-url", "", "Database URL")
 	dbLoc        = flag.String("database-loc", "./var/hdrwtch.db", "Database location")
+	domain       = flag.String("domain", "shiroko-wsl.shark-harmonic.ts.net", "Domain to use for user agent")
 	port         = flag.String("port", "8080", "Port to listen on")
+	region       = flag.String("fly-region", "yow-dev", "Region of this instance")
 
 	//go:embed static
 	staticFS embed.FS
@@ -55,7 +57,7 @@ func main() {
 
 	htmx.Mount(mux)
 
-	mux.Handle("/static/", http.FileServer(http.FS(staticFS)))
+	mux.Handle("/static/", internal.UnchangingCache(http.FileServer(http.FS(staticFS))))
 
 	mux.Handle("/{$}", templ.Handler(base("Home", nil, anonNavBar(true), homePage())))
 	mux.HandleFunc("/login", s.loginHandler)
@@ -73,10 +75,24 @@ func main() {
 	mux.Handle("PUT /probe/{id}", s.loggedIn(s.probeUpdate))
 	mux.Handle("DELETE /probe/{id}", s.loggedIn(s.probeDelete))
 
-	mux.Handle("/", templ.Handler(
-		base("Not Found", nil, anonNavBar(true), notFoundPage()),
-		templ.WithStatus(http.StatusNotFound),
+	mux.Handle("/", internal.UnchangingCache(
+		templ.Handler(
+			base("Not Found", nil, anonNavBar(true), notFoundPage()),
+			templ.WithStatus(http.StatusNotFound),
+		),
 	))
+
+	// test routes
+	mux.HandleFunc("GET /test/curr", func(w http.ResponseWriter, r *http.Request) {
+		val := time.Now().Format(http.TimeFormat)
+		w.Header().Set("Last-Modified", val)
+		fmt.Fprintln(w, val)
+	})
+	mux.HandleFunc("GET /test/constant", func(w http.ResponseWriter, r *http.Request) {
+		val := "Mon, 02 Jan 2006 15:04:05 GMT"
+		w.Header().Set("Last-Modified", val)
+		fmt.Fprintln(w, val)
+	})
 
 	slog.Info("listening", "on", "http://localhost:"+*port)
 
@@ -126,11 +142,7 @@ func (s *Server) loginCallbackHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := s.dao.db.Clauses(clause.OnConflict{
-		Columns:   []clause.Column{{Name: "id"}},                                                           // primary key
-		DoUpdates: clause.AssignmentColumns([]string{"first_name", "last_name", "photo_url", "auth_date"}), // column needed to be updated
-	}).Create(user).WithContext(r.Context()).Error; err != nil {
-		slog.Error("failed to create user", "err", err, "user", user)
+	if err := s.dao.UpsertUser(r.Context(), user); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -139,9 +151,16 @@ func (s *Server) loginCallbackHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) userHandler(w http.ResponseWriter, r *http.Request) {
-	userData, ok := r.Context().Value(ctxKeyTelegramUser).(*TelegramUser)
+	userData, ok := s.getTelegramUserData(r)
 	if !ok {
-		http.Error(w, "no user data", http.StatusUnauthorized)
+		http.Error(w, "unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	probeCount, err := s.dao.CountProbes(r.Context(), userData.ID)
+	if err != nil {
+		slog.Error("failed to count probes", "err", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -150,7 +169,7 @@ func (s *Server) userHandler(w http.ResponseWriter, r *http.Request) {
 			"User Info",
 			nil,
 			authedNavBar(userData),
-			userPage(userData),
+			userPage(userData, probeCount),
 		),
 	).ServeHTTP(w, r)
 }

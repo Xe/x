@@ -7,21 +7,43 @@ import (
 
 templ probeListPage(probes []Probe) {
 	<div id="parent">
-		<table class="table-auto p-4" id="table">
-			<thead>
-				<tr>
-					<th class="py-2 px-6">Name</th>
-					<th class="py-2 px-6">URL</th>
-					<th class="py-2 px-6">Last Result</th>
-					<th class="py-2 px-6"></th>
-				</tr>
-			</thead>
-			<tbody hx-target="closest tr" hx-swap="outerHTML">
-				for _, probe := range probes {
-					@probeRow(probe)
-				}
-			</tbody>
-		</table>
+		<div class="mt-8 flow-root">
+			<div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+				<div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+					<table class="min-w-full divide-y divide-gray-300">
+						<thead>
+							<tr>
+								<th
+									scope="col"
+									class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0"
+								>Name</th>
+								<th
+									scope="col"
+									class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+								>URL</th>
+								<th
+									scope="col"
+									class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+								>Last Result</th>
+								<th
+									scope="col"
+									class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+								></th>
+							</tr>
+						</thead>
+						<tbody
+							class="divide-y divide-gray-200"
+							hx-target="closest tr"
+							hx-swap="outerHTML"
+						>
+							for _, probe := range probes {
+								@probeRow(probe)
+							}
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
 		@probeCreateForm()
 	</div>
 }
@@ -77,9 +99,13 @@ templ probeCreateForm() {
 
 templ probeRow(probe Probe) {
 	<tr>
-		<td class="">{ probe.Name }</td>
-		<td class="">{ probe.URL }</td>
-		<td class=""><a href={ templ.SafeURL(fmt.Sprintf("/probe/%d/run/%d", probe.ID, probe.LastResult.ID)) }>{ probe.LastResult.LastModified }</a></td>
+		<td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0"><a href={ templ.SafeURL(fmt.Sprintf("/probe/%d", probe.ID)) }>{ probe.Name }</a></td>
+		<td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500"><code>{ probe.URL }</code></td>
+		if probe.LastResult.CreatedAt.IsZero() {
+			<td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">Not run yet</td>
+		} else {
+			<td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500"><a href={ templ.SafeURL(fmt.Sprintf("/probe/%d/run/%d", probe.ID, probe.LastResult.ID)) }>{ probe.LastResult.CreatedAt.Format(time.RFC3339) }</a></td>
+		}
 		<td>
 			<button
 				class="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
@@ -221,38 +247,38 @@ templ probePage(probe Probe, history []ProbeResult) {
 		<div class="sm:flex sm:items-center">
 			<div class="sm:flex-auto">
 				<h2 class="text-base font-semibold leading-6 text-gray-900">Run history</h2>
-				<p class="mt-2 text-sm text-gray-700">The top 15 runs of this probe.</p>
+				<p class="mt-2 text-sm text-gray-700">The most recent 15 runs of this probe.</p>
 			</div>
 		</div>
-		<div class="mt-8 flow-root">
-			<div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-				<div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-					<table class="min-w-full divide-y divide-gray-300">
-						<thead>
-							<tr>
-								<th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0">Name</th>
-								<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Title</th>
-								<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Email</th>
-								<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Role</th>
-								<th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-0">
-									<span class="sr-only">Edit</span>
-								</th>
-							</tr>
-						</thead>
-						<tbody class="divide-y divide-gray-200">
-							<tr>
-								<td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">Lindsay Walton</td>
-								<td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">Front-end Developer</td>
-								<td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">lindsay.walton@example.com</td>
-								<td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">Member</td>
-								<td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
-									<a href="#" class="text-indigo-600 hover:text-indigo-900">Edit<span class="sr-only">, Lindsay Walton</span></a>
-								</td>
-							</tr>
-						</tbody>
-					</table>
+		if len(history) != 0 {
+			<div class="mt-8 flow-root">
+				<div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+					<div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+						<table class="min-w-full divide-y divide-gray-300">
+							<thead>
+								<tr>
+									<th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0">Time</th>
+									<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Status code</th>
+									<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Region</th>
+									<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Last Modified</th>
+								</tr>
+							</thead>
+							<tbody class="divide-y divide-gray-200">
+								for _, check := range history {
+									<tr>
+										<td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">{ check.CreatedAt.Format(time.RFC3339) }</td>
+										<td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{ fmt.Sprint(check.StatusCode) }</td>
+										<td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{ check.Region }</td>
+										<td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{ check.LastModified }</td>
+									</tr>
+								}
+							</tbody>
+						</table>
+					</div>
 				</div>
 			</div>
-		</div>
+		} else {
+			<p class="mt-8 flow-root">This probe has not been run yet, wait 15 minutes or so for it to be run.</p>
+		}
 	</div>
 }

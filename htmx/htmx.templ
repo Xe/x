@@ -11,7 +11,7 @@ package htmx
 //
 // This is mostly based on the extensions that I personally use.
 templ Use(exts ...string) {
-	@Core()
+	<script src={ URL + "htmx.js" }></script>
 	for _, ext := range exts {
 		<script src={ URL + ext + ".js" }></script>
 	}

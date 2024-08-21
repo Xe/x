@@ -27,16 +27,10 @@ type ctxKey int
 
 const (
 	ctxKeyTelegramUser ctxKey = iota
-	ctxKeyProbe
 )
 
 func getTelegramUser(ctx context.Context) (*TelegramUser, bool) {
 	val, ok := ctx.Value(ctxKeyTelegramUser).(*TelegramUser)
-	return val, ok
-}
-
-func getProbe(ctx context.Context) (*Probe, bool) {
-	val, ok := ctx.Value(ctxKeyProbe).(*Probe)
 	return val, ok
 }
 

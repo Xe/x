@@ -12,6 +12,8 @@ runtime:
         ca-certificates \
         && rm -rf /var/lib/apt/lists/*
 
+    WORKDIR /app
+
 deps:
     FROM golang:1.23
     WORKDIR /app
@@ -189,11 +191,12 @@ xedn-static:
      && ln -s /app/static/pkg/iosevka /app/static/css/iosevka \
      && rm -f /iosevka-iaso.tgz
 
-    COPY ./xess/dist /app/static/pkg/xess
+    COPY ./xess/dist/*.css /app/static/pkg/xess/
     COPY ./xess/xess.css /app/static/css/xess.css
-    COPY ./xess/xess.css /app/static/pkg/xess
+    COPY ./xess/xess.css /app/static/pkg/xess/xess.css
     COPY ./xess/static/podkova.css /app/static/pkg/podkova/family.css
     COPY ./xess/static/podkova.woff2 /app/static/pkg/podkova/podkova.woff2
+    RUN ln -s /app/static/pkg/podkova /app/static/css/podkova
 
     SAVE ARTIFACT /app/static
 
@@ -203,8 +206,8 @@ xedn:
     COPY +everything/bin/xedn /app/bin/xedn
     COPY +everything/bin/uplodr /app/bin/uplodr
     COPY +xedn-static/static /app/static
-    CMD ["/bin/xedn"]
-    ENV XEDN_STATIC=/app/static
+    CMD ["/app/bin/xedn"]
+    ENV XEDN_STATIC=/app
     ENV UPLODR_BINARY=/app/bin/uplodr
 
     LABEL org.opencontainers.image.source="https://github.com/Xe/x"

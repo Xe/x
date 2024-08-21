@@ -3,6 +3,8 @@ package htmx
 import (
 	"embed"
 	"net/http"
+
+	"within.website/x/internal"
 )
 
 //go:generate go run github.com/a-h/templ/cmd/templ@latest generate
@@ -23,7 +25,10 @@ const URL = "/.within.website/x/htmx/"
 //
 // If you use the Core or Use functions, you will need to ensure that HTMX is mounted at the correct path. Otherwise it will not be able to find the required JavaScript files.
 func Mount(mux *http.ServeMux) {
-	mux.Handle(URL, http.StripPrefix(URL, http.FileServer(http.FS(Static))))
+	hdlr := http.StripPrefix(URL, http.FileServer(http.FS(Static)))
+	hdlr = internal.UnchangingCache(hdlr)
+
+	mux.Handle(URL, hdlr)
 }
 
 // HTTP request headers

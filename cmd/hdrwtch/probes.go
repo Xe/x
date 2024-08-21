@@ -3,6 +3,7 @@ package main
 import (
 	"log/slog"
 	"net/http"
+	"time"
 
 	"github.com/a-h/templ"
 	"gorm.io/gorm"
@@ -14,16 +15,19 @@ type Probe struct {
 	UserID       string
 	Name         string
 	URL          string
-	LastResultID int
+	LastResultID uint
 	LastResult   ProbeResult
 }
 
 type ProbeResult struct {
 	gorm.Model
-	ProbeID      int
+	ProbeID      uint
+	Success      bool
 	LastModified string
 	StatusCode   int
 	Region       string
+	Remark       string
+	Duration     time.Duration
 }
 
 func (s *Server) probeList(w http.ResponseWriter, r *http.Request) {
@@ -90,14 +94,10 @@ func (s *Server) probeEdit(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	probe, ok := getProbe(r.Context())
-	if !ok {
+	probe, err := s.dao.GetProbe(r.Context(), r.PathValue("id"), tu.ID)
+	if err != nil {
+		slog.Error("failed to get probe", "path", r.URL.Path, "err", err)
 		http.Error(w, "no probe data", http.StatusUnauthorized)
-		return
-	}
-
-	if probe.UserID != tu.ID {
-		http.Error(w, "unauthorized", http.StatusUnauthorized)
 		return
 	}
 
@@ -114,15 +114,9 @@ func (s *Server) probeGet(w http.ResponseWriter, r *http.Request) {
 	}
 
 	probe, err := s.dao.GetProbe(r.Context(), r.PathValue("id"), tu.ID)
-	slog.Info("probe", "probe", probe)
 	if err != nil {
 		slog.Error("failed to get probe", "path", r.URL.Path, "err", err)
 		http.Error(w, "no probe data", http.StatusUnauthorized)
-		return
-	}
-
-	if probe.UserID != tu.ID {
-		http.Error(w, "unauthorized", http.StatusUnauthorized)
 		return
 	}
 
@@ -140,7 +134,7 @@ func (s *Server) probeGet(w http.ResponseWriter, r *http.Request) {
 		}
 
 		templ.Handler(
-			base("Probe "+probe.Name, nil, authedNavBar(tu), probePage(*probe, results)),
+			base(probe.Name, nil, authedNavBar(tu), probePage(*probe, results)),
 		).ServeHTTP(w, r)
 	}
 }
@@ -152,16 +146,31 @@ func (s *Server) probeUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	probe, ok := getProbe(r.Context())
-	if !ok {
+	probe, err := s.dao.GetProbe(r.Context(), r.PathValue("id"), tu.ID)
+	if err != nil {
+		slog.Error("failed to get probe", "path", r.URL.Path, "err", err)
 		http.Error(w, "no probe data", http.StatusUnauthorized)
 		return
 	}
 
-	if probe.UserID != tu.ID {
-		http.Error(w, "unauthorized", http.StatusUnauthorized)
+	if err := r.ParseForm(); err != nil {
+		slog.Error("failed to parse form", "err", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	probe.Name = r.FormValue("name")
+	probe.URL = r.FormValue("url")
+
+	if err := s.dao.db.Save(probe).Error; err != nil {
+		slog.Error("failed to update probe", "err", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	templ.Handler(
+		probeRow(*probe),
+	).ServeHTTP(w, r)
 }
 
 func (s *Server) probeDelete(w http.ResponseWriter, r *http.Request) {
@@ -171,14 +180,18 @@ func (s *Server) probeDelete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	probe, ok := getProbe(r.Context())
-	if !ok {
+	probe, err := s.dao.GetProbe(r.Context(), r.PathValue("id"), tu.ID)
+	if err != nil {
+		slog.Error("failed to get probe", "path", r.URL.Path, "err", err)
 		http.Error(w, "no probe data", http.StatusUnauthorized)
 		return
 	}
 
-	if probe.UserID != tu.ID {
-		http.Error(w, "unauthorized", http.StatusUnauthorized)
+	if err := s.dao.db.Delete(probe).Error; err != nil {
+		slog.Error("failed to delete probe", "err", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	http.Redirect(w, r, "/probes", http.StatusFound)
 }

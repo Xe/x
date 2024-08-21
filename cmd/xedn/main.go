@@ -263,7 +263,7 @@ func main() {
 	h = XeDNAnnotation(h)
 
 	slog.Info("starting up", "addr", *addr)
-	http.ListenAndServe(*addr, h)
+	log.Fatal(http.ListenAndServe(*addr, h))
 }
 
 func XeDNAnnotation(next http.Handler) http.Handler {

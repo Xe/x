@@ -1,9 +1,9 @@
+@import url("https://cdn.xeiaso.net/static/pkg/iosevka/family.css");
+@import url("https://cdn.xeiaso.net/static/pkg/podkova/family.css");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-@import url("https://cdn.xeiaso.net/static/pkg/iosevka/family.css");
-@import url("https://cdn.xeiaso.net/static/pkg/podkova/family.css");
 
 @layer base {
   h1,

@@ -1,6 +1,9 @@
 package main
 
-import "within.website/x/htmx"
+import (
+	"fmt"
+	"within.website/x/htmx"
+)
 
 templ telegramWidget(botUsername string, avatarSize string, redirectURL string, requestAccess string) {
 	<script async src="https://telegram.org/js/telegram-widget.js?22" data-telegram-login={ botUsername } data-size={ avatarSize } data-auth-url={ redirectURL } data-request-access={ requestAccess }></script>
@@ -23,6 +26,7 @@ templ base(title string, head, navbar, body templ.Component) {
 				@head
 			}
 			@htmx.Use("remove-me")
+			<script async src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 		</head>
 		<body class="flex items-start justify-center h-full bg-gray-50 my-4">
 			<div class="w-full max-w-4xl px-2">
@@ -45,7 +49,7 @@ templ base(title string, head, navbar, body templ.Component) {
 
 templ loginPage(redirURL string) {
 	<p class="my-4">Use the widget below to authenticate to hdrwtch:</p>
-	@telegramWidget(*botUsername, "large", redirURL, "read")
+	@telegramWidget(*botUsername, "large", redirURL, "write")
 }
 
 templ anonNavBar(showLogin bool) {
@@ -54,7 +58,7 @@ templ anonNavBar(showLogin bool) {
 			<div class="flex items-center justify-between w-full md:w-auto">
 				<a href="/">
 					<span class="sr-only">hdrwtch</span>
-					<img class="w-auto h-8 sm:h-10" src="https://www.svgrepo.com/show/448244/pack.svg" loading="lazy" width="202" height="40"/>
+					<img class="w-auto h-8 sm:h-10" src="/static/img/logo.svg" loading="lazy" width="40" height="40"/>
 				</a>
 				<div class="flex -mr-2 md:hidden">
 					<button
@@ -105,8 +109,8 @@ templ authedNavBar(userData *TelegramUser) {
 		<div class="flex items-center flex-1 md:absolute md:inset-y-0 md:left-0">
 			<div class="flex items-center justify-between w-full md:w-auto">
 				<a href="/">
-					<span class="sr-only">hdrwtch</span>
-					<img class="w-auto h-8 sm:h-10" src="https://www.svgrepo.com/show/448244/pack.svg" loading="lazy" width="202" height="40"/>
+					<img class="w-auto h-8 sm:h-10" src="/static/img/logo.svg" loading="lazy" width="40" height="40"/>
+					<span class="ml-2 sr-only">hdrwtch</span>
 				</a>
 				<div class="flex -mr-2 md:hidden">
 					<button
@@ -165,7 +169,7 @@ templ homePage() {
 	<p class="my-4">WIP</p>
 }
 
-templ userPage(tu *TelegramUser) {
+templ userPage(tu *TelegramUser, probeCount int64) {
 	<div class="flex">
 		<div class="mr-4 flex-shrink-0">
 			<img
@@ -176,7 +180,12 @@ templ userPage(tu *TelegramUser) {
 		<div>
 			<h4 class="text-lg font-bold">{ tu.FirstName } { tu.LastName }</h4>
 			<p class="mt-1">{ "@" }{ tu.Username }</p>
+			<p class="mt-1"><b>Probes used</b>: { fmt.Sprint(probeCount) } / { fmt.Sprint(tu.ProbeLimit) }</p>
 		</div>
 	</div>
-	<a href="/logout">Logout</a>
+	<br/>
+	<a
+		class="rounded-md bg-indigo-600 m-4 px-4 py-4 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+		href="/logout"
+	>Logout</a>
 }

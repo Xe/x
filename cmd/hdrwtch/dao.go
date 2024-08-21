@@ -9,6 +9,7 @@ import (
 	"github.com/ncruces/go-sqlite3/gormlite"
 	slogGorm "github.com/orandin/slog-gorm"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 	gormPrometheus "gorm.io/plugin/prometheus"
 )
 
@@ -44,6 +45,47 @@ func New(dbLoc string) (*DAO, error) {
 	}))
 
 	return &DAO{db: db}, nil
+}
+
+func (dao *DAO) UpsertUser(ctx context.Context, user *TelegramUser) error {
+	if err := dao.db.Clauses(clause.OnConflict{
+		Columns:   []clause.Column{{Name: "id"}},                                                           // primary key
+		DoUpdates: clause.AssignmentColumns([]string{"first_name", "last_name", "photo_url", "auth_date"}), // column needed to be updated
+	}).
+		Create(user).
+		WithContext(ctx).
+		Error; err != nil {
+		return fmt.Errorf("failed to create user: %w", err)
+	}
+
+	return nil
+}
+
+func (dao *DAO) CreateProbe(ctx context.Context, probe *Probe, tu *TelegramUser) error {
+	// Check if user has reached probe limit
+	var count int64
+	if err := dao.db.Model(&Probe{}).Where("user_id = ?", tu.ID).Count(&count).Error; err != nil {
+		return fmt.Errorf("failed to count probes: %w", err)
+	}
+
+	if count >= int64(tu.ProbeLimit) {
+		return fmt.Errorf("probe limit reached")
+	}
+
+	if err := dao.db.Create(probe).WithContext(ctx).Error; err != nil {
+		return fmt.Errorf("failed to create probe: %w", err)
+	}
+
+	return nil
+}
+
+func (dao *DAO) CountProbes(ctx context.Context, userID string) (int64, error) {
+	var count int64
+	if err := dao.db.Model(&Probe{}).Where("user_id = ?", userID).Count(&count).WithContext(ctx).Error; err != nil {
+		return 0, fmt.Errorf("failed to count probes: %w", err)
+	}
+
+	return count, nil
 }
 
 func (dao *DAO) GetProbe(ctx context.Context, id string, userID string) (*Probe, error) {
