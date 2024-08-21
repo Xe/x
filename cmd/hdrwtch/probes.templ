@@ -6,11 +6,34 @@ import (
 )
 
 templ probeListPage(probes []Probe) {
+	<div class="flex p-4 mt-4" aria-label="Breadcrumb">
+		<ol class="inline-flex items-center space-x-1 md:space-x-2 rtl:space-x-reverse">
+			<li class="inline-flex items-center">
+				<a href="/" class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600">
+					<svg class="w-3 h-3 me-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+						<path d="m19.707 9.293-2-2-7-7a1 1 0 0 0-1.414 0l-7 7-2 2a1 1 0 0 0 1.414 1.414L2 10.414V18a2 2 0 0 0 2 2h3a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h3a2 2 0 0 0 2-2v-7.586l.293.293a1 1 0 0 0 1.414-1.414Z"></path>
+					</svg>
+					Home
+				</a>
+			</li>
+			<li aria-current="page">
+				<div class="flex items-center">
+					<svg class="rtl:rotate-180 w-3 h-3 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+						<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"></path>
+					</svg>
+					<span class="ms-1 text-sm font-medium text-gray-500 md:ms-2">Probes</span>
+				</div>
+			</li>
+		</ol>
+	</div>
+	<h1 class="my-2 pt-4 mt-0 text-3xl font-medium leading-tight text-primary">
+		Probes
+	</h1>
 	<div id="parent">
 		<div class="mt-8 flow-root">
 			<div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
 				<div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-					<table class="min-w-full divide-y divide-gray-300">
+					<table class="min-w-full divide-y divide-gray-300 table-auto">
 						<thead>
 							<tr>
 								<th
@@ -80,7 +103,7 @@ templ probeCreateForm() {
 									type="text"
 									name="url"
 									class="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
-									placeholder="https://google.com"
+									placeholder="https://example.com"
 								/>
 							</div>
 						</div>
@@ -104,7 +127,7 @@ templ probeRow(probe Probe) {
 		if probe.LastResult.CreatedAt.IsZero() {
 			<td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">Not run yet</td>
 		} else {
-			<td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500"><a href={ templ.SafeURL(fmt.Sprintf("/probe/%d/run/%d", probe.ID, probe.LastResult.ID)) }>{ probe.LastResult.CreatedAt.Format(time.RFC3339) }</a></td>
+			<td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500"><a href={ templ.SafeURL(fmt.Sprintf("/probe/%d/run/%d", probe.ID, probe.LastResult.ID)) }>{ probe.LastResult.LastModified }</a></td>
 		}
 		<td>
 			<button
@@ -135,27 +158,67 @@ templ probeRow(probe Probe) {
 
 templ probeEdit(probe Probe) {
 	<tr hx-trigger="cancel" class="editing" hx-get={ fmt.Sprintf("/probe/%d", probe.ID) }>
-		<td><input name="name" value={ probe.Name }/></td>
-		<td><input name="url" value={ probe.URL }/></td>
-		<td>
+		<td class="whitespace-nowrap px-2 py-4 text-sm text-gray-500"><input type="text" class="form-input rounded-lg w-full text-sm" name="name" value={ probe.Name }/></td>
+		<td class="whitespace-nowrap px-2 py-4 text-sm text-gray-500"><input type="text" class="form-input rounded-lg w-full text-sm" name="url" value={ probe.URL }/></td>
+		<td class="whitespace-nowrap px-2` py-4 text-sm text-gray-500">
 			<button
-				class="focus:outline-none text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
+				class="focus:outline-none text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-xs px-2.5 py-1.5 me-1"
 				hx-get={ fmt.Sprintf("/probe/%d", probe.ID) }
 			>
 				Cancel
 			</button>
 			<button
-				class="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
+				class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-xs px-2.5 py-1.5 me-1"
 				hx-put={ fmt.Sprintf("/probe/%d", probe.ID) }
 				hx-include="closest tr"
 			>
 				Save
+			</button>
+			<button
+				class="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-xs px-2.5 py-1.5 me-1"
+				hx-delete={ fmt.Sprintf("/probe/%d", probe.ID) }
+				hx-include="closest tr"
+				hx-target="closest tr"
+				hx-prompt="To confirm, write 'DELETE FOREVER' in all caps."
+			>
+				Delete
 			</button>
 		</td>
 	</tr>
 }
 
 templ probePage(probe Probe, history []ProbeResult) {
+	<div class="flex p-4 mt-4" aria-label="Breadcrumb">
+		<ol class="inline-flex items-center space-x-1 md:space-x-2 rtl:space-x-reverse">
+			<li class="inline-flex items-center">
+				<a href="/" class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600">
+					<svg class="w-3 h-3 me-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+						<path d="m19.707 9.293-2-2-7-7a1 1 0 0 0-1.414 0l-7 7-2 2a1 1 0 0 0 1.414 1.414L2 10.414V18a2 2 0 0 0 2 2h3a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h3a2 2 0 0 0 2-2v-7.586l.293.293a1 1 0 0 0 1.414-1.414Z"></path>
+					</svg>
+					Home
+				</a>
+			</li>
+			<li>
+				<div class="flex items-center">
+					<svg class="rtl:rotate-180 w-3 h-3 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+						<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"></path>
+					</svg>
+					<a href="/probe" class="ms-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ms-2">Probes</a>
+				</div>
+			</li>
+			<li aria-current="page">
+				<div class="flex items-center">
+					<svg class="rtl:rotate-180 w-3 h-3 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+						<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"></path>
+					</svg>
+					<span class="ms-1 text-sm font-medium text-gray-500 md:ms-2">{ probe.Name }</span>
+				</div>
+			</li>
+		</ol>
+	</div>
+	<h1 class="my-2 pt-4 mt-0 text-3xl font-medium leading-tight text-primary">
+		{ probe.Name }
+	</h1>
 	<div class="px-4 sm:px-6 lg:px-8">
 		<div class="mt-8 flow-root">
 			<div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -258,17 +321,29 @@ templ probePage(probe Probe, history []ProbeResult) {
 							<thead>
 								<tr>
 									<th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0">Time</th>
+									<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Result</th>
 									<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Status code</th>
-									<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Region</th>
 									<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Last Modified</th>
 								</tr>
 							</thead>
 							<tbody class="divide-y divide-gray-200">
 								for _, check := range history {
 									<tr>
-										<td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">{ check.CreatedAt.Format(time.RFC3339) }</td>
-										<td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{ fmt.Sprint(check.StatusCode) }</td>
-										<td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{ check.Region }</td>
+										<td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0"><a href={ templ.SafeURL(fmt.Sprintf("/probe/%d/run/%d", probe.ID, check.ID)) }>{ check.CreatedAt.Format(time.RFC3339) }</a></td>
+										<td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+											if check.Success {
+												✔️
+												<span class="sr-only">Success</span>
+											} else {
+												❌
+												<span class="sr-only">Failure</span>
+											}
+										</td>
+										<td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+											if check.StatusCode != 0 {
+												{ fmt.Sprint(check.StatusCode) }
+											}
+										</td>
 										<td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{ check.LastModified }</td>
 									</tr>
 								}
@@ -280,5 +355,133 @@ templ probePage(probe Probe, history []ProbeResult) {
 		} else {
 			<p class="mt-8 flow-root">This probe has not been run yet, wait 15 minutes or so for it to be run.</p>
 		}
+	</div>
+}
+
+templ probeRunPage(probe Probe, result ProbeResult) {
+	<div class="flex p-4 mt-4" aria-label="Breadcrumb">
+		<ol class="inline-flex items-center space-x-1 md:space-x-2 rtl:space-x-reverse">
+			<li class="inline-flex items-center">
+				<a href="/" class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600">
+					<svg class="w-3 h-3 me-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+						<path d="m19.707 9.293-2-2-7-7a1 1 0 0 0-1.414 0l-7 7-2 2a1 1 0 0 0 1.414 1.414L2 10.414V18a2 2 0 0 0 2 2h3a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h3a2 2 0 0 0 2-2v-7.586l.293.293a1 1 0 0 0 1.414-1.414Z"></path>
+					</svg>
+					Home
+				</a>
+			</li>
+			<li>
+				<div class="flex items-center">
+					<svg class="rtl:rotate-180 w-3 h-3 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+						<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"></path>
+					</svg>
+					<a href="/probe" class="ms-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ms-2">Probes</a>
+				</div>
+			</li>
+			<li>
+				<div class="flex items-center">
+					<svg class="rtl:rotate-180 w-3 h-3 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+						<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"></path>
+					</svg>
+					<a href={ templ.SafeURL(fmt.Sprintf("/probe/%d", probe.ID)) } class="ms-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ms-2">{ probe.Name }</a>
+				</div>
+			</li>
+			<li aria-current="page">
+				<div class="flex items-center">
+					<svg class="rtl:rotate-180 w-3 h-3 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+						<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"></path>
+					</svg>
+					<span class="ms-1 text-sm font-medium text-gray-500 md:ms-2">Run { fmt.Sprint(result.ID) }</span>
+				</div>
+			</li>
+		</ol>
+	</div>
+	<h1 class="my-2 pt-4 mt-0 text-3xl font-medium leading-tight text-primary">
+		Probe run { fmt.Sprint(result.ID) }
+	</h1>
+	<div class="mt-8 flow-root">
+		<div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+			<div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+				<table class="min-w-full divide-y divide-gray-300">
+					<tbody class="divide-y divide-gray-200">
+						<tr>
+							<td
+								class="whitespace-nowrap py-2 pl-4 pr-3 font-medium text-gray-900 sm:pl-0"
+							>
+								URL
+							</td>
+							<td
+								class="whitespace-nowrap py-2 pl-4 pr-3 text-gray-900 sm:pl-0"
+							>
+								{ probe.URL }
+							</td>
+						</tr>
+						<tr>
+							<td
+								class="whitespace-nowrap py-2 pl-4 pr-3 font-medium text-gray-900 sm:pl-0"
+							>
+								Success?
+							</td>
+							<td
+								class="whitespace-nowrap py-2 pl-4 pr-3 text-gray-900 sm:pl-0"
+							>
+								{ fmt.Sprint(result.Success) }
+							</td>
+						</tr>
+						<tr>
+							<td
+								class="whitespace-nowrap py-2 pl-4 pr-3 font-medium text-gray-900 sm:pl-0"
+							>
+								Last Modified
+							</td>
+							<td
+								class="whitespace-nowrap py-2 pl-4 pr-3 text-gray-900 sm:pl-0"
+							>
+								{ result.LastModified }
+							</td>
+						</tr>
+						<tr>
+							<td
+								class="whitespace-nowrap py-2 pl-4 pr-3 font-medium text-gray-900 sm:pl-0"
+							>
+								Status code
+							</td>
+							<td
+								class="whitespace-nowrap py-2 pl-4 pr-3 text-gray-900 sm:pl-0"
+							>
+								{ fmt.Sprint(result.StatusCode) }
+							</td>
+						</tr>
+						<tr>
+							<td
+								class="whitespace-nowrap py-2 pl-4 pr-3 font-medium text-gray-900 sm:pl-0"
+							>
+								Region
+							</td>
+							<td
+								class="whitespace-nowrap py-2 pl-4 pr-3 text-gray-900 sm:pl-0"
+							>
+								{ result.Region }
+							</td>
+						</tr>
+						<tr>
+							<td
+								class="whitespace-nowrap py-2 pl-4 pr-3 font-medium text-gray-900 sm:pl-0"
+							>
+								Remark
+							</td>
+							<td
+								class="whitespace-nowrap py-2 pl-4 pr-3 text-gray-900 sm:pl-0"
+							>
+								if result.Remark != "" {
+									{ result.Remark }
+								} else {
+									<small class="text-xs">n/a</small>
+								}
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
 	</div>
 }

@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"strconv"
 
 	_ "github.com/ncruces/go-sqlite3/embed"
@@ -26,6 +27,8 @@ func New(dbLoc string) (*DAO, error) {
 		Logger: slogGorm.New(
 			slogGorm.WithErrorField("err"),
 			slogGorm.WithRecordNotFoundError(),
+			slogGorm.SetLogLevel(slogGorm.DefaultLogType, slog.LevelInfo),
+			//slogGorm.WithTraceAll(),
 		),
 	})
 	if err != nil {
@@ -36,6 +39,7 @@ func New(dbLoc string) (*DAO, error) {
 		&TelegramUser{},
 		&Probe{},
 		&ProbeResult{},
+		&Doc{},
 	); err != nil {
 		return nil, fmt.Errorf("failed to migrate schema: %w", err)
 	}
@@ -45,6 +49,15 @@ func New(dbLoc string) (*DAO, error) {
 	}))
 
 	return &DAO{db: db}, nil
+}
+
+func (dao *DAO) GetUser(ctx context.Context, id int64) (*TelegramUser, error) {
+	var user TelegramUser
+	if err := dao.db.First(&user, id).WithContext(ctx).Error; err != nil {
+		return nil, fmt.Errorf("failed to get user: %w", err)
+	}
+
+	return &user, nil
 }
 
 func (dao *DAO) UpsertUser(ctx context.Context, user *TelegramUser) error {
@@ -79,7 +92,7 @@ func (dao *DAO) CreateProbe(ctx context.Context, probe *Probe, tu *TelegramUser)
 	return nil
 }
 
-func (dao *DAO) CountProbes(ctx context.Context, userID string) (int64, error) {
+func (dao *DAO) CountProbes(ctx context.Context, userID int64) (int64, error) {
 	var count int64
 	if err := dao.db.Model(&Probe{}).Where("user_id = ?", userID).Count(&count).WithContext(ctx).Error; err != nil {
 		return 0, fmt.Errorf("failed to count probes: %w", err)
@@ -88,7 +101,7 @@ func (dao *DAO) CountProbes(ctx context.Context, userID string) (int64, error) {
 	return count, nil
 }
 
-func (dao *DAO) GetProbe(ctx context.Context, id string, userID string) (*Probe, error) {
+func (dao *DAO) GetProbe(ctx context.Context, id string, userID int64) (*Probe, error) {
 	var probe Probe
 
 	idInt, err := strconv.Atoi(id)
@@ -96,7 +109,7 @@ func (dao *DAO) GetProbe(ctx context.Context, id string, userID string) (*Probe,
 		return nil, fmt.Errorf("invalid probe ID: %w", err)
 	}
 
-	if err := dao.db.First(&probe, idInt).WithContext(ctx).Error; err != nil {
+	if err := dao.db.Preload("LastResult").First(&probe, idInt).WithContext(ctx).Error; err != nil {
 		return nil, fmt.Errorf("failed to get probe: %w", err)
 	}
 
@@ -105,4 +118,26 @@ func (dao *DAO) GetProbe(ctx context.Context, id string, userID string) (*Probe,
 	}
 
 	return &probe, nil
+}
+
+func (dao *DAO) CreateProbeResult(ctx context.Context, tx *gorm.DB, probe Probe, result *ProbeResult) error {
+	if err := tx.Create(result).WithContext(ctx).Error; err != nil {
+		return fmt.Errorf("failed to create probe result: %w", err)
+	}
+
+	probe.LastResultID = result.ID
+	if err := tx.Save(&probe).WithContext(ctx).Error; err != nil {
+		return fmt.Errorf("failed to update probe: %w", err)
+	}
+
+	return nil
+}
+
+func (dao *DAO) GetDoc(slug string) (*Doc, error) {
+	var doc Doc
+	if err := dao.db.Where("slug = ?", slug).First(&doc).Error; err != nil {
+		return nil, err
+	}
+
+	return &doc, nil
 }

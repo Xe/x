@@ -13,6 +13,8 @@ import (
 	"github.com/a-h/templ"
 	"github.com/gorilla/securecookie"
 	"github.com/gorilla/sessions"
+	"github.com/mymmrac/telego"
+	"github.com/robfig/cron/v3"
 	"within.website/x/htmx"
 	"within.website/x/internal"
 )
@@ -43,6 +45,11 @@ func main() {
 		os.Exit(1)
 	}
 
+	bot, err := telego.NewBot(*botToken)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	dao, err := New(*dbLoc)
 	if err != nil {
 		log.Fatal(err)
@@ -51,18 +58,24 @@ func main() {
 	s := &Server{
 		store: sessions.NewCookieStore([]byte(*cookieSecret)),
 		dao:   dao,
+		tg:    bot,
+	}
+
+	if err := s.importDocs(); err != nil {
+		log.Fatal(err)
 	}
 
 	mux := http.NewServeMux()
 
 	htmx.Mount(mux)
 
-	mux.Handle("/static/", internal.UnchangingCache(http.FileServer(http.FS(staticFS))))
+	mux.Handle("/static/", http.FileServer(http.FS(staticFS)))
 
 	mux.Handle("/{$}", templ.Handler(base("Home", nil, anonNavBar(true), homePage())))
 	mux.HandleFunc("/login", s.loginHandler)
 	mux.HandleFunc("/login/callback", s.loginCallbackHandler)
 	mux.HandleFunc("/logout", s.logoutHandler)
+	mux.HandleFunc("/docs/{slug...}", s.docsHandler)
 
 	// authed routes
 	mux.Handle("/user", s.loggedIn(s.userHandler))
@@ -74,6 +87,7 @@ func main() {
 	mux.Handle("GET /probe/{id}/edit", s.loggedIn(s.probeEdit))
 	mux.Handle("PUT /probe/{id}", s.loggedIn(s.probeUpdate))
 	mux.Handle("DELETE /probe/{id}", s.loggedIn(s.probeDelete))
+	mux.Handle("GET /probe/{id}/run/{result_id}", s.loggedIn(s.probeRunGet))
 
 	mux.Handle("/", internal.UnchangingCache(
 		templ.Handler(
@@ -94,6 +108,15 @@ func main() {
 		fmt.Fprintln(w, val)
 	})
 
+	c := cron.New()
+	if *region == "yow-dev" {
+		c.AddFunc("@every 1m", s.cron)
+		slog.Info("running in dev mode", "cron-frequency", "1m")
+	} else {
+		c.AddFunc("@every 15m", s.cron)
+	}
+	go c.Start()
+
 	slog.Info("listening", "on", "http://localhost:"+*port)
 
 	log.Fatal(http.ListenAndServe(":"+*port, mux))
@@ -102,6 +125,7 @@ func main() {
 type Server struct {
 	store *sessions.CookieStore
 	dao   *DAO
+	tg    *telego.Bot
 }
 
 func (s *Server) logoutHandler(w http.ResponseWriter, r *http.Request) {
@@ -112,9 +136,7 @@ func (s *Server) logoutHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) loginHandler(w http.ResponseWriter, r *http.Request) {
-	if userData, ok := s.getTelegramUserData(r); ok {
-		slog.Info("user data", "ok", ok, "data", userData)
-
+	if _, ok := s.getTelegramUserData(r); ok {
 		http.Redirect(w, r, "/user", http.StatusFound)
 		return
 	}

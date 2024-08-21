@@ -6,6 +6,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"errors"
+	"fmt"
 	"net/http"
 	"sort"
 	"strconv"
@@ -13,7 +14,7 @@ import (
 )
 
 type TelegramUser struct {
-	ID         string `json:"id" gorm:"primaryKey"`
+	ID         int64  `json:"id" gorm:"primaryKey"`
 	FirstName  string `json:"first_name" gorm:"not null"`
 	LastName   string `json:"last_name" gorm:"not null"`
 	Username   string `json:"username" gorm:"index,not null"`
@@ -80,8 +81,13 @@ func checkTelegramAuthorization(botToken string, authData map[string]string) (*T
 		return nil, errors.New("data is outdated")
 	}
 
+	id, err := strconv.ParseInt(authData["id"], 10, 64)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse user ID: %w", err)
+	}
+
 	user := &TelegramUser{
-		ID:         authData["id"],
+		ID:         id,
 		FirstName:  authData["first_name"],
 		LastName:   authData["last_name"],
 		Username:   authData["username"],
@@ -110,7 +116,7 @@ func (s *Server) getTelegramUserData(r *http.Request) (*TelegramUser, bool) {
 		return nil, false
 	}
 
-	userID, ok := session.Values["user_id"].(string)
+	userID, ok := session.Values["user_id"].(int64)
 	if !ok {
 		return nil, false
 	}

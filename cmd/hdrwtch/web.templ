@@ -10,7 +10,15 @@ templ telegramWidget(botUsername string, avatarSize string, redirectURL string, 
 }
 
 templ notFoundPage() {
-	<p class="my-4">If you expected to find a page here, this ain't it chief. Try <a href="/">going home</a>.</p>
+	<section class="relative h-screen mb-0 md:h-[350px] mt-8">
+		<div class="container mx-auto h-full flex items-center justify-center bg-contain overflow-hidden bg-center bg-no-repeat xe-hero-image rounded-lg">
+			<div class="frosted-glass p-10 text-center">
+				<h1 class="text-4xl font-extrabold text-blue-600">Not found</h1>
+				<p class="mt-4 text-lg text-gray-700">If you expected to find a page here, this ain't it chief. Try <a href="/">going home</a>.</p>
+				<a href="/" class="mt-8 inline-block bg-blue-600 text-white font-semibold py-3 px-6 rounded shadow hover:bg-blue-700">Go home</a>
+			</div>
+		</div>
+	</section>
 }
 
 templ base(title string, head, navbar, body templ.Component) {
@@ -29,22 +37,48 @@ templ base(title string, head, navbar, body templ.Component) {
 			<script async src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 		</head>
 		<body class="flex items-start justify-center h-full bg-gray-50 my-4">
-			<div class="w-full max-w-4xl px-2">
+			<div class="w-full max-w-5xl px-2 m-4">
 				if navbar != nil {
 					@navbar
 				}
-				<h1 class="my-2 pt-4 mt-0 text-3xl font-medium leading-tight text-primary">
-					{ title }
-				</h1>
 				@body
-				<footer class="mt-2 bg-neutral-200 text-center dark:bg-neutral-700 lg:text-left">
-					<div class="p-4 text-neutral-700 dark:text-neutral-200">
-						Made by <a class="text-neutral-800 dark:text-neutral-400" href="https://xeiaso.net">Xe Iaso</a>.
-					</div>
-				</footer>
+				@footer()
 			</div>
 		</body>
 	</html>
+}
+
+templ footer() {
+	<footer class="mt-4">
+		<div class="mx-auto max-w-7xl overflow-hidden px-6 py-20 sm:py-24 lg:px-8">
+			<nav class="-mb-6 columns-2 sm:flex sm:justify-center sm:space-x-12" aria-label="Footer">
+				<div class="pb-6">
+					<a href="/" class="text-sm leading-6 text-gray-600 hover:text-gray-900">Home</a>
+				</div>
+				<div class="pb-6">
+					<a href="/docs/" class="text-sm leading-6 text-gray-600 hover:text-gray-900">Docs</a>
+				</div>
+				<div class="pb-6">
+					<a href="/docs/pricing" class="text-sm leading-6 text-gray-600 hover:text-gray-900">Pricing</a>
+				</div>
+			</nav>
+			<div class="mt-10 flex justify-center space-x-10">
+				<a href="https://x.com/theprincessxena" class="text-gray-400 hover:text-gray-500">
+					<span class="sr-only">X</span>
+					<svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+						<path d="M13.6823 10.6218L20.2391 3H18.6854L12.9921 9.61788L8.44486 3H3.2002L10.0765 13.0074L3.2002 21H4.75404L10.7663 14.0113L15.5685 21H20.8131L13.6819 10.6218H13.6823ZM11.5541 13.0956L10.8574 12.0991L5.31391 4.16971H7.70053L12.1742 10.5689L12.8709 11.5655L18.6861 19.8835H16.2995L11.5541 13.096V13.0956Z"></path>
+					</svg>
+				</a>
+				<a href="https://github.com/Xe" class="text-gray-400 hover:text-gray-500">
+					<span class="sr-only">GitHub</span>
+					<svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+						<path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"></path>
+					</svg>
+				</a>
+			</div>
+			<p class="mt-10 text-center text-xs leading-5 text-gray-500">&copy; 2024 <a href="https://xeiaso.net" class="underline">Xe Iaso</a>. All rights reserved.</p>
+		</div>
+	</footer>
 }
 
 templ loginPage(redirURL string) {
@@ -76,7 +110,7 @@ templ anonNavBar(showLogin bool) {
 		<div class="hidden md:flex md:space-x-10 list-none">
 			<li>
 				<a
-					href="/pricing"
+					href="/docs/pricing"
 					class="text-base font-normal text-gray-500 list-none hover:text-gray-900"
 				>Pricing</a>
 			</li>
@@ -128,18 +162,18 @@ templ authedNavBar(userData *TelegramUser) {
 		<div class="hidden md:flex md:space-x-10 list-none">
 			<li>
 				<a
-					href="/probe"
+					href="/docs/"
 					class="text-base font-normal text-gray-500 list-none hover:text-gray-900"
 				>
-					Probes
+					Docs
 				</a>
 			</li>
 			<li>
 				<a
-					href="/pricing"
+					href="/probe"
 					class="text-base font-normal text-gray-500 list-none hover:text-gray-900"
 				>
-					Pricing
+					Probes
 				</a>
 			</li>
 		</div>
@@ -166,10 +200,107 @@ templ authedNavBar(userData *TelegramUser) {
 }
 
 templ homePage() {
-	<p class="my-4">WIP</p>
+	<section class="relative h-screen mb-0 md:h-[350px] mt-8">
+		<div class="container mx-auto h-full flex items-center justify-center bg-contain overflow-hidden bg-center bg-no-repeat xe-hero-image rounded-lg">
+			<div class="frosted-glass p-10 text-center">
+				<h1 class="text-4xl font-extrabold text-blue-600">Monitor Last-Modified Headers with hdrwtch</h1>
+				<p class="mt-4 text-lg text-gray-700">Stay updated with the latest changes on any URL by tracking the Last-Modified headers effortlessly.</p>
+				<a href="#" class="mt-8 inline-block bg-blue-600 text-white font-semibold py-3 px-6 rounded shadow hover:bg-blue-700">Get Started</a>
+			</div>
+		</div>
+	</section>
+	<!-- Features Section -->
+	<section id="features" class="py-12">
+		<div class="container mx-auto text-center">
+			<h2 class="text-3xl font-bold text-gray-900">Features</h2>
+			<div class="mt-10 grid grid-cols-1 md:grid-cols-3 gap-8">
+				<div class="p-6 bg-white shadow rounded">
+					<h3 class="text-xl font-semibold text-blue-600">Real-Time Monitoring</h3>
+					<p class="mt-4 text-gray-600">Receive instant alerts whenever a Last-Modified header changes on your monitored URLs.</p>
+					<a href="/docs/alerts" class="mt-4 inline-block bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700">Learn More</a>
+				</div>
+				<div class="p-6 bg-white shadow rounded">
+					<h3 class="text-xl font-semibold text-blue-600">Customizable Alerts</h3>
+					<p class="mt-4 text-gray-600">Set up alerts via Email, Telegram, or webhooks to suit your monitoring needs.</p>
+					<a href="/docs/alerts" class="mt-4 inline-block bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700">Learn More</a>
+				</div>
+				<div class="p-6 bg-white shadow rounded">
+					<h3 class="text-xl font-semibold text-blue-600">Detailed Reporting</h3>
+					<p class="mt-4 text-gray-600">Access comprehensive reports on the changes detected over time.</p>
+					<a href="/docs/reports" class="mt-4 inline-block bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700">Learn More</a>
+				</div>
+			</div>
+		</div>
+	</section>
+	<!-- Pricing Section -->
+	<section id="pricing" class="py-12">
+		<div class="container mx-auto text-center">
+			<h2 class="text-3xl font-bold text-gray-900">Pricing</h2>
+			<p class="mt-4 text-gray-600">Simple and transparent pricing to suit your needs.</p>
+			<div class="mt-10 grid grid-cols-1 md:grid-cols-3 gap-8">
+				<div class="p-6 bg-white shadow rounded">
+					<h3 class="text-xl font-semibold text-blue-600">Free</h3>
+					<p class="mt-4 text-4xl font-bold text-gray-900">$0</p>
+					<p class="mt-2 text-gray-600">per month</p>
+					<ul class="mt-4 text-gray-600">
+						<li>Monitor up to 5 URLs</li>
+						<li>Telegram alerts</li>
+						<li>Community support</li>
+					</ul>
+					<a href="/login" class="mt-6 inline-block bg-blue-600 text-white py-3 px-6 rounded hover:bg-blue-700">Choose Plan</a>
+				</div>
+				<div class="p-6 bg-white shadow rounded">
+					<h3 class="text-xl font-semibold text-blue-600">Pro</h3>
+					<p class="mt-4 text-4xl font-bold text-gray-900">$3</p>
+					<p class="mt-2 text-gray-600">per month</p>
+					<ul class="mt-4 text-gray-600">
+						<li>Monitor up to 50 URLs</li>
+						<li>Email & Telegram alerts</li>
+						<li>Webhook integration</li>
+					</ul>
+					<a href="/docs/pricing" class="mt-6 inline-block bg-blue-600 text-white py-3 px-6 rounded hover:bg-blue-700">Choose Plan</a>
+				</div>
+				<div class="p-6 bg-white shadow rounded">
+					<h3 class="text-xl font-semibold text-blue-600">Enterprise</h3>
+					<p class="mt-4 text-4xl font-bold text-gray-900">Custom</p>
+					<p class="mt-2 text-gray-600">pricing</p>
+					<ul class="mt-4 text-gray-600">
+						<li>Unlimited URLs</li>
+						<li>Priority support</li>
+						<li>Custom integrations</li>
+					</ul>
+					<a href="/docs/contact" class="mt-6 inline-block bg-blue-600 text-white py-3 px-6 rounded hover:bg-blue-700">Contact Us</a>
+				</div>
+			</div>
+		</div>
+	</section>
+	<!-- Contact Section -->
+	<!--
+	<section id="contact" class="py-12">
+		<div class="container max-w-xl py-8 bg-white mx-auto text-center">
+			<h2 class="text-3xl font-bold text-gray-900">Contact Us</h2>
+			<p class="mt-4 text-gray-600">Have questions? We're here to help.</p>
+			<form class="mt-10 max-w-lg mx-auto" hx-post="/sales/contact" hx-trigger="submit" hx-swap="outerHTML">
+				<div class="mb-6">
+					<input type="text" name="name" placeholder="Your Name" class="w-full p-4 bg-white border border-gray-300 rounded" required/>
+				</div>
+				<div class="mb-6">
+					<input type="email" name="email" placeholder="Your Email" class="w-full p-4 bg-white border border-gray-300 rounded" required/>
+				</div>
+				<div class="mb-6">
+					<textarea name="message" placeholder="Your Message" class="w-full p-4 bg-white border border-gray-300 rounded h-40" required></textarea>
+				</div>
+				<button type="submit" class="bg-blue-600 text-white py-3 px-6 rounded hover:bg-blue-700">Send Message</button>
+			</form>
+		</div>
+	</section>
+	-->
 }
 
 templ userPage(tu *TelegramUser, probeCount int64) {
+	<h1 class="my-2 pt-4 mt-0 text-3xl font-medium leading-tight text-primary">
+		User Info
+	</h1>
 	<div class="flex">
 		<div class="mr-4 flex-shrink-0">
 			<img

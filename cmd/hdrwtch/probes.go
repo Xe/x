@@ -3,6 +3,7 @@ package main
 import (
 	"log/slog"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/a-h/templ"
@@ -12,7 +13,7 @@ import (
 
 type Probe struct {
 	gorm.Model
-	UserID       string
+	UserID       int64
 	Name         string
 	URL          string
 	LastResultID uint
@@ -39,7 +40,7 @@ func (s *Server) probeList(w http.ResponseWriter, r *http.Request) {
 
 	var probes []Probe
 
-	if err := s.dao.db.Find(&probes).Joins("LastResult").Where("id = ?", tu.ID).Error; err != nil {
+	if err := s.dao.db.Where("user_id = ?", tu.ID).Preload("LastResult").Find(&probes).Error; err != nil {
 		slog.Error("failed to get probes", "err", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -76,7 +77,7 @@ func (s *Server) probeCreate(w http.ResponseWriter, r *http.Request) {
 
 	var probes []Probe
 
-	if err := s.dao.db.Find(&probes).Joins("LastResult").Where("id = ?", tu.ID).Error; err != nil {
+	if err := s.dao.db.Preload("LastResult").Where("user_id = ?", tu.ID).Find(&probes).Error; err != nil {
 		slog.Error("failed to get probes", "err", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -127,7 +128,12 @@ func (s *Server) probeGet(w http.ResponseWriter, r *http.Request) {
 	} else {
 		var results []ProbeResult
 
-		if err := s.dao.db.Find(&results).Where("probe_id = ?", probe.ID).Order("created_at DESC").Limit(15).Error; err != nil {
+		if err := s.dao.db.Where("probe_id = ?", probe.ID).
+			Order("created_at DESC").
+			Limit(15).
+			Find(&results).
+			Error; err != nil {
+
 			slog.Error("failed to get probe results", "err", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -193,5 +199,47 @@ func (s *Server) probeDelete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, "/probes", http.StatusFound)
+	prompt := r.Header.Get(htmx.HeaderPrompt)
+	if prompt != "DELETE FOREVER" {
+		templ.Handler(
+			probeRow(*probe),
+		).ServeHTTP(w, r)
+		return
+	}
+
+	w.Header().Set("Hx-Refresh", "true")
+}
+
+func (s *Server) probeRunGet(w http.ResponseWriter, r *http.Request) {
+	tu, ok := getTelegramUser(r.Context())
+	if !ok {
+		http.Error(w, "unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	probe, err := s.dao.GetProbe(r.Context(), r.PathValue("id"), tu.ID)
+	if err != nil {
+		slog.Error("failed to get probe", "path", r.URL.Path, "err", err)
+		http.Error(w, "no probe data", http.StatusUnauthorized)
+		return
+	}
+
+	resultID, err := strconv.Atoi(r.PathValue("result_id"))
+	if err != nil {
+		slog.Error("failed to parse result ID", "err", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	var result ProbeResult
+
+	if err := s.dao.db.First(&result, resultID).WithContext(r.Context()).Error; err != nil {
+		slog.Error("failed to get probe", "err", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	templ.Handler(
+		base(probe.Name, nil, authedNavBar(tu), probeRunPage(*probe, result)),
+	).ServeHTTP(w, r)
 }

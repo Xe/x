@@ -12,6 +12,7 @@ require (
 	github.com/McKael/madon/v2 v2.4.0
 	github.com/Songmu/gitconfig v0.2.0
 	github.com/a-h/templ v0.2.747
+	github.com/adrg/frontmatter v0.2.0
 	github.com/aws/aws-sdk-go v1.54.0
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.55.1
 	github.com/bwmarrin/discordgo v0.28.1
@@ -56,6 +57,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/posener/complete v1.2.3
 	github.com/redis/go-redis/v9 v9.5.3
+	github.com/robfig/cron/v3 v3.0.0
 	github.com/rodaine/table v1.2.0
 	github.com/rogpeppe/go-internal v1.12.0
 	github.com/rs/cors v1.11.0
@@ -95,6 +97,7 @@ require (
 	cloud.google.com/go/longrunning v0.5.7 // indirect
 	dario.cat/mergo v1.0.0 // indirect
 	github.com/AlekSi/pointer v1.2.0 // indirect
+	github.com/BurntSushi/toml v1.3.2 // indirect
 	github.com/Khan/genqlient v0.6.0 // indirect
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/semver/v3 v3.2.1 // indirect
@@ -206,7 +209,6 @@ require (
 	github.com/pkg/term v1.2.0-beta.2 // indirect
 	github.com/polydawn/refmt v0.89.1-0.20221221234430-40501e09de1f // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
-	github.com/robfig/cron/v3 v3.0.0 // indirect
 	github.com/safchain/ethtool v0.3.0 // indirect
 	github.com/samber/lo v1.38.1 // indirect
 	github.com/savsgio/gotils v0.0.0-20240303185622-093b76447511 // indirect
@@ -245,6 +247,7 @@ require (
 	google.golang.org/genproto/googleapis/api v0.0.0-20240617180043-68d350f18fd4 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240617180043-68d350f18fd4 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
+	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	lukechampine.com/blake3 v1.2.1 // indirect
 	modernc.org/gc/v3 v3.0.0-20240107210532-573471604cb6 // indirect
