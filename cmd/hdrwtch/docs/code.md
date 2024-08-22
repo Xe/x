@@ -16,3 +16,5 @@ The code is written in Go and uses the following libraries/tools:
 - [HTMX](https://htmx.org) for client-side interactivity
 - [Tailwind CSS](https://tailwindcss.com) for styling
 - [Tabler icons](https://tablericons.com) for icons
+
+![Created with HTMX](/static/img/createdwithhtmx.jpeg)
