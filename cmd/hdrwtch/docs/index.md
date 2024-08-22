@@ -25,4 +25,4 @@ Here are some frequently asked questions about hdrwtch and their answers.
 
 ### Why is hdrwtch in my logs?
 
-A user configured a probe to watch a URL that you control. This is not a security risk. Please see ["Why is hdrwtch in my logs?"](/docs/why-in-logs) for more information.
+A user configured a probe to watch a URL that you control. This is not a security risk. Please see the ["Why is hdrwtch in my logs?" page](/docs/why-in-logs) for more information.
