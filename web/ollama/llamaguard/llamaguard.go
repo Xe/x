@@ -95,7 +95,7 @@ func Check(ctx context.Context, cli *ollama.Client, role, model string, messages
 		Model:     model,
 		System:    &role,
 		Prompt:    formatMessages(messages),
-		KeepAlive: "60m",
+		KeepAlive: "9999m",
 	}
 
 	resp, err := cli.Generate(ctx, req)

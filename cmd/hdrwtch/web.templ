@@ -21,6 +21,21 @@ templ notFoundPage() {
 	</section>
 }
 
+templ homepageHead() {
+	<meta name="title" content="hdrwtch - Monitor Last-Modified headers"/>
+	<meta name="description" content="hdrwtch is a tool that watches for changes in the Last-Modified header of a URL. If it changes, it messages you on Telegram."/>
+	<meta property="og:type" content="website"/>
+	<meta property="og:url" content="https://hdrwtch.xeserv.us/"/>
+	<meta property="og:title" content="hdrwtch - Monitor Last-Modified headers"/>
+	<meta property="og:description" content="hdrwtch is a tool that watches for changes in the Last-Modified header of a URL. If it changes, it messages you on Telegram."/>
+	<meta property="og:image" content="https://hdrwtch.xeserv.us/static/img/preview.jpg"/>
+	<meta property="twitter:card" content="summary_large_image"/>
+	<meta property="twitter:url" content="https://hdrwtch.xeserv.us/"/>
+	<meta property="twitter:title" content="hdrwtch - Monitor Last-Modified headers"/>
+	<meta property="twitter:description" content="hdrwtch is a tool that watches for changes in the Last-Modified header of a URL. If it changes, it messages you on Telegram."/>
+	<meta property="twitter:image" content="https://hdrwtch.xeserv.us/static/img/preview.jpg"/>
+}
+
 templ base(title string, head, navbar, body templ.Component) {
 	<!DOCTYPE html>
 	<html lang="en">

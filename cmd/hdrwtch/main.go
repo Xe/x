@@ -139,7 +139,9 @@ func (s *Server) index(w http.ResponseWriter, r *http.Request) {
 		navbar = anonNavBar(true)
 	}
 
-	templ.Handler(base("hdrwtch", nil, navbar, homePage())).ServeHTTP(w, r)
+	templ.Handler(
+		base("hdrwtch", homepageHead(), navbar, homePage()),
+	).ServeHTTP(w, r)
 }
 
 func (s *Server) logoutHandler(w http.ResponseWriter, r *http.Request) {

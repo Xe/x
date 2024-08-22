@@ -12,6 +12,7 @@ import (
 	"log/slog"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/bwmarrin/discordgo"
 	"within.website/x/cmd/mimi/internal"
@@ -38,7 +39,8 @@ import (
 var (
 	chatChannels      = flag.String("jufra-chat-channels", "217096701771513856,1266740925137289287", "comma-separated list of channels to allow chat in")
 	llamaGuardModel   = flag.String("jufra-llama-guard-model", "xe/llamaguard3", "ollama model tag for llama guard")
-	mimiModel         = flag.String("jufra-mimi-model", "xe/hermes3:70b", "ollama model tag for mimi")
+	llamaGuardHost    = flag.String("jufra-llama-guard-host", "http://ollama.ollama.svc.alrest.xeserv.us", "host for llama guard")
+	mimiModel         = flag.String("jufra-mimi-model", "llama3.1:70b", "ollama model tag for mimi")
 	mimiVisionModel   = flag.String("jufra-mimi-vision-model", "xe/mimi:vision3", "ollama model tag for mimi vision")
 	mimiNames         = flag.String("jufra-mimi-names", "mimi", "comma-separated list of names for mimi")
 	disableLlamaguard = flag.Bool("jufra-unsafe-disable-llamaguard", false, "disable llamaguard")
@@ -51,6 +53,7 @@ type Module struct {
 	sess   *discordgo.Session
 	cli    chatgpt.Client
 	ollama *ollama.Client
+	lg     *ollama.Client
 
 	convHistory map[string]state
 	lock        sync.Mutex
@@ -66,6 +69,7 @@ func New(sess *discordgo.Session) *Module {
 		sess:        sess,
 		cli:         chatgpt.NewClient("").WithBaseURL(internal.OllamaHost()),
 		ollama:      internal.OllamaClient(),
+		lg:          ollama.NewClient(*llamaGuardHost),
 		convHistory: make(map[string]state),
 	}
 
@@ -189,7 +193,22 @@ func (m *Module) messageCreate(s *discordgo.Session, mc *discordgo.MessageCreate
 		nick = gu.Nick
 	}
 
-	s.ChannelTyping(mc.ChannelID)
+	killChan := make(chan struct{})
+	defer close(killChan)
+
+	go func() {
+		t := time.NewTicker(5 * time.Second)
+		defer t.Stop()
+
+		for {
+			select {
+			case <-t.C:
+				s.ChannelTyping(mc.ChannelID)
+			case <-killChan:
+				return
+			}
+		}
+	}()
 
 	conv = append(conv, ollama.Message{
 		Role: "user",
@@ -314,6 +333,8 @@ func (m *Module) messageCreate(s *discordgo.Session, mc *discordgo.MessageCreate
 		}
 	}
 
+	killChan <- struct{}{}
+
 	s.ChannelMessageSend(mc.ChannelID, resp.Message.Content)
 
 	st.conv = conv
@@ -321,7 +342,7 @@ func (m *Module) messageCreate(s *discordgo.Session, mc *discordgo.MessageCreate
 }
 
 func (m *Module) llamaGuardCheck(ctx context.Context, role string, messages []ollama.Message) (*llamaguard.Response, error) {
-	return llamaguard.Check(ctx, m.ollama, role, *llamaGuardModel, messages)
+	return llamaguard.Check(ctx, m.lg, role, *llamaGuardModel, messages)
 }
 
 func (m *Module) llamaGuardComplain(ctx context.Context, from string, lgResp *llamaguard.Response) (string, error) {

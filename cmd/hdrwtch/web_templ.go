@@ -117,7 +117,7 @@ func notFoundPage() templ.Component {
 	})
 }
 
-func base(title string, head, navbar, body templ.Component) templ.Component {
+func homepageHead() templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
@@ -135,16 +135,42 @@ func base(title string, head, navbar, body templ.Component) templ.Component {
 			templ_7745c5c3_Var7 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<meta name=\"title\" content=\"hdrwtch - Monitor Last-Modified headers\"><meta name=\"description\" content=\"hdrwtch is a tool that watches for changes in the Last-Modified header of a URL. If it changes, it messages you on Telegram.\"><meta property=\"og:type\" content=\"website\"><meta property=\"og:url\" content=\"https://hdrwtch.xeserv.us/\"><meta property=\"og:title\" content=\"hdrwtch - Monitor Last-Modified headers\"><meta property=\"og:description\" content=\"hdrwtch is a tool that watches for changes in the Last-Modified header of a URL. If it changes, it messages you on Telegram.\"><meta property=\"og:image\" content=\"https://hdrwtch.xeserv.us/static/img/preview.jpg\"><meta property=\"twitter:card\" content=\"summary_large_image\"><meta property=\"twitter:url\" content=\"https://hdrwtch.xeserv.us/\"><meta property=\"twitter:title\" content=\"hdrwtch - Monitor Last-Modified headers\"><meta property=\"twitter:description\" content=\"hdrwtch is a tool that watches for changes in the Last-Modified header of a URL. If it changes, it messages you on Telegram.\"><meta property=\"twitter:image\" content=\"https://hdrwtch.xeserv.us/static/img/preview.jpg\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		return templ_7745c5c3_Err
+	})
+}
+
+func base(title string, head, navbar, body templ.Component) templ.Component {
+	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+		if !templ_7745c5c3_IsBuffer {
+			defer func() {
+				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err == nil {
+					templ_7745c5c3_Err = templ_7745c5c3_BufErr
+				}
+			}()
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var8 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var8 == nil {
+			templ_7745c5c3_Var8 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<!doctype html><html lang=\"en\"><head><meta charset=\"UTF-8\"><meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><link rel=\"stylesheet\" href=\"/static/css/styles.css\"><title>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var8 string
-		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(title)
+		var templ_7745c5c3_Var9 string
+		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web.templ`, Line: 32, Col: 17}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web.templ`, Line: 47, Col: 17}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -201,9 +227,9 @@ func footer() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var9 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var9 == nil {
-			templ_7745c5c3_Var9 = templ.NopComponent
+		templ_7745c5c3_Var10 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var10 == nil {
+			templ_7745c5c3_Var10 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<footer class=\"mt-4\"><div class=\"mx-auto max-w-7xl overflow-hidden px-6 py-20 sm:py-24 lg:px-8\"><nav class=\"-mb-6 columns-2 sm:flex sm:justify-center sm:space-x-12\" aria-label=\"Footer\"><div class=\"pb-6\"><a href=\"/\" class=\"text-sm leading-6 text-gray-600 hover:text-gray-900\">Home</a></div><div class=\"pb-6\"><a href=\"/docs/\" class=\"text-sm leading-6 text-gray-600 hover:text-gray-900\">Docs</a></div><div class=\"pb-6\"><a href=\"/docs/pricing\" class=\"text-sm leading-6 text-gray-600 hover:text-gray-900\">Pricing</a></div></nav><div class=\"mt-10 flex justify-center space-x-10\"><a href=\"https://x.com/theprincessxena\" class=\"text-gray-400 hover:text-gray-500\"><span class=\"sr-only\">X</span> <svg class=\"h-6 w-6\" fill=\"currentColor\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M13.6823 10.6218L20.2391 3H18.6854L12.9921 9.61788L8.44486 3H3.2002L10.0765 13.0074L3.2002 21H4.75404L10.7663 14.0113L15.5685 21H20.8131L13.6819 10.6218H13.6823ZM11.5541 13.0956L10.8574 12.0991L5.31391 4.16971H7.70053L12.1742 10.5689L12.8709 11.5655L18.6861 19.8835H16.2995L11.5541 13.096V13.0956Z\"></path></svg></a> <a href=\"https://github.com/Xe\" class=\"text-gray-400 hover:text-gray-500\"><span class=\"sr-only\">GitHub</span> <svg class=\"h-6 w-6\" fill=\"currentColor\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path fill-rule=\"evenodd\" d=\"M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z\" clip-rule=\"evenodd\"></path></svg></a></div><p class=\"mt-10 text-center text-xs leading-5 text-gray-500\">&copy; 2024 <a href=\"https://xeiaso.net\" class=\"underline\">Xe Iaso</a>. All rights reserved.</p></div></footer>")
@@ -227,9 +253,9 @@ func loginPage(redirURL string) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var10 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var10 == nil {
-			templ_7745c5c3_Var10 = templ.NopComponent
+		templ_7745c5c3_Var11 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var11 == nil {
+			templ_7745c5c3_Var11 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<p class=\"my-4\">Use the widget below to authenticate to hdrwtch:</p>")
@@ -257,9 +283,9 @@ func anonNavBar(showLogin bool) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var11 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var11 == nil {
-			templ_7745c5c3_Var11 = templ.NopComponent
+		templ_7745c5c3_Var12 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var12 == nil {
+			templ_7745c5c3_Var12 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<nav class=\"relative flex items-center justify-between sm:h-10 md:justify-center pb-4\" aria-label=\"Global\"><div class=\"flex items-center flex-1 md:absolute md:inset-y-0 md:left-0\"><div class=\"flex items-center justify-between w-full md:w-auto\"><a href=\"/\"><span class=\"sr-only\">hdrwtch</span> <img class=\"w-auto h-8 sm:h-10\" src=\"/static/img/logo.svg\" loading=\"lazy\" width=\"40\" height=\"40\"></a><div class=\"flex -mr-2 md:hidden\"><button class=\"inline-flex items-center justify-center p-2 text-gray-400 bg-gray-50 rounded-md hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-gray-50\" type=\"button\" aria-expanded=\"false\"><svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"2\" stroke=\"currentColor\" aria-hidden=\"true\" class=\"w-6 h-6\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M4 6h16M4 12h16M4 18h16\"></path></svg></button></div></div></div><div class=\"hidden md:flex md:space-x-10 list-none\"><li><a href=\"/docs/pricing\" class=\"text-base font-normal text-gray-500 list-none hover:text-gray-900\">Pricing</a></li><li><a href=\"/docs/\" class=\"text-base font-normal text-gray-500 list-none hover:text-gray-900\">Docs</a></li></div><div class=\"hidden md:absolute md:flex md:items-center md:justify-end md:inset-y-0 md:right-0\">")
@@ -293,21 +319,21 @@ func authedNavBar(userData *TelegramUser) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var12 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var12 == nil {
-			templ_7745c5c3_Var12 = templ.NopComponent
+		templ_7745c5c3_Var13 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var13 == nil {
+			templ_7745c5c3_Var13 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<nav class=\"relative flex items-center justify-between sm:h-10 md:justify-center pb-4\" aria-label=\"Global\"><div class=\"flex items-center flex-1 md:absolute md:inset-y-0 md:left-0\"><div class=\"flex items-center justify-between w-full md:w-auto\"><a href=\"/\"><img class=\"w-auto h-8 sm:h-10\" src=\"/static/img/logo.svg\" loading=\"lazy\" width=\"40\" height=\"40\"> <span class=\"ml-2 sr-only\">hdrwtch</span></a><div class=\"flex -mr-2 md:hidden\"><button class=\"inline-flex items-center justify-center p-2 text-gray-400 bg-gray-50 rounded-md hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-gray-50\" type=\"button\" aria-expanded=\"false\"><svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"2\" stroke=\"currentColor\" aria-hidden=\"true\" class=\"w-6 h-6\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M4 6h16M4 12h16M4 18h16\"></path></svg></button></div></div></div><div class=\"hidden md:flex md:space-x-10 list-none\"><li><a href=\"/docs/\" class=\"text-base font-normal text-gray-500 list-none hover:text-gray-900\">Docs</a></li><li><a href=\"/probe\" class=\"text-base font-normal text-gray-500 list-none hover:text-gray-900\">Probes</a></li></div><div class=\"hidden md:absolute md:flex md:items-center md:justify-end md:inset-y-0 md:right-0\"><div class=\"inline-flex rounded-full shadow\"><a href=\"/user\" class=\"inline-flex items-center px-4 py-2 text-base text-gray-900 bg-white border border-transparent rounded-full cursor-pointer font-base hover:bg-gray-50\"><div class=\"flex items-center\"><img class=\"inline-block h-10 w-10 rounded-full\" src=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var13 string
-		templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(userData.PhotoURL)
+		var templ_7745c5c3_Var14 string
+		templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(userData.PhotoURL)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web.templ`, Line: 189, Col: 30}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web.templ`, Line: 204, Col: 30}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -315,12 +341,12 @@ func authedNavBar(userData *TelegramUser) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var14 string
-		templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(userData.FirstName)
+		var templ_7745c5c3_Var15 string
+		templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(userData.FirstName)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web.templ`, Line: 192, Col: 32}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web.templ`, Line: 207, Col: 32}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -328,12 +354,12 @@ func authedNavBar(userData *TelegramUser) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var15 string
-		templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(userData.LastName)
+		var templ_7745c5c3_Var16 string
+		templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(userData.LastName)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web.templ`, Line: 192, Col: 54}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web.templ`, Line: 207, Col: 54}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -341,21 +367,21 @@ func authedNavBar(userData *TelegramUser) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var16 string
-		templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs("@")
+		var templ_7745c5c3_Var17 string
+		templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs("@")
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web.templ`, Line: 193, Col: 33}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web.templ`, Line: 208, Col: 33}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var17 string
-		templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(userData.Username)
+		var templ_7745c5c3_Var18 string
+		templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(userData.Username)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web.templ`, Line: 193, Col: 54}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web.templ`, Line: 208, Col: 54}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -380,9 +406,9 @@ func homePage() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var18 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var18 == nil {
-			templ_7745c5c3_Var18 = templ.NopComponent
+		templ_7745c5c3_Var19 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var19 == nil {
+			templ_7745c5c3_Var19 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<section class=\"relative h-screen mb-0 md:h-[350px] mt-8\"><div class=\"container mx-auto h-full flex items-center justify-center bg-contain overflow-hidden bg-center bg-no-repeat xe-hero-image rounded-lg\"><div class=\"frosted-glass p-10 text-center\"><h1 class=\"text-4xl font-extrabold text-blue-600\">Monitor Last-Modified Headers with hdrwtch</h1><p class=\"mt-4 text-lg text-gray-700\">Stay updated with the latest changes on any URL by tracking the Last-Modified headers effortlessly.</p><a href=\"/login\" class=\"mt-8 inline-block bg-blue-600 text-white font-semibold py-3 px-6 rounded shadow hover:bg-blue-700\">Get Started</a></div></div></section><!-- Features Section --><section id=\"features\" class=\"py-12\"><div class=\"container mx-auto text-center\"><h2 class=\"text-3xl font-bold text-gray-900\">Features</h2><div class=\"mt-10 grid grid-cols-1 md:grid-cols-3 gap-8\"><div class=\"p-6 bg-white shadow rounded\"><h3 class=\"text-xl font-semibold text-blue-600\">Real-Time Monitoring</h3><p class=\"mt-4 text-gray-600\">Receive instant alerts whenever a Last-Modified header changes on your monitored URLs.</p><a href=\"/docs/alerts\" class=\"mt-4 inline-block bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700\">Learn More</a></div><div class=\"p-6 bg-white shadow rounded\"><h3 class=\"text-xl font-semibold text-blue-600\">Customizable Alerts</h3><p class=\"mt-4 text-gray-600\">Set up alerts via Email, Telegram, or webhooks to suit your monitoring needs.</p><a href=\"/docs/alerts\" class=\"mt-4 inline-block bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700\">Learn More</a></div><div class=\"p-6 bg-white shadow rounded\"><h3 class=\"text-xl font-semibold text-blue-600\">Detailed Reporting</h3><p class=\"mt-4 text-gray-600\">Access comprehensive reports on the changes detected over time.</p><a href=\"/docs/reports\" class=\"mt-4 inline-block bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700\">Learn More</a></div></div></div></section><!-- Pricing Section --><section id=\"pricing\" class=\"py-12\"><div class=\"container mx-auto text-center\"><h2 class=\"text-3xl font-bold text-gray-900\">Pricing</h2><p class=\"mt-4 text-gray-600\">Simple and transparent pricing to suit your needs.</p><div class=\"mt-10 grid grid-cols-1 md:grid-cols-3 gap-8\"><div class=\"p-6 bg-white shadow rounded\"><h3 class=\"text-xl font-semibold text-blue-600\">Free</h3><p class=\"mt-4 text-4xl font-bold text-gray-900\">$0</p><p class=\"mt-2 text-gray-600\">per month</p><ul class=\"mt-4 text-gray-600\"><li>Monitor up to 5 URLs</li><li>Telegram alerts</li><li>Community support</li></ul><a href=\"/login\" class=\"mt-6 inline-block bg-blue-600 text-white py-3 px-6 rounded hover:bg-blue-700\">Choose Plan</a></div><div class=\"p-6 bg-white shadow rounded\"><h3 class=\"text-xl font-semibold text-blue-600\">Pro</h3><p class=\"mt-4 text-4xl font-bold text-gray-900\">$3</p><p class=\"mt-2 text-gray-600\">per month</p><ul class=\"mt-4 text-gray-600\"><li>Monitor up to 50 URLs</li><li>Email & Telegram alerts</li><li>Webhook integration</li></ul><a href=\"/docs/pricing\" class=\"mt-6 inline-block bg-blue-600 text-white py-3 px-6 rounded hover:bg-blue-700\">Choose Plan</a></div><div class=\"p-6 bg-white shadow rounded\"><h3 class=\"text-xl font-semibold text-blue-600\">Enterprise</h3><p class=\"mt-4 text-4xl font-bold text-gray-900\">Custom</p><p class=\"mt-2 text-gray-600\">pricing</p><ul class=\"mt-4 text-gray-600\"><li>Unlimited URLs</li><li>Priority support</li><li>Custom integrations</li></ul><a href=\"/docs/contact\" class=\"mt-6 inline-block bg-blue-600 text-white py-3 px-6 rounded hover:bg-blue-700\">Contact Us</a></div></div></div></section><!-- Contact Section --><!--\n\t<section id=\"contact\" class=\"py-12\">\n\t\t<div class=\"container max-w-xl py-8 bg-white mx-auto text-center\">\n\t\t\t<h2 class=\"text-3xl font-bold text-gray-900\">Contact Us</h2>\n\t\t\t<p class=\"mt-4 text-gray-600\">Have questions? We're here to help.</p>\n\t\t\t<form class=\"mt-10 max-w-lg mx-auto\" hx-post=\"/sales/contact\" hx-trigger=\"submit\" hx-swap=\"outerHTML\">\n\t\t\t\t<div class=\"mb-6\">\n\t\t\t\t\t<input type=\"text\" name=\"name\" placeholder=\"Your Name\" class=\"w-full p-4 bg-white border border-gray-300 rounded\" required/>\n\t\t\t\t</div>\n\t\t\t\t<div class=\"mb-6\">\n\t\t\t\t\t<input type=\"email\" name=\"email\" placeholder=\"Your Email\" class=\"w-full p-4 bg-white border border-gray-300 rounded\" required/>\n\t\t\t\t</div>\n\t\t\t\t<div class=\"mb-6\">\n\t\t\t\t\t<textarea name=\"message\" placeholder=\"Your Message\" class=\"w-full p-4 bg-white border border-gray-300 rounded h-40\" required></textarea>\n\t\t\t\t</div>\n\t\t\t\t<button type=\"submit\" class=\"bg-blue-600 text-white py-3 px-6 rounded hover:bg-blue-700\">Send Message</button>\n\t\t\t</form>\n\t\t</div>\n\t</section>\n\t-->")
@@ -406,21 +432,21 @@ func userPage(tu *TelegramUser, probeCount int64) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var19 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var19 == nil {
-			templ_7745c5c3_Var19 = templ.NopComponent
+		templ_7745c5c3_Var20 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var20 == nil {
+			templ_7745c5c3_Var20 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<h1 class=\"my-2 pt-4 mt-0 text-3xl font-medium leading-tight text-primary\">User Info</h1><div class=\"flex\"><div class=\"mr-4 flex-shrink-0\"><img class=\"inline-block h-16 w-16 rounded-full\" src=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var20 string
-		templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs(tu.PhotoURL)
+		var templ_7745c5c3_Var21 string
+		templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinStringErrs(tu.PhotoURL)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web.templ`, Line: 308, Col: 21}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web.templ`, Line: 323, Col: 21}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var21))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -428,12 +454,12 @@ func userPage(tu *TelegramUser, probeCount int64) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var21 string
-		templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinStringErrs(tu.FirstName)
+		var templ_7745c5c3_Var22 string
+		templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.JoinStringErrs(tu.FirstName)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web.templ`, Line: 312, Col: 47}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web.templ`, Line: 327, Col: 47}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var21))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var22))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -441,12 +467,12 @@ func userPage(tu *TelegramUser, probeCount int64) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var22 string
-		templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.JoinStringErrs(tu.LastName)
+		var templ_7745c5c3_Var23 string
+		templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.JoinStringErrs(tu.LastName)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web.templ`, Line: 312, Col: 63}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web.templ`, Line: 327, Col: 63}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var22))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var23))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -454,21 +480,21 @@ func userPage(tu *TelegramUser, probeCount int64) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var23 string
-		templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.JoinStringErrs("@")
+		var templ_7745c5c3_Var24 string
+		templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.JoinStringErrs("@")
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web.templ`, Line: 313, Col: 24}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web.templ`, Line: 328, Col: 24}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var23))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var24))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var24 string
-		templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.JoinStringErrs(tu.Username)
+		var templ_7745c5c3_Var25 string
+		templ_7745c5c3_Var25, templ_7745c5c3_Err = templ.JoinStringErrs(tu.Username)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web.templ`, Line: 313, Col: 39}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web.templ`, Line: 328, Col: 39}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var24))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var25))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -476,12 +502,12 @@ func userPage(tu *TelegramUser, probeCount int64) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var25 string
-		templ_7745c5c3_Var25, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprint(probeCount))
+		var templ_7745c5c3_Var26 string
+		templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprint(probeCount))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web.templ`, Line: 314, Col: 63}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web.templ`, Line: 329, Col: 63}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var25))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var26))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -489,12 +515,12 @@ func userPage(tu *TelegramUser, probeCount int64) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var26 string
-		templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprint(tu.ProbeLimit))
+		var templ_7745c5c3_Var27 string
+		templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprint(tu.ProbeLimit))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web.templ`, Line: 314, Col: 95}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web.templ`, Line: 329, Col: 95}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var26))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var27))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
