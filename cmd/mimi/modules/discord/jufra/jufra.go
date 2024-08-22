@@ -200,6 +200,8 @@ func (m *Module) messageCreate(s *discordgo.Session, mc *discordgo.MessageCreate
 		t := time.NewTicker(5 * time.Second)
 		defer t.Stop()
 
+		s.ChannelTyping(mc.ChannelID)
+
 		for {
 			select {
 			case <-t.C:
