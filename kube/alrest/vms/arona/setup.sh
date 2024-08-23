@@ -21,3 +21,13 @@ echo "deb-src [signed-by=/usr/share/keyrings/weechat-archive-keyring.gpg] https:
 # install weechat
 apt update
 apt install -y weechat-curses weechat-plugins weechat-python weechat-perl
+
+## configure weechat service
+
+cp ./weechat.service ~xe/.config/systemd/user/weechat.service
+sudo -u xe 'systemctl enable --user weechat.service'
+loginctl enable-linger
+
+## configure bashrc
+
+cat bashrc.append >> ~xe/.bashrc
