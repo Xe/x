@@ -69,8 +69,10 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /var/lib/gitea
-            - name: conf
+              subPath: data
+            - name: data
               mountPath: /etc/gitea
+              subPath: conf
           livenessProbe:
             httpGet:
               path: /api/healthz

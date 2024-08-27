@@ -7,10 +7,9 @@ metadata:
     kubevirt.io/domain: feixiao
 spec:
   storage:
-    storageClassName: longhorn-migratable
+    storageClassName: longhorn
     volumeMode: Block
     accessModes:
-      - ReadWriteMany
       - ReadWriteOnce
     resources:
       requests:

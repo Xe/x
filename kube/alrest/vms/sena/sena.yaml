@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: sena
+  namespace: waifud
+  labels:
+    kubevirt.io/domain: "sena"
+spec:
+  ports:
+    # ssh
+    - port: 22
+      protocol: TCP
+      targetPort: 22
+      name: ssh
+  selector:
+    kubevirt.io/domain: "sena"
+---
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  labels:
+    kubevirt.io/os: linux
+  name: "sena"
+  namespace: waifud
+spec:
+  running: true
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        kubevirt.io/domain: "sena"
+    spec:
+      domain:
+        cpu:
+          cores: 2
+        devices:
+          disks:
+            - disk:
+                bus: virtio
+              name: disk0
+        machine:
+          type: q35
+        resources:
+          requests:
+            memory: 2048M
+      volumes:
+      - name: disk0
+        persistentVolumeClaim:
+          claimName: "sena"

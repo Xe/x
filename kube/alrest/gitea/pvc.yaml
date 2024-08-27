@@ -9,15 +9,3 @@ spec:
   resources:
     requests:
       storage: 64Gi
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: conf
-spec:
-  accessModes:
-    - ReadWriteMany
-  storageClassName: longhorn
-  resources:
-    requests:
-      storage: 512Mi
