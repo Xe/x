@@ -1,0 +1,90 @@
+apiVersion: cdi.kubevirt.io/v1beta1
+kind: DataVolume
+metadata:
+  name: "feixiao"
+  namespace: waifud
+  labels:
+    kubevirt.io/domain: feixiao
+spec:
+  storage:
+    storageClassName: longhorn-migratable
+    volumeMode: Block
+    accessModes:
+      - ReadWriteMany
+      - ReadWriteOnce
+    resources:
+      requests:
+        storage: 64Gi
+  source:
+    http:
+      url: "https://cloud-images.ubuntu.com/daily/server/noble/current/noble-server-cloudimg-amd64.img"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: feixiao
+  namespace: waifud
+  labels:
+    kubevirt.io/domain: "feixiao"
+spec:
+  ports:
+    # ssh
+    - port: 22
+      protocol: TCP
+      targetPort: 22
+      name: ssh
+  selector:
+    kubevirt.io/domain: "feixiao"
+---
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  labels:
+    kubevirt.io/os: linux
+  name: "feixiao"
+  namespace: waifud
+spec:
+  running: true
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        kubevirt.io/domain: "feixiao"
+    spec:
+      domain:
+        cpu:
+          cores: 2
+        devices:
+          disks:
+            - disk:
+                bus: virtio
+              name: disk0
+            - cdrom:
+                bus: sata
+                readonly: true
+              name: cloudinitdisk
+        machine:
+          type: q35
+        resources:
+          requests:
+            memory: 2048M
+      volumes:
+      - name: disk0
+        persistentVolumeClaim:
+          claimName: "feixiao"
+      - cloudInitNoCloud:
+          userData: |
+            #cloud-config
+            hostname: feixiao
+            ssh_pwauth: True
+            disable_root: false
+
+            users:
+              - name: xe
+                groups: [ wheel ]
+                sudo: [ "ALL=(ALL) NOPASSWD:ALL" ]
+                shell: /bin/bash
+                ssh-authorized-keys:
+                  - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIF6/+q2dBHEfETomAH7rvDPXHulSXnhcV/szxTAWiKZA cadey@defoko
+                  - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJIH27tCTJZwJxp+bcWRALtrk7SqnwXZ4/Ae67jIO0eF cadey@shiroko
+        name: cloudinitdisk
