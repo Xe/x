@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"log/slog"
 	"os"
 
 	"within.website/x/llm/codeinterpreter/python"
@@ -13,7 +14,7 @@ import (
 var normalTools = []ollama.Function{
 	{
 		Name:        "code_interpreter",
-		Description: "Run the given Python code in a sandboxed environment",
+		Description: "Run the given Python code.",
 		Parameters: ollama.Param{
 			Type: "object",
 			Properties: ollama.Properties{
@@ -77,6 +78,8 @@ func (m *Module) runPythonCode(ctx context.Context, tc ollama.ToolCall) (*ollama
 			Content: jsonString(map[string]string{"error": err.Error(), "stdout": res.Stdout, "stderr": res.Stderr}),
 		}, nil
 	}
+
+	slog.Info("python code ran", "res", res, "args", args)
 
 	return &ollama.Message{
 		Role:    "tool",

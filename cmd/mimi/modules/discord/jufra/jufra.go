@@ -249,7 +249,7 @@ func (m *Module) messageCreate(s *discordgo.Session, mc *discordgo.MessageCreate
 		Options: map[string]any{
 			"num_ctx": 65536,
 		},
-		//Tools: m.getTools(),
+		Tools: m.getTools(),
 	}
 
 	resp, err := m.ollama.Chat(context.Background(), cr)

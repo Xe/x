@@ -32,8 +32,11 @@ func init() {
 }
 
 type Result struct {
-	Stdout string
-	Stderr string
+	UserCode      string
+	Stdout        string
+	Stderr        string
+	PlatformError string
+	Instruction   string
 }
 
 func Run(ctx context.Context, tmpDir, userCode string) (*Result, error) {
@@ -63,8 +66,11 @@ func Run(ctx context.Context, tmpDir, userCode string) (*Result, error) {
 	mod, err := r.InstantiateModule(ctx, code, config)
 	if err != nil {
 		result := &Result{
-			Stdout: fout.String(),
-			Stderr: ferr.String(),
+			UserCode:      userCode,
+			Stdout:        fout.String(),
+			Stderr:        ferr.String(),
+			PlatformError: err.Error(),
+			Instruction:   "Include the user code and any stderr or platform errors in code fences.",
 		}
 		return result, err
 	}
@@ -72,7 +78,9 @@ func Run(ctx context.Context, tmpDir, userCode string) (*Result, error) {
 	defer mod.Close(ctx)
 
 	return &Result{
-		Stdout: fout.String(),
-		Stderr: ferr.String(),
+		UserCode:    userCode,
+		Stdout:      fout.String(),
+		Stderr:      ferr.String(),
+		Instruction: "Include the user code, output, and any stderr or platform errors in code fences.",
 	}, nil
 }

@@ -17,6 +17,9 @@ spec:
             secretName: irc
         - name: tmp
           emptyDir: {}
+        - name: data
+          persistentVolumeClaim:
+            claimName: mimi
       securityContext:
         fsGroup: 1000
       containers:
@@ -56,6 +59,8 @@ spec:
               value: ":9002"
             - name: OLLAMA_HOST
               value: "http://ollama"
+            - name: JUFRA_MIMI_MODEL
+              value: hermes3:70b
           volumeMounts:
             - name: mimi
               readOnly: true
@@ -65,3 +70,5 @@ spec:
               mountPath: "/run/secrets/irc"
             - name: tmp
               mountPath: "/tmp"
+            - name: data
+              mountPath: "/data"
