@@ -1,0 +1,77 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: act-runner-vol
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: runner-secret
+data:
+  token: NE9vMUx4RXg0QjF5dUlienZCQTFPTFFqbTdzeTBVV2RMOVhCdWM3bg==
+type: Opaque
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/name: act-runner
+  name: act-runner
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: act-runner
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app.kubernetes.io/name: act-runner
+    spec:
+      restartPolicy: Always
+      volumes:
+      - name: docker-certs
+        emptyDir: {}
+      - name: runner-data
+        persistentVolumeClaim:
+          claimName: act-runner-vol
+      containers:
+      - name: runner
+        image: gitea/act_runner:nightly
+        command: ["sh", "-c", "while ! nc -z localhost 2376 </dev/null; do echo 'waiting for docker daemon...'; sleep 5; done; /sbin/tini -- /opt/act/run.sh"]
+        env:
+        - name: DOCKER_HOST
+          value: tcp://localhost:2376
+        - name: DOCKER_CERT_PATH
+          value: /certs/client
+        - name: DOCKER_TLS_VERIFY
+          value: "1"
+        - name: GITEA_INSTANCE_URL
+          value: http://git.gitea.svc.alrest.xeserv.us
+        - name: GITEA_RUNNER_REGISTRATION_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: runner-secret
+              key: token
+        volumeMounts:
+        - name: docker-certs
+          mountPath: /certs
+        - name: runner-data
+          mountPath: /data
+      - name: dockerd
+        image: docker:27.0.2-dind
+        env:
+        - name: DOCKER_TLS_CERTDIR
+          value: /certs
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - name: docker-certs
+          mountPath: /certs

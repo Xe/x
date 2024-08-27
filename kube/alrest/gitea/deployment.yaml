@@ -1,0 +1,82 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "gitea"
+data:
+  USER: git
+  USER_UID: "1000"
+  USER_GID: "1000"
+
+  #GITEA__storage__STORAGE_TYPE: minio
+  GITEA__storage__STORAGE_TYPE: local
+  GITEA__storage__SERVE_DIRECT: "true"
+  GITEA__storage__MINIO_ENDPOINT: https://fly.storage.tigris.dev
+  GITEA__storage__MINIO_BUCKET: alrest-gitea
+  GITEA__storage__MINIO_LOCATION: auto
+  GITEA__storage__MINIO_USE_SSL: "true"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gitea
+  labels:
+    xeiaso.net/thing: http
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      xeiaso.net/thing: http
+  template:
+    metadata:
+      labels:
+        xeiaso.net/thing: http
+    spec:
+      securityContext:
+        fsGroup: 1000
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: gitea
+        - name: conf
+          persistentVolumeClaim:
+            claimName: conf
+      containers:
+        - name: main
+          image: gitea/gitea:1-rootless
+          imagePullPolicy: Always
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
+          envFrom:
+            - configMapRef:
+                name: gitea
+            - secretRef:
+                name: tigris-creds
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+            - name: ssh
+              containerPort: 2222
+              protocol: TCP
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/gitea
+            - name: conf
+              mountPath: /etc/gitea
+          livenessProbe:
+            httpGet:
+              path: /api/healthz
+              port: http
+            initialDelaySeconds: 200
+            timeoutSeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 10

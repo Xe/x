@@ -1,0 +1,10 @@
+resources:
+  - namespace.yaml
+  - pvc.yaml
+  - 1password.yaml
+  - deployment.yaml
+  - service.yaml
+  - runner.yaml
+namespace: gitea
+commonLabels:
+  app.kubernetes.io/name: gitea
