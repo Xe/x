@@ -9,3 +9,15 @@ spec:
   resources:
     requests:
       storage: 2Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mi-backup
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: itsuki
+  resources:
+    requests:
+      storage: 2Gi

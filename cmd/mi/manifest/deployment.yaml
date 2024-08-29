@@ -12,6 +12,9 @@ spec:
         - name: vol
           persistentVolumeClaim:
             claimName: mi
+        - name: backup
+          persistentVolumeClaim:
+            claimName: mi-backup
         - name: bluesky
           secret:
             secretName: mi-bluesky
@@ -58,11 +61,15 @@ spec:
               value: ":8080"
             - name: DB_LOC
               value: "/data/mi.db"
+            - name: BACKUP_DB_LOC
+              value: "/srv/backup/mi.db"
             - name: INTERNAL_BIND
               value: ":9195"
           volumeMounts:
             - name: vol
               mountPath: "/data"
+            - name: backup
+              mountPath: "/srv/backup"
             - name: bluesky
               readOnly: true
               mountPath: "/run/secrets/bluesky"

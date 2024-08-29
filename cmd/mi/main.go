@@ -25,7 +25,8 @@ import (
 
 var (
 	bind         = flag.String("bind", ":8080", "HTTP bind address")
-	dbLoc        = flag.String("db-loc", "./var/data.db", "")
+	dbLoc        = flag.String("db-loc", "./var/data.db", "SQLite database location")
+	backupDBLoc  = flag.String("backup-db-loc", "./var/data.db.backup", "backup SQLite database location")
 	grpcBind     = flag.String("grpc-bind", ":8081", "GRPC bind address")
 	internalBind = flag.String("internal-bind", ":9195", "HTTP internal routes bind address")
 
@@ -51,6 +52,7 @@ func main() {
 		"starting up",
 		"bind", *bind,
 		"db-loc", *dbLoc,
+		"backup-db-loc", *backupDBLoc,
 		"internal-bind", *internalBind,
 		"bsky-handle", *blueskyHandle,
 		"bsky-pds", *blueskyPDS,
@@ -60,7 +62,7 @@ func main() {
 		"have-flyght-tracker-url", *flyghtTrackerURL != "",
 	)
 
-	dao, err := models.New(*dbLoc)
+	dao, err := models.New(*dbLoc, *backupDBLoc)
 	if err != nil {
 		slog.Error("failed to create dao", "err", err)
 		os.Exit(1)
@@ -135,6 +137,13 @@ func main() {
 		<-ctx.Done()
 		return ctx.Err()
 	})
+
+	// g.Go(func() error {
+	// 	c := cron.New()
+	// 	c.AddFunc("@every 1h", dao.Backup)
+	// 	c.Run()
+	// 	return nil
+	// })
 
 	if err := g.Wait(); err != nil {
 		slog.Error("error doing work", "err", err)
