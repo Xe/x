@@ -30,11 +30,11 @@ type Output []string
 
 type PredictionRequest struct {
 	Input               Input    `json:"input"`
-	ID                  string   `json:"id"`
-	CreatedAt           string   `json:"created_at"`
-	OutputFilePrefix    string   `json:"output_file_prefix"`
-	Webhook             string   `json:"webhook"`
-	WebhookEventsFilter []string `json:"webhook_events_filter"`
+	ID                  string   `json:"id,omitempty"`
+	CreatedAt           string   `json:"created_at,omitempty"`
+	OutputFilePrefix    string   `json:"output_file_prefix,omitempty"`
+	Webhook             string   `json:"webhook,omitempty"`
+	WebhookEventsFilter []string `json:"webhook_events_filter,omitempty"`
 }
 
 type PredictionResponse struct {
@@ -78,7 +78,7 @@ type Client struct {
 func NewClient(baseURL string) *Client {
 	return &Client{
 		BaseURL:    baseURL,
-		HTTPClient: &http.Client{Timeout: 10 * time.Second},
+		HTTPClient: &http.Client{Timeout: 10 * time.Minute},
 	}
 }
 

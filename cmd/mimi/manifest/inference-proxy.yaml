@@ -7,3 +7,13 @@ spec:
   region: yyz
   target: http://xe-inference.flycast
   port: 80
+---
+apiVersion: glaceon.friendshipcastle.zip/v1alpha1
+kind: MachineProxy
+metadata:
+  name: flux
+spec:
+  org: personal
+  region: yyz
+  target: http://xe-flux.flycast
+  port: 80

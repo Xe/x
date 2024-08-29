@@ -28,11 +28,11 @@ spec:
           imagePullPolicy: "Always"
           resources:
             limits:
-              cpu: "4"
-              memory: "2Gi"
+              cpu: "1"
+              memory: "512Mi"
             requests:
-              cpu: "2"
-              memory: "1Gi"
+              cpu: "500m"
+              memory: "256Mi"
           securityContext:
             runAsUser: 1000
             runAsGroup: 1000

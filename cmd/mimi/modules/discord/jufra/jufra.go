@@ -16,6 +16,7 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 	"within.website/x/cmd/mimi/internal"
+	"within.website/x/web/flux"
 	"within.website/x/web/ollama"
 	"within.website/x/web/ollama/llamaguard"
 	"within.website/x/web/openai/chatgpt"
@@ -44,6 +45,7 @@ var (
 	mimiVisionModel   = flag.String("jufra-mimi-vision-model", "xe/mimi:vision3", "ollama model tag for mimi vision")
 	mimiNames         = flag.String("jufra-mimi-names", "mimi", "comma-separated list of names for mimi")
 	disableLlamaguard = flag.Bool("jufra-unsafe-disable-llamaguard", false, "disable llamaguard")
+	fluxHost          = flag.String("jufra-flux-host", "http://xe-flux.flycast", "host for flux")
 
 	//go:embed system-prompt.txt
 	mimiSystemMessage string
@@ -54,6 +56,7 @@ type Module struct {
 	cli    chatgpt.Client
 	ollama *ollama.Client
 	lg     *ollama.Client
+	flux   *flux.Client
 
 	convHistory map[string]state
 	lock        sync.Mutex
@@ -70,6 +73,7 @@ func New(sess *discordgo.Session) *Module {
 		cli:         chatgpt.NewClient("").WithBaseURL(internal.OllamaHost()),
 		ollama:      internal.OllamaClient(),
 		lg:          ollama.NewClient(*llamaGuardHost),
+		flux:        flux.NewClient(*fluxHost),
 		convHistory: make(map[string]state),
 	}
 
@@ -286,6 +290,34 @@ func (m *Module) messageCreate(s *discordgo.Session, mc *discordgo.MessageCreate
 				if err != nil {
 					slog.Error("error running python code", "err", err, "message_id", mc.ID, "channel_id", mc.ChannelID)
 					s.ChannelMessageSend(mc.ChannelID, "error running python code")
+					return
+				}
+
+				conv = append(conv, *msg)
+
+				resp, err = m.ollama.Chat(context.Background(), &ollama.CompleteRequest{
+					Model:    *mimiModel,
+					Messages: conv,
+					Options: map[string]any{
+						"num_ctx": 65536,
+					},
+					Tools: m.getTools(),
+				})
+				if err != nil {
+					slog.Error("error chatting", "err", err, "message_id", mc.ID, "channel_id", mc.ChannelID)
+					s.ChannelMessageSend(mc.ChannelID, "error chatting")
+					return
+				}
+
+				conv = append(conv, resp.Message)
+
+			case "draw_image":
+				slog.Info("got draw_image tool call", "message_id", mc.ID, "channel_id", mc.ChannelID, "tc", tc)
+
+				msg, err := m.drawImage(context.Background(), tc.Function, mc.ChannelID)
+				if err != nil {
+					slog.Error("error drawing image", "err", err, "message_id", mc.ID, "channel_id", mc.ChannelID)
+					s.ChannelMessageSend(mc.ChannelID, "error drawing image")
 					return
 				}
 
