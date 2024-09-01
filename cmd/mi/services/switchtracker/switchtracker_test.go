@@ -25,7 +25,7 @@ func TestSwitch(t *testing.T) {
 	defer cancel()
 
 	dir := t.TempDir()
-	dao, err := models.New(filepath.Join(dir, "test.db"))
+	dao, err := models.New(filepath.Join(dir, "test.db"), filepath.Join(dir, "backup.db"))
 	if err != nil {
 		t.Fatalf("failed to create dao: %v", err)
 	}
