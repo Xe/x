@@ -183,12 +183,12 @@ func (d *DAO) backup(ctx context.Context, to string) error {
 	defer conn.Close()
 
 	if err := conn.Raw(func(dca any) error {
-		conn, ok := dca.(*sqlite3.Conn)
+		conn, ok := dca.(sqlite3.DriverConn)
 		if !ok {
 			return fmt.Errorf("db connection is not a sqlite3 connection, it is %T", dca)
 		}
 
-		bu, err := conn.BackupInit("main", to)
+		bu, err := conn.Raw().BackupInit("main", to)
 		if err != nil {
 			return fmt.Errorf("failed to initialize backup: %w", err)
 		}
