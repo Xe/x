@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sapientwindex
+  labels:
+    app.kubernetes.io/name: sapientwindex
+  annotations:
+    operator.1password.io/auto-restart: "true"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: sapientwindex
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: sapientwindex
+    spec:
+      volumes:
+        - name: sapientwindex
+          secret:
+            secretName: sapientwindex
+      containers:
+        - name: bot
+          image: ghcr.io/xe/x/sapientwindex:latest
+          imagePullPolicy: "Always"
+          resources:
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
+          volumeMounts:
+            - name: sapientwindex
+              readOnly: true
+              mountPath: "/run/secrets/sapientwindex"

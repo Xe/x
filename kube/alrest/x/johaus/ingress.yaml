@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: johaus
+  labels:
+    app.kubernetes.io/name: johaus
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+      - johaus.cetacean.club
+      secretName: johaus-public-tls
+  rules:
+  - host: johaus.cetacean.club
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: johaus
+            port: 
+              name: http

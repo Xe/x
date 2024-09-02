@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: hlang-within-lgbt
+  labels:
+    app.kubernetes.io/name: hlang
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+      - h.within.lgbt
+      secretName: hlang-within-lgbt-public-tls
+  rules:
+  - host: h.within.lgbt
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: hlang
+            port: 
+              name: http
