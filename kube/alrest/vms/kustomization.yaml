@@ -1,0 +1,5 @@
+resources:
+  - ./namespace.yaml
+  - arona/arona.yaml
+  - sena/sena.yaml
+  - xesite-ci/vm.yaml
