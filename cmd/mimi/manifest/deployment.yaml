@@ -60,7 +60,11 @@ spec:
             - name: OLLAMA_HOST
               value: "http://ollama"
             - name: JUFRA_MIMI_MODEL
-              value: hermes3:70b
+              value: "hermes3:70b"
+            - name: JUFRA_FLUX_HOST
+              value: "http://flux"
+            - name: JUFRA_CONTEXT_WINDOW
+              value: "32768"
           volumeMounts:
             - name: mimi
               readOnly: true

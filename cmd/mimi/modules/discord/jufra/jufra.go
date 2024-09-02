@@ -41,11 +41,11 @@ var (
 	chatChannels      = flag.String("jufra-chat-channels", "217096701771513856,1266740925137289287", "comma-separated list of channels to allow chat in")
 	llamaGuardModel   = flag.String("jufra-llama-guard-model", "xe/llamaguard3", "ollama model tag for llama guard")
 	llamaGuardHost    = flag.String("jufra-llama-guard-host", "http://ollama.ollama.svc.alrest.xeserv.us", "host for llama guard")
-	mimiModel         = flag.String("jufra-mimi-model", "llama3.1:70b", "ollama model tag for mimi")
-	mimiVisionModel   = flag.String("jufra-mimi-vision-model", "xe/mimi:vision3", "ollama model tag for mimi vision")
+	mimiModel         = flag.String("jufra-mimi-model", "hermes3", "ollama model tag for mimi")
 	mimiNames         = flag.String("jufra-mimi-names", "mimi", "comma-separated list of names for mimi")
-	disableLlamaguard = flag.Bool("jufra-unsafe-disable-llamaguard", false, "disable llamaguard")
+	disableLlamaguard = flag.Bool("jufra-unsafe-disable-llamaguard", true, "disable llamaguard")
 	fluxHost          = flag.String("jufra-flux-host", "http://xe-flux.flycast", "host for flux")
+	contextWindow     = flag.Int("jufra-context-window", 32768, "context window size for mimi")
 
 	//go:embed system-prompt.txt
 	mimiSystemMessage string
@@ -251,7 +251,7 @@ func (m *Module) messageCreate(s *discordgo.Session, mc *discordgo.MessageCreate
 		Model:    *mimiModel,
 		Messages: conv,
 		Options: map[string]any{
-			"num_ctx": 65536,
+			"num_ctx": *contextWindow,
 		},
 		Tools: m.getTools(),
 	}
@@ -299,7 +299,7 @@ func (m *Module) messageCreate(s *discordgo.Session, mc *discordgo.MessageCreate
 					Model:    *mimiModel,
 					Messages: conv,
 					Options: map[string]any{
-						"num_ctx": 65536,
+						"num_ctx": *contextWindow,
 					},
 					Tools: m.getTools(),
 				})
@@ -327,7 +327,7 @@ func (m *Module) messageCreate(s *discordgo.Session, mc *discordgo.MessageCreate
 					Model:    *mimiModel,
 					Messages: conv,
 					Options: map[string]any{
-						"num_ctx": 65536,
+						"num_ctx": *contextWindow,
 					},
 					Tools: m.getTools(),
 				})
