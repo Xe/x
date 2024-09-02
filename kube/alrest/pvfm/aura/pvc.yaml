@@ -1,0 +1,55 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: aura-recordings
+spec:
+  storageClassName: tigris
+  capacity:
+    storage: 10Ti
+  accessModes:
+    - ReadWriteMany
+  claimRef:
+    namespace: pvfm
+    name: aura-recordings
+  csi:
+    driver: ru.yandex.s3.csi
+    controllerPublishSecretRef:
+      name: csi-s3-secret
+      namespace: csi-s3
+    nodePublishSecretRef:
+      name: csi-s3-secret
+      namespace: csi-s3
+    nodeStageSecretRef:
+      name: csi-s3-secret
+      namespace: csi-s3
+    volumeAttributes:
+      capacity: 10Ti
+      mounter: geesefs
+      options: --memory-limit 1000 --dir-mode 0777 --file-mode 0666
+    volumeHandle: pvfm
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: aura-recordings
+spec:
+  storageClassName: tigris
+  resources:
+    requests:
+      storage: 10Ti
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: aura-recordings-nas
+spec:
+  storageClassName: itsuki
+  resources:
+    requests:
+      storage: 1Ti
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany

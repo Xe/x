@@ -1,0 +1,6 @@
+resources:
+  - core
+  - ollama
+  - pvfm
+  - vms
+  - x
