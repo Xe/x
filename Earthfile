@@ -42,6 +42,16 @@ azurda:
 
     SAVE IMAGE --push registry.fly.io/azurda:latest
 
+aerial:
+    FROM +runtime
+
+    COPY +everything/bin/aerial /app/bin/aerial
+    CMD ["/app/bin/aerial"]
+
+    LABEL org.opencontainers.image.source="https://github.com/Xe/x"
+
+    SAVE IMAGE --push ghcr.io/xe/x/aerial:latest
+
 future-sight:
     FROM +runtime
 

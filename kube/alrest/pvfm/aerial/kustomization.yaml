@@ -1,0 +1,4 @@
+namespace: pvfm
+resources:
+  - 1password.yaml
+  - deployment.yaml
