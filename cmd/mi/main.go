@@ -10,6 +10,7 @@ import (
 	"os"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/robfig/cron/v3"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/grpc"
 	"within.website/x/cmd/mi/models"
@@ -138,12 +139,12 @@ func main() {
 		return ctx.Err()
 	})
 
-	// g.Go(func() error {
-	// 	c := cron.New()
-	// 	c.AddFunc("@every 1h", dao.Backup)
-	// 	c.Run()
-	// 	return nil
-	// })
+	g.Go(func() error {
+		c := cron.New()
+		c.AddFunc("@every 1h", dao.Backup)
+		c.Run()
+		return nil
+	})
 
 	if err := g.Wait(); err != nil {
 		slog.Error("error doing work", "err", err)
