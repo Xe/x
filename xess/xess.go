@@ -22,5 +22,5 @@ func init() {
 const URL = "/.within.website/x/xess/xess.css"
 
 func Mount(mux *http.ServeMux) {
-	mux.Handle("/.within/x/xess/", http.StripPrefix("/.within/x/xess/", http.FileServerFS(Static)))
+	mux.Handle("/.within.website/x/xess/", http.StripPrefix("/.within.website/x/xess/", http.FileServerFS(Static)))
 }
