@@ -40,7 +40,7 @@ azurda:
 
     LABEL org.opencontainers.image.source="https://github.com/Xe/x"
 
-    SAVE IMAGE --push registry.fly.io/azurda:latest
+    SAVE IMAGE --push ghcr.io/xe/x/azurda:latest
 
 aerial:
     FROM +runtime
@@ -82,16 +82,6 @@ hlang:
 
     SAVE IMAGE --push ghcr.io/xe/x/hlang:latest
 
-johaus:
-    FROM +runtime
-
-    COPY +everything/bin/johaus /app/bin/johaus
-    CMD ["/app/bin/johaus", "--port=8080"]
-
-    LABEL org.opencontainers.image.source="https://github.com/Xe/x"
-
-    SAVE IMAGE --push ghcr.io/xe/x/johaus:latest
-
 mi:
     FROM +runtime
 
@@ -115,16 +105,6 @@ mimi:
     LABEL org.opencontainers.image.source="https://github.com/Xe/x"
 
     SAVE IMAGE --push ghcr.io/xe/x/mimi:latest
-
-robocadey2:
-    FROM +runtime
-
-    COPY +everything/bin/robocadey2 /app/bin/robocadey2
-    CMD ["/app/bin/robocadey2"]
-
-    LABEL org.opencontainers.image.source="https://github.com/Xe/x"
-
-    SAVE IMAGE --push registry.fly.io/xe-robocadey2:latest
 
 sanguisuga:
     FROM +runtime
@@ -155,16 +135,6 @@ todayinmarch2020:
     LABEL org.opencontainers.image.source="https://github.com/Xe/x"
 
     SAVE IMAGE --push ghcr.io/xe/x/todayinmarch2020:latest
-
-tourian:
-    FROM +runtime
-
-    COPY +everything/bin/tourian /app/bin/tourian
-    CMD ["/app/bin/tourian"]
-
-    LABEL org.opencontainers.image.source="https://github.com/Xe/x"
-
-    SAVE IMAGE --push registry.fly.io/tourian:latest
 
 within-website:
     FROM +runtime
@@ -239,13 +209,10 @@ all:
     BUILD --platform=linux/amd64 +future-sight
     BUILD --platform=linux/amd64 +hdrwtch
     BUILD --platform=linux/amd64 +hlang
-    BUILD --platform=linux/amd64 +johaus
     BUILD --platform=linux/amd64 +mi
     BUILD --platform=linux/amd64 +mimi
-    BUILD --platform=linux/amd64 +robocadey2
     BUILD --platform=linux/amd64 +sanguisuga
     BUILD --platform=linux/amd64 +sapientwindex
     BUILD --platform=linux/amd64 +todayinmarch2020
-    BUILD --platform=linux/amd64 +tourian
     BUILD --platform=linux/amd64 +within-website
     BUILD --platform=linux/amd64 +xedn
