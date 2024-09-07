@@ -52,6 +52,20 @@ aerial:
 
     SAVE IMAGE --push ghcr.io/xe/x/aerial:latest
 
+aura:
+    FROM +runtime
+
+    RUN apt-get update && apt-get install -y \
+        streamripper vim jq \
+        && rm -rf /var/lib/apt/lists/*
+
+    COPY +everything/bin/aura /app/bin/aura
+    CMD ["/app/bin/aura"]
+
+    LABEL org.opencontainers.image.source="https://github.com/Xe/x"
+
+    SAVE IMAGE --push ghcr.io/xe/x/aura:latest
+
 future-sight:
     FROM +runtime
 
@@ -205,6 +219,8 @@ xedn:
     SAVE IMAGE --push registry.fly.io/xedn:latest
 
 all:
+    BUILD --platform=linux/amd64 +aerial
+    BUILD --platform=linux/amd64 +aura
     BUILD --platform=linux/amd64 +azurda
     BUILD --platform=linux/amd64 +future-sight
     BUILD --platform=linux/amd64 +hdrwtch

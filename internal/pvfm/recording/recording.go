@@ -3,9 +3,14 @@ package recording
 import (
 	"context"
 	"errors"
+	"fmt"
+	"io"
 	"log"
+	"log/slog"
 	"os"
 	"os/exec"
+	"path/filepath"
+	"strings"
 	"time"
 )
 
@@ -18,6 +23,7 @@ type Recording struct {
 	ctx      context.Context
 	url      string
 	fname    string
+	tmpDir   string
 	cancel   context.CancelFunc
 	started  time.Time
 	restarts int
@@ -27,15 +33,21 @@ type Recording struct {
 }
 
 // New creates a new Recording of the given URL to the given filename for output.
-func New(url, fname string) (*Recording, error) {
+func New(url, destFname string) (*Recording, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 8*time.Hour)
+
+	tmpDir, err := os.MkdirTemp("", "aura-*")
+	if err != nil {
+		return nil, err
+	}
 
 	r := &Recording{
 		ctx:     ctx,
 		url:     url,
-		fname:   fname,
+		fname:   destFname,
 		cancel:  cancel,
 		started: time.Now(),
+		tmpDir:  tmpDir,
 	}
 
 	return r, nil
@@ -69,20 +81,22 @@ func (r *Recording) Start() error {
 		return err
 	}
 
-	cmd := exec.CommandContext(r.ctx, sr, r.url, "-A", "-a", r.fname)
+	fname := filepath.Join(r.tmpDir, "temp.mp3")
+
+	cmd := exec.CommandContext(r.ctx, sr, r.url, "-A", "-a", fname)
 	cmd.Stderr = os.Stderr
 	cmd.Stdout = os.Stdout
 
-	log.Printf("%s: %v", cmd.Path, cmd.Args)
+	slog.Info("starting streamripper", "cmd", cmd.Args)
 
 	err = cmd.Start()
 	if err != nil {
 		return err
 	}
 
-	// Automatically kill recordings after four hours
+	// Automatically kill recordings after eight hours
 	go func() {
-		t := time.NewTicker(4 * time.Hour)
+		t := time.NewTicker(8 * time.Hour)
 		defer t.Stop()
 
 		log.Println("got here")
@@ -92,7 +106,7 @@ func (r *Recording) Start() error {
 			case <-r.ctx.Done():
 				return
 			case <-t.C:
-				log.Printf("Automatically killing recording after 4 hours...")
+				log.Printf("Automatically killing recording after 8 hours...")
 				r.Cancel()
 			}
 		}
@@ -113,8 +127,42 @@ func (r *Recording) Start() error {
 
 		select {
 		case <-r.ctx.Done():
-			return nil
+			return Move(fname, r.fname)
 		default:
 		}
 	}
+}
+
+func Move(source, destination string) error {
+	err := os.Rename(source, destination)
+	if err != nil && strings.Contains(err.Error(), "invalid cross-device link") {
+		return moveCrossDevice(source, destination)
+	}
+	return err
+}
+
+func moveCrossDevice(source, destination string) error {
+	src, err := os.Open(source)
+	if err != nil {
+		return fmt.Errorf("Open(source): %w", err)
+	}
+	defer src.Close()
+
+	dst, err := os.Create(destination)
+	if err != nil {
+		return fmt.Errorf("Create(destination): %w", err)
+	}
+	defer dst.Close()
+
+	_, err = io.Copy(dst, src)
+	if err != nil {
+		return fmt.Errorf("Copy: %w", err)
+	}
+
+	err = os.Remove(source)
+	if err != nil {
+		return fmt.Errorf("Remove(source): %w", err)
+	}
+
+	return nil
 }

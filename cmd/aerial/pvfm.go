@@ -3,26 +3,15 @@ package main
 import (
 	"fmt"
 	"log"
-	"math/rand"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/bwmarrin/discordgo"
-	derpiSearch "within.website/x/cmd/aerial/derpi"
 	"within.website/x/internal/pvfm"
 	pvfmschedule "within.website/x/internal/pvfm/schedule"
 	"within.website/x/internal/pvfm/station"
 )
-
-func init() {
-	rand.Seed(time.Now().Unix())
-}
-
-// randomRange gives a random whole integer between the given integers [min, max)
-func randomRange(min, max int) int {
-	return rand.Intn(max-min) + min
-}
 
 func pesterLink(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if musicLinkRegex.Match([]byte(m.Content)) {
@@ -169,6 +158,8 @@ PonyvilleFM Europe OGG Stream:
 http://dj.bronyradio.com:8000/pvfm1.ogg
 PonyvilleFM Europe Stream:
 http://dj.bronyradio.com:8000/stream.mp3
+PonyvilleFM 2 Stream:
+http://luna.ponyvillefm.com/listen/pvfm2/radio.mp3
 PonyvilleFM Free MP3 24/7 Pony Stream:
 http://dj.bronyradio.com:8000/pvfmfree.mp3
 PonyvilleFM Free OGG 24/7 Pony Stream:
@@ -185,76 +176,10 @@ func streams(s *discordgo.Session, m *discordgo.Message, parv []string) error {
 	// PVFM
 	outputEmbed.AddField(":musical_note:  PVFM Servers", pvfmList)
 	// Luna Radio
-	outputEmbed.AddField(":musical_note:  Luna Radio Servers", "Luna Radio MP3 128Kbps Stream:\n<http://radio.ponyvillelive.com:8002/stream.mp3>\nLuna Radio Mobile MP3 64Kbps Stream:\n<http://radio.ponyvillelive.com:8002/mobile?;stream.mp3>\n")
+	outputEmbed.AddField(":musical_note:  Luna Radio Servers", "Luna Radio MP3 128Kbps Stream:\n<http://luna.ponyvillefm.com/listen/lunaradio/radio.mp3>\n")
 	// Recordings
 	outputEmbed.AddField(":cd:  DJ Recordings", "Archive\n<https://pvfm.within.lgbt/var/93252527679639552/>\nLegacy Archive\n<https://pvfm.within.lgbt/BronyRadio/>")
 
 	s.ChannelMessageSendEmbed(m.ChannelID, outputEmbed.MessageEmbed)
-
-	// no errors yay!!!!
-	return nil
-}
-
-func derpi(s *discordgo.Session, m *discordgo.Message, parv []string) error {
-	if m.ChannelID == "292755043684450304" {
-
-		searchResults, err := derpiSearch.SearchDerpi(m.Content[7:len(m.Content)]) // Safe tag will be added in derpi/derpi.go
-		if err != nil {
-			s.ChannelMessageSend(m.ChannelID, "An error occured.")
-			return err
-		}
-		if len(searchResults.Search) < 1 {
-			s.ChannelMessageSend(m.ChannelID, "Error: No results")
-			return nil
-		}
-		derpiImage := searchResults.Search[randomRange(0, len(searchResults.Search))]
-
-		tags := strings.Split(derpiImage.Tags, ", ") // because this isn't an array for some reason
-
-		// Check for artist tag
-		artist := ""
-		for _, tag := range tags {
-			if strings.Contains(tag, "artist:") {
-				artist = tag[7:]
-			}
-		}
-
-		outputEmbed := NewEmbed().
-			SetTitle("Derpibooru Image").
-			SetURL("https://derpibooru.org/" + derpiImage.ID).
-			SetDescription(derpiImage.Description).
-			SetImage("http:" + derpiImage.Image).
-			SetFooter("Image score: " + strconv.Itoa(derpiImage.Score) + " | Uploaded: " + derpiImage.CreatedAt.String())
-
-		// Credit the artist!
-		if artist == "" {
-			outputEmbed.SetAuthor("No artist")
-		} else {
-			outputEmbed.SetAuthor("Artist: " + artist)
-		}
-
-		s.ChannelMessageSendEmbed(m.ChannelID, outputEmbed.MessageEmbed)
-	} else {
-		s.ChannelMessageSend(m.ChannelID, "Please use this command in <#292755043684450304> only.")
-	}
-	return nil
-}
-
-func weather(s *discordgo.Session, m *discordgo.Message, parv []string) error {
-	responses := []string{
-		"Cloudy with a chance of meatballs.",
-		"It's currently pouring down even more than Pinkie.",
-		"It's the most overcast I've ever seen. In other words, same as always.",
-		"Do you have a better conversation starter than that?",
-		"There's at least 5 or 6 weather right now, my dude.",
-		"It's soggy enough for Rainbow Dash to get fired, if she didn't have a literal deity keeping her in charge.",
-		"Surprisingly, the weather is pretty alright.",
-		"You'd be happy to know that it's hot enough to make a phoenix sweat.",
-		"The weather right now is like you took London and stuck it in a dishwasher.",
-		"The Crystal Empire is warmer than this weather.",
-	}
-
-	s.ChannelMessageSend(m.ChannelID, responses[randomRange(0, len(responses))])
-
 	return nil
 }

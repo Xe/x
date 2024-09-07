@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aura
+  annotations:
+    operator.1password.io/auto-restart: "true"
+  labels:
+    app.kubernetes.io/name: aura
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: aura
+  replicas: 1
+  template:      
+    metadata:
+      labels:
+        app.kubernetes.io/name: aura
+    spec:
+      securityContext:
+        fsGroup: 1000
+      volumes:
+        - name: recordings
+          persistentVolumeClaim:
+            claimName: aura-recordings
+        - name: temp
+          emptyDir: {}
+      containers:
+        - name: bot
+          image: ghcr.io/xe/x/aura:latest
+          imagePullPolicy: "Always"
+          workingDir: "/data"
+          resources:
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
+          envFrom:
+            - secretRef:
+                name: aura
+          env:
+            - name: "PORT"
+              value: "8000"
+            - name: "DATA_PREFIX"
+              value: "/data/var"
+          volumeMounts:
+            - mountPath: "/data"
+              name: recordings
+            - mountPath: "/tmp"
+              name: temp

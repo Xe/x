@@ -19,12 +19,6 @@ type aerial struct {
 	s  *discordgo.Session
 }
 
-const (
-	djonHelp  = ``
-	djoffHelp = ``
-	setupHelp = ``
-)
-
 func (a *aerial) Handle(s *discordgo.Session, m *discordgo.MessageCreate) {
 	err := a.cs.Run(s, m.Message)
 	if err != nil {
@@ -35,8 +29,6 @@ func (a *aerial) Handle(s *discordgo.Session, m *discordgo.MessageCreate) {
 var (
 	token             = os.Getenv("TOKEN")
 	youtubeSpamRoomID = os.Getenv("DISCORD_YOUTUBESPAM_ROOMID")
-	gClientID         = os.Getenv("GOOGLE_CLIENT_ID")
-	gClientSecret     = os.Getenv("GOOGLE_CLIENT_SECRET")
 
 	musicLinkRegex = regexp.MustCompile(`(.*)((http(s?):\/\/(www\.)?soundcloud.com\/.*)|(http(s?):\/\/(www\.)?youtube.com\/.*)|(http(s?):\/\/(www\.)?youtu.be\/.*))(.*)|(.*)http(s?):\/\/(www\.)?mixcloud.com\/.*`)
 )
@@ -58,13 +50,10 @@ func main() {
 	a.cs.AddCmd("stats", "shows radio station statistics for Ponyville FM", bot.NoPermissions, stats)
 	a.cs.AddCmd("dj", "shows which DJ is up next on Ponyville FM", bot.NoPermissions, stats)
 	a.cs.AddCmd("schedule", "shows the future radio schedule for Ponyville FM", bot.NoPermissions, schedule)
-	a.cs.AddCmd("hipster", "hip me up fam", bot.NoPermissions, hipster)
 	a.cs.AddCmd("source", "source code information", bot.NoPermissions, source.Source)
 	a.cs.AddCmd("time", "shows the current bot time", bot.NoPermissions, curTime)
 	a.cs.AddCmd("streams", "shows the different Ponyville FM stream links", bot.NoPermissions, streams)
 	a.cs.AddCmd("servers", "shows the different Ponyville FM stream links", bot.NoPermissions, streams)
-	a.cs.AddCmd("derpi", "grabs a random **__safe__** image from Derpibooru with the given search results", bot.NoPermissions, derpi)
-	a.cs.AddCmd("weather", "how's the weather right now?", bot.NoPermissions, weather)
 
 	dg.AddHandler(a.Handle)
 	dg.AddHandler(pesterLink)

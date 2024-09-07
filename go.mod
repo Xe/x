@@ -13,7 +13,6 @@ require (
 	github.com/Songmu/gitconfig v0.2.0
 	github.com/a-h/templ v0.2.771
 	github.com/adrg/frontmatter v0.2.0
-	github.com/aws/aws-sdk-go v1.54.0
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.55.1
 	github.com/bwmarrin/discordgo v0.28.1
 	github.com/c-bata/go-prompt v0.2.6
@@ -22,16 +21,13 @@ require (
 	github.com/disintegration/imaging v1.6.2
 	github.com/dop251/goja v0.0.0-20230531210528-d7324b2d74f7
 	github.com/eaburns/peggy v1.0.2
-	github.com/expr-lang/expr v1.16.9
 	github.com/facebookgo/ensure v0.0.0-20160127193407-b4ab57deab51
-	github.com/fogleman/primitive v0.0.0-20190214200932-673f57e7b1b5
 	github.com/gen2brain/avif v0.3.1
 	github.com/gen2brain/heic v0.3.0
 	github.com/gen2brain/jpegxl v0.3.0
 	github.com/gen2brain/webp v0.4.4
 	github.com/go-gorm/caches/v4 v4.0.5
 	github.com/go-interpreter/wagon v0.6.0
-	github.com/go-shiori/go-readability v0.0.0-20230421032831-c66949dfc0ad
 	github.com/gomarkdown/markdown v0.0.0-20240328165702-4d01890c35c0
 	github.com/google/generative-ai-go v0.16.0
 	github.com/google/go-github v17.0.0+incompatible
@@ -40,8 +36,6 @@ require (
 	github.com/goreleaser/nfpm/v2 v2.37.1
 	github.com/gorilla/securecookie v1.1.2
 	github.com/gorilla/sessions v1.4.0
-	github.com/hullerob/go.farbfeld v0.0.0-20181222022525-3661193c725f
-	github.com/jaytaylor/html2text v0.0.0-20190408195923-01ec452cbe43
 	github.com/joho/godotenv v1.5.1
 	github.com/kr/pretty v0.3.1
 	github.com/lib/pq v1.10.9
@@ -63,6 +57,7 @@ require (
 	github.com/rs/cors v1.11.0
 	github.com/samber/go-gpt-3-encoder v0.3.1
 	github.com/sebest/xff v0.0.0-20210106013422-671bd2870b3a
+	github.com/speps/go-hashids v2.0.0+incompatible
 	github.com/stoewer/go-strcase v1.3.0
 	github.com/tetratelabs/wazero v1.7.2
 	github.com/thoj/go-ircevent v0.0.0-20210723090443-73e444401d64
@@ -107,7 +102,6 @@ require (
 	github.com/PuerkitoBio/rehttp v1.3.0 // indirect
 	github.com/agext/levenshtein v1.2.1 // indirect
 	github.com/andybalholm/brotli v1.1.0 // indirect
-	github.com/andybalholm/cascadia v1.3.2 // indirect
 	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.6.2 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/v4a v1.3.9 // indirect
@@ -132,7 +126,7 @@ require (
 	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/evanw/esbuild v0.19.11 // indirect
 	github.com/fasthttp/router v1.5.0 // indirect
-	github.com/fatih/color v1.16.0 // indirect
+	github.com/fatih/color v1.17.0 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/gaissmai/bart v0.4.1 // indirect
 	github.com/go-git/gcfg v1.5.1-0.20230307220236-3a3c6141e376 // indirect
@@ -142,12 +136,10 @@ require (
 	github.com/go-logr/logr v1.4.1 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-openapi/inflect v0.19.0 // indirect
-	github.com/go-shiori/dom v0.0.0-20210627111528-4e4722cd0d65 // indirect
 	github.com/go-sourcemap/sourcemap v2.1.3+incompatible // indirect
 	github.com/gobwas/glob v0.2.3 // indirect
 	github.com/goccy/go-yaml v1.9.5 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
-	github.com/gogs/chardet v0.0.0-20211120154057-b7413eaefb8f // indirect
 	github.com/google/nftables v0.2.1-0.20240414091927-5e242ec57806 // indirect
 	github.com/google/pprof v0.0.0-20240409012703-83162a5b38cd // indirect
 	github.com/google/rpmpack v0.6.1-0.20240329070804-c2247cbb881a // indirect
@@ -263,7 +255,7 @@ require (
 	github.com/akutz/memconn v0.1.0 // indirect
 	github.com/alexbrainman/sspi v0.0.0-20231016080023-1a75b4708caa // indirect
 	github.com/aws/aws-sdk-go-v2 v1.27.2
-	github.com/aws/aws-sdk-go-v2/config v1.27.10
+	github.com/aws/aws-sdk-go-v2/config v1.27.12
 	github.com/aws/aws-sdk-go-v2/credentials v1.17.18
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.16.5 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/configsources v1.3.9 // indirect
@@ -279,14 +271,12 @@ require (
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/coreos/go-iptables v0.7.1-0.20240112124308-65c67c9f46e6 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/dlclark/regexp2 v1.7.0 // indirect
+	github.com/dlclark/regexp2 v1.10.0 // indirect
 	github.com/facebookgo/stack v0.0.0-20160209184415-751773369052 // indirect
 	github.com/facebookgo/subset v0.0.0-20150612182917-8dac2c3c4870 // indirect
-	github.com/fogleman/gg v1.3.0 // indirect
 	github.com/fxamacker/cbor/v2 v2.5.0 // indirect
 	github.com/go-ole/go-ole v1.3.0 // indirect
 	github.com/godbus/dbus/v5 v5.1.1-0.20230522191255-76236955d466 // indirect
-	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/google/btree v1.1.2 // indirect
@@ -346,7 +336,7 @@ require (
 	golang.org/x/sys v0.23.0 // indirect
 	golang.org/x/term v0.23.0 // indirect
 	golang.org/x/text v0.17.0 // indirect
-	golang.org/x/time v0.5.0 // indirect
+	golang.org/x/time v0.5.0
 	golang.org/x/tools v0.24.0
 	golang.zx2c4.com/wintun v0.0.0-20230126152724-0fa3db229ce2 // indirect
 	golang.zx2c4.com/wireguard/windows v0.5.3 // indirect

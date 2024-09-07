@@ -1,5 +1,7 @@
 namespace: pvfm
 resources:
   - 1password.yaml
-  #- deployment.yaml
+  - deployment.yaml
+  - ingress.yaml
   - pvc.yaml
+  - service.yaml
