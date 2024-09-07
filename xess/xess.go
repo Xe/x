@@ -6,12 +6,14 @@ package xess
 import (
 	"embed"
 	"net/http"
+
+	"within.website/x/internal"
 )
 
 //go:generate go run github.com/a-h/templ/cmd/templ@latest generate
 
 var (
-	//go:embed xess.css
+	//go:embed xess.css static
 	Static embed.FS
 )
 
@@ -22,5 +24,5 @@ func init() {
 const URL = "/.within.website/x/xess/xess.css"
 
 func Mount(mux *http.ServeMux) {
-	mux.Handle("/.within.website/x/xess/", http.StripPrefix("/.within.website/x/xess/", http.FileServerFS(Static)))
+	mux.Handle("/.within.website/x/xess/", internal.UnchangingCache(http.StripPrefix("/.within.website/x/xess/", http.FileServerFS(Static))))
 }
