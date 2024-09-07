@@ -21,7 +21,7 @@ import (
 var normalTools = []ollama.Function{
 	{
 		Name:        "code_interpreter",
-		Description: "Run the given Python code.",
+		Description: "Run the given Python code",
 		Parameters: ollama.Param{
 			Type: "object",
 			Properties: ollama.Properties{
@@ -44,6 +44,7 @@ var normalTools = []ollama.Function{
 					Description: "The prompt to use",
 				},
 			},
+			Required: []string{"prompt"},
 		},
 	},
 	// {
@@ -161,7 +162,7 @@ func (m *Module) eventuallySendImage(ctx context.Context, channelID string, prom
 
 	pr, err := m.flux.PredictIdempotent(uuid.NewString(), flux.PredictionRequest{
 		Input: flux.Input{
-			Prompt:            "an anime depiction of " + prompt + " in a cyberpunk setting",
+			Prompt:            "an anime depiction of " + prompt,
 			AspectRatio:       "16:9",
 			NumInferenceSteps: 50,
 			GuidanceScale:     3.5,

@@ -286,6 +286,9 @@ func (m *Module) messageCreate(s *discordgo.Session, mc *discordgo.MessageCreate
 
 			case "code_interpreter":
 				slog.Info("got run_python_code tool call", "message_id", mc.ID, "channel_id", mc.ChannelID, "tc", tc)
+
+				m.sess.MessageReactionAdd(mc.ChannelID, mc.ID, "🐍")
+
 				msg, err := m.runPythonCode(context.Background(), tc.Function)
 				if err != nil {
 					slog.Error("error running python code", "err", err, "message_id", mc.ID, "channel_id", mc.ChannelID)
@@ -313,6 +316,8 @@ func (m *Module) messageCreate(s *discordgo.Session, mc *discordgo.MessageCreate
 
 			case "draw_image":
 				slog.Info("got draw_image tool call", "message_id", mc.ID, "channel_id", mc.ChannelID, "tc", tc)
+
+				m.sess.MessageReactionAdd(mc.ChannelID, mc.ID, "🖍️")
 
 				msg, err := m.drawImage(context.Background(), tc.Function, mc.ChannelID)
 				if err != nil {
