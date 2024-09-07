@@ -76,13 +76,14 @@ type Message struct {
 }
 
 type CompleteRequest struct {
-	Model    string         `json:"model"`
-	Messages []Message      `json:"messages"`
-	Format   *string        `json:"format,omitempty"`
-	Template *string        `json:"template,omitempty"`
-	Stream   bool           `json:"stream"`
-	Options  map[string]any `json:"options"`
-	Tools    []Tool         `json:"tools"`
+	Model     string         `json:"model"`
+	Messages  []Message      `json:"messages"`
+	Format    *string        `json:"format,omitempty"`
+	Template  *string        `json:"template,omitempty"`
+	Stream    bool           `json:"stream"`
+	Options   map[string]any `json:"options"`
+	Tools     []Tool         `json:"tools"`
+	KeepAlive string         `json:"keep_alive"`
 }
 
 type CompleteResponse struct {
@@ -99,6 +100,10 @@ type CompleteResponse struct {
 }
 
 func (c *Client) Chat(ctx context.Context, inp *CompleteRequest) (*CompleteResponse, error) {
+	if inp.KeepAlive == "" {
+		inp.KeepAlive = (9999 * time.Minute).String()
+	}
+
 	buf := &bytes.Buffer{}
 	if err := json.NewEncoder(buf).Encode(inp); err != nil {
 		return nil, fmt.Errorf("ollama: error encoding request: %w", err)
@@ -144,10 +149,11 @@ func p[T any](v T) *T {
 // Hallucinate prompts the model to hallucinate a "valid" JSON response to the given input.
 func Hallucinate[T valid.Interface](ctx context.Context, c *Client, opts HallucinateOpts) (*T, error) {
 	inp := &CompleteRequest{
-		Model:    opts.Model,
-		Messages: opts.Messages,
-		Format:   p("json"),
-		Stream:   true,
+		Model:     opts.Model,
+		Messages:  opts.Messages,
+		Format:    p("json"),
+		Stream:    true,
+		KeepAlive: (9999 * time.Minute).String(),
 	}
 	tries := 0
 	for tries <= 5 {
@@ -306,6 +312,10 @@ type GenerateResponse struct {
 }
 
 func (c *Client) Generate(ctx context.Context, gr *GenerateRequest) (*GenerateResponse, error) {
+	if gr.KeepAlive == "" {
+		gr.KeepAlive = (9999 * time.Minute).String()
+	}
+
 	buf := &bytes.Buffer{}
 	if err := json.NewEncoder(buf).Encode(gr); err != nil {
 		return nil, fmt.Errorf("ollama: error encoding request: %w", err)
