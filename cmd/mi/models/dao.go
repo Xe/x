@@ -180,10 +180,6 @@ func (d *DAO) backup(ctx context.Context, to string) error {
 		return fmt.Errorf("failed to get database connection: %w", err)
 	}
 
-	if _, err := db.Exec("VACCUM"); err != nil {
-		return fmt.Errorf("failed to vacuum source database: %w", err)
-	}
-
 	defer conn.Close()
 
 	if err := conn.Raw(func(dca any) error {
@@ -208,10 +204,6 @@ func (d *DAO) backup(ctx context.Context, to string) error {
 
 		if err := bu.Close(); err != nil {
 			return fmt.Errorf("failed to close backup: %w", err)
-		}
-
-		if err := conn.Raw().Exec("VACUUM"); err != nil {
-			return fmt.Errorf("failed to vacuum database: %w", err)
 		}
 
 		return nil
