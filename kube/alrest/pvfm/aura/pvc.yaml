@@ -33,23 +33,11 @@ kind: PersistentVolumeClaim
 metadata:
   name: aura-recordings
 spec:
-  storageClassName: tigris
+  storageClassName: "tigris"
   resources:
     requests:
       storage: 10Ti
   volumeMode: Filesystem
   accessModes:
     - ReadWriteMany
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: aura-recordings-nas
-spec:
-  storageClassName: itsuki
-  resources:
-    requests:
-      storage: 1Ti
-  volumeMode: Filesystem
-  accessModes:
-    - ReadWriteMany
+  volumeName: aura-recordings
