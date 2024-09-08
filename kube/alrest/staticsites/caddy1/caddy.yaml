@@ -11,6 +11,20 @@ data:
       root /srv/http/lewa
     }
 
+    graphviz.christine.website:8080 {
+      tls off
+      errors stdout
+
+      root /srv/http/graphviz
+    }
+
+    tulpanomicon.guide:8080 {
+      tls off
+      errors stdout
+
+      root /srv/http/tulpanomicon
+    }
+
     xena.greedo.xeserv.us:8080 {
       tls off
       errors stdout
@@ -40,6 +54,28 @@ data:
         template page templates/page.html
       }
     }
+
+    when-then-zen.christine.website:8080 {
+      tls off
+      errors stdout
+
+      root /srv/http/when-then-zen.christine.website
+
+      internal /README.md
+      internal /templates
+      internal /LICENSE
+      internal /Caddyfile
+
+      ext .md
+
+      browse /bonus
+      browse /meditation /srv/http/when-then-zen.christine.website/templates/index.html
+      browse /skills /srv/http/when-then-zen.christine.website/templates/index.html
+
+      markdown / {
+        #template templates/page.html
+      }
+    }
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -63,12 +99,46 @@ spec:
         - name: lewa
           persistentVolumeClaim:
             claimName: lewa
+        - name: graphviz
+          persistentVolumeClaim:
+            claimName: graphviz
         - name: greedo
           persistentVolumeClaim:
             claimName: xena-greedo-xeserv-us
+        - name: tulpanomicon
+          persistentVolumeClaim:
+            claimName: tulpanomicon
         - name: xn--u7hz981o
           persistentVolumeClaim:
             claimName: xn--u7hz981o
+        - name: when-then-zen
+          persistentVolumeClaim:
+            claimName: when-then-zen
+      initContainers:
+        - name: "graphviz"
+          image: ghcr.io/xe/x/git
+          volumeMounts:
+            - mountPath: "/srv/http/graphviz"
+              name: graphviz
+          command: 
+            - sh
+            - "-c"
+            - |
+              cd /srv/http/graphviz
+              git clone https://github.com/dreampuf/GraphvizOnline site ||:
+              cd site && git pull
+        - name: "when-then-zen"
+          image: ghcr.io/xe/x/git
+          volumeMounts:
+            - mountPath: "/srv/http/when-then-zen.christine.website"
+              name: when-then-zen
+          command: 
+            - sh
+            - "-c"
+            - |
+              cd /srv/http/when-then-zen.christine.website
+              git clone https://github.com/Xe/when-then-zen site ||:
+              cd site && git pull
       containers:
         - name: caddy
           image: ghcr.io/xe/x/caddy1
@@ -97,6 +167,14 @@ spec:
               name: xn--u7hz981o
             - mountPath: "/srv/http/xena.greedo.xeserv.us"
               name: greedo
+            - mountPath: "/srv/http/tulpanomicon"
+              name: tulpanomicon
+            - mountPath: "/srv/http/when-then-zen.christine.website"
+              name: when-then-zen
+              subPath: site
+            - mountPath: "/srv/http/graphviz"
+              name: graphviz
+              subPath: site
 ---
 apiVersion: v1
 kind: Service
@@ -109,4 +187,3 @@ spec:
     - port: 80
       targetPort: 8080
       name: http
----

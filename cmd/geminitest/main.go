@@ -5,7 +5,6 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"os"
 
 	"github.com/google/generative-ai-go/genai"
 	"google.golang.org/api/iterator"
@@ -14,13 +13,14 @@ import (
 )
 
 var (
-	geminiModel = flag.String("gemini-model", "gemini-1.5-flash", "The model to use for generating text")
+	geminiApiKey = flag.String("gemini-api-key", "", "The Gemini API key")
+	geminiModel  = flag.String("gemini-model", "gemini-1.5-flash", "The model to use for generating text")
 )
 
 func main() {
 	internal.HandleStartup()
 	ctx := context.Background()
-	client, err := genai.NewClient(ctx, option.WithAPIKey(os.Getenv("GEMINI_API_KEY")))
+	client, err := genai.NewClient(ctx, option.WithAPIKey(*geminiApiKey))
 	if err != nil {
 		log.Fatal(err)
 	}

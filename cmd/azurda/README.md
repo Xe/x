@@ -12,8 +12,6 @@ The heinous crime that we're doing here is implementing this using Tigris' shado
 
 However this realistically supports anything that support that can implement the S3 GetObject API call. It doesn't even have to be a storage service. You can just make your own server implement this call and then you get everything cached in tigris for you.
 
-[Live demo](https://azurda.fly.dev)
-
 ![A screenshot of the demo](./static/img/azurda-screenshot.png)
 
 This works because we're treating Stable Diffusion as a key-value store, where the key is the fabricated prompt based on the MD5 checksum passed in the URL and the value is the generated image from Stable Diffusion.

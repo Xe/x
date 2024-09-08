@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: graphviz
+spec:
+  storageClassName: "longhorn"
+  resources:
+    requests:
+      storage: 512Mi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: graphviz
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - graphviz.christine.website
+      secretName: graphviz-public-tls
+  rules:
+    - host: graphviz.christine.website
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: caddy
+                port:
+                  name: http

@@ -1,0 +1,32 @@
+VERSION 0.8
+FROM debian:bookworm
+
+caddy-build:
+  FROM debian:bookworm
+  WORKDIR /app
+  RUN mkdir -p /app
+  ADD https://github.com/caddyserver/caddy/releases/download/v1.0.4/caddy_v1.0.4_linux_amd64.tar.gz /app/caddy1.tgz
+  RUN tar xf /app/caddy1.tgz
+  SAVE ARTIFACT caddy
+
+caddy:
+  FROM debian:bookworm
+  LABEL org.opencontainers.image.source="https://github.com/Xe/x"
+  WORKDIR /app
+  RUN mkdir -p /app/bin
+  COPY +caddy-build/caddy /app/bin/caddy
+  CMD ["/app/bin/caddy", "-port", "8080", "-agree", "-conf", "/app/etc/Caddyfile"]
+
+  SAVE IMAGE --push ghcr.io/xe/x/caddy1:latest
+
+git:
+  FROM debian:bookworm
+  LABEL org.opencontainers.image.source="https://github.com/Xe/x"
+
+  RUN apt-get update && apt-get install -y git ca-certificates
+
+  SAVE IMAGE --push ghcr.io/xe/x/git:latest
+
+all:
+  BUILD --platform=linux/amd64 +caddy
+  BUILD --platform=linux/amd64 +git

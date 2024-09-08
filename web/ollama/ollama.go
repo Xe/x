@@ -240,23 +240,28 @@ func Hallucinate[T valid.Interface](ctx context.Context, c *Client, opts Halluci
 }
 
 type EmbedRequest struct {
-	Model  string `json:"model"`
-	Prompt string `json:"prompt"`
-
-	Options map[string]any `json:"options"`
+	Model     string         `json:"model"`
+	Input     []string       `json:"input"`
+	Truncate  bool           `json:"truncate"`
+	Options   map[string]any `json:"options"`
+	KeepAlive string         `json:"keep_alive"`
 }
 
 type EmbedResponse struct {
-	Embedding []float64 `json:"embedding"`
+	Embeddings [][]float64 `json:"embedding"`
 }
 
 func (c *Client) Embeddings(ctx context.Context, er *EmbedRequest) (*EmbedResponse, error) {
+	if er.KeepAlive == "" {
+		er.KeepAlive = (9999 * time.Minute).String()
+	}
+
 	buf := &bytes.Buffer{}
 	if err := json.NewEncoder(buf).Encode(er); err != nil {
 		return nil, fmt.Errorf("ollama: error encoding request: %w", err)
 	}
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, c.baseURL+"/api/embeddings", buf)
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, c.baseURL+"/api/embed", buf)
 	if err != nil {
 		return nil, fmt.Errorf("ollama: error creating request: %w", err)
 	}

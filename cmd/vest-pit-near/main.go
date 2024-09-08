@@ -7,29 +7,20 @@ import (
 	"expvar"
 	"flag"
 	"fmt"
-	"io"
-	"log"
 	"log/slog"
 	"net/http"
-	"os"
-	"path/filepath"
 	"time"
 
-	"tailscale.com/hostinfo"
-	"tailscale.com/tsnet"
-	"tailscale.com/tsweb"
 	"within.website/x/internal"
 	"within.website/x/internal/yeet"
 	"within.website/x/web/discordwebhook"
 )
 
 var (
-	checkURL      = flag.String("check-url", "https://am.i.mullvad.net/json", "connection endpoint to check")
-	containerNet  = flag.String("container", "wireguard", "container to assume the network stack of")
-	dockerImage   = flag.String("docker-image", "ghcr.io/xe/alpine:3.18.2", "docker image to use")
-	stateDir      = flag.String("state-dir", "", "where to store state data")
-	tsnetHostname = flag.String("tsnet-hostname", "vest-pit-near", "hostname for tsnet")
-	webhook       = flag.String("webhook", "", "Discord webhook URL")
+	checkURL     = flag.String("check-url", "https://am.i.mullvad.net/json", "connection endpoint to check")
+	containerNet = flag.String("container", "wireguard", "container to assume the network stack of")
+	dockerImage  = flag.String("docker-image", "ghcr.io/xe/alpine:3.18.2", "docker image to use")
+	webhook      = flag.String("webhook", "", "Discord webhook URL")
 
 	failureCount = expvar.NewInt("vest-pit-near_failure")
 )
@@ -37,29 +28,7 @@ var (
 func main() {
 	internal.HandleStartup()
 
-	hostinfo.SetApp("within.website/x/cmd/vest-pit-near")
-
-	os.MkdirAll(filepath.Join(*stateDir, "tsnet"), 0700)
-
-	srv := &tsnet.Server{
-		Hostname: *tsnetHostname,
-		Logf:     log.New(io.Discard, "", 0).Printf,
-		AuthKey:  os.Getenv("TS_AUTHKEY"),
-		Dir:      filepath.Join(*stateDir, "tsnet"),
-	}
-
-	go cron()
-
-	lis, err := srv.Listen("tcp", ":80")
-	if err != nil {
-		log.Fatalf("can't listen over tsnet: %v", err)
-	}
-
-	http.DefaultServeMux.HandleFunc("/metrics", tsweb.VarzHandler)
-
-	defer srv.Close()
-	defer lis.Close()
-	log.Fatal(http.Serve(lis, http.DefaultServeMux))
+	cron()
 }
 
 func cron() {

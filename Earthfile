@@ -232,3 +232,5 @@ all:
     BUILD --platform=linux/amd64 +todayinmarch2020
     BUILD --platform=linux/amd64 +within-website
     BUILD --platform=linux/amd64 +xedn
+
+    BUILD ./kube/alrest/staticsites/caddy1+all
