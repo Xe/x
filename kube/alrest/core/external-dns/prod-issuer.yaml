@@ -13,6 +13,12 @@ spec:
       name: letsencrypt-prod
     # Enable the HTTP-01 challenge provider
     solvers:
-      - http01:
-          ingress:
-            ingressClassName: nginx
+      - dns01:
+          route53:
+            region: ca-central-1
+            accessKeyIDSecretRef:
+              name: aws-creds
+              key: AWS_ACCESS_KEY_ID
+            secretAccessKeySecretRef:
+              name: aws-creds
+              key: AWS_SECRET_ACCESS_KEY

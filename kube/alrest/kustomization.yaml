@@ -2,5 +2,6 @@ resources:
   - core
   - ollama
   - pvfm
+  - staticsites
   - vms
   - x

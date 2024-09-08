@@ -1,0 +1,5 @@
+resources:
+  - caddy.yaml
+  - lewa.yaml
+  - xena-greedo.yaml
+  - xn--u7hz981o.yaml

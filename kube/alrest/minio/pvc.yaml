@@ -1,12 +1,11 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: gitea
+  name: minio
 spec:
   accessModes:
-    - ReadWriteOnce
     - ReadWriteMany
-  storageClassName: longhorn
+  storageClassName: itsuki
   resources:
     requests:
-      storage: 64Gi
+      storage: 100Gi

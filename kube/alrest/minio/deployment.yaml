@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minio
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: minio
+  template:
+    metadata:
+      labels:
+        app: minio
+    spec:
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: minio
+      containers:
+      - name: minio
+        volumeMounts:
+        - name: data 
+          mountPath: /data
+        image: minio/minio
+        args:
+        - server
+        - /data
+        - --console-address=:9001
+        env:
+        - name: MINIO_ROOT_USER
+          value: root
+        - name: MINIO_ROOT_PASSWORD
+          value: hunter22
+        ports:
+        - containerPort: 9000
+          hostPort: 9000
+          name: http
+        - containerPort: 9001
+          hostPort: 9001
+          name: webui
