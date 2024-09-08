@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: todayinmarch2020
+  labels:
+    app.kubernetes.io/name: todayinmarch2020
+spec:
+  selector:
+    app.kubernetes.io/name: todayinmarch2020
+  ports:
+    - port: 80
+      targetPort: 8080
+      name: http
+  type: ClusterIP

@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: todayinmarch2020
+  labels:
+    app.kubernetes.io/name: todayinmarch2020
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+      - todayinmarch2020.xn--sz8hf6d.ws
+      secretName: todayinmarch2020-public-tls
+  rules:
+  - host: todayinmarch2020.xn--sz8hf6d.ws
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: todayinmarch2020
+            port: 
+              name: http
