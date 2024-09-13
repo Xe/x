@@ -58,9 +58,9 @@ spec:
             - name: HTTP_ADDR
               value: ":9002"
             - name: OLLAMA_HOST
-              value: "http://ollama"
+              value: "http://ollama.ollama.svc.alrest.xeserv.us"
             - name: JUFRA_MIMI_MODEL
-              value: "hermes3:70b"
+              value: "hermes3"
             - name: JUFRA_FLUX_HOST
               value: "http://flux"
             - name: JUFRA_CONTEXT_WINDOW
