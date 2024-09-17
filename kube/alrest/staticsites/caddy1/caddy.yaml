@@ -104,13 +104,13 @@ spec:
             claimName: graphviz
         - name: greedo
           persistentVolumeClaim:
-            claimName: xena-greedo-xeserv-us
+            claimName: xena-greedo
         - name: tulpanomicon
           persistentVolumeClaim:
             claimName: tulpanomicon
         - name: xn--u7hz981o
           persistentVolumeClaim:
-            claimName: xn--u7hz981o
+            claimName: xn--u7hz981o--2
         - name: when-then-zen
           persistentVolumeClaim:
             claimName: when-then-zen

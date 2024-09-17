@@ -14,9 +14,9 @@ spec:
             - name: NFS_SERVER
               value: 192.168.2.241
             - name: NFS_PATH
-              value: /data/k8s
+              value: /itsuki/safe/kubernetes
       volumes:
         - name: nfs-client-root
           nfs:
             server: 192.168.2.241
-            path: /data/k8s
+            path: /itsuki/safe/kubernetes

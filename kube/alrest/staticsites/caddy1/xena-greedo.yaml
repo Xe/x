@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: xena-greedo-xeserv-us
+  name: xena-greedo
 spec:
   storageClassName: "itsuki"
   resources:

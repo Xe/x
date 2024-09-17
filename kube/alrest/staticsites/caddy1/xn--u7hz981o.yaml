@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: xn--u7hz981o
+  name: xn--u7hz981o--2
 spec:
   storageClassName: "itsuki"
   resources:
