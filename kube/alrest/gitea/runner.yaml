@@ -2,8 +2,8 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: runner-secret
-data:
-  token: NE9vMUx4RXg0QjF5dUlienZCQTFPTFFqbTdzeTBVV2RMOVhCdWM3bg==
+stringData:
+  token: "CY2fOnh2aP4scVZc9w4dEDkyxBGnsezNZqRWcKyi"
 type: Opaque
 ---
 apiVersion: apps/v1
@@ -13,7 +13,7 @@ metadata:
     app.kubernetes.io/name: act-runner
   name: act-runner
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       app.kubernetes.io/name: act-runner
@@ -28,8 +28,7 @@ spec:
       - name: docker-certs
         emptyDir: {}
       - name: runner-data
-        persistentVolumeClaim:
-          claimName: gitea
+        emptyDir: {}
       containers:
       - name: runner
         image: gitea/act_runner:nightly

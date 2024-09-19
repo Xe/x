@@ -37,9 +37,6 @@ spec:
         - name: data
           persistentVolumeClaim:
             claimName: gitea
-        - name: conf
-          persistentVolumeClaim:
-            claimName: conf
       containers:
         - name: main
           image: gitea/gitea:1-rootless
