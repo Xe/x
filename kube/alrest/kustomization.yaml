@@ -1,5 +1,6 @@
 resources:
   - core
+  - gitea
   - ollama
   - pvfm
   - staticsites
