@@ -4,9 +4,11 @@ FROM debian:bookworm
 caddy-build:
   FROM debian:bookworm
   WORKDIR /app
-  RUN mkdir -p /app
-  ADD https://github.com/caddyserver/caddy/releases/download/v1.0.4/caddy_v1.0.4_linux_amd64.tar.gz /app/caddy1.tgz
-  RUN tar xf /app/caddy1.tgz
+  RUN mkdir -p /app \
+   && apt update \
+   && apt install -y wget ca-certificates \
+   && wget https://github.com/caddyserver/caddy/releases/download/v1.0.4/caddy_v1.0.4_linux_amd64.tar.gz -O /app/caddy1.tgz \
+   && tar xf /app/caddy1.tgz
   SAVE ARTIFACT caddy
 
 caddy:
