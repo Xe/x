@@ -4,6 +4,10 @@ metadata:
   name: within-website
   labels:
     app.kubernetes.io/name: within-website
+  annotations:
+    keel.sh/policy: all
+    keel.sh/trigger: poll
+    keel.sh/pollSchedule: "@hourly"
 spec:
   replicas: 1
   selector:

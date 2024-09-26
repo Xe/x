@@ -4,6 +4,9 @@ metadata:
   name: aerial
   annotations:
     operator.1password.io/auto-restart: "true"
+    keel.sh/policy: all
+    keel.sh/trigger: poll
+    keel.sh/pollSchedule: "@hourly"
   labels:
     app.kubernetes.io/name: aerial
 spec:

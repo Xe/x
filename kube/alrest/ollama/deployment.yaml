@@ -5,6 +5,10 @@ metadata:
   namespace: ollama
   labels:
     xeiaso.net/project: ollama
+  annotations:
+    keel.sh/policy: all
+    keel.sh/trigger: poll
+    keel.sh/pollSchedule: "@hourly"
 spec:
   replicas: 1
   selector:

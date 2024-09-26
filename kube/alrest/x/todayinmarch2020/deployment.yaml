@@ -4,6 +4,10 @@ metadata:
   name: todayinmarch2020
   labels:
     app.kubernetes.io/name: todayinmarch2020
+  annotations:
+    keel.sh/policy: all
+    keel.sh/trigger: poll
+    keel.sh/pollSchedule: "@hourly"
 spec:
   replicas: 1
   selector:

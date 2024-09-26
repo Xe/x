@@ -12,6 +12,10 @@ metadata:
   labels:
     app.kubernetes.io/name: act-runner
   name: act-runner
+  annotations:
+    keel.sh/policy: all
+    keel.sh/trigger: poll
+    keel.sh/pollSchedule: "@hourly"
 spec:
   replicas: 3
   selector:

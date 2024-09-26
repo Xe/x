@@ -21,6 +21,10 @@ metadata:
   name: gitea
   labels:
     xeiaso.net/thing: http
+  annotations:
+    keel.sh/policy: all
+    keel.sh/trigger: poll
+    keel.sh/pollSchedule: "@hourly"
 spec:
   replicas: 1
   selector:
