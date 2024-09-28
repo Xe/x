@@ -19,6 +19,19 @@ spec:
       url: "https://cloud-images.ubuntu.com/daily/server/noble/current/noble-server-cloudimg-amd64.img"
 ---
 apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: feixiao-storage
+spec:
+  accessModes:
+    - ReadWriteOnce
+    - ReadWriteMany
+  storageClassName: itsuki
+  resources:
+    requests:
+      storage: 128Gi
+---
+apiVersion: v1
 kind: Service
 metadata:
   name: feixiao
@@ -62,6 +75,9 @@ spec:
                 bus: sata
                 readonly: true
               name: cloudinitdisk
+          filesystems:
+            - name: storage
+              virtiofs: {}
         machine:
           type: q35
         resources:
@@ -71,12 +87,20 @@ spec:
       - name: disk0
         persistentVolumeClaim:
           claimName: "feixiao"
+      - name: storage
+        persistentVolumeClaim:
+          claimName: "feixiao-storage"
       - cloudInitNoCloud:
           userData: |
             #cloud-config
             hostname: feixiao
             ssh_pwauth: True
             disable_root: false
+
+            bootcmd:
+              - "sudo mkdir -p /xe/storage"
+              - "sudo mount -t virtiofs storage /xe/storage"
+              - "sudo chown xe /xe/storage"
 
             write_files:
               - encoding: b64
