@@ -17,8 +17,8 @@ app.use(expressConnectMiddleware({
   routes
 }));
 
-app.get("/", function (req, res) {
-  res.send("hello, world!");
+app.get("/healthz", function (_req, res) {
+  res.send("OK");
 });
 
 http.createServer(app).listen(8080);
