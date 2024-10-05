@@ -233,4 +233,5 @@ all:
     BUILD --platform=linux/amd64 +within-website
     BUILD --platform=linux/amd64 +xedn
 
-    BUILD ./kube/alrest/staticsites/caddy1+all
+    BUILD --platform=linux/amd64 ./kube/alrest/staticsites/caddy1+all
+    BUILD --platform=linux/amd64 ./migroserbices/falin+run

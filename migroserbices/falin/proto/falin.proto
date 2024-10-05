@@ -6,7 +6,7 @@ option go_package = "within.website/x/migroserbices/falin/gen";
 message GenerateImageRequest {
   string prompt = 1;
   string model = 2;
-  int32 seed = 3;
+  int64 seed = 3;
   int32 num_images = 4;
   bool enable_safety_checker = 5;
 }
@@ -20,8 +20,7 @@ message ImageOutput {
 
 message GenerateImageResponse {
   repeated ImageOutput images = 1;
-  int32 seed = 2;
-  string prompt = 3;
+  string prompt = 2;
 }
 
 service ImageService {

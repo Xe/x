@@ -4,7 +4,7 @@
 // @ts-nocheck
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
-import { Message, proto3 } from "@bufbuild/protobuf";
+import { Message, proto3, protoInt64 } from "@bufbuild/protobuf";
 
 /**
  * @generated from message within.website.x.falin.v1alpha1.GenerateImageRequest
@@ -21,9 +21,9 @@ export class GenerateImageRequest extends Message<GenerateImageRequest> {
   model = "";
 
   /**
-   * @generated from field: int32 seed = 3;
+   * @generated from field: int64 seed = 3;
    */
-  seed = 0;
+  seed = protoInt64.zero;
 
   /**
    * @generated from field: int32 num_images = 4;
@@ -45,7 +45,7 @@ export class GenerateImageRequest extends Message<GenerateImageRequest> {
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "prompt", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "model", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "seed", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 3, name: "seed", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
     { no: 4, name: "num_images", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
     { no: 5, name: "enable_safety_checker", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
   ]);
@@ -132,12 +132,7 @@ export class GenerateImageResponse extends Message<GenerateImageResponse> {
   images: ImageOutput[] = [];
 
   /**
-   * @generated from field: int32 seed = 2;
-   */
-  seed = 0;
-
-  /**
-   * @generated from field: string prompt = 3;
+   * @generated from field: string prompt = 2;
    */
   prompt = "";
 
@@ -150,8 +145,7 @@ export class GenerateImageResponse extends Message<GenerateImageResponse> {
   static readonly typeName = "within.website.x.falin.v1alpha1.GenerateImageResponse";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "images", kind: "message", T: ImageOutput, repeated: true },
-    { no: 2, name: "seed", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-    { no: 3, name: "prompt", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "prompt", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GenerateImageResponse {

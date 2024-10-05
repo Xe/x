@@ -65,6 +65,8 @@ spec:
               value: "http://flux"
             - name: JUFRA_CONTEXT_WINDOW
               value: "32768"
+            - name: JUFRA_FALIN_HOST
+              value: "http://falin.mimi.svc.alrest.xeserv.us"
           volumeMounts:
             - name: mimi
               readOnly: true

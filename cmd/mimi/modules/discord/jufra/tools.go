@@ -12,9 +12,9 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/google/uuid"
+	"connectrpc.com/connect"
 	"within.website/x/llm/codeinterpreter/python"
-	"within.website/x/web/flux"
+	falin "within.website/x/migroserbices/falin/gen"
 	"within.website/x/web/ollama"
 )
 
@@ -163,30 +163,22 @@ func (m *Module) eventuallySendImage(ctx context.Context, channelID string, prom
 	}
 	defer os.RemoveAll(tempDir)
 
-	pr, err := m.flux.PredictIdempotent(uuid.NewString(), flux.PredictionRequest{
-		Input: flux.Input{
-			Prompt:            "an anime depiction of " + prompt,
-			AspectRatio:       "16:9",
-			NumInferenceSteps: 50,
-			GuidanceScale:     3.5,
-			OutputFormat:      "webp",
-			NumOutputs:        1,
-			MaxSequenceLength: 512,
-			OutputQuality:     95,
-			Seed:              &[]int{420}[0],
-		},
-	})
+	ir, err := m.falin.GenerateImage(ctx, connect.NewRequest(&falin.GenerateImageRequest{
+		Prompt:    "an anime depiction of " + prompt,
+		Model:     *falinModel,
+		NumImages: 1,
+	}))
 	if err != nil {
 		return fmt.Errorf("failed to predict: %w", err)
 	}
 
-	resp, err := http.Get(pr.Output[0])
+	resp, err := http.Get(ir.Msg.Images[0].Url)
 	if err != nil {
 		return fmt.Errorf("failed to get image: %w", err)
 	}
 	defer resp.Body.Close()
 
-	imgPath := filepath.Join(tempDir, "image.webp")
+	imgPath := filepath.Join(tempDir, "image.jpg")
 	imgFile, err := os.Create(imgPath)
 	if err != nil {
 		return fmt.Errorf("failed to create image file: %w", err)
@@ -200,7 +192,7 @@ func (m *Module) eventuallySendImage(ctx context.Context, channelID string, prom
 		return fmt.Errorf("failed to seek image file: %w", err)
 	}
 
-	msg, err := m.sess.ChannelFileSendWithMessage(channelID, "Here's the image!\n\n```"+prompt+"\n```", "image.webp", imgFile)
+	msg, err := m.sess.ChannelFileSendWithMessage(channelID, "Here's the image!\n\n```"+prompt+"\n```", "image.jpg", imgFile)
 	if err != nil {
 		return fmt.Errorf("failed to send image: %w", err)
 	}

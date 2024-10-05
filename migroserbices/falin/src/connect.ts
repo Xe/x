@@ -41,7 +41,6 @@ export default function (router: ConnectRouter) {
 
       return new GenerateImageResponse({
         images,
-        seed: result.seed,
         prompt: result.prompt,
       });
     }

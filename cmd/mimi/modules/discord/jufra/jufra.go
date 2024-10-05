@@ -10,13 +10,15 @@ import (
 	"encoding/json"
 	"flag"
 	"log/slog"
+	"net/http"
 	"strings"
 	"sync"
 	"time"
 
+	"connectrpc.com/connect"
 	"github.com/bwmarrin/discordgo"
 	"within.website/x/cmd/mimi/internal"
-	"within.website/x/web/flux"
+	falinconnect "within.website/x/migroserbices/falin/gen/genconnect"
 	"within.website/x/web/ollama"
 	"within.website/x/web/ollama/llamaguard"
 	"within.website/x/web/openai/chatgpt"
@@ -44,7 +46,8 @@ var (
 	mimiModel         = flag.String("jufra-mimi-model", "hermes3", "ollama model tag for mimi")
 	mimiNames         = flag.String("jufra-mimi-names", "mimi", "comma-separated list of names for mimi")
 	disableLlamaguard = flag.Bool("jufra-unsafe-disable-llamaguard", true, "disable llamaguard")
-	fluxHost          = flag.String("jufra-flux-host", "http://xe-flux.flycast", "host for flux")
+	falinHost         = flag.String("jufra-falin-host", "http://localhost:8080", "host for  falin")
+	falinModel        = flag.String("jufra-falin-model", "fal-ai/flux-pro/v1.1", "model to use for Falin generations")
 	contextWindow     = flag.Int("jufra-context-window", 32768, "context window size for mimi")
 
 	//go:embed system-prompt.txt
@@ -56,7 +59,7 @@ type Module struct {
 	cli    chatgpt.Client
 	ollama *ollama.Client
 	lg     *ollama.Client
-	flux   *flux.Client
+	falin  falinconnect.ImageServiceClient
 
 	convHistory map[string]state
 	lock        sync.Mutex
@@ -73,7 +76,7 @@ func New(sess *discordgo.Session) *Module {
 		cli:         chatgpt.NewClient("").WithBaseURL(internal.OllamaHost()),
 		ollama:      internal.OllamaClient(),
 		lg:          ollama.NewClient(*llamaGuardHost),
-		flux:        flux.NewClient(*fluxHost),
+		falin:       falinconnect.NewImageServiceClient(http.DefaultClient, *falinHost, connect.WithProtoJSON()),
 		convHistory: make(map[string]state),
 	}
 
