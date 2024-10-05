@@ -1,0 +1,33 @@
+VERSION 0.8
+
+FROM alpine:edge
+
+WORKDIR /app
+
+ENV NODE_ENV="production"
+LABEL org.opencontainers.image.source="https://github.com/Xe/x"
+
+
+build:
+    RUN apk -U add build-base gyp pkgconfig python3 nodejs npm
+
+    COPY package-lock.json package.json ./
+    RUN npm ci --include=dev
+
+    COPY . .
+
+    RUN npm run build
+
+    RUN npm prune --omit=dev
+
+    SAVE ARTIFACT /app
+
+run:
+    RUN apk -U add nodejs
+
+    COPY +build/app /app
+
+    EXPOSE 3000
+    CMD [ "node", "src/main.js" ]
+
+    SAVE IMAGE --push ghcr.io/xe/x/falin

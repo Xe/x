@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package within.website.x.falin.v1alpha1;
+option go_package = "within.website/x/migroserbices/falin/gen";
+
+message GenerateImageRequest {
+  string prompt = 1;
+  string model = 2;
+  int32 seed = 3;
+  int32 num_images = 4;
+  bool enable_safety_checker = 5;
+}
+
+message ImageOutput {
+  string url = 1;
+  int32 width = 2;
+  int32 height = 3;
+  string content_type = 4;
+}
+
+message GenerateImageResponse {
+  repeated ImageOutput images = 1;
+  int32 seed = 2;
+  string prompt = 3;
+}
+
+service ImageService {
+  rpc GenerateImage(GenerateImageRequest) returns (GenerateImageResponse) {}
+}

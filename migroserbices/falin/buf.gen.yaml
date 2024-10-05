@@ -1,0 +1,14 @@
+version: v2
+plugins:
+  - local: protoc-gen-es
+    out: gen
+    opt: target=ts
+  - local: protoc-gen-connect-es
+    out: gen
+    opt: target=ts
+  - local: protoc-gen-go
+    out: gen
+    opt: paths=source_relative
+  - local: protoc-gen-connect-go
+    out: gen
+    opt: paths=source_relative
