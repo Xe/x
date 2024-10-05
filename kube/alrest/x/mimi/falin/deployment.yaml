@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: falin
+  annotations:
+    keel.sh/policy: all
+    keel.sh/trigger: poll
+    keel.sh/pollSchedule: "@hourly"
+spec:
+  replicas: 1
+  template:
+    spec:
+      containers:
+        - name: main
+          image: ghcr.io/xe/x/falin
+          imagePullPolicy: Always
+          envFrom:
+            - secretRef:
+                name: falin
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http

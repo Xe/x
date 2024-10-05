@@ -1,0 +1,4 @@
+namespace: mimi
+resources:
+  - ./falin
+  - ./pgvector
