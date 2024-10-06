@@ -1,4 +1,6 @@
 namespace: mimi
 resources:
+  - namespace.yaml
+  - ./bot
   - ./falin
   - ./pgvector

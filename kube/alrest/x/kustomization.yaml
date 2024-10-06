@@ -1,7 +1,8 @@
 resources:
+  - future-sight
   - hlang
+  - mi
   - mimi
-  #- johaus
   - sapientwindex
   - todayinmarch2020
   - within.website
