@@ -41,6 +41,9 @@ spec:
         - name: data
           persistentVolumeClaim:
             claimName: gitea
+        - name: tigris
+          persistentVolumeClaim:
+            claimName: gitea-tigris
       containers:
         - name: main
           image: gitea/gitea:1-rootless
@@ -74,6 +77,12 @@ spec:
             - name: data
               mountPath: /etc/gitea
               subPath: conf
+            - name: tigris
+              mountPath: /var/lib/gitea/data/attachments
+              subPath: attachments
+            - name: tigris
+              mountPath: /var/lib/gitea/git/lfs
+              subPath: lfs
           livenessProbe:
             httpGet:
               path: /api/healthz

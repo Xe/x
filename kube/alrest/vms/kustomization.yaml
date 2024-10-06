@@ -1,5 +1,6 @@
 resources:
   - ./namespace.yaml
   - arona/arona.yaml
+  - feixiao/feixiao.yaml
   - sena/sena.yaml
   - xesite-ci/vm.yaml

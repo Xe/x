@@ -1,0 +1,23 @@
+kind: HTTPScaledObject
+apiVersion: http.keda.sh/v1alpha1
+metadata:
+   name: todayinmarch2020
+spec:
+  hosts:
+    - todayinmarch2020.xn--sz8hf6d.ws
+  targetPendingRequests: 100
+  scaleTargetRef:
+    name: todayinmarch2020
+    kind: Deployment
+    apiVersion: apps/v1
+    service: todayinmarch2020
+    port: 80
+  replicas:
+    min: 0
+    max: 3
+  scaledownPeriod: 300
+  scalingMetric:
+    requestRate:
+      granularity: 1s
+      targetValue: 100
+      window: 1m

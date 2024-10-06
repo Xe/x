@@ -8,11 +8,11 @@ spec:
     type: Recreate
   selector:
     matchLabels:
-      app: external-dns
+      app: external-dns-ingress
   template:
     metadata:
       labels:
-        app: external-dns
+        app: external-dns-ingress
     spec:
       serviceAccountName: external-dns
       containers:

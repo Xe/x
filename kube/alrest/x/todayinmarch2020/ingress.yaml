@@ -20,6 +20,6 @@ spec:
         path: "/"
         backend:
           service:
-            name: todayinmarch2020
+            name: keda-add-ons-http-interceptor-proxy
             port: 
-              name: http
+              number: 8080

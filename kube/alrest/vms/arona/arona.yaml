@@ -85,6 +85,13 @@ spec:
             ssh_pwauth: True
             disable_root: false
 
+            write_files:
+              - encoding: b64
+                content: bmV0d29yazoKICB2ZXJzaW9uOiAyCiAgZXRoZXJuZXRzOgogICAgaWQwOgogICAgICBkaGNwNDogdHJ1ZQogICAgICBtYXRjaDoKICAgICAgICBuYW1lOiBlbnAqCg==
+                owner: root:root
+                path: /etc/netplan/99-net-fix.yaml
+                permissions: '0644'
+
             users:
               - name: xe
                 groups: [ wheel ]

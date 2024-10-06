@@ -20,6 +20,6 @@ spec:
         path: "/"
         backend:
           service:
-            name: hlang
+            name: keda-add-ons-http-interceptor-proxy
             port: 
-              name: http
+              number: 8080

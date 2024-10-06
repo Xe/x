@@ -1,0 +1,24 @@
+kind: HTTPScaledObject
+apiVersion: http.keda.sh/v1alpha1
+metadata:
+   name: hlang
+spec:
+  hosts:
+    - h.christine.website
+    - h.within.lgbt
+  targetPendingRequests: 100
+  scaleTargetRef:
+    name: hlang
+    kind: Deployment
+    apiVersion: apps/v1
+    service: hlang
+    port: 80
+  replicas:
+    min: 0
+    max: 10
+  scaledownPeriod: 300
+  scalingMetric:
+    requestRate:
+      granularity: 1s
+      targetValue: 100
+      window: 1m  

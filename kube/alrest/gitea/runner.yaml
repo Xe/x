@@ -36,6 +36,7 @@ spec:
       containers:
       - name: runner
         image: gitea/act_runner:nightly-dind-rootless
+        imagePullPolicy: Always
         env:
         - name: GITEA_INSTANCE_URL
           value: http://git.gitea.svc.alrest.xeserv.us

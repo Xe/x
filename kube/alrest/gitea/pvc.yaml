@@ -10,3 +10,16 @@ spec:
   resources:
     requests:
       storage: 64Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: gitea-tigris
+spec:
+  accessModes:
+    - ReadWriteOnce
+    - ReadWriteMany
+  storageClassName: tigris
+  resources:
+    requests:
+      storage: 64Ti
