@@ -8,12 +8,35 @@ metadata:
     keel.sh/pollSchedule: "@hourly"
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: falin
   template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: falin
     spec:
       containers:
         - name: main
           image: ghcr.io/xe/x/falin
           imagePullPolicy: Always
+          resources:
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+            requests:
+              cpu: "250m"
+              memory: "256Mi"
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
           envFrom:
             - secretRef:
                 name: falin

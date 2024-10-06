@@ -6,6 +6,9 @@ metadata:
     operator.1password.io/auto-restart: "true"
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: mimi
   template:
     spec:
       volumes:
@@ -67,6 +70,8 @@ spec:
               value: "32768"
             - name: JUFRA_FALIN_HOST
               value: "http://falin.mimi.svc.alrest.xeserv.us"
+            - name: JUFRA_FALIN_MODEL
+              value: fal-ai/flux/schnell
           volumeMounts:
             - name: mimi
               readOnly: true

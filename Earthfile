@@ -32,16 +32,6 @@ everything:
 
     SAVE ARTIFACT bin
 
-azurda:
-    FROM +runtime
-    
-    COPY +everything/bin/azurda /app/bin/azurda
-    CMD ["/app/bin/azurda"]
-
-    LABEL org.opencontainers.image.source="https://github.com/Xe/x"
-
-    SAVE IMAGE --push ghcr.io/xe/x/azurda:latest
-
 aerial:
     FROM +runtime
 
@@ -221,7 +211,6 @@ xedn:
 all:
     BUILD --platform=linux/amd64 +aerial
     BUILD --platform=linux/amd64 +aura
-    BUILD --platform=linux/amd64 +azurda
     BUILD --platform=linux/amd64 +future-sight
     BUILD --platform=linux/amd64 +hdrwtch
     BUILD --platform=linux/amd64 +hlang
