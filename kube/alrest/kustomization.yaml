@@ -3,6 +3,7 @@ resources:
   - gitea
   - ollama
   - pvfm
+  - registry
   - staticsites
   - vms
   - x

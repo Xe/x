@@ -110,6 +110,16 @@ mimi:
 
     SAVE IMAGE --push ghcr.io/xe/x/mimi:latest
 
+relayd:
+    FROM +runtime
+
+    COPY +everything/bin/relayd /app/bin/relayd
+    CMD ["/app/bin/relayd"]
+
+    LABEL org.opencontainers.image.source="https://github.com/Xe/x"
+
+    SAVE IMAGE --push ghcr.io/xe/x/relayd:latest
+
 sanguisuga:
     FROM +runtime
 
@@ -216,6 +226,7 @@ all:
     BUILD --platform=linux/amd64 +hlang
     BUILD --platform=linux/amd64 +mi
     BUILD --platform=linux/amd64 +mimi
+    BUILD --platform=linux/amd64 +relayd
     BUILD --platform=linux/amd64 +sanguisuga
     BUILD --platform=linux/amd64 +sapientwindex
     BUILD --platform=linux/amd64 +todayinmarch2020
