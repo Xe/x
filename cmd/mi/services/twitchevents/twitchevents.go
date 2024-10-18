@@ -272,7 +272,7 @@ func (s *Server) handleStreamUp(ctx context.Context, lg *slog.Logger, ev *helix.
 			return fmt.Errorf("can't create bluesky agent: %w", err)
 		}
 
-		u, err := url.Parse("https://twitch.tv/" + ev.BroadcasterUserLogin)
+		u, err := url.Parse("https://twitch.tv/princessxen")
 		if err != nil {
 			return fmt.Errorf("[unexpected] can't create twitch URL: %w", err)
 		}
