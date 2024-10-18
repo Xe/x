@@ -28,16 +28,11 @@ var (
 		Help: "Number of twitch events ever processed",
 	}, []string{"messageType"})
 
-	twitchEventsErrors = promauto.NewGaugeVec(prometheus.GaugeOpts{
-		Name: "mi_twitch_events_errors",
-		Help: "Number of twitch events that caused errors",
-	}, []string{"messageType"})
-
 	twitchClientID      = flag.String("twitch-client-id", "", "twitch.tv client ID")
 	twitchClientSecret  = flag.String("twitch-client-secret", "", "twitch.tv client secret")
 	twitchUserID        = flag.Int("twitch-user-id", 105794391, "twitch.tv user ID")
 	twitchWebhookSecret = flag.String("twitch-webhook-secret", "", "twitch.tv webhook secret")
-	twitchWebhookURL    = flag.String("twitch-events-webhook-url", "https://shiroko-wsl.shark-harmonic.ts.net/twitch", "URL for Twitch events to be pushed to")
+	twitchWebhookURL    = flag.String("twitch-webhook-url", "", "URL for Twitch events to be pushed to")
 )
 
 type Config struct {
@@ -223,7 +218,7 @@ func (s *Server) handleNotification(ctx context.Context, lg *slog.Logger, w http
 		if err := json.Unmarshal(data.Event, &ev); err != nil {
 			return fmt.Errorf("can't unmarshal event: %w", err)
 		}
-		err = s.handleStreamUp(ctx, lg, w, &ev)
+		err = s.handleStreamUp(ctx, lg, &ev)
 	default:
 		lg.Error("unknown event", "event", data.Subscription.Type, "data", data.Event)
 	}
@@ -237,7 +232,7 @@ func (s *Server) handleNotification(ctx context.Context, lg *slog.Logger, w http
 	return nil
 }
 
-func (s *Server) handleStreamUp(ctx context.Context, lg *slog.Logger, w http.ResponseWriter, ev *helix.EventSubStreamOnlineEvent) error {
+func (s *Server) handleStreamUp(ctx context.Context, lg *slog.Logger, ev *helix.EventSubStreamOnlineEvent) error {
 	lg.Info("broadcaster went online!", "username", ev.BroadcasterUserLogin)
 
 	bs, err := s.cfg.BlueskyAgent(ctx)
