@@ -244,6 +244,10 @@ func (ae *miAddEvent) Execute(ctx context.Context, f *flag.FlagSet, _ ...interfa
 				return nil
 			})
 
+			if ae.endDate == "" {
+				ae.endDate = ae.startDate
+			}
+
 			_, err := time.Parse("2006-01-02", ae.endDate)
 			if err != nil {
 				fmt.Printf("error parsing date: %v\n", err)
