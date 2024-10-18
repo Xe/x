@@ -21,6 +21,9 @@ spec:
         - name: irc
           secret:
             secretName: mi-irc
+        - name: twitch
+          secret:
+            secretName: mi-twitch
         - name: mastodon
           secret:
             secretName: mi-mastodon
@@ -76,6 +79,9 @@ spec:
             - name: irc
               readOnly: true
               mountPath: "/run/secrets/irc"
+            - name: twitch
+              readOnly: true
+              mountPath: "/run/secrets/twitch"
             - name: mastodon
               readOnly: true
               mountPath: "/run/secrets/mastodon"

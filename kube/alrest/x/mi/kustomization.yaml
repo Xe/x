@@ -6,6 +6,7 @@ resources:
   - service.yaml
   - public-api-ingress.yaml
   - public-front-ingress.yaml
+  - public-twitch-events-ingress.yaml
 namespace: mi
 commonLabels:
   app.kubernetes.io/name: mi

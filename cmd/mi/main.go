@@ -19,6 +19,7 @@ import (
 	"within.website/x/cmd/mi/services/importer"
 	"within.website/x/cmd/mi/services/posse"
 	"within.website/x/cmd/mi/services/switchtracker"
+	"within.website/x/cmd/mi/services/twitchevents"
 	"within.website/x/internal"
 	pb "within.website/x/proto/mi"
 	"within.website/x/proto/mimi/announce"
@@ -84,6 +85,17 @@ func main() {
 		os.Exit(1)
 	}
 
+	te, err := twitchevents.New(ctx, dao, twitchevents.Config{
+		BlueskyAuthkey:  *blueskyAuthkey,
+		BlueskyHandle:   *blueskyHandle,
+		BlueskyPDS:      *blueskyPDS,
+		MimiAnnounceURL: *mimiAnnounceURL,
+	})
+	if err != nil {
+		slog.Error("failed to create twitch events", "err", err)
+		os.Exit(1)
+	}
+
 	st := switchtracker.New(dao)
 	es := events.New(dao, *flyghtTrackerURL)
 
@@ -97,6 +109,7 @@ func main() {
 	mux.Handle(pb.SwitchTrackerPathPrefix, pb.NewSwitchTrackerServer(st))
 	mux.Handle(pb.EventsPathPrefix, pb.NewEventsServer(es))
 	mux.Handle("/front", homefrontshim.New(dao))
+	mux.Handle("/twitch", te)
 
 	i := importer.New(dao)
 	i.Mount(http.DefaultServeMux)

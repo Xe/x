@@ -1,0 +1,27 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: mi-twitch-events-public
+  namespace: mi
+  labels:
+    app.kubernetes.io/name: mi
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+      - te.xeiaso.net
+      secretName: twitch-events-xeiaso-net-tls
+  rules:
+  - host: te.xeiaso.net
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/twitch"
+        backend:
+          service:
+            name: mi
+            port: 
+              name: http
