@@ -5,6 +5,14 @@ option go_package = "within.website/x/proto/mimi/announce";
 import "google/protobuf/empty.proto";
 import "external/jsonfeed.proto";
 
+message StatusUpdate {
+  string body = 1;
+}
+
 service Announce {
   rpc Announce(jsonfeed.Item) returns (google.protobuf.Empty) {}
+}
+
+service Post {
+  rpc Post(StatusUpdate) returns (google.protobuf.Empty) {}
 }
