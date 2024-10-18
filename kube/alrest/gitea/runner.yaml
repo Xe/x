@@ -6,6 +6,16 @@ stringData:
   token: "CY2fOnh2aP4scVZc9w4dEDkyxBGnsezNZqRWcKyi"
 type: Opaque
 ---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: docker-daemon-config
+data:
+  daemon.json: |
+    {
+      "registry-mirrors": ["https://pt-dh.default.svc.alrest.xeserv.us"]
+    }
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -33,6 +43,9 @@ spec:
         emptyDir: {}
       - name: runner-data
         emptyDir: {}
+      - name: docker-daemon-config
+        configMap:
+          name: docker-daemon-config
       containers:
       - name: runner
         image: gitea/act_runner:nightly-dind-rootless
@@ -52,3 +65,5 @@ spec:
         - name: runner-data
           mountPath: /data
           subPath: "actions"
+        - name: docker-daemon-config
+          mountPath: "/etc/docker"
