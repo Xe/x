@@ -1,8 +1,10 @@
 resources:
+  - amano
   - future-sight
   - hlang
   - mi
   - mimi
   - sapientwindex
+  #- stealthmountain
   - todayinmarch2020
   - within.website

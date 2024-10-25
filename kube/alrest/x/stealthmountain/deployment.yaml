@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stealthmountain
+spec:
+  selector:
+    matchLabels:
+      app: stealthmountain
+  template:
+    metadata:
+      labels:
+        app: stealthmountain
+    spec:
+      containers:
+      - name: stealthmountain
+        image: ghcr.io/xe/x/stealthmountain
+        securityContext:
+          runAsUser: 1000
+          runAsGroup: 1000
+          runAsNonRoot: true
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - ALL
+          seccompProfile:
+            type: RuntimeDefault
+        resources:
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+        env:
+          - name: "NATS_URL"
+            value: "nats://nats.future-sight.svc.alrest.xeserv.us:4222"
+        envFrom:
+          - secretRef:
+              name: bsky-stealth-mountain
