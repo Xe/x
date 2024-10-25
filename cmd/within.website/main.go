@@ -10,7 +10,6 @@ import (
 
 	"github.com/a-h/templ"
 	"go.jetpack.io/tyson"
-	"tailscale.com/tsweb"
 	"within.website/x/internal"
 	"within.website/x/web/vanity"
 	"within.website/x/xess"
@@ -83,7 +82,6 @@ func main() {
 	}
 
 	xess.Mount(mux)
-	mux.HandleFunc("/debug/varz", tsweb.VarzHandler)
 
 	mux.Handle("/{$}", templ.Handler(
 		xess.Base(

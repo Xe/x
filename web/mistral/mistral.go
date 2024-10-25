@@ -4,26 +4,12 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"expvar"
 	"fmt"
 	"net/http"
 
-	"tailscale.com/metrics"
 	"within.website/x/llm"
 	"within.website/x/web"
 )
-
-var (
-	promptTokens     = metrics.LabelMap{Label: "model"}
-	completionTokens = metrics.LabelMap{Label: "model"}
-	totalTokens      = metrics.LabelMap{Label: "model"}
-)
-
-func init() {
-	expvar.Publish("gauge_x_web_mistral_prompt_tokens", &promptTokens)
-	expvar.Publish("gauge_x_web_mistral_completion_tokens", &completionTokens)
-	expvar.Publish("gauge_x_web_mistral_total_tokens", &totalTokens)
-}
 
 type Client struct {
 	*http.Client

@@ -28,7 +28,6 @@ import (
 	irc "github.com/thoj/go-ircevent"
 	"go.jetpack.io/tyson"
 	"honnef.co/go/transmission"
-	"tailscale.com/hostinfo"
 	"tailscale.com/jsondb"
 	"tailscale.com/tsnet"
 	"within.website/x/internal"
@@ -42,7 +41,6 @@ var (
 	dbLoc        = flag.String("db-loc", "./data.json", "path to data file")
 	tysonConfig  = flag.String("tyson-config", "./config.ts", "path to configuration secrets (TySON)")
 	externalSeed = flag.Bool("external-seed", false, "try to external seed?")
-	tsnetVerbose = flag.Bool("tsnet-verbose", false, "enable verbose tsnet logging")
 
 	crcCheckCLI = flag.Bool("crc-check", false, "if true, check args[0] against hash args[1]")
 
@@ -82,7 +80,6 @@ func ParseTorrentAnnouncement(input string) (*TorrentAnnouncement, error) {
 
 func main() {
 	internal.HandleStartup()
-	hostinfo.SetApp("within.website/x/cmd/sanguisuga")
 
 	if *crcCheckCLI {
 		if flag.NArg() != 2 {
@@ -137,34 +134,10 @@ func main() {
 	if c.Tailscale.DataDir != nil {
 		dataDir = *c.Tailscale.DataDir
 	}
-
-	srv := &tsnet.Server{
-		Dir:      dataDir,
-		AuthKey:  c.Tailscale.Authkey,
-		Hostname: c.Tailscale.Hostname,
-		Logf:     func(string, ...any) {},
-	}
-
-	if *tsnetVerbose {
-		srv.Logf = slog.NewLogLogger(slog.Default().Handler().WithAttrs([]slog.Attr{slog.String("from", "tsnet")}), slog.LevelDebug).Printf
-	}
-
-	if err := srv.Start(); err != nil {
-		log.Fatalf("can't start tsnet server: %v", err)
-	}
-
-	go func() {
-		ln, err := srv.Listen("tcp", ":80")
-		if err != nil {
-			log.Fatalf("can't listen on tsnet: %v", err)
-		}
-		defer ln.Close()
-
-		log.Fatal(http.Serve(ln, http.DefaultServeMux))
-	}()
+	_ = dataDir
 
 	cl := &transmission.Client{
-		Client:   srv.HTTPClient(),
+		Client:   http.DefaultClient,
 		Endpoint: c.Transmission.URL,
 		Username: c.Transmission.User,
 		Password: c.Transmission.Password,
@@ -206,7 +179,6 @@ func main() {
 		db:     db,
 		bot:    bot,
 		tnet:   tnet,
-		srv:    srv,
 
 		animeInFlight: map[string]*SubspleaseAnnouncement{},
 	}

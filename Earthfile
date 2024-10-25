@@ -42,6 +42,16 @@ aerial:
 
     SAVE IMAGE --push ghcr.io/xe/x/aerial:latest
 
+amano:
+    FROM +runtime
+
+    COPY +everything/bin/amano /app/bin/amano
+    CMD ["/app/bin/amano"]
+
+    LABEL org.opencontainers.image.source="https://github.com/Xe/x"
+
+    SAVE IMAGE --push ghcr.io/xe/x/amano:latest
+
 aura:
     FROM +runtime
 
@@ -139,6 +149,16 @@ sapientwindex:
     LABEL org.opencontainers.image.source="https://github.com/Xe/x"
 
     SAVE IMAGE --push ghcr.io/xe/x/sapientwindex:latest
+
+stealthmountain:
+    FROM +runtime
+
+    COPY +everything/bin/stealthmountain /app/bin/stealthmountain
+    CMD ["/app/bin/stealthmountain"]
+
+    LABEL org.opencontainers.image.source="https://github.com/Xe/x"
+
+    SAVE IMAGE --push ghcr.io/xe/x/stealthmountain:latest
 
 todayinmarch2020:
     FROM +runtime
