@@ -12,10 +12,10 @@ import (
 	comatproto "github.com/bluesky-social/indigo/api/atproto"
 	bskyData "github.com/bluesky-social/indigo/api/bsky"
 	jsModels "github.com/bluesky-social/jetstream/pkg/models"
-	bsky "github.com/danrusei/gobot-bsky"
 	"github.com/goccy/go-json"
 	"github.com/nats-io/nats.go"
 	"within.website/x/internal"
+	bsky "within.website/x/web/bskybot"
 )
 
 const (
@@ -41,14 +41,6 @@ func main() {
 		"nats-url", *natsURL,
 	)
 
-	nc, err := nats.Connect(*natsURL)
-	if err != nil {
-		slog.Error("can't connect to NATS", "err", err)
-		os.Exit(1)
-	}
-	defer nc.Close()
-	slog.Info("connected to NATS")
-
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
@@ -57,6 +49,14 @@ func main() {
 		slog.Error("can't auth to bluesky", "err", err)
 		os.Exit(1)
 	}
+
+	nc, err := nats.Connect(*natsURL)
+	if err != nil {
+		slog.Error("can't connect to NATS", "err", err)
+		os.Exit(1)
+	}
+	defer nc.Close()
+	slog.Info("connected to NATS")
 
 	sub, err := nc.SubscribeSync(PostTopic)
 	if err != nil {
@@ -126,22 +126,8 @@ func main() {
 
 func bskyAuth(ctx context.Context, pds, handle, authkey string) (*bsky.BskyAgent, error) {
 	bluesky := bsky.NewAgent(ctx, pds, handle, authkey)
-	if err := bluesky.Connect(ctx); err != nil {
-		slog.Error("failed to connect to bluesky", "err", err)
-		return nil, err
-	}
 
-	go func() {
-		ctx, cancel := context.WithCancel(context.Background())
-		defer cancel()
-		t := time.NewTicker(5 * time.Minute)
-		defer t.Stop()
-		for range t.C {
-			if err := bluesky.Connect(ctx); err != nil {
-				slog.Error("can't reauth to bluesky", "err", err)
-			}
-		}
-	}()
+	slog.Debug("connecting to bluesky server", "pds", pds, "handle", handle)
 
 	if err := bluesky.Connect(ctx); err != nil {
 		slog.Error("failed to connect to bluesky", "err", err)
