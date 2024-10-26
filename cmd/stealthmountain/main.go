@@ -3,13 +3,11 @@ package main
 import (
 	"context"
 	"flag"
-	"fmt"
 	"log/slog"
 	"os"
 	"regexp"
 	"time"
 
-	comatproto "github.com/bluesky-social/indigo/api/atproto"
 	bskyData "github.com/bluesky-social/indigo/api/bsky"
 	jsModels "github.com/bluesky-social/jetstream/pkg/models"
 	"github.com/goccy/go-json"
@@ -94,27 +92,12 @@ func main() {
 
 		actorID := m.Header.Get("bsky-actor-did")
 		slog.Info("found a stealth mountain!", "id", commit.Rev, "actor", actorID)
-		reply, err := bsky.NewPostBuilder(`I think you mean "sneak peek"`).Build()
+		reply, err := bsky.NewPostBuilder(`I think you mean "sneak peek"`).
+			InReplyTo(post, actorID, commit.CID, commit.RKey).
+			Build()
 		if err != nil {
 			slog.Error("can't build reply post", "err", err)
 		}
-		parent := comatproto.RepoStrongRef{
-			LexiconTypeID: "app.bsky.feed.post",
-			Uri:           fmt.Sprintf("at://%s/app.bsky.feed.post/%s", actorID, commit.RKey),
-			Cid:           commit.CID,
-		}
-		root := parent
-
-		if post.Reply != nil {
-			root = *post.Reply.Root
-		}
-
-		reply.Reply = &bskyData.FeedPost_ReplyRef{
-			Parent: &parent,
-			Root:   &root,
-		}
-
-		reply.CreatedAt = time.Now().UTC().Format(time.RFC3339)
 
 		cid, uri, err := bsAgent.PostToFeed(ctx, reply)
 		if err != nil {

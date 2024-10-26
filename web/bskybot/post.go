@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/bluesky-social/indigo/api/atproto"
 	appbsky "github.com/bluesky-social/indigo/api/bsky"
 	lexutil "github.com/bluesky-social/indigo/lex/util"
 	"github.com/bluesky-social/indigo/util"
@@ -27,6 +28,8 @@ type PostBuilder struct {
 	Text  string
 	Facet []Facet
 	Embed Embed
+	Time  time.Time
+	Reply *appbsky.FeedPost_ReplyRef
 }
 
 type Facet struct {
@@ -62,7 +65,6 @@ func NewPostBuilder(text string) PostBuilder {
 
 // Create a Richtext Post with facests
 func (pb PostBuilder) WithFacet(ftype Facet_Type, value string, text string) PostBuilder {
-
 	pb.Facet = append(pb.Facet, Facet{
 		Ftype:   ftype,
 		Value:   value,
@@ -74,7 +76,6 @@ func (pb PostBuilder) WithFacet(ftype Facet_Type, value string, text string) Pos
 
 // Create a Post with external links
 func (pb PostBuilder) WithExternalLink(title string, link url.URL, description string) PostBuilder {
-
 	pb.Embed.Link.Title = title
 	pb.Embed.Link.Uri = link
 	pb.Embed.Link.Description = description
@@ -84,21 +85,50 @@ func (pb PostBuilder) WithExternalLink(title string, link url.URL, description s
 
 // Create a Post with images
 func (pb PostBuilder) WithImages(blobs []lexutil.LexBlob, images []Image) PostBuilder {
-
 	pb.Embed.Images = images
 	pb.Embed.UploadedImages = blobs
 
 	return pb
 }
 
+// Create a post in reply to another post
+func (pb PostBuilder) InReplyTo(post appbsky.FeedPost, actorID, cid, rkey string) PostBuilder {
+	parent := atproto.RepoStrongRef{
+		LexiconTypeID: "app.bsky.feed.post",
+		Uri:           fmt.Sprintf("at://%s/app.bsky.feed.post/%s", actorID, rkey),
+		Cid:           cid,
+	}
+	root := parent
+
+	if post.Reply != nil {
+		root = *post.Reply.Root
+	}
+
+	pb.Reply = &appbsky.FeedPost_ReplyRef{
+		Parent: &parent,
+		Root:   &root,
+	}
+
+	return pb
+}
+
+func (pb PostBuilder) AtTime(t time.Time) PostBuilder {
+	pb.Time = t
+	return pb
+}
+
 // Build the request
 func (pb PostBuilder) Build() (appbsky.FeedPost, error) {
-
 	post := appbsky.FeedPost{}
 
 	post.Text = pb.Text
 	post.LexiconTypeID = "app.bsky.feed.post"
-	post.CreatedAt = time.Now().Format(util.ISO8601)
+	if pb.Time.IsZero() {
+		pb.Time = time.Now().UTC()
+	}
+	post.CreatedAt = pb.Time.UTC().Format(util.ISO8601)
+
+	post.Reply = pb.Reply
 
 	// RichtextFacet Section
 	// https://docs.bsky.app/docs/advanced-guides/post-richtext
@@ -167,7 +197,6 @@ func (pb PostBuilder) Build() (appbsky.FeedPost, error) {
 	// As of now it allows only one Embed type per post:
 	// https://github.com/bluesky-social/indigo/blob/main/api/bsky/feedpost.go
 	if pb.Embed.Link != (Link{}) {
-
 		FeedPost_Embed.EmbedExternal = &appbsky.EmbedExternal{
 			LexiconTypeID: "app.bsky.embed.external",
 			External: &appbsky.EmbedExternal_External{
@@ -217,6 +246,7 @@ func (f Facet_Type) String() string {
 		return "Unknown"
 	}
 }
+
 func findSubstring(s, substr string) (int, int, error) {
 	index := strings.Index(s, substr)
 	if index == -1 {

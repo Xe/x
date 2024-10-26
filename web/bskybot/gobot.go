@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"log/slog"
 	"net/http"
@@ -74,7 +74,7 @@ func (c *BskyAgent) Connect(ctx context.Context) error {
 	c.lock.Lock()
 	defer c.lock.Unlock()
 
-	if c.t == nil {
+	if c.t != nil {
 		return nil
 	}
 
@@ -102,6 +102,7 @@ func (c *BskyAgent) refreshAuth(ctx context.Context) error {
 	c.lock.Lock()
 	defer c.lock.Unlock()
 
+	c.client.Auth.AccessJwt = c.client.Auth.RefreshJwt
 	resp, err := atproto.ServerRefreshSession(ctx, c.client)
 	if err != nil {
 		return err
@@ -157,6 +158,10 @@ func (c *BskyAgent) PostToFeed(ctx context.Context, post appbsky.FeedPost) (stri
 	return response.Cid, response.Uri, nil
 }
 
+func (c *BskyAgent) Client() *xrpc.Client {
+	return c.client
+}
+
 func getImageAsBuffer(imageURL string) ([]byte, error) {
 	// Fetch image
 	response, err := http.Get(imageURL)
@@ -171,7 +176,7 @@ func getImageAsBuffer(imageURL string) ([]byte, error) {
 	}
 
 	// Read response body
-	imageData, err := ioutil.ReadAll(response.Body)
+	imageData, err := io.ReadAll(response.Body)
 	if err != nil {
 		return nil, err
 	}
