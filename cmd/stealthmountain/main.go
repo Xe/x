@@ -88,39 +88,41 @@ func main() {
 			continue
 		}
 
-		if sneakPeakRegex.MatchString(post.Text) {
-			actorID := m.Header.Get("bsky-actor-did")
-			slog.Info("found a stealth mountain!", "id", commit.Rev, "actor", actorID)
-			reply, err := bsky.NewPostBuilder(`I think you mean "sneak peek"`).Build()
-			if err != nil {
-				slog.Error("can't build reply post", "err", err)
-			}
-			parent := comatproto.RepoStrongRef{
-				LexiconTypeID: "app.bsky.feed.post",
-				Uri:           fmt.Sprintf("at://%s/app.bsky.feed.post/%s", actorID, commit.RKey),
-				Cid:           commit.CID,
-			}
-			root := parent
-
-			if post.Reply != nil {
-				root = *post.Reply.Root
-			}
-
-			reply.Reply = &bskyData.FeedPost_ReplyRef{
-				Parent: &parent,
-				Root:   &root,
-			}
-
-			reply.CreatedAt = time.Now().UTC().Format(time.RFC3339)
-
-			cid, uri, err := bsAgent.PostToFeed(ctx, reply)
-			if err != nil {
-				slog.Error("cannot post to feed", "err", err)
-				continue
-			}
-
-			slog.Info("posted to bluesky", "bluesky_cid", cid, "bluesky_uri", uri)
+		if !sneakPeakRegex.MatchString(post.Text) {
+			continue
 		}
+
+		actorID := m.Header.Get("bsky-actor-did")
+		slog.Info("found a stealth mountain!", "id", commit.Rev, "actor", actorID)
+		reply, err := bsky.NewPostBuilder(`I think you mean "sneak peek"`).Build()
+		if err != nil {
+			slog.Error("can't build reply post", "err", err)
+		}
+		parent := comatproto.RepoStrongRef{
+			LexiconTypeID: "app.bsky.feed.post",
+			Uri:           fmt.Sprintf("at://%s/app.bsky.feed.post/%s", actorID, commit.RKey),
+			Cid:           commit.CID,
+		}
+		root := parent
+
+		if post.Reply != nil {
+			root = *post.Reply.Root
+		}
+
+		reply.Reply = &bskyData.FeedPost_ReplyRef{
+			Parent: &parent,
+			Root:   &root,
+		}
+
+		reply.CreatedAt = time.Now().UTC().Format(time.RFC3339)
+
+		cid, uri, err := bsAgent.PostToFeed(ctx, reply)
+		if err != nil {
+			slog.Error("cannot post to feed", "err", err)
+			continue
+		}
+
+		slog.Info("posted to bluesky", "bluesky_cid", cid, "bluesky_uri", uri)
 	}
 }
 
