@@ -101,6 +101,7 @@ func handleEvent(nc *nats.Conn) func(ctx context.Context, ev *jsModels.Event) er
 			m := nats.NewMsg(subject)
 			m.Data = data
 			m.Header.Set("bsky-actor-did", ev.Did)
+			m.Header.Set("bsky-commit-collection", ev.Commit.Collection)
 
 			if err := nc.PublishMsg(m); err != nil {
 				return fmt.Errorf("can't publish %q event: %w", subject, err)
