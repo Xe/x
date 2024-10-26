@@ -79,7 +79,7 @@ func handleEvent(nc *nats.Conn) func(ctx context.Context, ev *jsModels.Event) er
 				return fmt.Errorf("can't marshal account event: %w", err)
 			}
 
-			if err := nc.Publish("amano:account", data); err != nil {
+			if err := nc.Publish("amano.account", data); err != nil {
 				return fmt.Errorf("can't publish account event: %w", err)
 			}
 		case "identity":
@@ -88,11 +88,11 @@ func handleEvent(nc *nats.Conn) func(ctx context.Context, ev *jsModels.Event) er
 				return fmt.Errorf("can't marshal identity event: %w", err)
 			}
 
-			if err := nc.Publish("amano:identity", data); err != nil {
+			if err := nc.Publish("amano.identity", data); err != nil {
 				return fmt.Errorf("can't publish identity event: %w", err)
 			}
 		case "commit":
-			subject := fmt.Sprintf("amano:commit:%s", ev.Commit.Collection)
+			subject := fmt.Sprintf("amano.commit.%s", ev.Commit.Collection)
 			data, err := json.Marshal(ev.Commit)
 			if err != nil {
 				return fmt.Errorf("can't marshal commit event: %w", err)

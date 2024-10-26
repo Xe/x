@@ -19,7 +19,7 @@ import (
 )
 
 const (
-	PostTopic = "amano:commit:app.bsky.feed.post"
+	PostTopic = "amano.commit.app.bsky.feed.post"
 )
 
 var (
