@@ -1,0 +1,10 @@
+namespace: external-dns
+resources:
+  - 1password.yaml
+  - clusterrole.yaml
+  - clusterrolebinding.yaml
+  - crd.yaml
+  - deployment-crd.yaml
+  - deployment-ingress.yaml
+  - namespace.yaml
+  - serviceaccount.yaml
