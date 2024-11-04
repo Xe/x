@@ -89,6 +89,8 @@ func main() {
 		BlueskyAuthkey:  *blueskyAuthkey,
 		BlueskyHandle:   *blueskyHandle,
 		BlueskyPDS:      *blueskyPDS,
+		MastodonToken:   *mastodonToken,
+		MastodonURL:     *mastodonURL,
 		MimiAnnounceURL: *mimiAnnounceURL,
 	})
 	if err != nil {

@@ -1,0 +1,6 @@
+namespace: default
+resources:
+  - 1password.yaml
+  - certificate.yaml
+  - deployment.yaml
+  - service.yaml

@@ -1,0 +1,82 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pullthru-docker-hub
+  annotations:
+    operator.1password.io/auto-restart: "true"
+    keel.sh/policy: all
+    keel.sh/trigger: poll
+    keel.sh/pollSchedule: "@hourly"
+  labels:
+    app.kubernetes.io/name: pullthru-docker-hub
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: pullthru-docker-hub
+  replicas: 1
+  template:      
+    metadata:
+      labels:
+        app.kubernetes.io/name: pullthru-docker-hub
+    spec:
+      securityContext:
+        fsGroup: 1000
+      imagePullSecrets:
+        - name: regcred
+      volumes:
+        - name: internal-certs
+          secret:
+            secretName: pt-dh-internal-tls
+      containers:
+        - name: registry
+          image: registry:2
+          imagePullPolicy: "Always"
+          resources:
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
+          envFrom:
+            - secretRef:
+                name: pullthru-docker-hub
+        - name: relayd
+          image: ghcr.io/xe/x/relayd:latest
+          imagePullPolicy: "Always"
+          resources:
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
+          env:
+            - name: BIND
+              value: ":8443"
+            - name: PROXY_TO
+              value: "http://localhost:5000"
+          volumeMounts:
+            - name: "internal-certs"
+              mountPath: "/xe/pki"
+              readOnly: true

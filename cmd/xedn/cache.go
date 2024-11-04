@@ -146,7 +146,6 @@ func (dc *Cache) Load(dir string, w io.Writer) error {
 
 		if t.Before(now) {
 			tx.DeleteBucket([]byte(dir))
-			fileDeaths.Get(dir).Add(1)
 			return ErrNotCached
 		}
 
@@ -183,7 +182,6 @@ func (dc *Cache) Load(dir string, w io.Writer) error {
 
 		w.Write(data)
 		cacheHits.Add(1)
-		fileHits.Add(dir, 1)
 
 		return nil
 	})
@@ -294,7 +292,6 @@ func (dc *Cache) CronPurgeDead() {
 						return fmt.Errorf("when trying to delete bucket %s: %w", string(name), err)
 					}
 
-					fileDeaths.Add(string(name), 1)
 					lg.Info("deleted", "diesAt", diesAt)
 				}
 

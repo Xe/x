@@ -29,7 +29,7 @@ spec:
             secretName: registry-internal-tls
       containers:
         - name: registry
-          image: registrxe.fly.dev/registry:2
+          image: registry:2
           imagePullPolicy: "Always"
           resources:
             limits:

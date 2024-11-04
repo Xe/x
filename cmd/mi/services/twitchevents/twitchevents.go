@@ -18,8 +18,14 @@ import (
 	"github.com/nicklaw5/helix/v2"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
+	"golang.org/x/sync/errgroup"
 	"within.website/x/cmd/mi/models"
 	"within.website/x/proto/mimi/announce"
+	"within.website/x/web/mastodon"
+)
+
+const (
+	streamAnnouncement = "Xe is live on Twitch! https://twitch.tv/princessxen"
 )
 
 var (
@@ -28,22 +34,19 @@ var (
 		Help: "Number of twitch events ever processed",
 	}, []string{"messageType"})
 
-	twitchEventsErrors = promauto.NewGaugeVec(prometheus.GaugeOpts{
-		Name: "mi_twitch_events_errors",
-		Help: "Number of twitch events that caused errors",
-	}, []string{"messageType"})
-
 	twitchClientID      = flag.String("twitch-client-id", "", "twitch.tv client ID")
 	twitchClientSecret  = flag.String("twitch-client-secret", "", "twitch.tv client secret")
 	twitchUserID        = flag.Int("twitch-user-id", 105794391, "twitch.tv user ID")
 	twitchWebhookSecret = flag.String("twitch-webhook-secret", "", "twitch.tv webhook secret")
-	twitchWebhookURL    = flag.String("twitch-events-webhook-url", "https://shiroko-wsl.shark-harmonic.ts.net/twitch", "URL for Twitch events to be pushed to")
+	twitchWebhookURL    = flag.String("twitch-webhook-url", "", "URL for Twitch events to be pushed to")
 )
 
 type Config struct {
 	BlueskyAuthkey  string
 	BlueskyHandle   string
 	BlueskyPDS      string
+	MastodonToken   string
+	MastodonURL     string
 	MimiAnnounceURL string
 }
 
@@ -63,10 +66,11 @@ func (c Config) BlueskyAgent(ctx context.Context) (*bsky.BskyAgent, error) {
 }
 
 type Server struct {
-	dao    *models.DAO
-	mimi   announce.Announce
-	cfg    Config
-	twitch *helix.Client
+	dao      *models.DAO
+	mimi     announce.Post
+	mastodon *mastodon.Client
+	cfg      Config
+	twitch   *helix.Client
 }
 
 func New(ctx context.Context, dao *models.DAO, cfg Config) (*Server, error) {
@@ -88,11 +92,17 @@ func New(ctx context.Context, dao *models.DAO, cfg Config) (*Server, error) {
 
 	twitch.SetAppAccessToken(resp.Data.AccessToken)
 
+	mas, err := mastodon.Authenticated("mi_irl", "https://xeiaso.net", cfg.MastodonURL, cfg.MastodonToken)
+	if err != nil {
+		return nil, fmt.Errorf("failed to authenticate to mastodon: %w", err)
+	}
+
 	s := &Server{
-		dao:    dao,
-		mimi:   announce.NewAnnounceProtobufClient(cfg.MimiAnnounceURL, &http.Client{}),
-		cfg:    cfg,
-		twitch: twitch,
+		dao:      dao,
+		mimi:     announce.NewPostProtobufClient(cfg.MimiAnnounceURL, &http.Client{}),
+		mastodon: mas,
+		cfg:      cfg,
+		twitch:   twitch,
 	}
 
 	if err := s.maybeCreateWebhookSubscription(); err != nil {
@@ -216,6 +226,8 @@ func (s *Server) handleNotification(ctx context.Context, lg *slog.Logger, w http
 		return fmt.Errorf("can't decode notification: %w", err)
 	}
 
+	lg = lg.With("event", data.Subscription.Type)
+
 	var err error
 	switch data.Subscription.Type {
 	case "stream.online":
@@ -223,7 +235,7 @@ func (s *Server) handleNotification(ctx context.Context, lg *slog.Logger, w http
 		if err := json.Unmarshal(data.Event, &ev); err != nil {
 			return fmt.Errorf("can't unmarshal event: %w", err)
 		}
-		err = s.handleStreamUp(ctx, lg, w, &ev)
+		err = s.handleStreamUp(ctx, lg, &ev)
 	default:
 		lg.Error("unknown event", "event", data.Subscription.Type, "data", data.Event)
 	}
@@ -237,44 +249,78 @@ func (s *Server) handleNotification(ctx context.Context, lg *slog.Logger, w http
 	return nil
 }
 
-func (s *Server) handleStreamUp(ctx context.Context, lg *slog.Logger, w http.ResponseWriter, ev *helix.EventSubStreamOnlineEvent) error {
+func (s *Server) handleStreamUp(ctx context.Context, lg *slog.Logger, ev *helix.EventSubStreamOnlineEvent) error {
 	lg.Info("broadcaster went online!", "username", ev.BroadcasterUserLogin)
 
-	bs, err := s.cfg.BlueskyAgent(ctx)
-	if err != nil {
-		return fmt.Errorf("can't create bluesky agent: %w", err)
+	g, gCtx := errgroup.WithContext(ctx)
+
+	g.Go(func() error {
+		post, err := s.mastodon.CreateStatus(gCtx, mastodon.CreateStatusParams{
+			Status: streamAnnouncement,
+		})
+		if err != nil {
+			slog.Error("failed to announce to mastodon", "err", err)
+			return err
+		}
+		slog.Info("posted to mastodon", "mastodon_url", post.URL)
+		return nil
+	})
+
+	g.Go(func() error {
+		bs, err := s.cfg.BlueskyAgent(gCtx)
+		if err != nil {
+			return fmt.Errorf("can't create bluesky agent: %w", err)
+		}
+
+		u, err := url.Parse("https://twitch.tv/princessxen")
+		if err != nil {
+			return fmt.Errorf("[unexpected] can't create twitch URL: %w", err)
+		}
+
+		q := u.Query()
+		q.Set("utm_campaign", "mi_irl")
+		q.Set("utm_medium", "social")
+		q.Set("utm_source", "bluesky")
+		u.RawQuery = q.Encode()
+
+		var sb strings.Builder
+		fmt.Fprintln(&sb, "Xe is live on stream!")
+		fmt.Fprintln(&sb)
+		fmt.Fprint(&sb, u.String())
+
+		post, err := bsky.NewPostBuilder(sb.String()).
+			WithExternalLink("twitch.tv - princessxen", *u, "Xe on Twitch!").
+			WithFacet(bsky.Facet_Link, u.String(), u.String()).
+			Build()
+		if err != nil {
+			return fmt.Errorf("can't build post: %w", err)
+		}
+
+		cid, uri, err := bs.PostToFeed(gCtx, post)
+		if err != nil {
+			return fmt.Errorf("can't post to feed: %w", err)
+		}
+
+		lg.Info("posted to bluesky", "bluesky_cid", cid, "bluesky_uri", uri, "body", sb.String())
+
+		return nil
+	})
+
+	g.Go(func() error {
+		if _, err := s.mimi.Post(gCtx, &announce.StatusUpdate{
+			Body: streamAnnouncement,
+		}); err != nil {
+			return fmt.Errorf("can't announce to Mimi: %w", err)
+		}
+
+		lg.Info("posted to Mimi")
+
+		return nil
+	})
+
+	if err := g.Wait(); err != nil {
+		return err
 	}
-
-	u, err := url.Parse("https://twitch.tv/" + ev.BroadcasterUserLogin)
-	if err != nil {
-		return fmt.Errorf("[unexpected] can't create twitch URL: %w", err)
-	}
-
-	q := u.Query()
-	q.Set("utm_campaign", "mi_irl")
-	q.Set("utm_medium", "social")
-	q.Set("utm_source", "bluesky")
-	u.RawQuery = q.Encode()
-
-	var sb strings.Builder
-	fmt.Fprintln(&sb, "Xe is live on stream!")
-	fmt.Fprintln(&sb)
-	fmt.Fprint(&sb, u.String())
-
-	post, err := bsky.NewPostBuilder(sb.String()).
-		WithExternalLink("twitch.tv - princessxen", *u, "Xe on Twitch!").
-		WithFacet(bsky.Facet_Link, u.String(), u.String()).
-		Build()
-	if err != nil {
-		return fmt.Errorf("can't build post: %w", err)
-	}
-
-	cid, uri, err := bs.PostToFeed(ctx, post)
-	if err != nil {
-		return fmt.Errorf("can't post to feed: %w", err)
-	}
-
-	lg.Info("posted to bluesky", "bluesky_cid", cid, "bluesky_uri", uri, "body", sb.String())
 
 	return nil
 }

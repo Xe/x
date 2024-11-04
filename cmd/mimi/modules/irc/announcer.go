@@ -22,8 +22,11 @@ var (
 func (m *Module) RegisterHTTP(mux *http.ServeMux) {
 	var h http.Handler = announce.NewAnnounceServer(&AnnounceService{Module: m})
 	h = xinternal.PasswordMiddleware(*ircAnnouncerUsername, *ircAnnouncerPassword, h)
+	var postH http.Handler = announce.NewPostServer(&PostService{Module: m})
+	postH = xinternal.PasswordMiddleware(*ircAnnouncerUsername, *ircAnnouncerPassword, postH)
 
 	mux.Handle(announce.AnnouncePathPrefix, h)
+	mux.Handle(announce.PostPathPrefix, postH)
 }
 
 type AnnounceService struct {

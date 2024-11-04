@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: amano
+spec:
+  selector:
+    matchLabels:
+      app: amano
+  template:
+    metadata:
+      labels:
+        app: amano
+    spec:
+      containers:
+      - name: amano
+        image: ghcr.io/xe/x/amano
+        imagePullPolicy: Always
+        securityContext:
+          runAsUser: 1000
+          runAsGroup: 1000
+          runAsNonRoot: true
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - ALL
+          seccompProfile:
+            type: RuntimeDefault
+        resources:
+          limits:
+            memory: "512Mi"
+            cpu: "2"
+          requests:
+            memory: "256Mi"
+            cpu: "2"
+        env:
+          - name: "NATS_URL"
+            value: "nats://nats.future-sight.svc.alrest.xeserv.us:4222"

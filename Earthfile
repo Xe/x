@@ -42,6 +42,16 @@ aerial:
 
     SAVE IMAGE --push ghcr.io/xe/x/aerial:latest
 
+amano:
+    FROM +runtime
+
+    COPY +everything/bin/amano /app/bin/amano
+    CMD ["/app/bin/amano"]
+
+    LABEL org.opencontainers.image.source="https://github.com/Xe/x"
+
+    SAVE IMAGE --push ghcr.io/xe/x/amano:latest
+
 aura:
     FROM +runtime
 
@@ -140,6 +150,16 @@ sapientwindex:
 
     SAVE IMAGE --push ghcr.io/xe/x/sapientwindex:latest
 
+stealthmountain:
+    FROM +runtime
+
+    COPY +everything/bin/stealthmountain /app/bin/stealthmountain
+    CMD ["/app/bin/stealthmountain"]
+
+    LABEL org.opencontainers.image.source="https://github.com/Xe/x"
+
+    SAVE IMAGE --push ghcr.io/xe/x/stealthmountain:latest
+
 todayinmarch2020:
     FROM +runtime
 
@@ -220,6 +240,7 @@ xedn:
 
 all:
     BUILD --platform=linux/amd64 +aerial
+    BUILD --platform=linux/amd64 +amano
     BUILD --platform=linux/amd64 +aura
     BUILD --platform=linux/amd64 +future-sight
     BUILD --platform=linux/amd64 +hdrwtch
@@ -229,6 +250,7 @@ all:
     BUILD --platform=linux/amd64 +relayd
     BUILD --platform=linux/amd64 +sanguisuga
     BUILD --platform=linux/amd64 +sapientwindex
+    BUILD --platform=linux/amd64 +stealthmountain
     BUILD --platform=linux/amd64 +todayinmarch2020
     BUILD --platform=linux/amd64 +within-website
     BUILD --platform=linux/amd64 +xedn

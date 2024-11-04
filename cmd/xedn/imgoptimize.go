@@ -22,7 +22,6 @@ import (
 	"github.com/gen2brain/webp"
 	"go.etcd.io/bbolt"
 	"golang.org/x/sync/singleflight"
-	"tailscale.com/metrics"
 )
 
 type OptimizedImageServer struct {
@@ -31,11 +30,6 @@ type OptimizedImageServer struct {
 	PNGEnc *png.Encoder
 	group  *singleflight.Group
 }
-
-var (
-	OISFileConversions = metrics.LabelMap{Label: "format"}
-	OISFileHits        = metrics.LabelMap{Label: "path"}
-)
 
 func (ois *OptimizedImageServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// /sticker/character/mood/width
@@ -88,7 +82,6 @@ func (ois *OptimizedImageServer) ServeHTTP(w http.ResponseWriter, r *http.Reques
 	w.Header().Set("Etag", fmt.Sprintf(`W/"%s"`, Hash(r.URL.Path)))
 	w.WriteHeader(http.StatusOK)
 	w.Write(data)
-	OISFileHits.Add(r.URL.Path, 1)
 }
 
 func (ois *OptimizedImageServer) ResizeTo(widthPixels int, character, mood, format string) ([]byte, error) {
@@ -150,8 +143,6 @@ func (ois *OptimizedImageServer) ResizeTo(widthPixels int, character, mood, form
 		default:
 			return nil, fmt.Errorf("i don't know how to render to %s yet, sorry", format)
 		}
-
-		OISFileConversions.Add(format, 1)
 
 		err = ois.DB.Update(func(tx *bbolt.Tx) error {
 			bkt, err := tx.CreateBucketIfNotExists([]byte("sticker_cache"))

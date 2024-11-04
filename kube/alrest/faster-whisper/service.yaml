@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: faster-whisper
+spec:
+  type: ClusterIP
+  selector:
+    app: faster-whisper
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8000

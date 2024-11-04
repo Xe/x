@@ -6,3 +6,4 @@ resources:
   - external-dns.yaml
   - ingress.yaml
   - service.yaml
+  - pull-through/dockerhub
