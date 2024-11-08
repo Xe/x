@@ -25,7 +25,7 @@ spec:
         - --provider=aws
         - --registry=dynamodb
         - --dynamodb-region=ca-central-1
-        - --dynamodb-table=external-dns-crd-rhadamanthus
+        - --dynamodb-table=external-dns-crd-aeacus
         env:
         - name: AWS_REGION
           value: us-east-1
