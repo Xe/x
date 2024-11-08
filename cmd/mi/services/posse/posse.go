@@ -65,14 +65,16 @@ func New(ctx context.Context, dao *models.DAO, cfg Config) (*Announcer, error) {
 }
 
 func (a *Announcer) Announce(ctx context.Context, it *jsonfeed.Item) (*emptypb.Empty, error) {
-	switch {
-	case strings.Contains(it.GetUrl(), "svc.alrest.xeserv.us"),
-		strings.Contains(it.GetUrl(), "shark-harmonic.ts.net"),
-		strings.Contains(it.GetUrl(), "preview.xeiaso.net"):
-		slog.Info("skipping announcement", "url", it.GetUrl(), "reason", "staging URLs")
+	u, err := url.Parse(it.GetUrl())
+	if err != nil {
+		slog.Error("[unexpected] can't parse URL", "err", err, "url", it.GetUrl())
 		return &emptypb.Empty{}, nil
 	}
 
+	if u.Host != "xeiaso.net" {
+		slog.Info("skipping announcement", "url", it.GetUrl(), "reason", "non-prod URLs")
+		return &emptypb.Empty{}, nil
+	}
 	if has, err := a.dao.HasBlogpost(ctx, it.GetUrl()); err != nil {
 		return nil, err
 	} else if has {
