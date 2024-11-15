@@ -156,7 +156,7 @@ func (a *Announcer) Announce(ctx context.Context, it *jsonfeed.Item) (*emptypb.E
 	g.Go(func() error {
 		if _, err := a.mimi.Announce(gCtx, it); err != nil {
 			slog.Error("failed to announce to mimi", "err", err)
-			return err
+			return nil
 		}
 		possePosts.WithLabelValues("irc").Inc()
 		return nil
