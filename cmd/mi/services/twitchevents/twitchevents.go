@@ -310,7 +310,8 @@ func (s *Server) handleStreamUp(ctx context.Context, lg *slog.Logger, ev *helix.
 		if _, err := s.mimi.Post(gCtx, &announce.StatusUpdate{
 			Body: streamAnnouncement,
 		}); err != nil {
-			return fmt.Errorf("can't announce to Mimi: %w", err)
+			slog.Error("can't announce to Mimi", "err", err)
+			return nil
 		}
 
 		lg.Info("posted to Mimi")

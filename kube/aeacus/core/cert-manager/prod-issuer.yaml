@@ -1,0 +1,24 @@
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-prod
+spec:
+  acme:
+    # The ACME server URL
+    server: https://acme-v02.api.letsencrypt.org/directory
+    # Email address used for ACME registration
+    email: me@xeiaso.net
+    # Name of a secret used to store the ACME account private key
+    privateKeySecretRef:
+      name: letsencrypt-prod
+    # Enable the HTTP-01 challenge provider
+    solvers:
+      - dns01:
+          route53:
+            region: ca-central-1
+            accessKeyIDSecretRef:
+              name: aws-creds
+              key: AWS_ACCESS_KEY_ID
+            secretAccessKeySecretRef:
+              name: aws-creds
+              key: AWS_SECRET_ACCESS_KEY
