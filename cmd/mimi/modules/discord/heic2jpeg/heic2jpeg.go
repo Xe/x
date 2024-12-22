@@ -99,7 +99,7 @@ func (m *Module) heic2jpeg(s *discordgo.Session, mc *discordgo.MessageCreate) {
 		}
 
 		// convert the image
-		cmd := exec.CommandContext(ctx, "magick", fname, "-quality", "80%", fnameJPEG)
+		cmd := exec.CommandContext(ctx, "convert", fname, "-quality", "80%", fnameJPEG)
 		if err := cmd.Run(); err != nil {
 			s.ChannelMessageSend(mc.ChannelID, "failed to convert image")
 			slog.Error("failed to convert image", "err", err)
