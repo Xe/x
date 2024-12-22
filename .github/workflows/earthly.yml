@@ -1,0 +1,42 @@
+name: Docker image updates
+
+on:
+  push:
+    branches: [ "master" ]
+    # Publish semver tags as releases.
+    tags: [ 'v*.*.*' ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+    runs-on: alrest-x
+    permissions:
+      contents: read
+      packages: write
+    env:
+      EARTHLY_TOKEN: ${{ secrets.EARTHLY_TOKEN }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - uses: earthly/actions-setup@v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          version: "latest" # or pin to an specific version, e.g. "0.8.1"
+      - name: Log into registry 
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push Docker image
+        if: github.event_name != 'pull_request'
+        id: build-and-push
+        run: |
+          earthly --org me-2625 --sat alpha --ci --push +all
+      - name: Build Docker image
+        if: github.event_name == 'pull_request'
+        id: build
+        run: |
+          earthly --org me-2625 --sat alpha --ci +all
