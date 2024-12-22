@@ -35,7 +35,7 @@ jobs:
             /home/linuxbrew/.linuxbrew/sbin
             /home/linuxbrew/.linuxbrew/share
             /home/linuxbrew/.linuxbrew/var
-          key: ${{ runner.os }}-homebrew-cellar-${{ hashFiles('Brewfile.lock.json') }}
+          key: ${{ runner.os }}-homebrew-cellar-${{ hashFiles('go.sum') }}
           restore-keys: |
             ${{ runner.os }}-homebrew-cellar-
 
