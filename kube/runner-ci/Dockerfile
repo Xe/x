@@ -22,6 +22,8 @@ RUN \
   build-essential \
   && rm -rf /var/lib/apt/lists/*
 
+COPY daemon.json /etc/docker/daemon.json
+
 USER runner
 
 RUN /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
