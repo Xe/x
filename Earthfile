@@ -130,16 +130,6 @@ relayd:
 
     SAVE IMAGE --push ghcr.io/xe/x/relayd:latest
 
-sanguisuga:
-    FROM +runtime
-
-    COPY +everything/bin/sanguisuga /app/bin/sanguisuga
-    CMD ["/app/bin/sanguisuga"]
-
-    LABEL org.opencontainers.image.source="https://github.com/Xe/x"
-
-    SAVE IMAGE --push ghcr.io/xe/x/sanguisuga:latest
-
 sapientwindex:
     FROM +runtime
 
@@ -248,7 +238,6 @@ all:
     BUILD --platform=linux/amd64 +mi
     BUILD --platform=linux/amd64 +mimi
     BUILD --platform=linux/amd64 +relayd
-    BUILD --platform=linux/amd64 +sanguisuga
     BUILD --platform=linux/amd64 +sapientwindex
     BUILD --platform=linux/amd64 +stealthmountain
     BUILD --platform=linux/amd64 +todayinmarch2020
