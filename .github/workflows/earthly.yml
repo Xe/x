@@ -9,7 +9,7 @@ on:
     branches: [ "master" ]
 
 jobs:
-  build:
+  docker-build:
     runs-on: alrest-x
     permissions:
       contents: read
