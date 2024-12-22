@@ -6,8 +6,11 @@ on:
   pull_request:
     branches: [ "master" ]
 
-jobs:
+permissions:
+  contents: read
+  actions: write
 
+jobs:
   build:
     runs-on: alrest-x
     steps:
