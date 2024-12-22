@@ -1,8 +1,8 @@
 name: Regenerate actions-runner image
 
 on:
-  push:
-    branches: [ "master" ]
+  # push:
+  #   branches: [ "master" ]
   schedule:
     - cron: "0 0 1,8,15,22 * *"
 

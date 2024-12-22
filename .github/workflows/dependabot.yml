@@ -10,8 +10,8 @@ permissions:
 
 jobs:
   run-custom-command:
-    if: ${{ github.actor_id == '49699333' }}
-    runs-on: ubuntu-latest
+    if: ${{ github.actor_id == '49699333' }} # Dependabot
+    runs-on: alrest-x
     steps:
       - uses: actions/checkout@v3
         with:
