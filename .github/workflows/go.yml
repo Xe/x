@@ -36,7 +36,7 @@ jobs:
           /home/linuxbrew/.linuxbrew/var
         key: ${{ runner.os }}-homebrew-cellar-${{ hashFiles('go.sum') }}
         restore-keys: |
-          ${{ runner.os }}-homebrew-cellar-
+          ${{ runner.os }}-go-homebrew-cellar-
 
     - name: Install Brew dependencies
       run: |
