@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sftpgo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: sftpgo
+      app.kubernetes.io/instance: release-name
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: sftpgo
+        app.kubernetes.io/instance: release-name
+    spec:
+      hostNetwork: false
+      securityContext:
+        {}
+      containers:
+        - name: sftpgo
+          securityContext:
+            {}
+          image: "ghcr.io/drakkan/sftpgo:v2.5.4"
+          imagePullPolicy: IfNotPresent
+          args:
+            - sftpgo
+            - serve
+          env:
+            - name: SFTPGO_SFTPD__BINDINGS__0__PORT
+              value: "2022"
+            - name: SFTPGO_SFTPD__BINDINGS__0__ADDRESS
+              value: "0.0.0.0"
+            - name: SFTPGO_HTTPD__BINDINGS__0__PORT
+              value: "8080"
+            - name: SFTPGO_HTTPD__BINDINGS__0__ADDRESS
+              value: "0.0.0.0"
+            - name: SFTPGO_TELEMETRY__BIND_PORT
+              value: "10000"
+            - name: SFTPGO_TELEMETRY__BIND_ADDRESS
+              value: "0.0.0.0"
+          ports:
+            - name: sftp
+              containerPort: 2022
+              protocol: TCP
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+            - name: telemetry
+              containerPort: 10000
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: telemetry
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: telemetry
+          volumeMounts:
+            - name: config
+              mountPath: /etc/sftpgo/
+            - mountPath: /palworld
+              name: datadir
+      volumes:
+        - name: config
+          emptyDir: {}
+        - name: datadir
+          persistentVolumeClaim:
+            claimName: palworld-data

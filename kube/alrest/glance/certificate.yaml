@@ -1,0 +1,32 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: glance
+  namespace: default
+spec:
+  secretName: glance-tls
+
+  duration: 2160h # 90d
+  renewBefore: 360h # 15d
+
+  usages:
+    - digital signature
+    - key encipherment
+  dnsNames:
+    - glance.cetacean.club
+  issuerRef:
+    name: "letsencrypt-prod"
+    kind: ClusterIssuer
+    group: cert-manager.io
+---
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: glance
+spec:
+  endpoints:
+    - dnsName: glance.cetacean.club
+      recordTTL: 3600
+      recordType: A
+      targets:
+        - 10.215.240.10

@@ -1,0 +1,6 @@
+resources:
+  - certificate.yaml
+  - configmap.yaml
+  - deployment.yaml
+  - service.yaml
+namespace: default

@@ -1,0 +1,40 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: palworld-server
+  name: game
+spec:
+  ports:
+    - name: server
+      port: 8211
+      protocol: UDP
+      targetPort: server
+    - name: query
+      port: 27015
+      protocol: UDP
+      targetPort: query
+  selector:
+    app: palworld-server
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: game
+  name: server
+spec:
+  ports:
+    - name: server
+      port: 8211
+      protocol: UDP
+      targetPort: server
+    - name: query
+      port: 27015
+      protocol: UDP
+      targetPort: query
+  selector:
+    app: palworld-server
+  type: LoadBalancer
+  loadBalancerClass: tailscale

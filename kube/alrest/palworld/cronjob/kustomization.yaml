@@ -1,0 +1,7 @@
+namespace: palworld
+resources:
+  - configmap.yaml
+  - cronjob.yaml
+  - role.yaml
+  - rolebinding.yaml
+  - serviceaccount.yaml

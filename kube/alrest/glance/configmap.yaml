@@ -1,0 +1,63 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: glance
+data:
+  glance.yml: |
+    pages:
+      - name: Home
+        columns:
+          - size: small
+            widgets:
+              - type: search
+                search-engine: duckduckgo
+                bangs:
+                  - title: YouTube
+                    shortcut: "!yt"
+                    url: https://www.youtube.com/results?search_query={QUERY}
+
+              - type: calendar
+
+              - type: weather
+                location: Ottawa, Canada
+
+              - type: twitch-channels
+                channels:
+                  - lithiumfox
+                  - oatsngoats
+                  - gamesdonequick
+
+          - size: full
+            widgets:
+              - type: group
+                widgets:
+                  - type: hacker-news
+                    limit: 20
+                    collapse-after: 15
+                  - type: lobsters
+                    limit: 20
+                    collapse-after: 15
+                  - type: reddit
+                    subreddit: tulpas
+                    limit: 20
+                    collapse-after: 15
+                  - type: reddit
+                    subreddit: homelab
+                    limit: 20
+                    collapse-after: 15
+              
+          - size: small
+            widgets:
+              - type: reddit
+                subreddit: technology
+                style: vertical-cards
+                limit: 5
+
+    theme:
+      background-color: 50 1 6
+      primary-color: 24 97 58
+      negative-color: 209 88 54
+
+    branding:
+      custom-footer: |
+        <p>From Within</p>

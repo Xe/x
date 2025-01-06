@@ -1,7 +1,9 @@
 resources:
   - core
   - gitea
+  - glance
   - ollama
+  - palworld
   - pvfm
   - registry
   - staticsites

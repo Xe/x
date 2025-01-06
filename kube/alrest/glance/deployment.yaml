@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: glance
+spec:
+  selector:
+    matchLabels:
+      app: glance
+  template:
+    metadata:
+      labels:
+        app: glance
+    spec:
+      volumes:
+      - name: config
+        configMap:
+          name: glance
+      - name: internal-certs
+        secret:
+          secretName: glance-tls
+      containers:
+      - name: glance
+        image: glanceapp/glance:v0.6.4
+        imagePullPolicy: IfNotPresent
+        args:
+          - "--config=/app/etc/glance.yml"
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        volumeMounts:
+        - name: config
+          mountPath: "/app/etc"
+          readOnly: true
+        ports:
+        - containerPort: 8080
+      - name: relayd
+        image: ghcr.io/xe/x/relayd:latest
+        imagePullPolicy: "Always"
+        resources:
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+          requests:
+            cpu: "100m"
+            memory: "256Mi"
+        securityContext:
+          runAsUser: 1000
+          runAsGroup: 1000
+          runAsNonRoot: true
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - ALL
+          seccompProfile:
+            type: RuntimeDefault
+        env:
+          - name: BIND
+            value: ":8443"
+          - name: PROXY_TO
+            value: "http://localhost:8080"
+        volumeMounts:
+          - name: "internal-certs"
+            mountPath: "/xe/pki"
+            readOnly: true

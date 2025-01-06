@@ -4,4 +4,4 @@ metadata:
   name: aws-creds
   namespace: cert-manager
 spec:
-  itemPath: "vaults/lc5zo4zjz3if3mkeuhufjmgmui/items/3xn7uf73xnzholrfk6tla5rhpa"
+  itemPath: "vaults/lc5zo4zjz3if3mkeuhufjmgmui/items/4tyvezgvpl3qhceah3hh2jjapm"

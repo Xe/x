@@ -1,0 +1,8 @@
+namespace: palworld
+resources:
+  - 1password.yaml
+  - configmap.yaml
+  - deployment.yaml
+  - pvc.yaml
+  #- secret.yaml
+  - service.yaml

@@ -1,0 +1,4 @@
+namespace: palworld
+resources:
+  - deployment.yaml
+  - service.yaml
