@@ -13,7 +13,7 @@ spec:
     - digital signature
     - key encipherment
   dnsNames:
-    - registry.default.svc.alrest.xeserv.us
+    - registry.int.xeserv.us
   issuerRef:
     name: "letsencrypt-prod"
     kind: ClusterIssuer

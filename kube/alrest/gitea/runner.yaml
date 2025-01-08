@@ -3,7 +3,7 @@ kind: Secret
 metadata:
   name: runner-secret
 stringData:
-  token: "CY2fOnh2aP4scVZc9w4dEDkyxBGnsezNZqRWcKyi"
+  token: "6ALUVtYp8UAl5FHFUwGZ1lG03lMR2xta2cV9m2mW"
 type: Opaque
 ---
 apiVersion: v1
@@ -17,7 +17,7 @@ data:
     }
 ---
 apiVersion: apps/v1
-kind: Deployment
+kind: DaemonSet
 metadata:
   labels:
     app.kubernetes.io/name: act-runner
@@ -27,11 +27,9 @@ metadata:
     keel.sh/trigger: poll
     keel.sh/pollSchedule: "@hourly"
 spec:
-  replicas: 3
   selector:
     matchLabels:
       app.kubernetes.io/name: act-runner
-  strategy: {}
   template:
     metadata:
       labels:
@@ -48,7 +46,7 @@ spec:
           name: docker-daemon-config
       containers:
       - name: runner
-        image: gitea/act_runner:nightly-dind-rootless
+        image: gitea/act_runner:nightly-dind
         imagePullPolicy: Always
         env:
         - name: GITEA_INSTANCE_URL

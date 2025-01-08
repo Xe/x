@@ -1,0 +1,11 @@
+[Unit]
+Description=A hack to start dhcpcd at the right time
+After=network.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/sbin/dhcpcd enp1s0
+
+[Install]
+WantedBy=default.target

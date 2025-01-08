@@ -107,7 +107,7 @@ spec:
             claimName: xena-greedo
         - name: tulpanomicon
           persistentVolumeClaim:
-            claimName: tulpanomicon
+            claimName: tulpanomicon2
         - name: xn--u7hz981o
           persistentVolumeClaim:
             claimName: xn--u7hz981o--2

@@ -2,11 +2,10 @@ apiVersion: externaldns.k8s.io/v1alpha1
 kind: DNSEndpoint
 metadata:
   name: registry-internal
-  namespace: default
 spec:
   endpoints:
-  - dnsName: registry.default.svc.alrest.xeserv.us
-    recordTTL: 3600
-    recordType: A
-    targets:
-    - 10.223.208.190
+    - dnsName: registry.int.xeserv.us
+      recordTTL: 3600
+      recordType: A
+      targets:
+        - 10.223.208.190

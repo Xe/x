@@ -7,13 +7,15 @@ data:
   USER_UID: "1000"
   USER_GID: "1000"
 
-  #GITEA__storage__STORAGE_TYPE: minio
-  GITEA__storage__STORAGE_TYPE: local
+  GITEA__storage__STORAGE_TYPE: minio
+  #GITEA__storage__STORAGE_TYPE: local
   GITEA__storage__SERVE_DIRECT: "true"
-  GITEA__storage__MINIO_ENDPOINT: https://fly.storage.tigris.dev
-  GITEA__storage__MINIO_BUCKET: alrest-gitea
-  GITEA__storage__MINIO_LOCATION: auto
-  GITEA__storage__MINIO_USE_SSL: "true"
+  GITEA__storage__MINIO_ENDPOINT: http://minio.default.svc.alrest.xeserv.us
+  GITEA__storage__MINIO_BUCKET: gitea
+  GITEA__storage__MINIO_LOCATION: alrest
+  GITEA__storage__MINIO_USE_SSL: "false"
+  GITEA__storage__MINIO_ACCESS_KEY_ID: "nkb2jIEnRmoiu56R5vsH"
+  GITEA__stroage__MINIO_SECRET_ACCESS_KEY: "pZFQDZFFMzqqvQdAjwpdEQrRIbMlu0H9cd25MmkQ"
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -41,9 +43,6 @@ spec:
         - name: data
           persistentVolumeClaim:
             claimName: gitea
-        - name: tigris
-          persistentVolumeClaim:
-            claimName: gitea-tigris
       containers:
         - name: main
           image: gitea/gitea:1-rootless
@@ -61,8 +60,6 @@ spec:
           envFrom:
             - configMapRef:
                 name: gitea
-            - secretRef:
-                name: tigris-creds
           ports:
             - name: http
               containerPort: 3000
@@ -77,12 +74,6 @@ spec:
             - name: data
               mountPath: /etc/gitea
               subPath: conf
-            - name: tigris
-              mountPath: /var/lib/gitea/data/attachments
-              subPath: attachments
-            - name: tigris
-              mountPath: /var/lib/gitea/git/lfs
-              subPath: lfs
           livenessProbe:
             httpGet:
               path: /api/healthz

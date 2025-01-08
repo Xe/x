@@ -33,8 +33,6 @@ spec:
           value: hunter22
         ports:
         - containerPort: 9000
-          hostPort: 9000
           name: http
         - containerPort: 9001
-          hostPort: 9001
           name: webui

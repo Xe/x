@@ -7,13 +7,13 @@ metadata:
     kubevirt.io/domain: feixiao
 spec:
   storage:
-    storageClassName: longhorn
+    storageClassName: rotational
     volumeMode: Block
     accessModes:
       - ReadWriteOnce
     resources:
       requests:
-        storage: 64Gi
+        storage: 128Gi
   source:
     http:
       url: "https://cloud-images.ubuntu.com/daily/server/noble/current/noble-server-cloudimg-amd64.img"
@@ -21,7 +21,22 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: feixiao-storage
+  name: feixiao-longhorn
+  namespace: waifud
+spec:
+  accessModes:
+    - ReadWriteOnce
+    - ReadWriteMany
+  volumeMode: Block
+  storageClassName: rotational
+  resources:
+    requests:
+      storage: 128Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: feixiao-itsuki
   namespace: waifud
 spec:
   accessModes:
@@ -91,22 +106,25 @@ spec:
                 bus: sata
                 readonly: true
               name: cloudinitdisk
-          filesystems:
-            - name: storage
-              virtiofs: {}
+          filesystems: []
+            # - name: storage
+            #   virtiofs: {}
         machine:
           type: q35
         resources:
           requests:
             memory: 8192M
       volumes:
+      - name: storage
+        persistentVolumeClaim:
+          claimName: "feixiao"
       - name: disk0
         persistentVolumeClaim:
           claimName: "feixiao"
       - cloudInitNoCloud:
           userData: |
             #cloud-config
-            hostname: feixiao
+            hostname: feixiao:
             ssh_pwauth: True
             disable_root: false
 
