@@ -5,6 +5,8 @@ import (
 	"embed"
 	"flag"
 	"fmt"
+	"io"
+	"io/fs"
 	"log"
 	"log/slog"
 	"net/http"
@@ -95,7 +97,26 @@ func main() {
 			})
 			if err != nil {
 				slog.Error("can't head key", "format", format, "bucket", *bucketName, "key", key, "err", err)
-				http.ServeFileFS(w, r, static, "data/not_found."+format)
+
+				st, err := fs.Stat(static, "data/not_found."+format)
+				if err != nil {
+					http.Error(w, "internal stat error, sorry", http.StatusInternalServerError)
+					return
+				}
+
+				fin, err := static.Open("data/not_found." + format)
+				if err != nil {
+					http.Error(w, "internal fopen error, sorry", http.StatusInternalServerError)
+					return
+				}
+				defer fin.Close()
+
+				w.Header().Add("Content-Length", fmt.Sprint(st.Size()))
+				w.Header().Add("Content-Type", "image/"+format)
+				w.WriteHeader(http.StatusNotFound)
+
+				io.Copy(w, fin)
+
 				return
 			}
 
@@ -105,7 +126,26 @@ func main() {
 		req, err := presigner.GetObject(r.Context(), key, 3600)
 		if err != nil {
 			slog.Error("can't presign get for key", "format", format, "bucket", *bucketName, "key", key, "err", err)
-			http.ServeFileFS(w, r, static, "data/error."+format)
+
+			st, err := fs.Stat(static, "data/error."+format)
+			if err != nil {
+				http.Error(w, "internal stat error, sorry", http.StatusInternalServerError)
+				return
+			}
+
+			fin, err := static.Open("data/error." + format)
+			if err != nil {
+				http.Error(w, "internal fopen error, sorry", http.StatusInternalServerError)
+				return
+			}
+			defer fin.Close()
+
+			w.Header().Add("Content-Length", fmt.Sprint(st.Size()))
+			w.Header().Add("Content-Type", "image/"+format)
+			w.WriteHeader(http.StatusInternalServerError)
+
+			io.Copy(w, fin)
+
 			return
 		}
 
