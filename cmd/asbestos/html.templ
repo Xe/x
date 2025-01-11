@@ -1,0 +1,114 @@
+package main
+
+import (
+	"within.website/x/htmx"
+	"within.website/x/xess"
+)
+
+templ NotFound() {
+	<p>The URL you requested could not be found. Please check your URL and hang up to try your call again.</p>
+}
+
+templ allClear() {
+	<p>Your data was not found in the dataset. No action is required on your part.</p>
+}
+
+templ Error(why string) {
+	<p>Oopsie whoopsie uwu we made a fucky-wucky! A widdle fucko boingo! The code monkeys at our headquarters are working VEWY HARD to fix this!</p>
+	<p>Reason: { why }</p>
+}
+
+templ Index() {
+	<p>TODO placeholder</p>
+	<input
+		style="display: block"
+		class="form-control"
+		type="search"
+		name="search"
+		placeholder="Begin Typing To Search Users..."
+		hx-post="/search"
+		hx-trigger="input changed delay:500ms, search"
+		hx-target="#search-results"
+		hx-indicator=".htmx-indicator"
+		hx-swap="innerHTML"
+	/>
+	<br/>
+	<div id="search-results"></div>
+}
+
+templ headArea() {
+	@htmx.Use()
+	<style>
+    .no-copy {
+      -webkit-user-select: none; /* Safari */
+      -moz-user-select: none;    /* Firefox */
+      -ms-user-select: none;     /* Internet Explorer/Edge */
+      user-select: none;         /* Non-prefixed version, currently supported by Chrome, Opera and Edge */
+    }
+  </style>
+}
+
+templ footer() {
+	<p>
+		A product of <a href="https://techaro.lol">Techaro</a>
+		<a href="https://bsky.app/profile/techaro.lol">
+			{ "@techaro.lol" }
+		</a>, the only ethical AI company
+	</p>
+}
+
+templ Layout(title string, body templ.Component) {
+	@xess.Base(
+		title,
+		headArea(),
+		nil,
+		body,
+		footer(),
+	)
+}
+
+templ searchPage(authorDID string, posts []Post) {
+	<table>
+		<thead>
+			<tr>
+				<th>Created at</th>
+				<th>Text</th>
+				<th>Link</th>
+			</tr>
+		</thead>
+		<tbody>
+			for _, post := range posts {
+				<tr>
+					<td>{ post.CreatedAt }</td>
+					<td>{ post.Text }</td>
+					<td><a href={ templ.SafeURL(post.BlueskyURL) }>🔗</a></td>
+				</tr>
+			}
+		</tbody>
+	</table>
+	<div id="dmca-notice">
+		<p>Since your data is in this dataset, here's what you can do about it:</p>
+		<p>Compose an email to <code>dmca@huggingface.co</code> with the subject line <code>DMCA Takedown Request</code> and something like the following body (rephrase this in your own words):</p>
+		<blockquote class="no-copy">
+			Hello,
+			<br/>
+			<br/>
+			I am writing to you to inform you that my data is present in the dataset <a href="https://huggingface.co/datasets/bluesky-community/one-million-bluesky-posts">bluesky-community/one-million-bluesky-posts</a> and I did not consent to it being included. I would like to request that you remove my data from the dataset.
+			<br/>
+			<br/>
+			You can identify my data by searching for the following DID in the <code>author_did</code> column: <code>{ authorDID }</code>
+			<br/>
+			<br/>
+			Thank you for your attention and patience in this matter.
+			<br/>
+			<br/>
+			Sincerely,
+			<br/>
+			<br/>
+			{ "(Your Name here)" }, { "(Your Email here)" }
+			<br/>
+			{ "(identified as" } { authorDID }{ ")" }
+		</blockquote>
+		<p>For more information, please refer to the <a href="https://huggingface.co/datasets/bluesky-community/one-million-bluesky-posts/discussions/12">dataset page</a>.</p>
+	</div>
+}

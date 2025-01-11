@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stickers
+  labels:
+    app.kubernetes.io/name: stickers
+  annotations:
+    keel.sh/policy: all
+    keel.sh/trigger: poll
+    keel.sh/pollSchedule: "@hourly"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: stickers
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: stickers
+    spec:
+      securityContext:
+        fsGroup: 1000
+      containers:
+        - name: main
+          image: ghcr.io/xe/x/stickers:latest
+          imagePullPolicy: "Always"
+          envFrom:
+            - secretRef:
+                name: stickers-tigris-creds
+          resources:
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+            requests:
+              cpu: "250m"
+              memory: "128Mi"
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8080
+              httpHeaders:
+                - name: X-Kubernetes
+                  value: "is kinda okay"
+            initialDelaySeconds: 3
+            periodSeconds: 3
+          env:
+            - name: BIND
+              value: ":8080"
+            - name: SLOG_LEVEL
+              value: DEBUG

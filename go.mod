@@ -11,7 +11,7 @@ require (
 	github.com/Marcel-ICMC/graw v0.0.0-20230411090719-e24cd8592d25
 	github.com/McKael/madon/v2 v2.4.0
 	github.com/Songmu/gitconfig v0.2.0
-	github.com/a-h/templ v0.2.771
+	github.com/a-h/templ v0.3.819
 	github.com/adrg/frontmatter v0.2.0
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.55.1
 	github.com/bluesky-social/indigo v0.0.0-20240905024844-a4f38639767f
@@ -42,6 +42,7 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/kr/pretty v0.3.1
 	github.com/lib/pq v1.10.9
+	github.com/mattn/go-sqlite3 v1.14.22
 	github.com/mymmrac/telego v0.29.2
 	github.com/nats-io/nats.go v1.35.0
 	github.com/ncruces/go-sqlite3 v0.16.0
@@ -239,14 +240,14 @@ require (
 	github.com/prometheus/client_model v0.6.1 // indirect
 	github.com/prometheus/common v0.54.0 // indirect
 	github.com/prometheus/procfs v0.15.1 // indirect
-	github.com/rivo/uniseg v0.4.4 // indirect
+	github.com/rivo/uniseg v0.4.4
 	github.com/sacOO7/go-logger v0.0.0-20180719173527-9ac9add5a50d // indirect
 	github.com/sacOO7/gowebsocket v0.0.0-20221109081133-70ac927be105
 	github.com/sendgrid/rest v2.6.9+incompatible // indirect
 	golang.org/x/exp v0.0.0-20240604190554-fc45aab8b7f8
 	golang.org/x/image v0.18.0
 	golang.org/x/mod v0.20.0 // indirect
-	golang.org/x/net v0.28.0 // indirect
+	golang.org/x/net v0.33.0 // indirect
 	golang.org/x/sys v0.28.0 // indirect
 	golang.org/x/text v0.21.0 // indirect
 	golang.org/x/time v0.5.0

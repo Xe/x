@@ -150,6 +150,16 @@ stealthmountain:
 
     SAVE IMAGE --push ghcr.io/xe/x/stealthmountain:latest
 
+stickers:
+    FROM +runtime
+
+    COPY +everything/bin/stickers /app/bin/stickers
+    CMD ["/app/bin/stickers"]
+
+    LABEL org.opencontainers.image.source="https://github.com/Xe/x"
+
+    SAVE IMAGE --push ghcr.io/xe/x/stickers:latest
+
 todayinmarch2020:
     FROM +runtime
 
