@@ -78,7 +78,7 @@ func index(character, mood string) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\"><p>Inline</p><div style=\"margin: 1rem 0; display: flex; gap: 1rem; border-radius: 0.375rem; border: 1px solid #d1d5db; background-color: #f3f4f6; padding: 0.75rem; max-width: 65ch; margin-left: auto; margin-right: auto; min-height: fit-content;\"><div style=\"display: flex; padding-top: 0.5rem; padding-bottom: 0.5rem; max-height: 4rem; flex-shrink: 0; align-items: center; justify-content: center; align-self: center;\"><img style=\"max-height: 6rem\" alt=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\"><p>Inline</p><div style=\"margin: 1rem 0; display: flex; gap: 1rem; border-radius: 0.375rem; color: #000000; border: 1px solid #d1d5db; background-color: #f3f4f6; padding: 0.75rem; max-width: 65ch; margin-left: auto; margin-right: auto; min-height: fit-content;\"><div style=\"display: flex; padding-top: 0.5rem; padding-bottom: 0.5rem; max-height: 4rem; flex-shrink: 0; align-items: center; justify-content: center; align-self: center;\"><img style=\"max-height: 6rem\" alt=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -117,7 +117,7 @@ func index(character, mood string) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</b></a>&gt;  Have you ever been far even as decided to use even go want to do look more like?</div></div><p>Standalone</p><div style=\"margin: 1rem 0; display: flex; gap: 1rem; border-radius: 0.375rem; border: 1px solid #d1d5db; background-color: #f3f4f6; padding: 0.75rem; max-width: 75ch; margin-left: auto; margin-right: auto; min-height: fit-content;\"><div style=\"display: flex; padding-top: 1.5rem; padding-bottom: 1.5rem; max-height: 4rem; flex-shrink: 0; align-items: center; justify-content: center; align-self: center;\"><img style=\"max-height: 8rem\" alt=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</b></a>&gt;  Have you ever been far even as decided to use even go want to do look more like?</div></div><p>Standalone</p><div style=\"margin: 1rem 0; display: flex; gap: 1rem; border-radius: 0.375rem; color: #000000; border: 1px solid #d1d5db; background-color: #f3f4f6; padding: 0.75rem; max-width: 75ch; margin-left: auto; margin-right: auto; min-height: fit-content;\"><div style=\"display: flex; padding-top: 1.5rem; padding-bottom: 1.5rem; max-height: 4rem; flex-shrink: 0; align-items: center; justify-content: center; align-self: center;\"><img style=\"max-height: 8rem\" alt=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
