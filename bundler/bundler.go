@@ -23,10 +23,11 @@ import (
 type mode int
 
 const (
-	DefaultDelayThreshold       = time.Second
-	DefaultBundleCountThreshold = 10
-	DefaultBundleByteThreshold  = 1e6 // 1M
-	DefaultBufferedByteLimit    = 1e9 // 1G
+	DefaultDelayThreshold        = time.Second
+	DefaultBundleHandlerDeadline = time.Minute
+	DefaultBundleCountThreshold  = 10
+	DefaultBundleByteThreshold   = 1e6 // 1M
+	DefaultBufferedByteLimit     = 1e9 // 1G
 )
 
 const (
@@ -37,14 +38,14 @@ const (
 
 var (
 	// ErrOverflow indicates that Bundler's stored bytes exceeds its BufferedByteLimit.
-	ErrOverflow = errors.New("bundler reached buffered byte limit")
+	ErrOverflow = errors.New("bundler: reached buffered byte limit")
 
 	// ErrOversizedItem indicates that an item's size exceeds the maximum bundle size.
-	ErrOversizedItem = errors.New("item size exceeds bundle byte limit")
+	ErrOversizedItem = errors.New("bundler: item size exceeds bundle byte limit")
 
 	// errMixedMethods indicates that mutually exclusive methods has been
 	// called subsequently.
-	errMixedMethods = errors.New("calls to Add and AddWait cannot be mixed")
+	errMixedMethods = errors.New("bundler: calls to Add and AddWait cannot be mixed")
 )
 
 // A Bundler collects items added to it into a bundle until the bundle
@@ -80,7 +81,10 @@ type Bundler[T any] struct {
 	// The default is 1.
 	HandlerLimit int
 
-	handler       func([]T) // called to handle a bundle
+	// ContextDeadline is the deadline for the context attached to bundle handling.
+	ContextDeadline time.Duration
+
+	handler func(context.Context, []T) // called to handle a bundle
 
 	mu           sync.Mutex          // guards access to fields below
 	flushTimer   *time.Timer         // implements DelayThreshold
@@ -114,9 +118,9 @@ type Bundler[T any] struct {
 // A bundle is a group of items that were added individually and will be passed
 // to a handler as a slice.
 type bundle[T any] struct {
-	items []T   // slice of T
+	items []T             // slice of T
 	size  int             // size in bytes of all items
-	next  *bundle[T]         // bundles are handled in order as a linked list queue
+	next  *bundle[T]      // bundles are handled in order as a linked list queue
 	flush *sync.WaitGroup // the counter that tracks flush completion
 }
 
@@ -135,7 +139,7 @@ func (bu *bundle[T]) add(item T, size int) {
 //
 // Configure the Bundler by setting its thresholds and limits before calling
 // any of its methods.
-func New[T any](handler func([]T)) *Bundler[T] {
+func New[T any](handler func(context.Context, []T)) *Bundler[T] {
 	b := &Bundler[T]{
 		DelayThreshold:       DefaultDelayThreshold,
 		BundleCountThreshold: DefaultBundleCountThreshold,
@@ -143,8 +147,8 @@ func New[T any](handler func([]T)) *Bundler[T] {
 		BufferedByteLimit:    DefaultBufferedByteLimit,
 		HandlerLimit:         1,
 
-		handler:       handler,
-		curFlush:      &sync.WaitGroup{},
+		handler:  handler,
+		curFlush: &sync.WaitGroup{},
 	}
 	return b
 }
@@ -315,7 +319,9 @@ func (b *Bundler[T]) next() *bundle[T] {
 // goroutine ends.
 func (b *Bundler[T]) handle(bu *bundle[T]) {
 	for bu != nil {
-		b.handler(bu.items)
+		ctx, cancel := context.WithTimeout(context.Background(), b.ContextDeadline)
+		b.handler(ctx, bu.items)
+		cancel()
 		bu = b.postHandle(bu)
 	}
 }

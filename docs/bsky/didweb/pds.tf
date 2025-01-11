@@ -30,9 +30,25 @@ resource "civo_firewall" "pds" {
     action     = "allow"
   }
 
+  ingress_rule {
+    label      = "yolo-udp"
+    protocol   = "udp"
+    port_range = "1-65535"
+    cidr       = ["0.0.0.0/0"]
+    action     = "allow"
+  }
+
   egress_rule {
     label      = "yolo"
     protocol   = "tcp"
+    port_range = "1-65535"
+    cidr       = ["0.0.0.0/0"]
+    action     = "allow"
+  }
+
+  egress_rule {
+    label      = "yolo-udp"
+    protocol   = "udp"
     port_range = "1-65535"
     cidr       = ["0.0.0.0/0"]
     action     = "allow"

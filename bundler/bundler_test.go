@@ -1,13 +1,14 @@
 package bundler
 
 import (
+	"context"
 	"testing"
 )
 
 func TestBundler(t *testing.T) {
 	input := []int{1, 2, 3, 4}
 	done := false
-	b := New[int](func(data []int) {
+	b := New[int](func(_ context.Context, data []int) {
 		if len(data) != 4 {
 			t.Errorf("Wanted len(data) == %d, got: %d", len(input), len(data))
 		}
@@ -29,7 +30,7 @@ func TestBundler(t *testing.T) {
 	}
 
 	b.Flush()
-	
+
 	if !done {
 		t.Fatal("function wasn't called")
 	}

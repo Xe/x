@@ -4,8 +4,8 @@ metadata:
   name: minio
 spec:
   accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce
   storageClassName: rotational
   resources:
     requests:
-      storage: 100Gi
+      storage: 350Gi

@@ -1,3 +1,4 @@
+tap "hashicorp/tap"
 tap "xe/pkgs"
 
 # programming languages
@@ -33,6 +34,7 @@ brew "earthly"
 brew "pandoc"
 brew "jq"
 brew "jo"
+brew "hashicorp/tap/terraform"
 
 # frontend tools
 brew "esbuild"

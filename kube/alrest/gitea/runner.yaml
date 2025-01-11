@@ -13,7 +13,7 @@ metadata:
 data:
   daemon.json: |
     {
-      "registry-mirrors": ["https://pt-dh.default.svc.alrest.xeserv.us"]
+      "registry-mirrors": ["https://pt-dh.int.xeserv.us"]
     }
 ---
 apiVersion: apps/v1

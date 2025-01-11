@@ -69,3 +69,5 @@
     - Get reccomended did credentials .verificationMethods.atproto
     - s/did:key://
     - Put in did.json .verificationMethod[0].publicKeyMultibase
+    - activate account
+    - skeet: https://bsky.app/profile/the.cetacean.club/post/3lbsasfpb2s2m
