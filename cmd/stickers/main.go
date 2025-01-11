@@ -149,6 +149,9 @@ func main() {
 			return
 		}
 
+		w.Header().Add("Cache-Control", "max-age=3599")
+		w.Header().Add("Expires", time.Now().Add(time.Hour-time.Second).Format(http.TimeFormat))
+
 		http.Redirect(w, r, req.URL, http.StatusTemporaryRedirect)
 	})
 

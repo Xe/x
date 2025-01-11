@@ -26,7 +26,6 @@ import (
 	"github.com/gen2brain/webp"
 	"golang.org/x/sync/errgroup"
 	"within.website/x/internal"
-	"within.website/x/tigris"
 )
 
 var (
@@ -135,8 +134,9 @@ func main() {
 				ContentLength:  aws.Int64(st.Size()),
 				ChecksumSHA256: aws.String(shaSum),
 				ContentMD5:     aws.String(md5Sum),
+				CacheControl:   aws.String("max-age=2592000,public"),
 			},
-			tigris.WithCreateObjectIfNotExists(),
+			//tigris.WithCreateObjectIfNotExists(),
 		)
 		if err != nil {
 			log.Fatal(err)
