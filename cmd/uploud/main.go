@@ -17,6 +17,7 @@ import (
 	"path/filepath"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
+	awsConfig "github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/disintegration/imaging"
 	"github.com/gen2brain/avif"
@@ -93,10 +94,14 @@ func main() {
 		log.Fatal(err)
 	}
 
-	s3c, err := tigris.Client(context.Background())
+	cfg, err := awsConfig.LoadDefaultConfig(ctx)
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	s3c := s3.NewFromConfig(cfg, func(o *s3.Options) {
+		o.UsePathStyle = true
+	})
 
 	for _, finfo := range files {
 		log.Printf("uploading %s", finfo.Name())
@@ -287,7 +292,7 @@ func processImage(fname, tempDir string) error {
 
 	eg.Go(func() error {
 		if err := doJPEG(src, filepath.Join(tempDir, fnameBase+".jpg")); err != nil {
-			return fmt.Errorf("webp: %w", err)
+			return fmt.Errorf("jpeg: %w", err)
 		}
 
 		return nil
