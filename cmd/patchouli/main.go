@@ -35,7 +35,7 @@ func main() {
 
 	db, err := connectDB()
 	if err != nil {
-		log.Fatalf("can't connect to DB: %w", err)
+		log.Fatalf("can't connect to DB: %v", err)
 	}
 	_ = db
 
