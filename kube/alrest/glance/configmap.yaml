@@ -48,6 +48,10 @@ data:
               
           - size: small
             widgets:
+              - type: extension
+                url: http://mi.mi.svc.alrest.xeserv.us/glance
+                cache: 30m
+                allow-potentially-dangerous-html: true
               - type: reddit
                 subreddit: technology
                 style: vertical-cards
