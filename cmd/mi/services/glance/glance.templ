@@ -7,6 +7,7 @@ import (
 )
 
 templ whoIsFront(sw *models.Switch) {
+  <div class="cards-vertical">
     <div class="widget-content-frame relative">
         <div class="reddit-card-thumbnail-container">
             <img class="reddit-card-thumbnail cached finished-transition" loading="lazy" src={ sw.Member.AvatarURL } alt="">
@@ -16,6 +17,7 @@ templ whoIsFront(sw *models.Switch) {
             <p><span class="color-primary">{sw.Member.Name}</span> is front</p>
             <p>Change logged <span data-dynamic-relative-time={ fmt.Sprint(sw.CreatedAt.Unix()) }></span> ago</p>
         </div>
+    </div>
   </div>
 }
 
