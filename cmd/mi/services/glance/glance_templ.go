@@ -48,7 +48,7 @@ func whoIsFront(sw *models.Switch) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\" alt=\"\"></div><div class=\"padding-widget relative\"><p><span class=\"color-primary\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\" alt=\"\"></div><div class=\"padding-widget relative\" style=\"padding-top: 12rem;\"><p><span class=\"color-primary\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
