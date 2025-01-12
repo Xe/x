@@ -1,0 +1,18 @@
+package glance
+
+import (
+  "fmt"
+
+  "within.website/x/cmd/mi/models"
+)
+
+templ whoIsFront(sw *models.Switch) {
+  <p><span class="color-primary">{sw.Member.Name}</span> is front</p>
+  <p>Change logged <span data-dynamic-relative-time={ fmt.Sprint(sw.CreatedAt.Unix()) }></span> ago</p>
+  <img src={ sw.Member.AvatarURL } alt="" loading="lazy" />
+}
+
+templ ohNoes(err error) {
+  <p class="color-negative size-h4">Error</p>
+  <p>{ err.Error() }</p>
+}

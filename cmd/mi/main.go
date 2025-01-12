@@ -15,6 +15,7 @@ import (
 	"google.golang.org/grpc"
 	"within.website/x/cmd/mi/models"
 	"within.website/x/cmd/mi/services/events"
+	"within.website/x/cmd/mi/services/glance"
 	"within.website/x/cmd/mi/services/homefrontshim"
 	"within.website/x/cmd/mi/services/importer"
 	"within.website/x/cmd/mi/services/posse"
@@ -112,6 +113,7 @@ func main() {
 	mux.Handle(pb.EventsPathPrefix, pb.NewEventsServer(es))
 	mux.Handle("/front", homefrontshim.New(dao))
 	mux.Handle("/twitch", te)
+	mux.Handle("/glance", glance.New(dao))
 
 	i := importer.New(dao)
 	i.Mount(http.DefaultServeMux)
