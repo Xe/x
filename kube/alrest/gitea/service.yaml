@@ -14,4 +14,8 @@ spec:
       port: 22
       targetPort: 2222
       name: ssh
+    - name: https
+      port: 443
+      targetPort: 8443
+      protocol: TCP
   type: ClusterIP

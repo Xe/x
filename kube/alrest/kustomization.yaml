@@ -2,8 +2,10 @@ resources:
   - core
   - gitea
   - glance
+  - minio
   - ollama
   - palworld
+  - pocket-id
   - pvfm
   - registry
   - staticsites

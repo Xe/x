@@ -1,0 +1,56 @@
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: minio
+spec:
+  endpoints:
+  - dnsName: minio.xeserv.us
+    recordTTL: 3600
+    recordType: A
+    targets:
+    - 10.219.35.168
+  - dnsName: minio-ui.xeserv.us
+    recordTTL: 3600
+    recordType: A
+    targets:
+    - 10.213.19.165
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: minio
+spec:
+  secretName: minio-alrest-internal-tls
+
+  duration: 2160h # 90d
+  renewBefore: 360h # 15d
+
+  usages:
+    - digital signature
+    - key encipherment
+  dnsNames:
+    - minio.xeserv.us
+  issuerRef:
+    name: "letsencrypt-prod"
+    kind: ClusterIssuer
+    group: cert-manager.io
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: minio-ui
+spec:
+  secretName: minio-ui-alrest-internal-tls
+
+  duration: 2160h # 90d
+  renewBefore: 360h # 15d
+
+  usages:
+    - digital signature
+    - key encipherment
+  dnsNames:
+    - minio-ui.xeserv.us
+  issuerRef:
+    name: "letsencrypt-prod"
+    kind: ClusterIssuer
+    group: cert-manager.io

@@ -5,4 +5,5 @@ resources:
   - deployment.yaml
   - service.yaml
   - runner.yaml
+  - external-dns.yaml
 namespace: gitea

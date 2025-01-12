@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: pocket-id
+  labels:
+    name: pocket-id
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+      - idp.xeserv.us
+      secretName: idp-xeserv-us-public-tls
+  rules:
+  - host: idp.xeserv.us
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: pocket-id
+            port: 
+              name: http

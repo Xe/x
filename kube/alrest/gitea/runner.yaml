@@ -3,7 +3,7 @@ kind: Secret
 metadata:
   name: runner-secret
 stringData:
-  token: "6ALUVtYp8UAl5FHFUwGZ1lG03lMR2xta2cV9m2mW"
+  token: "lauI1MNpokCnDRUZ1LcS7cQKSyuMyI0UikmKCJcQ"
 type: Opaque
 ---
 apiVersion: v1

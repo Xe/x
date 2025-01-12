@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pocket-id
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pocket-id
+  template:
+    metadata:
+      labels:
+        app: pocket-id
+    spec:
+      securityContext:
+        fsGroup: 1000
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: pocket-id
+      containers:
+      - name: main
+        image: stonith404/pocket-id:v0.24.0
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          runAsUser: 1000
+          runAsGroup: 1000
+          runAsNonRoot: false
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          seccompProfile:
+            type: RuntimeDefault
+        envFrom:
+        - configMapRef:
+            name: pocket-id
+        resources:
+          limits:
+            memory: "512Mi"
+            cpu: "1"
+        ports:
+        - containerPort: 8080
+          name: backend
+        - containerPort: 3000
+          name: frontend
+        - containerPort: 80
+          name: http
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: 200
+          timeoutSeconds: 5
+          periodSeconds: 10
+          successThreshold: 1
+          failureThreshold: 10
+        volumeMounts:
+        - name: data
+          mountPath: /app/backend/data
+          subPath: data

@@ -1,0 +1,31 @@
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: gitea
+spec:
+  endpoints:
+  - dnsName: git.xeserv.us
+    recordTTL: 3600
+    recordType: A
+    targets:
+    - 10.219.80.171
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: gitea
+spec:
+  secretName: gitea-internal-tls
+
+  duration: 2160h # 90d
+  renewBefore: 360h # 15d
+
+  usages:
+    - digital signature
+    - key encipherment
+  dnsNames:
+    - git.xeserv.us
+  issuerRef:
+    name: "letsencrypt-prod"
+    kind: ClusterIssuer
+    group: cert-manager.io

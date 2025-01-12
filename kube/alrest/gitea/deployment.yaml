@@ -7,15 +7,14 @@ data:
   USER_UID: "1000"
   USER_GID: "1000"
 
-  GITEA__storage__STORAGE_TYPE: minio
-  #GITEA__storage__STORAGE_TYPE: local
+  # GITEA__storage__STORAGE_TYPE: minio
+  GITEA__storage__STORAGE_TYPE: local
   GITEA__storage__SERVE_DIRECT: "true"
-  GITEA__storage__MINIO_ENDPOINT: http://minio.default.svc.alrest.xeserv.us
+  GITEA__storage__MINIO_ENDPOINT: minio.default.svc.alrest.xeserv.us
   GITEA__storage__MINIO_BUCKET: gitea
-  GITEA__storage__MINIO_LOCATION: alrest
   GITEA__storage__MINIO_USE_SSL: "false"
-  GITEA__storage__MINIO_ACCESS_KEY_ID: "nkb2jIEnRmoiu56R5vsH"
-  GITEA__stroage__MINIO_SECRET_ACCESS_KEY: "pZFQDZFFMzqqvQdAjwpdEQrRIbMlu0H9cd25MmkQ"
+  GITEA__storage__MINIO_ACCESS_KEY_ID: "qI118JbfKI7jSoIODniy"
+  GITEA__stroage__MINIO_SECRET_ACCESS_KEY: "dIOfpszdPDKLurcppvic68TJcscZ4NZbgJr30RaX"
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -43,6 +42,9 @@ spec:
         - name: data
           persistentVolumeClaim:
             claimName: gitea
+        - name: internal-certs
+          secret:
+            secretName: gitea-internal-tls
       containers:
         - name: main
           image: gitea/gitea:1-rootless
@@ -83,3 +85,32 @@ spec:
             periodSeconds: 10
             successThreshold: 1
             failureThreshold: 10
+        - name: relayd
+          image: ghcr.io/xe/x/relayd:latest
+          imagePullPolicy: "Always"
+          resources:
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
+          env:
+            - name: BIND
+              value: ":8443"
+            - name: PROXY_TO
+              value: "http://localhost:3000"
+          volumeMounts:
+            - name: "internal-certs"
+              mountPath: "/xe/pki"
+              readOnly: true
