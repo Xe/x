@@ -44,7 +44,7 @@ require (
 	github.com/lib/pq v1.10.9
 	github.com/mattn/go-sqlite3 v1.14.22
 	github.com/mymmrac/telego v0.29.2
-	github.com/nats-io/nats.go v1.35.0
+	github.com/nats-io/nats.go v1.38.0
 	github.com/ncruces/go-sqlite3 v0.16.0
 	github.com/ncruces/go-sqlite3/gormlite v0.16.0
 	github.com/nicklaw5/helix/v2 v2.30.0
@@ -162,7 +162,7 @@ require (
 	github.com/multiformats/go-multicodec v0.9.0 // indirect
 	github.com/multiformats/go-multihash v0.2.3 // indirect
 	github.com/multiformats/go-varint v0.0.7 // indirect
-	github.com/nats-io/nkeys v0.4.7 // indirect
+	github.com/nats-io/nkeys v0.4.9 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
 	github.com/ncruces/julianday v1.0.0 // indirect
 	github.com/opentracing/opentracing-go v1.2.0 // indirect
