@@ -28,3 +28,24 @@ spec:
             name: uptime-kuma
             port:
               number: 3001
+      - path: /assets
+        pathType: Prefix
+        backend:
+          service:
+            name: uptime-kuma
+            port:
+              number: 3001
+      - path: /icon.svg
+        pathType: Prefix
+        backend:
+          service:
+            name: uptime-kuma
+            port:
+              number: 3001
+      - path: /api/status-page/heartbeat
+        pathType: Prefix
+        backend:
+          service:
+            name: uptime-kuma
+            port:
+              number: 3001
