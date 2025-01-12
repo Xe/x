@@ -37,3 +37,19 @@ COPY daemon.json /etc/docker/daemon.json
 USER runner
 
 RUN /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+
+# Homebrew deps hack
+RUN mkdir -p /tmp/git \
+  && cd /tmp/git \
+  && git clone https://github.com/Xe/x \
+  && cd x \
+  && /home/linuxbrew/.linuxbrew/bin/brew bundle \
+  && cd .. \
+  && rm -rf x \
+  && git clone https://github.com/Xe/site \
+  && cd site \
+  && /home/linuxbrew/.linuxbrew/bin/brew bundle \
+  && cd .. \
+  && rm -rf site \
+  && cd / \
+  && rm -rf /tmp/git
