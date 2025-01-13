@@ -20,9 +20,10 @@ import (
 )
 
 var (
-	clientID     = flag.String("oauth2-client-id", "", "OAuth2 Client ID")
-	clientSecret = flag.String("oauth2-client-secret", "", "OAuth2 Client Secret")
+	clientID     = flag.String("oauth2-client-id", "", "OAuth2 client ID")
+	clientSecret = flag.String("oauth2-client-secret", "", "OAuth2 client secret")
 	idpURL       = flag.String("oauth2-idp-url", "https://idp.xeserv.us", "OAuth2 IDP URL")
+	redirectURL  = flag.String("oauth2-redirect-url", "http://127.0.0.1:5556/auth/callback", "OAuth2 redirect URL")
 )
 
 func randString(nByte int) (string, error) {
@@ -59,7 +60,7 @@ func main() {
 		ClientID:     *clientID,
 		ClientSecret: *clientSecret,
 		Endpoint:     provider.Endpoint(),
-		RedirectURL:  "http://127.0.0.1:5556/auth/callback",
+		RedirectURL:  *redirectURL,
 		Scopes:       []string{oidc.ScopeOpenID, "profile", "email", "groups"},
 	}
 
@@ -102,11 +103,13 @@ func main() {
 			}
 
 			var claims struct {
+				Subject           string   `json:"sub"`
 				Email             string   `json:"email"`
 				Verified          bool     `json:"email_verified"`
 				Name              string   `json:"name"`
 				PreferredUsername string   `json:"preferred_username"`
 				Groups            []string `json:"groups"`
+				Picture           string   `json:"picture"`
 			}
 
 			if err := idToken.Claims(&claims); err != nil {
@@ -132,6 +135,7 @@ func main() {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+		w.Header().Add("Content-Type", "application/json")
 		w.Write(data)
 	})
 
