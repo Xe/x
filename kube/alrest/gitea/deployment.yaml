@@ -10,11 +10,13 @@ data:
   # GITEA__storage__STORAGE_TYPE: minio
   GITEA__storage__STORAGE_TYPE: local
   GITEA__storage__SERVE_DIRECT: "true"
-  GITEA__storage__MINIO_ENDPOINT: minio.default.svc.alrest.xeserv.us
+  GITEA__storage__MINIO_ENDPOINT: minio.xeserv.us
   GITEA__storage__MINIO_BUCKET: gitea
-  GITEA__storage__MINIO_USE_SSL: "false"
+  GITEA__storage__MINIO_USE_SSL: "true"
   GITEA__storage__MINIO_ACCESS_KEY_ID: "qI118JbfKI7jSoIODniy"
   GITEA__stroage__MINIO_SECRET_ACCESS_KEY: "dIOfpszdPDKLurcppvic68TJcscZ4NZbgJr30RaX"
+  GITEA__service__DISABLE_REGISTRATION: "false"
+  GITEA__service__REGISTER_MANUAL_CONFIRM: "true"
 ---
 apiVersion: apps/v1
 kind: Deployment
