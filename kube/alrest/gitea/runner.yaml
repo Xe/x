@@ -50,7 +50,7 @@ spec:
         imagePullPolicy: Always
         env:
         - name: GITEA_INSTANCE_URL
-          value: http://git.gitea.svc.alrest.xeserv.us
+          value: https://git.xeserv.us
         - name: GITEA_RUNNER_REGISTRATION_TOKEN
           valueFrom:
             secretKeyRef:

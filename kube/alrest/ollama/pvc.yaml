@@ -8,7 +8,7 @@ metadata:
 spec:
   accessModes:
     - ReadWriteOnce
-  storageClassName: "longhorn"
+  storageClassName: "ssd"
   resources:
     requests:
       storage: 64Gi

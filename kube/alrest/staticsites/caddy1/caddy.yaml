@@ -18,13 +18,6 @@ data:
       root /srv/http/graphviz
     }
 
-    tulpanomicon.guide:8080 {
-      tls off
-      errors stdout
-
-      root /srv/http/tulpanomicon
-    }
-
     xena.greedo.xeserv.us:8080 {
       tls off
       errors stdout
@@ -105,9 +98,6 @@ spec:
         - name: greedo
           persistentVolumeClaim:
             claimName: xena-greedo
-        - name: tulpanomicon
-          persistentVolumeClaim:
-            claimName: tulpanomicon2
         - name: xn--u7hz981o
           persistentVolumeClaim:
             claimName: xn--u7hz981o--2
@@ -167,8 +157,6 @@ spec:
               name: xn--u7hz981o
             - mountPath: "/srv/http/xena.greedo.xeserv.us"
               name: greedo
-            - mountPath: "/srv/http/tulpanomicon"
-              name: tulpanomicon
             - mountPath: "/srv/http/when-then-zen.christine.website"
               name: when-then-zen
               subPath: site

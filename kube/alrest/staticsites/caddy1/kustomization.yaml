@@ -2,7 +2,6 @@ resources:
   - caddy.yaml
   - graphviz.yaml
   - lewa.yaml
-  - tulpanomicon.yaml
   - when-then-zen.yaml
   - xena-greedo.yaml
   - xn--u7hz981o.yaml
