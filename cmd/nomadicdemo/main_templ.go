@@ -31,7 +31,7 @@ func index(prompt, negPrompt, imageURL string, howLong time.Duration) templ.Comp
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<style>\n\t.big-input {\n  \tpadding: 0.5rem;\n  \twidth: 100%;\n\t}\n</style><form><input class=\"big-input\" id=\"prompt\" name=\"prompt\" type=\"text\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<style>\n\t.big-input {\n  \tpadding: 0.5rem;\n  \twidth: 100%;\n\t}\n\t</style><form><input class=\"big-input\" id=\"prompt\" name=\"prompt\" type=\"text\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
