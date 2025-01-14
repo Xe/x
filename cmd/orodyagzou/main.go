@@ -14,7 +14,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/joho/godotenv"
 	"within.website/x/internal"
 	"within.website/x/web/vastai/vastaicli"
@@ -23,10 +22,12 @@ import (
 var (
 	bind          = flag.String("bind", ":3238", "HTTP port to bind to")
 	diskSizeGB    = flag.Int("vastai-disk-size-gb", 32, "amount of disk we need from vast.ai")
-	dockerImage   = flag.String("docker-image", "reg.xeiaso.net/runner/sdxl-tigris:latest", "docker image to start")
-	onstartCmd    = flag.String("onstart-cmd", "python -m cog.server.http", "onstart command to run in vast.ai")
-	vastaiPort    = flag.Int("vastai-port", 5000, "port that the guest will use in vast.ai")
-	vastaiFilters = flag.String("vastai-filters", "verified=False cuda_max_good>=12.1 gpu_ram>=12 num_gpus=1 inet_down>=850", "vast.ai search filters")
+	dockerImage   = flag.String("docker-image", "reg.xeiaso.net/xeserv/waifuwave:latest", "docker image to start")
+	onstartCmd    = flag.String("onstart-cmd", "/opt/comfyui/startup.sh", "onstart command to run in vast.ai")
+	vastaiPort    = flag.Int("vastai-port", 8080, "port that the guest will use in vast.ai")
+	vastaiFilters = flag.String("vastai-filters", "verified=True cuda_max_good>=12.1 gpu_ram>=24 num_gpus=1 inet_down>=2000", "vast.ai search filters")
+
+	idleTimeout = flag.Duration("idle-timeout", 5*time.Minute, "how long the instance should be considered \"idle\" before it is slain")
 )
 
 func main() {
@@ -63,7 +64,7 @@ func main() {
 	go images.slayLoop(ctx)
 
 	mux := http.NewServeMux()
-	mux.Handle("/v1/images", images)
+	mux.Handle("/", images)
 
 	fmt.Printf("http://localhost%s\n", *bind)
 	log.Fatal(http.ListenAndServe(*bind, mux))
@@ -81,7 +82,7 @@ type ScaleToZeroProxy struct {
 }
 
 func (s *ScaleToZeroProxy) slayLoop(ctx context.Context) {
-	t := time.NewTicker(time.Minute)
+	t := time.NewTicker(time.Second)
 	defer t.Stop()
 
 	for {
@@ -99,7 +100,7 @@ func (s *ScaleToZeroProxy) slayLoop(ctx context.Context) {
 				continue
 			}
 
-			if lastUsed.Add(5 * time.Minute).Before(time.Now()) {
+			if lastUsed.Add(*idleTimeout).Before(time.Now()) {
 				if err := s.slay(ctx); err != nil {
 					slog.Error("can't slay instance", "err", err)
 				}
@@ -133,11 +134,6 @@ func (s *ScaleToZeroProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	next := httputil.NewSingleHostReverseProxy(u)
-	od := next.Director
-	next.Director = func(r *http.Request) {
-		od(r)
-		r.URL.Path = "/predictions/" + uuid.NewString()
-	}
 	next.ServeHTTP(w, r)
 
 	s.lock.Lock()
@@ -221,14 +217,21 @@ func (s *ScaleToZeroProxy) delayUntilReady(ctx context.Context, endpointURL stri
 	t := time.NewTicker(time.Second)
 	defer t.Stop()
 
+	failCount := 0
+
 	for {
 		select {
 		case <-ctx.Done():
 			return ctx.Err()
 		case <-t.C:
+			if failCount >= 100 {
+				return fmt.Errorf("healthcheck failed %d times", failCount+1)
+			}
+
 			resp, err := http.Get(u.String())
 			if err != nil {
-				return fmt.Errorf("can't fetch health check: %w", err)
+				slog.Error("health check failed", "err", err)
+				continue
 			}
 
 			var status cogHealthCheck

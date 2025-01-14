@@ -1,0 +1,34 @@
+package main
+
+import "time"
+
+templ index(prompt, negPrompt, imageURL string, howLong time.Duration) {
+	<style>
+	.big-input {
+  	padding: 0.5rem;
+  	width: 100%;
+	}
+</style>
+	<form>
+		<input class="big-input" id="prompt" name="prompt" type="text" value={ prompt }/>
+		<br/>
+		<input class="big-input" id="negative_prompt" name="negative_prompt" type="text" value={ negPrompt }/>
+		<br/>
+		<button>Submit</button>
+	</form>
+	if imageURL != "" {
+		<div id="image">
+			<img
+				width="100%"
+				src={ imageURL }
+			/>
+			<p>Generated in { howLong.String() }</p>
+		</div>
+	}
+}
+
+templ ohNoes(why string) {
+	<big>Oh noes!</big>
+	<p>{ why }</p>
+	<p>Audience: please laugh.</p>
+}
