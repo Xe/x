@@ -253,7 +253,7 @@ require (
 	github.com/prometheus/client_model v0.6.1 // indirect
 	github.com/prometheus/common v0.54.0 // indirect
 	github.com/prometheus/procfs v0.15.1 // indirect
-	github.com/rivo/uniseg v0.4.4
+	github.com/rivo/uniseg v0.4.7
 	github.com/sacOO7/go-logger v0.0.0-20180719173527-9ac9add5a50d // indirect
 	github.com/sacOO7/gowebsocket v0.0.0-20221109081133-70ac927be105
 	github.com/sendgrid/rest v2.6.9+incompatible // indirect
