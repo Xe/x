@@ -17,6 +17,8 @@ data:
   GITEA__stroage__MINIO_SECRET_ACCESS_KEY: "dIOfpszdPDKLurcppvic68TJcscZ4NZbgJr30RaX"
   GITEA__service__DISABLE_REGISTRATION: "false"
   GITEA__service__REGISTER_MANUAL_CONFIRM: "true"
+  GITEA__service__ALLOW_ONLY_EXTERNAL_REGISTRATION: "true"
+  GITEA__server__SSH_DOMAIN: "git.gitea.svc.alrest.xeserv.us"
 ---
 apiVersion: apps/v1
 kind: Deployment
