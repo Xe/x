@@ -7,18 +7,29 @@ data:
   USER_UID: "1000"
   USER_GID: "1000"
 
-  # GITEA__storage__STORAGE_TYPE: minio
-  GITEA__storage__STORAGE_TYPE: local
-  GITEA__storage__SERVE_DIRECT: "true"
+  GITEA__storage__STORAGE_TYPE: minio
+  #GITEA__storage__STORAGE_TYPE: local
+  GITEA__storage__SERVE_DIRECT: "false"
   GITEA__storage__MINIO_ENDPOINT: minio.xeserv.us
   GITEA__storage__MINIO_BUCKET: gitea
+  GITEA__storage__MINIO_LOCATION: auto
   GITEA__storage__MINIO_USE_SSL: "true"
-  GITEA__storage__MINIO_ACCESS_KEY_ID: "qI118JbfKI7jSoIODniy"
-  GITEA__stroage__MINIO_SECRET_ACCESS_KEY: "dIOfpszdPDKLurcppvic68TJcscZ4NZbgJr30RaX"
   GITEA__service__DISABLE_REGISTRATION: "false"
   GITEA__service__REGISTER_MANUAL_CONFIRM: "true"
   GITEA__service__ALLOW_ONLY_EXTERNAL_REGISTRATION: "true"
   GITEA__server__SSH_DOMAIN: "git.gitea.svc.alrest.xeserv.us"
+  GITEA__service.explore__REQUIRE_SIGNIN_VIEW: "true"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gitea-custom
+data:
+  robots.txt: |
+    User-agent: *
+    Disallow: /
+  # "templates/custom/header.tmpl": |
+  #   <meta name="robots" content="noindex" />
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -32,6 +43,8 @@ metadata:
     keel.sh/pollSchedule: "@hourly"
 spec:
   replicas: 1
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       xeiaso.net/thing: http
@@ -49,10 +62,20 @@ spec:
         - name: internal-certs
           secret:
             secretName: gitea-internal-tls
+        - name: custom
+          configMap:
+            name: gitea-custom
       containers:
         - name: main
           image: gitea/gitea:1-rootless
           imagePullPolicy: Always
+          resources:
+            limits:
+              cpu: "2"
+              memory: "2Gi"
+            requests:
+              cpu: "1"
+              memory: "1Gi"
           securityContext:
             runAsUser: 1000
             runAsGroup: 1000
@@ -66,6 +89,8 @@ spec:
           envFrom:
             - configMapRef:
                 name: gitea
+            - secretRef:
+                name: gitea-secrets
           ports:
             - name: http
               containerPort: 3000
@@ -80,6 +105,8 @@ spec:
             - name: data
               mountPath: /etc/gitea
               subPath: conf
+            - name: custom
+              mountPath: /var/lib/gitea/custom
           livenessProbe:
             httpGet:
               path: /api/healthz

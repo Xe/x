@@ -6,6 +6,19 @@ metadata:
     name: gitea
   annotations:
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/limit-rpm: "30"
+    # nginx.ingress.kubernetes.io/configuration-snippet: |
+    #   if ($http_user_agent ~* "(Amazon)" ){
+    #      return 444;
+    #   }
+    # nginx.ingress.kubernetes.io/configuration-snippet: |
+    #   if ($http_user_agent ~* "(Amazon)" ){
+    #      proxy_pass http://uncle-ted.default.svc.alrest.xeserv.us:80/gzip-bomb?url=$request_uri;
+    #   }
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      if ($http_user_agent ~* "(Amazon)" ){
+         proxy_pass http://uncle-ted.default.svc.alrest.xeserv.us:80/bee-movie?url=$request_uri;
+      }
 spec:
   ingressClassName: nginx
   tls:
