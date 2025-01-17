@@ -3,7 +3,6 @@ package main
 import (
 	_ "embed"
 	"flag"
-	"fmt"
 	"log"
 	"log/slog"
 	"net/http"
@@ -31,7 +30,6 @@ func defenseHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/plain")
 	w.Header().Set("Content-Encoding", "gzip")
 	w.Header().Set("Transfer-Encoding", "gzip")
-	w.Header().Set("Content-Length", fmt.Sprint(len(kaboom)))
 
 	w.WriteHeader(http.StatusOK)
 	w.Write(kaboom)
