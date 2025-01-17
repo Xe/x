@@ -7,6 +7,7 @@ import (
 	"log/slog"
 	"net/http"
 
+	"github.com/NYTimes/gziphandler"
 	"within.website/x/internal"
 )
 
@@ -23,7 +24,7 @@ var (
 func main() {
 	internal.HandleStartup()
 
-	http.HandleFunc("/bee-movie", beeMovie)
+	http.Handle("/bee-movie", gziphandler.GzipHandler(http.HandlerFunc(beeMovie)))
 	http.HandleFunc("/gzip-bomb", gzipBomb)
 
 	slog.Info("started up", "url", "http://localhost"+*bind)
