@@ -24,7 +24,12 @@ var (
 func main() {
 	internal.HandleStartup()
 
-	http.Handle("/bee-movie", gziphandler.GzipHandler(http.HandlerFunc(beeMovie)))
+	beeMovieHDLR, err := gziphandler.GzipHandlerWithOpts(gziphandler.CompressionLevel(9))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	http.Handle("/bee-movie", beeMovieHDLR(http.HandlerFunc(beeMovie)))
 	http.HandleFunc("/gzip-bomb", gzipBomb)
 
 	slog.Info("started up", "url", "http://localhost"+*bind)
