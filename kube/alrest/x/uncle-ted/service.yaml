@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: uncle-ted
+  labels:
+    app.kubernetes.io/name: uncle-ted
+spec:
+  selector:
+    app.kubernetes.io/name: uncle-ted
+  ports:
+    - port: 80
+      targetPort: 2836
+      name: http
+  type: ClusterIP
