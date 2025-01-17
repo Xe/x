@@ -262,6 +262,7 @@ all:
     BUILD --platform=linux/amd64 +stealthmountain
     BUILD --platform=linux/amd64 +stickers
     BUILD --platform=linux/amd64 +todayinmarch2020
+    BUILD --platform=linux/amd64 +uncle-ted
     BUILD --platform=linux/amd64 +within-website
     BUILD --platform=linux/amd64 +xedn
 
