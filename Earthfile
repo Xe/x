@@ -170,6 +170,16 @@ todayinmarch2020:
 
     SAVE IMAGE --push ghcr.io/xe/x/todayinmarch2020:latest
 
+uncle-ted:
+    FROM +runtime
+
+    COPY +everything/bin/uncle-ted /app/bin/uncle-ted
+    CMD ["/app/bin/uncle-ted"]
+
+    LABEL org.opencontainers.image.source="https://github.com/Xe/x"
+
+    SAVE IMAGE --push ghcr.io/xe/x/uncle-ted:latest
+
 within-website:
     FROM +runtime
 
