@@ -7,7 +7,7 @@ toolchain go1.23.2
 require (
 	al.essio.dev/pkg/shellescape v1.5.1
 	cirello.io/goherokuname v0.0.0-20190914093443-b436bae8c2c5
-	connectrpc.com/connect v1.16.2
+	connectrpc.com/connect v1.18.1
 	github.com/Marcel-ICMC/graw v0.0.0-20230411090719-e24cd8592d25
 	github.com/McKael/madon/v2 v2.4.0
 	github.com/Songmu/gitconfig v0.2.0
