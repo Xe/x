@@ -5,5 +5,6 @@ resources:
   - deployment.yaml
   - service.yaml
   - runner.yaml
+  #- external-dns.yaml
   - ingress.yaml
 namespace: gitea

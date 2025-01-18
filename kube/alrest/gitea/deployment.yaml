@@ -145,3 +145,34 @@ spec:
             - name: "internal-certs"
               mountPath: "/xe/pki"
               readOnly: true
+        - name: anubis
+          image: ghcr.io/xe/x/anubis:latest
+          imagePullPolicy: Always
+          env:
+          - name: "BIND"
+            value: ":8080"
+          - name: "DIFFICULTY"
+            value: "3"
+          - name: "METRICS_BIND"
+            value: ":9090"
+          - name: "SERVE_ROBOTS_TXT"
+            value: "true"
+          - name: "TARGET"
+            value: "http://localhost:3000"
+          resources:
+            limits:
+              cpu: 500m
+              memory: 128Mi
+            requests:
+              cpu: 250m
+              memory: 128Mi
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
