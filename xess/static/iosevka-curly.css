@@ -1,0 +1,6 @@
+@font-face {
+  font-family: "Iosevka Curly";
+  font-style: monospace;
+  font-display: swap;
+  src: url("iosevka-curly.woff2") format("woff2");
+}

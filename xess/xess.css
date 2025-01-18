@@ -1,8 +1,9 @@
-@import url(https://cdn.xeiaso.net/static/css/iosevka/family.css);
-@import url(https://cdn.xeiaso.net/static/css/podkova/family.css);
+@import url(./static/geist.css);
+@import url(./static/podkova.css);
+@import url(./static/iosevka-curly.css);
 
 main {
-  font-family: Iosevka Aile Iaso, sans-serif;
+  font-family: Geist, sans-serif;
   max-width: 50rem;
   padding: 2rem;
   margin: auto;
