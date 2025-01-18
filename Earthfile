@@ -52,6 +52,16 @@ amano:
 
     SAVE IMAGE --push ghcr.io/xe/x/amano:latest
 
+anubis:
+    FROM +runtime
+
+    COPY +everything/bin/anubis /app/bin/anubis
+    CMD ["/app/bin/anubis"]
+
+    LABEL org.opencontainers.image.source="https://github.com/Xe/x"
+
+    SAVE IMAGE --push ghcr.io/xe/x/anubis:latest
+
 aura:
     FROM +runtime
 
@@ -251,6 +261,7 @@ xedn:
 all:
     BUILD --platform=linux/amd64 +aerial
     BUILD --platform=linux/amd64 +amano
+    BUILD --platform=linux/amd64 +anubis
     BUILD --platform=linux/amd64 +aura
     BUILD --platform=linux/amd64 +future-sight
     BUILD --platform=linux/amd64 +hdrwtch

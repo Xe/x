@@ -1,0 +1,69 @@
+package main
+
+import (
+  "within.website/x/xess"
+)
+
+templ base(title string, body templ.Component) {
+  <!DOCTYPE html>
+  <html>
+
+  <head>
+    <title>{ title }</title>
+    <link rel="stylesheet" href={ xess.URL } />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      body,
+      html {
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 65ch;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .centered-div {
+        text-align: center;
+      }
+    </style>
+  </head>
+
+  <body id="top">
+    <main>
+      <center>
+        <h1 id="title" class=".centered-div">{ title }</h1>
+      </center>
+      @body
+      <footer>
+        <center>
+        <p>Protected by <a href="https://xeiaso.net/blog/2025/anubis">Anubis</a> from <a href="https://within.website">Within</a>.</p>
+        </center>
+      </footer>
+    </main>
+  </body>
+
+  </html>
+}
+
+templ index() {
+  <div class="centered-div">
+    <img id="image" width="256" src="/.within.website/x/cmd/anubis/static/img/pensive.webp" />
+    <img style="display:none;" width="256" src="/.within.website/x/cmd/anubis/static/img/happy.webp" />
+    <p id="status">Loading...</p>
+    <script async type="module" src="/.within.website/x/cmd/anubis/static/js/main.mjs"></script>
+    <noscript>
+      <p>Sadly, you must enable JavaScript to get past this challenge. I would love to not have to do this, but god is dead and AI scrapers have destroyed the common good.</p>
+    </noscript>
+  </div>
+}
+
+templ errorPage(message string) {
+  <div class="centered-div">
+    <img id="image" width="256" src="/.within.website/x/cmd/anubis/static/img/sad.webp" />
+    <p>{ message }.</p>
+    <button onClick="window.location.reload();">Try again</button>
+    <p><a href="/">Go home</a></p>
+  </div>
+}
