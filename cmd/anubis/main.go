@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"log"
 	"log/slog"
+	"math"
 	mrand "math/rand"
 	"net/http"
 	"net/http/httputil"
@@ -24,6 +25,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"within.website/x/internal"
 	"within.website/x/xess"
 )
@@ -37,6 +39,11 @@ var (
 
 	//go:embed static
 	static embed.FS
+
+	bypasses = promauto.NewCounter(prometheus.CounterOpts{
+		Name: "anubis_bypasses",
+		Help: "The total number of requests that bypassed challenge validation",
+	})
 
 	challengesIssued = promauto.NewCounter(prometheus.CounterOpts{
 		Name: "anubis_challenges_issued",
@@ -56,7 +63,7 @@ var (
 	timeTaken = promauto.NewHistogram(prometheus.HistogramOpts{
 		Name:    "anubis_time_taken",
 		Help:    "The time taken for a browser to generate a response (milliseconds)",
-		Buckets: prometheus.DefBuckets,
+		Buckets: prometheus.ExponentialBucketsRange(1, math.Pow(2, 18), 19),
 	})
 )
 
@@ -94,10 +101,21 @@ func main() {
 		})
 	}
 
+	if *metricsBind != "" {
+		go metricsServer()
+	}
+
 	mux.HandleFunc("/", s.maybeReverseProxy)
 
-	slog.Info("listening", "url", "http://localhost"+*bind)
+	slog.Info("listening", "url", "http://localhost"+*bind, "difficulty", *challengeDifficulty, "serveRobotsTXT", *robotsTxt, "target", *target)
 	log.Fatal(http.ListenAndServe(*bind, mux))
+}
+
+func metricsServer() {
+	mux := http.NewServeMux()
+	mux.Handle("/metrics", promhttp.Handler())
+	slog.Debug("listening for metrics", "url", "http://localhost"+*metricsBind)
+	log.Fatal(http.ListenAndServe(*metricsBind, mux))
 }
 
 func sha256sum(text string) (string, error) {

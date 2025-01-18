@@ -1,0 +1,12 @@
+[Unit]
+Description="Anubis HTTP defense proxy (instance %i)"
+
+[Service]
+ExecStart=/usr/bin/anubis
+Restart=always
+RestartSec=30s
+EnvironmentFile=/etc/anubis/anubis-%i.env
+LimitNOFILE=infinity
+
+[Install]
+WantedBy=multi-user.target
