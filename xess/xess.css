@@ -1,6 +1,25 @@
-@import url(./static/geist.css);
-@import url(./static/podkova.css);
-@import url(./static/iosevka-curly.css);
+@font-face {
+  font-family: "Geist";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("./static/geist.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Podkova";
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url("./static/podkova.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Iosevka Curly";
+  font-style: monospace;
+  font-display: swap;
+  src: url("./static/iosevka-curly.woff2") format("woff2");
+}
 
 main {
   font-family: Geist, sans-serif;

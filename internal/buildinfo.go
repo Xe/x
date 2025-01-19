@@ -5,6 +5,8 @@ import (
 	"log/slog"
 	"net/http"
 	"runtime/debug"
+
+	"within.website/x"
 )
 
 func init() {
@@ -16,7 +18,10 @@ func init() {
 			return
 		}
 
-		if err := json.NewEncoder(w).Encode(bi); err != nil {
+		if err := json.NewEncoder(w).Encode(struct {
+			BuildInfo *debug.BuildInfo `json:"build_info"`
+			Version   string           `json:"version"`
+		}{bi, x.Version}); err != nil {
 			slog.Error("can't encode build info", "err", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
