@@ -299,6 +299,20 @@ func (s *Server) passChallenge(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	difficultyStr := r.FormValue("difficulty")
+	if difficultyStr == "" {
+		clearCookie(w)
+		templ.Handler(base("Oh noes!", errorPage("missing difficulty")), templ.WithStatus(http.StatusInternalServerError)).ServeHTTP(w, r)
+		return
+	}
+
+	difficulty, err := strconv.Atoi(difficultyStr)
+	if err != nil {
+		clearCookie(w)
+		templ.Handler(base("Oh noes!", errorPage("invalid difficulty")), templ.WithStatus(http.StatusInternalServerError)).ServeHTTP(w, r)
+		return
+	}
+
 	slog.Info("challenge took", "elapsedTime", elapsedTime)
 	timeTaken.Observe(elapsedTime)
 
@@ -323,6 +337,14 @@ func (s *Server) passChallenge(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if subtle.ConstantTimeCompare([]byte(response), []byte(calculated)) != 1 {
+		clearCookie(w)
+		templ.Handler(base("Oh noes!", errorPage("invalid response")), templ.WithStatus(http.StatusForbidden)).ServeHTTP(w, r)
+		failedValidations.Inc()
+		return
+	}
+
+	// compare the leading zeroes
+	if !strings.HasPrefix(response, strings.Repeat("0", difficulty)) {
 		clearCookie(w)
 		templ.Handler(base("Oh noes!", errorPage("invalid response")), templ.WithStatus(http.StatusForbidden)).ServeHTTP(w, r)
 		failedValidations.Inc()

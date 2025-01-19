@@ -42,6 +42,6 @@ const u = (url = "", params = {}) => {
 
   setTimeout(() => {
     const redir = window.location.href;
-    window.location.href = u("/.within.website/x/cmd/anubis/api/pass-challenge", { response: hash, nonce, redir, elapsedTime: t1 - t0 });
+    window.location.href = u("/.within.website/x/cmd/anubis/api/pass-challenge", { response: hash, nonce, redir, elapsedTime: t1 - t0, difficulty });
   }, 2000);
 })();
