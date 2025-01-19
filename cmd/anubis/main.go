@@ -84,7 +84,7 @@ func main() {
 
 	mux := http.NewServeMux()
 
-	mux.Handle(staticPath, http.StripPrefix(staticPath, http.FileServerFS(static)))
+	mux.Handle(staticPath, internal.UnchangingCache(http.StripPrefix(staticPath, http.FileServerFS(static))))
 	xess.Mount(mux)
 
 	mux.HandleFunc("POST /.within.website/x/cmd/anubis/api/make-challenge", s.makeChallenge)
