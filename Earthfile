@@ -28,7 +28,7 @@ everything:
 
     COPY . .
     RUN mkdir -p bin
-    RUN --mount=type=cache,target=/root/.cache GOBIN=$(pwd)/bin go install -ldflags="-X within.website/x.Version=$(git describe --tags)" ./... 
+    RUN --mount=type=cache,target=/root/.cache sh -c 'GOBIN=$(pwd)/bin go install -ldflags="-X within.website/x.Version=$(git describe --tags)" ./...'
 
     SAVE ARTIFACT bin
 

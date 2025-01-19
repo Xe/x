@@ -5,11 +5,13 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	stdslog "log/slog"
 	"os"
 	"path/filepath"
 
 	"github.com/posener/complete"
 	"go4.org/legal"
+	"within.website/x"
 	"within.website/x/flagfolder"
 	"within.website/x/internal/confyg/flagconfyg"
 	"within.website/x/internal/flagenv"
@@ -82,6 +84,8 @@ func HandleStartup() {
 	if *manpageGen {
 		manpage.Spew()
 	}
+
+	stdslog.Debug("starting up", "version", x.Version, "program", filepath.Base(os.Args[0]))
 }
 
 func HandleCompletion(args complete.Predictor, subcommands complete.Commands) {
