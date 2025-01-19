@@ -133,8 +133,8 @@ func challengeFor(r *http.Request) string {
 		r.Header.Get("Accept-Encoding"),
 		r.Header.Get("Accept-Language"),
 		r.Header.Get("X-Real-Ip"),
-		time.Now().UTC().Round(24*7*time.Hour).Format(time.RFC3339),
 		r.UserAgent(),
+		time.Now().UTC().Round(24*7*time.Hour).Format(time.RFC3339),
 	)
 	result, _ := sha256sum(data)
 	return result
@@ -198,23 +198,24 @@ func (s *Server) maybeReverseProxy(w http.ResponseWriter, r *http.Request) {
 	ckie, err := r.Cookie(cookieName)
 	if err != nil {
 		slog.Debug("cookie not found", "path", r.URL.Path)
+		clearCookie(w)
 		s.renderIndex(w, r)
 		return
 	}
 
-	if ckie.Expires.IsZero() {
-		slog.Debug("cookie has no expiration time", "path", r.URL.Path)
+	if err := ckie.Valid(); err != nil {
+		slog.Debug("cookie is invalid", "err", err)
+		clearCookie(w)
 		s.renderIndex(w, r)
 		return
 	}
 
-	// slog.Debug("cookie expiration time", "expires", ckie.Expires)
-	// if !ckie.Expires.IsZero() && ckie.Expires.Before(time.Now()) {
-	// 	slog.Debug("cookie expired", "path", r.URL.Path)
-	// 	clearCookie(w)
-	// 	s.renderIndex(w, r)
-	// 	return
-	// }
+	if time.Now().After(ckie.Expires) && !ckie.Expires.IsZero() {
+		slog.Debug("cookie expired", "path", r.URL.Path)
+		clearCookie(w)
+		s.renderIndex(w, r)
+		return
+	}
 
 	token, err := jwt.ParseWithClaims(ckie.Value, jwt.MapClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return s.pub, nil
@@ -227,15 +228,32 @@ func (s *Server) maybeReverseProxy(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	claims := token.Claims.(jwt.MapClaims)
+
+	exp, ok := claims["exp"].(float64)
+	if !ok {
+		slog.Debug("exp is not int64", "ok", ok, "typeof(exp)", fmt.Sprintf("%T", exp))
+		clearCookie(w)
+		s.renderIndex(w, r)
+		return
+	}
+
+	if exp := time.Unix(int64(exp), 0); time.Now().After(exp) {
+		slog.Debug("token has expired", "exp", exp.Format(time.RFC3339))
+		clearCookie(w)
+		s.renderIndex(w, r)
+		return
+	}
+
 	if token.Valid && randomJitter() {
-		slog.Debug("randomly choosing to not check challenge value")
+		slog.Debug("cookie is not enrolled into secondary screening")
 		s.rp.ServeHTTP(w, r)
 		return
 	}
 
-	claims := token.Claims.(jwt.MapClaims)
 	if claims["challenge"] != challengeFor(r) {
 		slog.Debug("invalid challenge", "path", r.URL.Path)
+		clearCookie(w)
 		s.renderIndex(w, r)
 		return
 	}
@@ -267,7 +285,6 @@ func (s *Server) maybeReverseProxy(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) renderIndex(w http.ResponseWriter, r *http.Request) {
-	clearCookie(w)
 	templ.Handler(
 		base("Making sure you're not a bot!", index()),
 	).ServeHTTP(w, r)
