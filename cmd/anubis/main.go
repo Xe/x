@@ -202,6 +202,12 @@ func (s *Server) maybeReverseProxy(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if ckie.Expires.IsZero() {
+		slog.Debug("cookie has no expiration time", "path", r.URL.Path)
+		s.renderIndex(w, r)
+		return
+	}
+
 	slog.Debug("cookie expiration time", "expires", ckie.Expires)
 	if !ckie.Expires.IsZero() && ckie.Expires.Before(time.Now()) {
 		slog.Debug("cookie expired", "path", r.URL.Path)
@@ -395,6 +401,7 @@ func clearCookie(w http.ResponseWriter) {
 		Name:    cookieName,
 		Value:   "",
 		Expires: time.Now().Add(-1 * time.Hour),
+		MaxAge:  -1,
 	})
 }
 
