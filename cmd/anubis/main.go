@@ -202,6 +202,13 @@ func (s *Server) maybeReverseProxy(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if ckie.Expires.Before(time.Now()) {
+		slog.Debug("cookie expired", "path", r.URL.Path)
+		clearCookie(w)
+		s.renderIndex(w, r)
+		return
+	}
+
 	token, err := jwt.ParseWithClaims(ckie.Value, jwt.MapClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return s.pub, nil
 	})
@@ -244,11 +251,7 @@ func (s *Server) maybeReverseProxy(w http.ResponseWriter, r *http.Request) {
 	if subtle.ConstantTimeCompare([]byte(claims["response"].(string)), []byte(calculated)) != 1 {
 		slog.Debug("invalid response", "path", r.URL.Path)
 		failedValidations.Inc()
-		http.SetCookie(w, &http.Cookie{
-			Name:    cookieName,
-			Value:   "",
-			Expires: time.Now().Add(-1 * time.Hour),
-		})
+		clearCookie(w)
 		s.renderIndex(w, r)
 		return
 	}

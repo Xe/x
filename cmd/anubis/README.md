@@ -30,6 +30,39 @@ For live chat, please join the [Patreon](https://patreon.com/cadey) and ask in t
 
 Anubis uses a proof-of-work challenge to ensure that clients are using a modern browser and are able to calculate SHA-256 checksums. Anubis has a customizable difficulty for this proof-of-work challenge, but defaults to 5 leading zeroes.
 
+```mermaid
+---
+title: Challenge generation and validation
+---
+
+flowchart TD
+    Backend("Backend")
+    Fail("Fail")
+
+    style PresentChallenge color:#FFFFFF, fill:#AA00FF, stroke:#AA00FF
+    style ValidateChallenge color:#FFFFFF, fill:#AA00FF, stroke:#AA00FF
+    style Backend color:#FFFFFF, stroke:#00C853, fill:#00C853
+    style Fail color:#FFFFFF, stroke:#FF2962, fill:#FF2962
+
+    subgraph Server
+        PresentChallenge("Present Challenge")
+        ValidateChallenge("Validate Challenge")
+    end
+
+    subgraph Client
+        Main("main.mjs")
+        Worker("Worker")
+    end
+
+    Main -- Request challenge --> PresentChallenge
+    PresentChallenge -- Return challenge & difficulty --> Main
+    Main -- Spawn worker --> Worker
+    Worker -- Successful challenge --> Main
+    Main -- Validate challenge --> ValidateChallenge
+    ValidateChallenge -- Return cookie --> Backend
+    ValidateChallenge -- If anything is wrong --> Fail
+```
+
 ### Challenge presentation
 
 Anubis decides to present a challenge using this logic:
@@ -39,6 +72,48 @@ Anubis decides to present a challenge using this logic:
 - Request path is not obviously an RSS feed (ends with `.rss`, `.xml`, or `.atom`)
 
 This should ensure that git clients, RSS readers, and other low-harm clients can get through without issue, but high-risk clients such as browsers and AI scraper bots will get blocked.
+
+```mermaid
+---
+title: Challenge presentation logic
+---
+
+flowchart LR
+    Request("Request")
+    Backend("Backend")
+    %%Fail("Fail")
+    PresentChallenge("Present
+challenge")
+    HasMozilla{"Is browser
+or scraper?"}
+    HasCookie{"Has cookie?"}
+    HasExpired{"Cookie expired?"}
+    HasSignature{"Has valid
+signature?"}
+    RandomJitter{"Secondary
+screening?"}
+    POWPass{"Proof of
+work valid?"}
+
+    style PresentChallenge color:#FFFFFF, fill:#AA00FF, stroke:#AA00FF
+    style Backend color:#FFFFFF, stroke:#00C853, fill:#00C853
+    %%style Fail color:#FFFFFF, stroke:#FF2962, fill:#FF2962
+
+    Request --> HasMozilla
+    HasMozilla -- Yes --> HasCookie
+    HasMozilla -- No --> Backend
+    HasCookie -- Yes --> HasExpired
+    HasCookie -- No --> PresentChallenge
+    HasExpired -- Yes --> PresentChallenge
+    HasExpired -- No --> HasSignature
+    HasSignature -- Yes --> RandomJitter
+    HasSignature -- No --> PresentChallenge
+    RandomJitter -- Yes --> POWPass
+    RandomJitter -- No --> Backend
+    POWPass -- Yes --> Backend
+    PowPass -- No --> PresentChallenge
+    PresentChallenge -- Back again for another cycle --> Request
+```
 
 ### Proof of passing challenges
 
