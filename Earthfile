@@ -26,9 +26,11 @@ deps:
 everything:
     FROM +deps
 
+    ARG VERSION=no-version-error
+
     COPY . .
     RUN mkdir -p bin
-    RUN --mount=type=cache,target=/root/.cache sh -c 'GOBIN=$(pwd)/bin go install -ldflags="-X within.website/x.Version=$(git describe --tags)" ./...'
+    RUN --mount=type=cache,target=/root/.cache GOBIN=$(pwd)/bin go install -ldflags="-X within.website/x.Version=${VERSION}" ./...
 
     SAVE ARTIFACT bin
 
@@ -259,23 +261,23 @@ xedn:
     SAVE IMAGE --push registry.fly.io/xedn:latest
 
 all:
-    BUILD --platform=linux/amd64 +aerial
-    BUILD --platform=linux/amd64 +amano
-    BUILD --platform=linux/amd64 +anubis
-    BUILD --platform=linux/amd64 +aura
-    BUILD --platform=linux/amd64 +future-sight
-    BUILD --platform=linux/amd64 +hdrwtch
-    BUILD --platform=linux/amd64 +hlang
-    BUILD --platform=linux/amd64 +mi
-    BUILD --platform=linux/amd64 +mimi
-    BUILD --platform=linux/amd64 +relayd
-    BUILD --platform=linux/amd64 +sapientwindex
-    BUILD --platform=linux/amd64 +stealthmountain
-    BUILD --platform=linux/amd64 +stickers
-    BUILD --platform=linux/amd64 +todayinmarch2020
-    BUILD --platform=linux/amd64 +uncle-ted
-    BUILD --platform=linux/amd64 +within-website
-    BUILD --platform=linux/amd64 +xedn
+    BUILD --pass-args --platform=linux/amd64 +aerial
+    BUILD --pass-args --platform=linux/amd64 +amano
+    BUILD --pass-args --platform=linux/amd64 +anubis
+    BUILD --pass-args --platform=linux/amd64 +aura
+    BUILD --pass-args --platform=linux/amd64 +future-sight
+    BUILD --pass-args --platform=linux/amd64 +hdrwtch
+    BUILD --pass-args --platform=linux/amd64 +hlang
+    BUILD --pass-args --platform=linux/amd64 +mi
+    BUILD --pass-args --platform=linux/amd64 +mimi
+    BUILD --pass-args --platform=linux/amd64 +relayd
+    BUILD --pass-args --platform=linux/amd64 +sapientwindex
+    BUILD --pass-args --platform=linux/amd64 +stealthmountain
+    BUILD --pass-args --platform=linux/amd64 +stickers
+    BUILD --pass-args --platform=linux/amd64 +todayinmarch2020
+    BUILD --pass-args --platform=linux/amd64 +uncle-ted
+    BUILD --pass-args --platform=linux/amd64 +within-website
+    BUILD --pass-args --platform=linux/amd64 +xedn
 
-    BUILD --platform=linux/amd64 ./kube/alrest/staticsites/caddy1+all
-    BUILD --platform=linux/amd64 ./migroserbices/falin+run
+    BUILD --pass-args --platform=linux/amd64 ./kube/alrest/staticsites/caddy1+all
+    BUILD --pass-args --platform=linux/amd64 ./migroserbices/falin+run

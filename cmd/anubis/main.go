@@ -26,6 +26,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"within.website/x"
 	"within.website/x/internal"
 	"within.website/x/xess"
 )
@@ -107,7 +108,7 @@ func main() {
 
 	mux.HandleFunc("/", s.maybeReverseProxy)
 
-	slog.Info("listening", "url", "http://localhost"+*bind, "difficulty", *challengeDifficulty, "serveRobotsTXT", *robotsTxt, "target", *target)
+	slog.Info("listening", "url", "http://localhost"+*bind, "difficulty", *challengeDifficulty, "serveRobotsTXT", *robotsTxt, "target", *target, "version", x.Version)
 	log.Fatal(http.ListenAndServe(*bind, mux))
 }
 
