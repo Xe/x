@@ -20,6 +20,9 @@ spec:
         - name: main
           image: ghcr.io/xe/x/hlang:latest
           imagePullPolicy: "Always"
+          env:
+          - name: SLOG_LEVEL
+            value: debug
           resources:
             limits:
               cpu: "500m"
