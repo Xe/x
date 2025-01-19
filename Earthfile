@@ -30,7 +30,7 @@ everything:
 
     COPY . .
     RUN mkdir -p bin
-    RUN --mount=type=cache,target=/root/.cache GOBIN=$(pwd)/bin go install -ldflags="-X within.website/x.Version=${VERSION}" ./...
+    RUN --mount=type=cache,target=/root/.cache GOBIN=$(pwd)/bin go install -ldflags="-X within.website/x.Version="${VERSION} ./...
 
     SAVE ARTIFACT bin
 
