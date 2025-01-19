@@ -46,7 +46,7 @@ function processTask() {
       let nonce = 0;
       do {
         hash = await sha256(data + nonce++);
-      } while (hash.substr(0, difficulty) !== Array(difficulty + 1).join('0'));
+      } while (hash.substring(0, difficulty) !== Array(difficulty + 1).join('0'));
 
       nonce -= 1; // last nonce was post-incremented
 

@@ -129,10 +129,11 @@ func sha256sum(text string) (string, error) {
 
 func challengeFor(r *http.Request) string {
 	data := fmt.Sprintf(
-		"Accept-Encoding=%s,Accept-Language=%s,X-Real-IP=%s,User-Agent=%s",
+		"Accept-Encoding=%s,Accept-Language=%s,X-Real-IP=%s,User-Agent=%s,WeekTime=%s",
 		r.Header.Get("Accept-Encoding"),
 		r.Header.Get("Accept-Language"),
 		r.Header.Get("X-Real-Ip"),
+		time.Now().UTC().Round(24*7*time.Hour).Format(time.RFC3339),
 		r.UserAgent(),
 	)
 	result, _ := sha256sum(data)
