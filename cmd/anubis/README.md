@@ -18,6 +18,8 @@ This is a bit of a nuclear response, but AI scraper bots scraping so aggressivel
 
 In most cases, you should not need this and can probably get by using Cloudflare to protect a given origin. However, for circumstances where you can't or won't use Cloudflare, Anubis is there for you.
 
+If you want to try this out, connect to [git.xeserv.us](https://git.xeserv.us).
+
 ## Support
 
 If you run into any issues running Anubis, please [open an issue](https://github.com/Xe/x/issues/new?template=Blank+issue) and tag it with the Anubis tag. Please include all the information I would need to diagnose your issue.

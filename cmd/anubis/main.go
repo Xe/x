@@ -168,22 +168,27 @@ type Server struct {
 func (s *Server) maybeReverseProxy(w http.ResponseWriter, r *http.Request) {
 	switch {
 	case !strings.Contains(r.UserAgent(), "Mozilla"):
+		bypasses.Inc()
 		slog.Debug("non-browser user agent")
 		s.rp.ServeHTTP(w, r)
 		return
 	case strings.HasPrefix(r.URL.Path, "/.well-known/"):
+		bypasses.Inc()
 		slog.Debug("well-known path")
 		s.rp.ServeHTTP(w, r)
 		return
 	case strings.HasSuffix(r.URL.Path, ".rss") || strings.HasSuffix(r.URL.Path, ".xml") || strings.HasSuffix(r.URL.Path, ".atom"):
+		bypasses.Inc()
 		slog.Debug("rss path")
 		s.rp.ServeHTTP(w, r)
 		return
 	case r.URL.Path == "/favicon.ico":
+		bypasses.Inc()
 		slog.Debug("favicon path")
 		s.rp.ServeHTTP(w, r)
 		return
 	case r.URL.Path == "/robots.txt":
+		bypasses.Inc()
 		slog.Debug("robots.txt path")
 		s.rp.ServeHTTP(w, r)
 		return
@@ -216,7 +221,6 @@ func (s *Server) maybeReverseProxy(w http.ResponseWriter, r *http.Request) {
 	claims := token.Claims.(jwt.MapClaims)
 	if claims["challenge"] != challengeFor(r) {
 		slog.Debug("invalid challenge", "path", r.URL.Path)
-		clearCookie(w)
 		s.renderIndex(w, r)
 		return
 	}

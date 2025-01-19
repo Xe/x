@@ -29,17 +29,14 @@ export function process(data, difficulty = 5) {
 
 function processTask() {
   return function () {
-    function sha256(text) {
-      return new Promise((resolve, reject) => {
-        let buffer = (new TextEncoder).encode(text);
-
-        crypto.subtle.digest('SHA-256', buffer.buffer).then(result => {
-          resolve(Array.from(new Uint8Array(result)).map(
-            c => c.toString(16).padStart(2, '0')
-          ).join(''));
-        }, reject);
-      });
-    }
+    const sha256 = (text) => {
+      const encoded = new TextEncoder().encode(text);
+      return crypto.subtle.digest("SHA-256", encoded.buffer).then((result) =>
+        Array.from(new Uint8Array(result))
+          .map((c) => c.toString(16).padStart(2, "0"))
+          .join(""),
+      );
+    };
 
     addEventListener('message', async (event) => {
       let data = event.data.data;
