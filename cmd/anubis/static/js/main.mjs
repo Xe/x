@@ -14,6 +14,7 @@ const u = (url = "", params = {}) => {
   const status = document.getElementById('status');
   const image = document.getElementById('image');
   const title = document.getElementById('title');
+  const spinner = document.getElementById('spinner');
 
   status.innerHTML = 'Calculating...';
 
@@ -39,6 +40,8 @@ const u = (url = "", params = {}) => {
   title.innerHTML = "Success!";
   status.innerHTML = `Done! Took ${t1 - t0}ms, ${nonce} iterations`;
   image.src = "/.within.website/x/cmd/anubis/static/img/happy.webp";
+  spinner.innerHTML = "";
+  spinner.style.display = "none";
 
   setTimeout(() => {
     const redir = window.location.href;
