@@ -127,14 +127,20 @@ func sha256sum(text string) (string, error) {
 	return hex.EncodeToString(hash.Sum(nil)), nil
 }
 
-func challengeFor(r *http.Request) string {
+func (s *Server) challengeFor(r *http.Request) string {
+	fp := sha256.Sum256(s.priv.Seed())
+
 	data := fmt.Sprintf(
-		"Accept-Encoding=%s,Accept-Language=%s,X-Real-IP=%s,User-Agent=%s,WeekTime=%s",
+		"Accept-Encoding=%s,Accept-Language=%s,X-Real-IP=%s,User-Agent=%s,WeekTime=%s,Fingerprint=%x",
 		r.Header.Get("Accept-Encoding"),
 		r.Header.Get("Accept-Language"),
 		r.Header.Get("X-Real-Ip"),
 		r.UserAgent(),
+<<<<<<< Updated upstream
 		time.Now().UTC().Round(24*7*time.Hour).Format(time.RFC3339),
+=======
+		fp,
+>>>>>>> Stashed changes
 	)
 	result, _ := sha256sum(data)
 	return result
@@ -251,7 +257,12 @@ func (s *Server) maybeReverseProxy(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+<<<<<<< Updated upstream
 	if claims["challenge"] != challengeFor(r) {
+=======
+	claims := token.Claims.(jwt.MapClaims)
+	if claims["challenge"] != s.challengeFor(r) {
+>>>>>>> Stashed changes
 		slog.Debug("invalid challenge", "path", r.URL.Path)
 		clearCookie(w)
 		s.renderIndex(w, r)
@@ -264,7 +275,7 @@ func (s *Server) maybeReverseProxy(w http.ResponseWriter, r *http.Request) {
 		nonce = int(v)
 	}
 
-	calcString := fmt.Sprintf("%s%d", challengeFor(r), nonce)
+	calcString := fmt.Sprintf("%s%d", s.challengeFor(r), nonce)
 	calculated, err := sha256sum(calcString)
 	if err != nil {
 		slog.Error("failed to calculate sha256sum", "path", r.URL.Path, "err", err)
@@ -291,7 +302,7 @@ func (s *Server) renderIndex(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) makeChallenge(w http.ResponseWriter, r *http.Request) {
-	challenge := challengeFor(r)
+	challenge := s.challengeFor(r)
 	difficulty := *challengeDifficulty
 
 	json.NewEncoder(w).Encode(struct {
@@ -347,7 +358,7 @@ func (s *Server) passChallenge(w http.ResponseWriter, r *http.Request) {
 	response := r.FormValue("response")
 	redir := r.FormValue("redir")
 
-	challenge := challengeFor(r)
+	challenge := s.challengeFor(r)
 
 	nonce, err := strconv.Atoi(nonceStr)
 	if err != nil {
