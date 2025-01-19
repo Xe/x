@@ -6,7 +6,6 @@ metadata:
     name: gitea
   annotations:
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
-    nginx.ingress.kubernetes.io/limit-rpm: "30"
     nginx.ingress.kubernetes.io/proxy-body-size: 2048g
     # nginx.ingress.kubernetes.io/configuration-snippet: |
     #   if ($http_user_agent ~* "(Amazon)" ){

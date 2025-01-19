@@ -152,13 +152,15 @@ spec:
           - name: "BIND"
             value: ":8080"
           - name: "DIFFICULTY"
-            value: "3"
+            value: "4"
           - name: "METRICS_BIND"
             value: ":9090"
           - name: "SERVE_ROBOTS_TXT"
             value: "true"
           - name: "TARGET"
             value: "http://localhost:3000"
+          # - name: "SLOG_LEVEL"
+          #   value: "debug"
           resources:
             limits:
               cpu: 500m
