@@ -40,9 +40,9 @@ jobs:
         if: github.event_name != 'pull_request'
         id: build-and-push
         run: |
-          earthly --org me-2625 --sat alpha --ci --push +all --VERSION=$(git describe --tags)
+          earthly --org me-2625 --sat alpha --ci --push +all
       - name: Build Docker image
         if: github.event_name == 'pull_request'
         id: build
         run: |
-          earthly --org me-2625 --sat alpha --ci +all --VERSION=$(git describe --tags)
+          earthly --org me-2625 --sat alpha --ci +all
