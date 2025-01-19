@@ -27,7 +27,7 @@ everything:
     FROM +deps
 
     COPY . .
-    ARG VERSION=$(git describe --tags)
+    ARG VERSION=$(git describe --tags --always --dirty)
     RUN mkdir -p bin
     RUN --mount=type=cache,target=/root/.cache GOBIN=$(pwd)/bin go install -ldflags="-X within.website/x.Version="${VERSION} ./...
 
