@@ -112,10 +112,9 @@ func main() {
 }
 
 func metricsServer() {
-	mux := http.NewServeMux()
-	mux.Handle("/metrics", promhttp.Handler())
+	http.DefaultServeMux.Handle("/metrics", promhttp.Handler())
 	slog.Debug("listening for metrics", "url", "http://localhost"+*metricsBind)
-	log.Fatal(http.ListenAndServe(*metricsBind, mux))
+	log.Fatal(http.ListenAndServe(*metricsBind, nil))
 }
 
 func sha256sum(text string) (string, error) {
