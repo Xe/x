@@ -254,12 +254,7 @@ func (s *Server) maybeReverseProxy(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-<<<<<<< Updated upstream
-	if claims["challenge"] != challengeFor(r) {
-=======
-	claims := token.Claims.(jwt.MapClaims)
 	if claims["challenge"] != s.challengeFor(r) {
->>>>>>> Stashed changes
 		slog.Debug("invalid challenge", "path", r.URL.Path)
 		clearCookie(w)
 		s.renderIndex(w, r)
