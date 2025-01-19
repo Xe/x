@@ -137,6 +137,7 @@ Challenges are formed by taking some user request metadata and using that to gen
 - `X-Real-Ip`: The IP address of the requestor, as set by a reverse proxy server.
 - `User-Agent`: The user agent string of the requestor.
 - The current time in UTC rounded to the nearest week.
+- The fingerprint (checksum) of Anubis' private ED25519 key.
 
 This forms a fingerprint of the requestor using metadata that any requestor already is sending. It also uses time as an input, which is known to both the server and requestor due to the nature of linear timelines. Depending on facts and circumstances, you may wish to disclose this to your users.
 
