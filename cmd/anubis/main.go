@@ -136,11 +136,8 @@ func (s *Server) challengeFor(r *http.Request) string {
 		r.Header.Get("Accept-Language"),
 		r.Header.Get("X-Real-Ip"),
 		r.UserAgent(),
-<<<<<<< Updated upstream
 		time.Now().UTC().Round(24*7*time.Hour).Format(time.RFC3339),
-=======
 		fp,
->>>>>>> Stashed changes
 	)
 	result, _ := sha256sum(data)
 	return result
