@@ -1,6 +1,7 @@
 package main
 
 import (
+  "within.website/x"
   "within.website/x/xess"
 )
 
@@ -49,10 +50,10 @@ templ base(title string, body templ.Component) {
 
 templ index() {
   <div class="centered-div">
-    <img id="image" width="256" src="/.within.website/x/cmd/anubis/static/img/pensive.webp" />
-    <img style="display:none;" width="256" src="/.within.website/x/cmd/anubis/static/img/happy.webp" />
+    <img id="image" width="256" src={"/.within.website/x/cmd/anubis/static/img/pensive.webp?cacheBuster=" + x.Version} />
+    <img style="display:none;" width="256" src={"/.within.website/x/cmd/anubis/static/img/happy.webp?cacheBuster=" + x.Version} />
     <p id="status">Loading...</p>
-    <script async type="module" src="/.within.website/x/cmd/anubis/static/js/main.mjs"></script>
+    <script async type="module" src={"/.within.website/x/cmd/anubis/static/js/main.mjs?cacheBuster=" + x.Version}></script>
     <noscript>
       <p>Sadly, you must enable JavaScript to get past this challenge. I would love to not have to do this, but god is dead and AI scrapers have destroyed the common good.</p>
     </noscript>
@@ -61,7 +62,7 @@ templ index() {
 
 templ errorPage(message string) {
   <div class="centered-div">
-    <img id="image" width="256" src="/.within.website/x/cmd/anubis/static/img/sad.webp" />
+    <img id="image" width="256" src={"/.within.website/x/cmd/anubis/static/img/sad.webp?cacheBuster=" + x.Version} />
     <p>{ message }.</p>
     <button onClick="window.location.reload();">Try again</button>
     <p><a href="/">Go home</a></p>
