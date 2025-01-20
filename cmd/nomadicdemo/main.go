@@ -49,7 +49,7 @@ func main() {
 			if err != nil {
 				slog.Error("can't make image", "err", err)
 				templ.Handler(
-					xess.Simple("Scale to 0 demo", ohNoes(err.Error())),
+					xess.Simple("It broke!", ohNoes(err.Error())),
 					templ.WithStatus(http.StatusInternalServerError),
 				).ServeHTTP(w, r)
 				return
@@ -68,7 +68,10 @@ func main() {
 		}
 
 		templ.Handler(
-			xess.Simple("Scale to 0 demo", index(prompt, negPrompt, imageURL, howLong)),
+			xess.Simple(
+				"Nomadic Infra Demo",
+				index(prompt, negPrompt, imageURL, howLong),
+			),
 		).ServeHTTP(w, r)
 	})
 
