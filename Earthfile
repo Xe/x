@@ -61,6 +61,7 @@ anubis:
 
     LABEL org.opencontainers.image.source="https://github.com/Xe/x"
 
+    USER 1000:1000
     SAVE IMAGE --push ghcr.io/xe/x/anubis:latest
 
 aura:
