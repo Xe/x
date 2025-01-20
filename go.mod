@@ -10,6 +10,7 @@ require (
 	connectrpc.com/connect v1.18.1
 	github.com/Marcel-ICMC/graw v0.0.0-20230411090719-e24cd8592d25
 	github.com/McKael/madon/v2 v2.4.0
+	github.com/NYTimes/gziphandler v1.1.1
 	github.com/Songmu/gitconfig v0.2.0
 	github.com/a-h/templ v0.3.819
 	github.com/adrg/frontmatter v0.2.0
@@ -89,7 +90,6 @@ require (
 	github.com/Masterminds/semver/v3 v3.2.1 // indirect
 	github.com/Masterminds/sprig/v3 v3.2.3 // indirect
 	github.com/Microsoft/go-winio v0.6.1 // indirect
-	github.com/NYTimes/gziphandler v1.1.1 // indirect
 	github.com/ProtonMail/go-crypto v1.1.3 // indirect
 	github.com/andybalholm/brotli v1.1.1 // indirect
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.6.2 // indirect
@@ -259,7 +259,7 @@ require (
 	github.com/sacOO7/gowebsocket v0.0.0-20221109081133-70ac927be105
 	github.com/sendgrid/rest v2.6.9+incompatible // indirect
 	golang.org/x/exp v0.0.0-20240719175910-8a7402abbf56
-	golang.org/x/image v0.18.0
+	golang.org/x/image v0.23.0
 	golang.org/x/mod v0.20.0 // indirect
 	golang.org/x/net v0.33.0
 	golang.org/x/sys v0.28.0 // indirect
