@@ -151,6 +151,8 @@ Anubis is meant to sit between your reverse proxy (such as Nginx or Caddy) and y
 
 Anubis is shipped in the Docker image [`ghcr.io/xe/x/anubis:latest`](https://github.com/Xe/x/pkgs/container/x%2Fanubis). Other methods to install Anubis may exist, but the Docker image is currently the only supported method.
 
+The Docker image runs Anubis as user ID 1000 and group ID 1000. If you are mounting external volumes into Anubis' container, please be sure they are owned by or writable to this user/group.
+
 Anubis has very minimal system requirements. I suspect that 128Mi of ram may be sufficient for a large number of concurrent clients. Anubis may be a poor fit for apps that use WebSockets and maintain open connections, but I don't have enough real-world experience to know one way or another.
 
 Anubis uses these environment variables for configuration:
@@ -257,4 +259,37 @@ Then point your Ingress to the Anubis port:
              port:
 -              name: http
 +              name: anubis
+```
+
+## Known caveats
+
+Anubis works with most programs without any issues as long as they're configured to trust `127.0.0.0/8` and `::1/128` as "valid proxy servers". Some combinations of reverse proxy and target application can have issues. This section documents them so that you can pattern-match and fix them.
+
+### Caddy + Gitea/Forgejo
+
+Gitea/Forgejo relies on the reverse proxy setting the `X-Real-Ip` header. Caddy does not do this out of the gate. Modify your Caddyfile like this:
+
+```diff
+ ellenjoe.int.within.lgbt {
+   # ...
+-  reverse_proxy http://localhost:3000
++  reverse_proxy http://localhost:3000 {
++    header_up X-Real-Ip {remote_host}
++  }
+   # ...
+ }
+```
+
+Ensure that Gitea/Forgejo have `[security].REVERSE_PROXY_TRUSTED_PROXIES` set to the IP ranges that Anubis will appear from. Typically this is sufficient:
+
+```ini
+[security]
+REVERSE_PROXY_TRUSTED_PROXIES = 127.0.0.0/8,::1/128
+```
+
+However if you are running Anubis in a separate Pod/Deployment in Kubernetes, you may have to adjust this to the IP range of the Pod space in your Container Networking Interface plugin:
+
+```ini
+[security]
+REVERSE_PROXY_TRUSTED_PROXIES = 10.192.0.0/12
 ```
