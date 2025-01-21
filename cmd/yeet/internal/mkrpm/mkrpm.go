@@ -1,68 +1,17 @@
 package mkrpm
 
 import (
-	"context"
-	"flag"
 	"fmt"
 	"log/slog"
 	"os"
 	"path/filepath"
 	"runtime"
 
-	"github.com/Songmu/gitconfig"
 	"github.com/goreleaser/nfpm/v2"
 	"github.com/goreleaser/nfpm/v2/files"
 	_ "github.com/goreleaser/nfpm/v2/rpm"
-	"within.website/x/internal/yeet"
+	"within.website/x/cmd/yeet/internal"
 )
-
-var (
-	gpgKeyFile     = flag.String("gpg-key-file", gpgKeyFileLocation(), "GPG key file to sign the package")
-	gpgKeyID       = flag.String("gpg-key-id", "", "GPG key ID to sign the package")
-	gpgKeyPassword = flag.String("gpg-key-password", "", "GPG key password to sign the package")
-	userName       = flag.String("git-user-name", gitUserName(), "user name in Git")
-	userEmail      = flag.String("git-user-email", gitUserEmail(), "user email in Git")
-)
-
-const (
-	fallbackName  = "Mimi Yasomi"
-	fallbackEmail = "mimi@xeserv.us"
-)
-
-func gpgKeyFileLocation() string {
-	folder, err := os.UserConfigDir()
-	if err != nil {
-		return ""
-	}
-
-	return filepath.Join(folder, "within.website", "x", "yeet", "key.asc")
-}
-
-func gitUserName() string {
-	name, err := gitconfig.User()
-	if err != nil {
-		return fallbackName
-	}
-
-	return name
-}
-
-func gitUserEmail() string {
-	email, err := gitconfig.Email()
-	if err != nil {
-		return fallbackEmail
-	}
-
-	return email
-}
-
-func gitVersion() string {
-	vers, err := yeet.GitTag(context.Background())
-	if err != nil {
-		panic(err)
-	}
-	return vers[1:]
-}
 
 type Package struct {
 	Name        string   `json:"name"`
@@ -97,7 +46,7 @@ func Build(p Package) (foutpath string, err error) {
 	}()
 
 	if p.Version == "" {
-		p.Version = gitVersion()
+		p.Version = internal.GitVersion()
 	}
 
 	dir, err := os.MkdirTemp("", "yeet-mkrpm")
@@ -152,7 +101,7 @@ func Build(p Package) (foutpath string, err error) {
 		Arch:        p.Goarch,
 		Platform:    "linux",
 		Description: p.Description,
-		Maintainer:  fmt.Sprintf("%s <%s>", *userName, *userEmail),
+		Maintainer:  fmt.Sprintf("%s <%s>", *internal.UserName, *internal.UserEmail),
 		Homepage:    p.Homepage,
 		License:     p.License,
 		Overridables: nfpm.Overridables{
@@ -166,11 +115,11 @@ func Build(p Package) (foutpath string, err error) {
 
 	info.Overridables.RPM.Group = p.Group
 
-	if *gpgKeyID != "" {
-		slog.Debug("using GPG key", "file", *gpgKeyFile, "id", gpgKeyID, "password", *gpgKeyPassword)
-		info.Overridables.RPM.Signature.KeyFile = *gpgKeyFile
-		info.Overridables.RPM.Signature.KeyID = gpgKeyID
-		info.Overridables.RPM.Signature.KeyPassphrase = *gpgKeyPassword
+	if *internal.GPGKeyID != "" {
+		slog.Debug("using GPG key", "file", *internal.GPGKeyFile, "id", *internal.GPGKeyID, "password", *internal.GPGKeyPassword)
+		info.Overridables.RPM.Signature.KeyFile = *internal.GPGKeyFile
+		info.Overridables.RPM.Signature.KeyID = *&internal.GPGKeyID
+		info.Overridables.RPM.Signature.KeyPassphrase = *internal.GPGKeyPassword
 	}
 
 	pkg, err := nfpm.Get("rpm")
