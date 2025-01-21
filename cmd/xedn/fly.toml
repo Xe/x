@@ -8,7 +8,7 @@ swap_size_mb = 512
 auto_rollback = true
 
 [build]
-image = "registry.fly.io/xedn:latest"
+image = "ghcr.io/xe/x/xedn:latest"
 
 [deploy]
 strategy = "immediate"

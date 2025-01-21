@@ -96,7 +96,7 @@ hdrwtch:
 
     LABEL org.opencontainers.image.source="https://github.com/Xe/x"
 
-    SAVE IMAGE --push registry.fly.io/hdrwtch:latest
+    SAVE IMAGE --push ghcr.io/xe/x/hdrwtch:latest
 
 hlang:
     FROM +runtime
@@ -258,7 +258,7 @@ xedn:
 
     LABEL org.opencontainers.image.source="https://github.com/Xe/x"
 
-    SAVE IMAGE --push registry.fly.io/xedn:latest
+    SAVE IMAGE --push ghcr.io/xe/x/xedn:latest
 
 all:
     BUILD --pass-args --platform=linux/amd64 +aerial
