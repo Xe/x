@@ -74,7 +74,7 @@ require (
 	go.jetpack.io/tyson v0.1.1
 	go4.org v0.0.0-20190313082347-94abd6928b1d
 	golang.org/x/crypto v0.31.0
-	golang.org/x/oauth2 v0.21.0
+	golang.org/x/oauth2 v0.25.0
 	golang.org/x/sync v0.10.0
 	google.golang.org/grpc v1.64.1
 	gorm.io/gorm v1.25.10
