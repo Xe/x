@@ -52,7 +52,7 @@ require (
 	github.com/ncruces/go-sqlite3 v0.16.0
 	github.com/ncruces/go-sqlite3/gormlite v0.16.0
 	github.com/nicklaw5/helix/v2 v2.30.0
-	github.com/orandin/slog-gorm v1.3.2
+	github.com/orandin/slog-gorm v1.4.0
 	github.com/otiai10/copy v1.14.0
 	github.com/pires/go-proxyproto v0.7.0
 	github.com/pkg/errors v0.9.1
