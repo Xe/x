@@ -38,7 +38,8 @@ build:
     RUN go mod download
 
     COPY . .
-    RUN go build -o /app/bin/${PROGRAM} ./cmd/${PROGRAM}
+    ARG VERSION=$(git describe --tags --always --dirty)
+    RUN --mount=type=cache,target=/root/.cache go build -o /app/bin/${PROGRAM} -ldflags="-X within.website/x.Version=${VERSION}" ./cmd/${PROGRAM}
 
     SAVE ARTIFACT bin
 
@@ -50,12 +51,7 @@ ship:
     COPY --platform=${TARGETPLATFORM} (+runtime/ca-certificates.crt) /etc/ssl/certs/ca-certificates.crt
     COPY --platform=${TARGETPLATFORM} (+build/bin/${PROGRAM} --GOARCH=${GOARCH} --PROGRAM=${PROGRAM}) /app/bin/${PROGRAM}
 
-    CMD ["/app/bin/${PROGRAM}"]
-    USER 1000:1000
-
     LABEL org.opencontainers.image.source="https://github.com/Xe/x"
-
-    SAVE IMAGE --push ghcr.io/xe/x/${PROGRAM}:latest
 
 everything:
     FROM +deps
@@ -68,28 +64,28 @@ everything:
     SAVE ARTIFACT bin
 
 aerial:
-    FROM +runtime
-
-    COPY +everything/bin/aerial /app/bin/aerial
-    CMD ["/app/bin/aerial"]
-
-    LABEL org.opencontainers.image.source="https://github.com/Xe/x"
-
-    SAVE IMAGE --push ghcr.io/xe/x/aerial:latest
+    BUILD +ship --PROGRAM=aerial --GOARCH=amd64
 
 amano:
-    FROM +runtime
+    BUILD +ship --PROGRAM=amano --GOARCH=amd64
 
-    COPY +everything/bin/amano /app/bin/amano
-    CMD ["/app/bin/amano"]
+anubis-amd64:
+    FROM +ship --PROGRAM=anubis --GOARCH=amd64
+    CMD ["/app/bin/anubis"]
+    USER 1000:1000
 
-    LABEL org.opencontainers.image.source="https://github.com/Xe/x"
+    SAVE IMAGE --push ghcr.io/xe/x/anubis:latest
 
-    SAVE IMAGE --push ghcr.io/xe/x/amano:latest
+anubis-arm64:
+    FROM +ship --PROGRAM=anubis --GOARCH=arm64
+    CMD ["/app/bin/anubis"]
+    USER 1000:1000
+
+    SAVE IMAGE --push ghcr.io/xe/x/anubis:latest
 
 anubis:
-    BUILD +ship --PROGRAM=anubis --GOARCH=amd64
-    BUILD +ship --PROGRAM=anubis --GOARCH=arm64
+    BUILD +anubis-amd64
+    BUILD +anubis-arm64
 
 aura:
     FROM +runtime
