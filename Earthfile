@@ -5,14 +5,17 @@ WORKDIR /app
 runtime:
     FROM debian:bookworm
 
+    WORKDIR /app
+
     RUN apt-get update && apt-get install -y \
         curl \
         wget \
         unzip \
         ca-certificates \
-        && rm -rf /var/lib/apt/lists/*
+        && rm -rf /var/lib/apt/lists/* \
+        && cp /etc/ssl/certs/ca-certificates.crt .
 
-    WORKDIR /app
+    SAVE ARTIFACT ca-certificates.crt
 
 deps:
     FROM golang:1.23
@@ -22,6 +25,37 @@ deps:
     RUN go mod download
 
     SAVE ARTIFACT go.mod
+
+build:
+    FROM +deps
+    WORKDIR /app
+
+    ARG PROGRAM=anubis
+    ARG GOOS=linux
+    ARG GOARCH=amd64
+    ARG GOARM
+
+    RUN go mod download
+
+    COPY . .
+    RUN go build -o /app/bin/${PROGRAM} ./cmd/${PROGRAM}
+
+    SAVE ARTIFACT bin
+
+ship:
+    ARG PROGRAM=anubis
+    ARG GOARCH
+
+    FROM --platform=linux/${GOARCH} debian:bookworm
+    COPY --platform=${TARGETPLATFORM} (+runtime/ca-certificates.crt) /etc/ssl/certs/ca-certificates.crt
+    COPY --platform=${TARGETPLATFORM} (+build/bin/${PROGRAM} --GOARCH=${GOARCH} --PROGRAM=${PROGRAM}) /app/bin/${PROGRAM}
+
+    CMD ["/app/bin/${PROGRAM}"]
+    USER 1000:1000
+
+    LABEL org.opencontainers.image.source="https://github.com/Xe/x"
+
+    SAVE IMAGE --push ghcr.io/xe/x/${PROGRAM}:latest
 
 everything:
     FROM +deps
@@ -54,15 +88,8 @@ amano:
     SAVE IMAGE --push ghcr.io/xe/x/amano:latest
 
 anubis:
-    FROM +runtime
-
-    COPY +everything/bin/anubis /app/bin/anubis
-    CMD ["/app/bin/anubis"]
-
-    LABEL org.opencontainers.image.source="https://github.com/Xe/x"
-
-    USER 1000:1000
-    SAVE IMAGE --push ghcr.io/xe/x/anubis:latest
+    BUILD +ship --PROGRAM=anubis --GOARCH=amd64
+    BUILD +ship --PROGRAM=anubis --GOARCH=arm64
 
 aura:
     FROM +runtime
