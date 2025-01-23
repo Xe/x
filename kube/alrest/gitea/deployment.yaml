@@ -7,6 +7,7 @@ data:
   USER_UID: "1000"
   USER_GID: "1000"
 
+  GITEA__DEFAULT__APP_NAME: "Xeserv internal git"
   GITEA__storage__STORAGE_TYPE: minio
   #GITEA__storage__STORAGE_TYPE: local
   GITEA__storage__SERVE_DIRECT: "false"
