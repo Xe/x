@@ -3,6 +3,7 @@ resources:
   - pvc.yaml
   - 1password.yaml
   - deployment.yaml
+  - onionservice.yaml
   - service.yaml
   - runner.yaml
   #- external-dns.yaml
