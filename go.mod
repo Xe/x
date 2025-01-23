@@ -77,7 +77,7 @@ require (
 	golang.org/x/oauth2 v0.25.0
 	golang.org/x/sync v0.10.0
 	google.golang.org/grpc v1.64.1
-	gorm.io/gorm v1.25.10
+	gorm.io/gorm v1.25.12
 	gorm.io/plugin/prometheus v0.1.0
 	nhooyr.io/websocket v1.8.11
 )
