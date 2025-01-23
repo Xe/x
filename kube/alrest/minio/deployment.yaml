@@ -27,7 +27,8 @@ spec:
         volumeMounts:
         - name: data 
           mountPath: /data
-        image: minio/minio
+        image: minio/minio:latest
+        imagePullPolicy: Always
         args:
         - server
         - /data
