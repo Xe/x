@@ -6,6 +6,9 @@ metadata:
     name: pocket-id
   annotations:
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/proxy-buffers-number: "4"
+    nginx.ingress.kubernetes.io/proxy-buffer-size: "256k"
+    nginx.ingress.kubernetes.io/proxy-busy-buffers-size: "512k"
 spec:
   ingressClassName: nginx
   tls:
