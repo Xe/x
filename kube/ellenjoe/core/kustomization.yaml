@@ -1,0 +1,4 @@
+resources:
+  - ca.yaml
+  - cert-manager.yaml
+  - tor-controller.yaml
