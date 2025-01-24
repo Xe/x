@@ -2,9 +2,12 @@ package main
 
 import (
 	"flag"
+	"fmt"
+	"io"
 	"log"
 	"log/slog"
 	"net/http"
+	"os"
 
 	"within.website/x/internal"
 )
@@ -19,7 +22,9 @@ func main() {
 	slog.Info("listening", "url", "http://localhost"+*bind)
 	log.Fatal(http.ListenAndServe(*bind, http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
-			r.Write(w)
+			fmt.Println("---")
+			r.Write(io.MultiWriter(w, os.Stdout))
+			fmt.Println("---")
 		},
 	)))
 }

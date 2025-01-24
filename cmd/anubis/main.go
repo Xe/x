@@ -131,8 +131,7 @@ func (s *Server) challengeFor(r *http.Request) string {
 	fp := sha256.Sum256(s.priv.Seed())
 
 	data := fmt.Sprintf(
-		"Accept-Encoding=%s,Accept-Language=%s,X-Real-IP=%s,User-Agent=%s,WeekTime=%s,Fingerprint=%x",
-		r.Header.Get("Accept-Encoding"),
+		"Accept-Language=%s,X-Real-IP=%s,User-Agent=%s,WeekTime=%s,Fingerprint=%x",
 		r.Header.Get("Accept-Language"),
 		r.Header.Get("X-Real-Ip"),
 		r.UserAgent(),
