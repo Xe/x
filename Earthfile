@@ -35,8 +35,6 @@ build:
     ARG GOARCH=amd64
     ARG GOARM
 
-    RUN go mod download
-
     COPY . .
     ARG VERSION=$(git describe --tags --always --dirty)
     RUN --mount=type=cache,target=/root/.cache go build -o /app/bin/${PROGRAM} -ldflags="-X within.website/x.Version=${VERSION}" ./cmd/${PROGRAM}
@@ -130,6 +128,11 @@ hlang:
     LABEL org.opencontainers.image.source="https://github.com/Xe/x"
 
     SAVE IMAGE --push ghcr.io/xe/x/hlang:latest
+
+httpdebug:
+    FROM +ship --PROGRAM=httpdebug --GOARCH=amd64
+    CMD ["/app/bin/httpdebug"]
+    SAVE IMAGE --push ghcr.io/xe/x/httpdebug:latest
 
 mi:
     FROM +runtime
@@ -291,6 +294,7 @@ all:
     BUILD --pass-args --platform=linux/amd64 +future-sight
     BUILD --pass-args --platform=linux/amd64 +hdrwtch
     BUILD --pass-args --platform=linux/amd64 +hlang
+    BUILD --pass-args --platform=linux/amd64 +httpdebug
     BUILD --pass-args --platform=linux/amd64 +mi
     BUILD --pass-args --platform=linux/amd64 +mimi
     BUILD --pass-args --platform=linux/amd64 +relayd
