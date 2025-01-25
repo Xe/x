@@ -12,7 +12,7 @@
 
 Anubis [weighs the soul of your connection](https://en.wikipedia.org/wiki/Weighing_of_souls) using a sha256 proof-of-work challenge in order to protect upstream resources from scraper bots.
 
-Installing and using this will likely result in your website not being indexed by Google or other search engines. This is considered a feature of Anubis, not a bug.
+Installing and using this will likely result in your website not being indexed by some search engines. This is considered a feature of Anubis, not a bug.
 
 This is a bit of a nuclear response, but AI scraper bots scraping so aggressively have forced my hand. I hate that I have to do this, but this is what we get for the modern Internet because bots don't conform to standards like robots.txt, even when they claim to.
 
@@ -164,6 +164,10 @@ Anubis uses these environment variables for configuration:
 | `METRICS_BIND`       | `:9090`                 | The TCP port that Anubis serves Prometheus metrics on.                                                                                                                                                                                                                                   |
 | `SERVE_ROBOTS_TXT`   | `false`                 | If set `true`, Anubis will serve a default `robots.txt` file that disallows all known AI scrapers by name and then additionally disallows every scraper. This is useful if facts and circumstances make it difficult to change the underlying service to serve such a `robots.txt` file. |
 | `TARGET`             | `http://localhost:3923` | The URL of the service that Anubis should forward valid requests to.                                                                                                                                                                                                                     |
+
+### Policies
+
+Anubis has support for custom bot policies, matched by User-Agent string and request path. Check the [bot policy documentation](./docs/policies.md) for more information.
 
 ### Docker compose
 

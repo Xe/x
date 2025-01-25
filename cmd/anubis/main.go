@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"log/slog"
 	"math"
@@ -17,6 +18,7 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -27,6 +29,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"within.website/x"
+	"within.website/x/cmd/anubis/internal/config"
 	"within.website/x/internal"
 	"within.website/x/xess"
 )
@@ -36,15 +39,11 @@ var (
 	challengeDifficulty = flag.Int("difficulty", 5, "difficulty of the challenge")
 	metricsBind         = flag.String("metrics-bind", ":9090", "TCP port to bind metrics to")
 	robotsTxt           = flag.Bool("serve-robots-txt", false, "serve a robots.txt file that disallows all robots")
+	policyFname         = flag.String("policy-fname", "", "full path to anubis policy document (defaults to a sensible built-in policy)")
 	target              = flag.String("target", "http://localhost:3923", "target to reverse proxy to")
 
-	//go:embed static
+	//go:embed static botPolicies.json
 	static embed.FS
-
-	bypasses = promauto.NewCounter(prometheus.CounterOpts{
-		Name: "anubis_bypasses",
-		Help: "The total number of requests that bypassed challenge validation",
-	})
 
 	challengesIssued = promauto.NewCounter(prometheus.CounterOpts{
 		Name: "anubis_challenges_issued",
@@ -78,7 +77,7 @@ const (
 func main() {
 	internal.HandleStartup()
 
-	s, err := New(*target)
+	s, err := New(*target, *policyFname)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -142,7 +141,7 @@ func (s *Server) challengeFor(r *http.Request) string {
 	return result
 }
 
-func New(target string) (*Server, error) {
+func New(target, policyFname string) (*Server, error) {
 	u, err := url.Parse(target)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse target URL: %w", err)
@@ -155,65 +154,93 @@ func New(target string) (*Server, error) {
 
 	rp := httputil.NewSingleHostReverseProxy(u)
 
+	var fin io.ReadCloser
+
+	if policyFname != "" {
+		fin, err = os.Open(policyFname)
+		if err != nil {
+			return nil, fmt.Errorf("can't parse policy file %s: %w", policyFname, err)
+		}
+	} else {
+		policyFname = "(static)/botPolicies.json"
+		fin, err = static.Open("botPolicies.json")
+		if err != nil {
+			return nil, fmt.Errorf("[unexpected] can't parse builtin policy file %s: %w", policyFname, err)
+		}
+	}
+
+	defer fin.Close()
+
+	policy, err := parseConfig(fin, policyFname)
+	if err != nil {
+		return nil, err // parseConfig sets a fancy error for us
+	}
+
 	return &Server{
-		rp:   rp,
-		priv: priv,
-		pub:  pub,
+		rp:     rp,
+		priv:   priv,
+		pub:    pub,
+		policy: policy,
 	}, nil
 }
 
 type Server struct {
-	rp   *httputil.ReverseProxy
-	priv ed25519.PrivateKey
-	pub  ed25519.PublicKey
+	rp     *httputil.ReverseProxy
+	priv   ed25519.PrivateKey
+	pub    ed25519.PublicKey
+	policy *ParsedConfig
 }
 
 func (s *Server) maybeReverseProxy(w http.ResponseWriter, r *http.Request) {
-	switch {
-	case !strings.Contains(r.UserAgent(), "Mozilla"):
-		bypasses.Inc()
-		slog.Debug("non-browser user agent")
+	cr := s.check(r)
+	r.Header.Add("X-Anubis-Rule", cr.Name)
+	r.Header.Add("X-Anubis-Action", string(cr.Rule))
+	lg := slog.With(
+		"check_result", cr,
+		"user_agent", r.UserAgent(),
+		"accept_language", r.Header.Get("Accept-Language"),
+		"priority", r.Header.Get("Priority"),
+		"x-forwarded-for",
+		r.Header.Get("X-Forwarded-For"),
+		"x-real-ip", r.Header.Get("X-Real-Ip"),
+	)
+	policyApplications.WithLabelValues(cr.Name, string(cr.Rule)).Add(1)
+
+	switch cr.Rule {
+	case config.RuleAllow:
+		lg.Debug("allowing traffic to origin (explicit)")
 		s.rp.ServeHTTP(w, r)
 		return
-	case strings.HasPrefix(r.URL.Path, "/.well-known/"):
-		bypasses.Inc()
-		slog.Debug("well-known path")
-		s.rp.ServeHTTP(w, r)
+	case config.RuleDeny:
+		clearCookie(w)
+		lg.Info("explicit deny")
+		templ.Handler(base("Oh noes!", errorPage("Access Denied")), templ.WithStatus(http.StatusOK)).ServeHTTP(w, r)
 		return
-	case strings.HasSuffix(r.URL.Path, ".rss") || strings.HasSuffix(r.URL.Path, ".xml") || strings.HasSuffix(r.URL.Path, ".atom"):
-		bypasses.Inc()
-		slog.Debug("rss path")
-		s.rp.ServeHTTP(w, r)
-		return
-	case r.URL.Path == "/favicon.ico":
-		bypasses.Inc()
-		slog.Debug("favicon path")
-		s.rp.ServeHTTP(w, r)
-		return
-	case r.URL.Path == "/robots.txt":
-		bypasses.Inc()
-		slog.Debug("robots.txt path")
-		s.rp.ServeHTTP(w, r)
+	case config.RuleChallenge:
+		lg.Debug("challenge requested")
+	default:
+		clearCookie(w)
+		templ.Handler(base("Oh noes!", errorPage("Other internal server error (contact the admin)")), templ.WithStatus(http.StatusInternalServerError)).ServeHTTP(w, r)
 		return
 	}
 
 	ckie, err := r.Cookie(cookieName)
 	if err != nil {
-		slog.Debug("cookie not found", "path", r.URL.Path)
+		lg.Debug("cookie not found", "path", r.URL.Path)
 		clearCookie(w)
 		s.renderIndex(w, r)
 		return
 	}
 
 	if err := ckie.Valid(); err != nil {
-		slog.Debug("cookie is invalid", "err", err)
+		lg.Debug("cookie is invalid", "err", err)
 		clearCookie(w)
 		s.renderIndex(w, r)
 		return
 	}
 
 	if time.Now().After(ckie.Expires) && !ckie.Expires.IsZero() {
-		slog.Debug("cookie expired", "path", r.URL.Path)
+		lg.Debug("cookie expired", "path", r.URL.Path)
 		clearCookie(w)
 		s.renderIndex(w, r)
 		return
@@ -224,7 +251,7 @@ func (s *Server) maybeReverseProxy(w http.ResponseWriter, r *http.Request) {
 	})
 
 	if !token.Valid {
-		slog.Debug("invalid token", "path", r.URL.Path)
+		lg.Debug("invalid token", "path", r.URL.Path)
 		clearCookie(w)
 		s.renderIndex(w, r)
 		return
@@ -234,27 +261,28 @@ func (s *Server) maybeReverseProxy(w http.ResponseWriter, r *http.Request) {
 
 	exp, ok := claims["exp"].(float64)
 	if !ok {
-		slog.Debug("exp is not int64", "ok", ok, "typeof(exp)", fmt.Sprintf("%T", exp))
+		lg.Debug("exp is not int64", "ok", ok, "typeof(exp)", fmt.Sprintf("%T", exp))
 		clearCookie(w)
 		s.renderIndex(w, r)
 		return
 	}
 
 	if exp := time.Unix(int64(exp), 0); time.Now().After(exp) {
-		slog.Debug("token has expired", "exp", exp.Format(time.RFC3339))
+		lg.Debug("token has expired", "exp", exp.Format(time.RFC3339))
 		clearCookie(w)
 		s.renderIndex(w, r)
 		return
 	}
 
 	if token.Valid && randomJitter() {
-		slog.Debug("cookie is not enrolled into secondary screening")
+		r.Header.Add("X-Anubis-Status", "PASS-BRIEF")
+		lg.Debug("cookie is not enrolled into secondary screening")
 		s.rp.ServeHTTP(w, r)
 		return
 	}
 
 	if claims["challenge"] != s.challengeFor(r) {
-		slog.Debug("invalid challenge", "path", r.URL.Path)
+		lg.Debug("invalid challenge", "path", r.URL.Path)
 		clearCookie(w)
 		s.renderIndex(w, r)
 		return
@@ -269,20 +297,22 @@ func (s *Server) maybeReverseProxy(w http.ResponseWriter, r *http.Request) {
 	calcString := fmt.Sprintf("%s%d", s.challengeFor(r), nonce)
 	calculated, err := sha256sum(calcString)
 	if err != nil {
-		slog.Error("failed to calculate sha256sum", "path", r.URL.Path, "err", err)
+		lg.Error("failed to calculate sha256sum", "path", r.URL.Path, "err", err)
 		clearCookie(w)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	if subtle.ConstantTimeCompare([]byte(claims["response"].(string)), []byte(calculated)) != 1 {
-		slog.Debug("invalid response", "path", r.URL.Path)
+		lg.Debug("invalid response", "path", r.URL.Path)
 		failedValidations.Inc()
 		clearCookie(w)
 		s.renderIndex(w, r)
 		return
 	}
 
+	slog.Debug("all checks passed")
+	r.Header.Add("X-Anubis-Status", "PASS-FULL")
 	s.rp.ServeHTTP(w, r)
 }
 
@@ -296,6 +326,8 @@ func (s *Server) makeChallenge(w http.ResponseWriter, r *http.Request) {
 	challenge := s.challengeFor(r)
 	difficulty := *challengeDifficulty
 
+	lg := slog.With("user_agent", r.UserAgent(), "accept_language", r.Header.Get("Accept-Language"), "priority", r.Header.Get("Priority"), "x-forwarded-for", r.Header.Get("X-Forwarded-For"), "x-real-ip", r.Header.Get("X-Real-Ip"))
+
 	json.NewEncoder(w).Encode(struct {
 		Challenge  string `json:"challenge"`
 		Difficulty int    `json:"difficulty"`
@@ -303,14 +335,17 @@ func (s *Server) makeChallenge(w http.ResponseWriter, r *http.Request) {
 		Challenge:  challenge,
 		Difficulty: difficulty,
 	})
-	slog.Debug("made challenge", "challenge", challenge, "difficulty", difficulty)
+	lg.Debug("made challenge", "challenge", challenge, "difficulty", difficulty)
 	challengesIssued.Inc()
 }
 
 func (s *Server) passChallenge(w http.ResponseWriter, r *http.Request) {
+	lg := slog.With("user_agent", r.UserAgent(), "accept_language", r.Header.Get("Accept-Language"), "priority", r.Header.Get("Priority"), "x-forwarded-for", r.Header.Get("X-Forwarded-For"), "x-real-ip", r.Header.Get("X-Real-Ip"))
+
 	nonceStr := r.FormValue("nonce")
 	if nonceStr == "" {
 		clearCookie(w)
+		lg.Debug("no nonce")
 		templ.Handler(base("Oh noes!", errorPage("missing nonce")), templ.WithStatus(http.StatusInternalServerError)).ServeHTTP(w, r)
 		return
 	}
@@ -318,6 +353,7 @@ func (s *Server) passChallenge(w http.ResponseWriter, r *http.Request) {
 	elapsedTimeStr := r.FormValue("elapsedTime")
 	if elapsedTimeStr == "" {
 		clearCookie(w)
+		lg.Debug("no elapsedTime")
 		templ.Handler(base("Oh noes!", errorPage("missing elapsedTime")), templ.WithStatus(http.StatusInternalServerError)).ServeHTTP(w, r)
 		return
 	}
@@ -325,6 +361,7 @@ func (s *Server) passChallenge(w http.ResponseWriter, r *http.Request) {
 	elapsedTime, err := strconv.ParseFloat(elapsedTimeStr, 64)
 	if err != nil {
 		clearCookie(w)
+		lg.Debug("elapsedTime doesn't parse", "err", err)
 		templ.Handler(base("Oh noes!", errorPage("invalid elapsedTime")), templ.WithStatus(http.StatusInternalServerError)).ServeHTTP(w, r)
 		return
 	}
@@ -332,6 +369,7 @@ func (s *Server) passChallenge(w http.ResponseWriter, r *http.Request) {
 	difficultyStr := r.FormValue("difficulty")
 	if difficultyStr == "" {
 		clearCookie(w)
+		lg.Debug("no difficulty")
 		templ.Handler(base("Oh noes!", errorPage("missing difficulty")), templ.WithStatus(http.StatusInternalServerError)).ServeHTTP(w, r)
 		return
 	}
@@ -339,11 +377,12 @@ func (s *Server) passChallenge(w http.ResponseWriter, r *http.Request) {
 	difficulty, err := strconv.Atoi(difficultyStr)
 	if err != nil {
 		clearCookie(w)
+		lg.Debug("difficulty doesn't parse", "err", err)
 		templ.Handler(base("Oh noes!", errorPage("invalid difficulty")), templ.WithStatus(http.StatusInternalServerError)).ServeHTTP(w, r)
 		return
 	}
 
-	slog.Info("challenge took", "elapsedTime", elapsedTime)
+	lg.Info("challenge took", "elapsedTime", elapsedTime)
 	timeTaken.Observe(elapsedTime)
 
 	response := r.FormValue("response")
@@ -354,6 +393,7 @@ func (s *Server) passChallenge(w http.ResponseWriter, r *http.Request) {
 	nonce, err := strconv.Atoi(nonceStr)
 	if err != nil {
 		clearCookie(w)
+		lg.Debug("nonce doesn't parse", "err", err)
 		templ.Handler(base("Oh noes!", errorPage("invalid nonce")), templ.WithStatus(http.StatusInternalServerError)).ServeHTTP(w, r)
 		return
 	}
@@ -362,12 +402,14 @@ func (s *Server) passChallenge(w http.ResponseWriter, r *http.Request) {
 	calculated, err := sha256sum(calcString)
 	if err != nil {
 		clearCookie(w)
+		lg.Debug("can't parse shasum", "err", err)
 		templ.Handler(base("Oh noes!", errorPage("failed to calculate sha256sum")), templ.WithStatus(http.StatusInternalServerError)).ServeHTTP(w, r)
 		return
 	}
 
 	if subtle.ConstantTimeCompare([]byte(response), []byte(calculated)) != 1 {
 		clearCookie(w)
+		lg.Debug("hash does not match", "got", response, "want", calculated)
 		templ.Handler(base("Oh noes!", errorPage("invalid response")), templ.WithStatus(http.StatusForbidden)).ServeHTTP(w, r)
 		failedValidations.Inc()
 		return
@@ -376,6 +418,7 @@ func (s *Server) passChallenge(w http.ResponseWriter, r *http.Request) {
 	// compare the leading zeroes
 	if !strings.HasPrefix(response, strings.Repeat("0", difficulty)) {
 		clearCookie(w)
+		lg.Debug("difficulty check failed", "response", response, "difficulty", difficulty)
 		templ.Handler(base("Oh noes!", errorPage("invalid response")), templ.WithStatus(http.StatusForbidden)).ServeHTTP(w, r)
 		failedValidations.Inc()
 		return
@@ -392,7 +435,7 @@ func (s *Server) passChallenge(w http.ResponseWriter, r *http.Request) {
 	})
 	tokenString, err := token.SignedString(s.priv)
 	if err != nil {
-		slog.Error("failed to sign JWT", "err", err)
+		lg.Error("failed to sign JWT", "err", err)
 		clearCookie(w)
 		templ.Handler(base("Oh noes!", errorPage("failed to sign JWT")), templ.WithStatus(http.StatusInternalServerError)).ServeHTTP(w, r)
 		return
@@ -407,6 +450,7 @@ func (s *Server) passChallenge(w http.ResponseWriter, r *http.Request) {
 	})
 
 	challengesValidated.Inc()
+	lg.Debug("challenge passed, redirecting to app")
 	http.Redirect(w, r, redir, http.StatusFound)
 }
 
