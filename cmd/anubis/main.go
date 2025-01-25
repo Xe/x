@@ -74,6 +74,9 @@ const (
 
 //go:generate go run github.com/a-h/templ/cmd/templ@latest generate
 //go:generate esbuild js/main.mjs --minify --bundle --outfile=static/js/main.mjs
+//go:generate gzip -f -k static/js/main.mjs
+//go:generate zstd -f -k --ultra -22 static/js/main.mjs
+//go:generate brotli -fZk static/js/main.mjs
 
 func main() {
 	internal.HandleStartup()
@@ -84,9 +87,11 @@ func main() {
 	}
 
 	mux := http.NewServeMux()
+	xess.Mount(mux)
 
 	mux.Handle(staticPath, internal.UnchangingCache(http.StripPrefix(staticPath, http.FileServerFS(static))))
-	xess.Mount(mux)
+
+	// mux.HandleFunc("GET /.within.website/x/cmd/anubis/static/js/main.mjs", serveMainJSWithBestEncoding)
 
 	mux.HandleFunc("POST /.within.website/x/cmd/anubis/api/make-challenge", s.makeChallenge)
 	mux.HandleFunc("GET /.within.website/x/cmd/anubis/api/pass-challenge", s.passChallenge)
@@ -460,6 +465,11 @@ func (s *Server) testError(w http.ResponseWriter, r *http.Request) {
 	templ.Handler(base("Oh noes!", errorPage(err)), templ.WithStatus(http.StatusInternalServerError)).ServeHTTP(w, r)
 }
 
+func ohNoes(w http.ResponseWriter, r *http.Request, err error) {
+	slog.Error("super fatal error", "err", err)
+	templ.Handler(base("Oh noes!", errorPage("An internal server error happened")), templ.WithStatus(http.StatusInternalServerError)).ServeHTTP(w, r)
+}
+
 func clearCookie(w http.ResponseWriter) {
 	http.SetCookie(w, &http.Cookie{
 		Name:     cookieName,
@@ -472,4 +482,25 @@ func clearCookie(w http.ResponseWriter) {
 
 func randomJitter() bool {
 	return mrand.Intn(100) > 10
+}
+
+func serveMainJSWithBestEncoding(w http.ResponseWriter, r *http.Request) {
+	priorityList := []string{"zstd", "br", "gzip"}
+	enc2ext := map[string]string{
+		"zstd": "zst",
+		"br":   "br",
+		"gzip": "gz",
+	}
+
+	for _, enc := range priorityList {
+		if strings.Contains(r.Header.Get("Accept-Encoding"), enc) {
+			w.Header().Set("Content-Type", "text/javascript")
+			w.Header().Set("Content-Encoding", enc)
+			http.ServeFileFS(w, r, static, "static/js/main.mjs."+enc2ext[enc])
+			return
+		}
+	}
+
+	w.Header().Set("Content-Type", "text/javascript")
+	http.ServeFileFS(w, r, static, "static/js/main.mjs")
 }
