@@ -6,6 +6,7 @@ package xess
 import (
 	"embed"
 	"net/http"
+	"path/filepath"
 
 	"within.website/x"
 	"within.website/x/internal"
@@ -16,14 +17,19 @@ import (
 //go:generate npm run build
 
 var (
-	//go:embed xess.min.css static
+	//go:embed xess.min.css xess.css static
 	Static embed.FS
 
-	URL = "/.within.website/x/xess/xess.min.css"
+	URL = "/.within.website/x/xess/xess.css"
 )
 
 func init() {
 	Mount(http.DefaultServeMux)
+
+	if x.Version != "devel" {
+		URL = filepath.Join(filepath.Dir(URL), "xess.min.css")
+	}
+
 	URL = URL + "?cachebuster=" + x.Version
 }
 
