@@ -1,19 +1,18 @@
 package main
 
 import (
-  "within.website/x"
-  "within.website/x/xess"
+	"within.website/x"
+	"within.website/x/xess"
 )
 
 templ base(title string, body templ.Component) {
-  <!DOCTYPE html>
-  <html>
-
-  <head>
-    <title>{ title }</title>
-    <link rel="stylesheet" href={ xess.URL } />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <style>
+	<!DOCTYPE html>
+	<html>
+		<head>
+			<title>{ title }</title>
+			<link rel="stylesheet" href={ xess.URL }/>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+			<style>
       body,
       html {
         height: 100%;
@@ -119,43 +118,42 @@ templ base(title string, body templ.Component) {
         }
       }
     </style>
-  </head>
-
-  <body id="top">
-    <main>
-      <center>
-        <h1 id="title" class=".centered-div">{ title }</h1>
-      </center>
-      @body
-      <footer>
-        <center>
-        <p>Protected by <a href="https://xeiaso.net/blog/2025/anubis">Anubis</a> from <a href="https://within.website">Within</a>.</p>
-        </center>
-      </footer>
-    </main>
-  </body>
-
-  </html>
+		</head>
+		<body id="top">
+			<main>
+				<center>
+					<h1 id="title" class=".centered-div">{ title }</h1>
+				</center>
+				@body
+				<footer>
+					<center>
+						<p>Protected by <a href="https://xeiaso.net/blog/2025/anubis">Anubis</a> from <a href="https://within.website">Within</a>.</p>
+					</center>
+				</footer>
+			</main>
+		</body>
+	</html>
 }
 
 templ index() {
-  <div class="centered-div">
-    <img id="image" width="256" src={"/.within.website/x/cmd/anubis/static/img/pensive.webp?cacheBuster=" + x.Version} />
-    <img style="display:none;" width="256" src={"/.within.website/x/cmd/anubis/static/img/happy.webp?cacheBuster=" + x.Version} />
-    <p id="status">Loading...</p>
-    <script async type="module" src={"/.within.website/x/cmd/anubis/static/js/main.mjs?cacheBuster=" + x.Version}></script>
-    <div id="spinner" class="lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
-    <noscript>
-      <p>Sadly, you must enable JavaScript to get past this challenge. I would love to not have to do this, but god is dead and AI scrapers have destroyed the common good.</p>
-    </noscript>
-  </div>
+	<div class="centered-div">
+		<img id="image" width="256" src={ "/.within.website/x/cmd/anubis/static/img/pensive.webp?cacheBuster=" + x.Version }/>
+		<img style="display:none;" width="256" src={ "/.within.website/x/cmd/anubis/static/img/happy.webp?cacheBuster=" + x.Version }/>
+		<p id="status">Loading...</p>
+		<script async type="module" src={ "/.within.website/x/cmd/anubis/static/js/main.mjs?cacheBuster=" + x.Version }></script>
+		<div id="spinner" class="lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+		<noscript>
+			<p>Sadly, you must enable JavaScript to get past this challenge. I would love to not have to do this, but god is dead and AI scrapers have destroyed the common good.</p>
+		</noscript>
+		<div id="testarea"></div>
+	</div>
 }
 
 templ errorPage(message string) {
-  <div class="centered-div">
-    <img id="image" width="256" src={"/.within.website/x/cmd/anubis/static/img/sad.webp?cacheBuster=" + x.Version} />
-    <p>{ message }.</p>
-    <button onClick="window.location.reload();">Try again</button>
-    <p><a href="/">Go home</a></p>
-  </div>
+	<div class="centered-div">
+		<img id="image" width="256" src={ "/.within.website/x/cmd/anubis/static/img/sad.webp?cacheBuster=" + x.Version }/>
+		<p>{ message }.</p>
+		<button onClick="window.location.reload();">Try again</button>
+		<p><a href="/">Go home</a></p>
+	</div>
 }

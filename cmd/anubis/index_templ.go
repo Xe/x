@@ -41,7 +41,7 @@ func base(title string, body templ.Component) templ.Component {
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `index.templ`, Line: 13, Col: 18}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `index.templ`, Line: 12, Col: 17}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
@@ -54,7 +54,7 @@ func base(title string, body templ.Component) templ.Component {
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(xess.URL)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `index.templ`, Line: 14, Col: 42}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `index.templ`, Line: 13, Col: 41}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
@@ -67,7 +67,7 @@ func base(title string, body templ.Component) templ.Component {
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `index.templ`, Line: 127, Col: 52}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `index.templ`, Line: 125, Col: 49}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
@@ -117,7 +117,7 @@ func index() templ.Component {
 		var templ_7745c5c3_Var6 string
 		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs("/.within.website/x/cmd/anubis/static/img/pensive.webp?cacheBuster=" + x.Version)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `index.templ`, Line: 143, Col: 117}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `index.templ`, Line: 140, Col: 116}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 		if templ_7745c5c3_Err != nil {
@@ -130,7 +130,7 @@ func index() templ.Component {
 		var templ_7745c5c3_Var7 string
 		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs("/.within.website/x/cmd/anubis/static/img/happy.webp?cacheBuster=" + x.Version)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `index.templ`, Line: 144, Col: 126}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `index.templ`, Line: 141, Col: 125}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 		if templ_7745c5c3_Err != nil {
@@ -143,13 +143,13 @@ func index() templ.Component {
 		var templ_7745c5c3_Var8 string
 		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs("/.within.website/x/cmd/anubis/static/js/main.mjs?cacheBuster=" + x.Version)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `index.templ`, Line: 146, Col: 112}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `index.templ`, Line: 143, Col: 111}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\"></script><div id=\"spinner\" class=\"lds-roller\"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div><noscript><p>Sadly, you must enable JavaScript to get past this challenge. I would love to not have to do this, but god is dead and AI scrapers have destroyed the common good.</p></noscript></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\"></script><div id=\"spinner\" class=\"lds-roller\"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div><noscript><p>Sadly, you must enable JavaScript to get past this challenge. I would love to not have to do this, but god is dead and AI scrapers have destroyed the common good.</p></noscript><div id=\"testarea\"></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -185,7 +185,7 @@ func errorPage(message string) templ.Component {
 		var templ_7745c5c3_Var10 string
 		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs("/.within.website/x/cmd/anubis/static/img/sad.webp?cacheBuster=" + x.Version)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `index.templ`, Line: 156, Col: 113}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `index.templ`, Line: 154, Col: 112}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 		if templ_7745c5c3_Err != nil {
@@ -198,7 +198,7 @@ func errorPage(message string) templ.Component {
 		var templ_7745c5c3_Var11 string
 		templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(message)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `index.templ`, Line: 157, Col: 16}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `index.templ`, Line: 155, Col: 14}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 		if templ_7745c5c3_Err != nil {

@@ -73,6 +73,7 @@ const (
 )
 
 //go:generate go run github.com/a-h/templ/cmd/templ@latest generate
+//go:generate esbuild js/main.mjs --minify --bundle --outfile=static/js/main.mjs
 
 func main() {
 	internal.HandleStartup()
@@ -445,7 +446,7 @@ func (s *Server) passChallenge(w http.ResponseWriter, r *http.Request) {
 		Name:     cookieName,
 		Value:    tokenString,
 		Expires:  time.Now().Add(24 * 7 * time.Hour),
-		SameSite: http.SameSiteDefaultMode,
+		SameSite: http.SameSiteLaxMode,
 		Path:     "/",
 	})
 
@@ -461,10 +462,11 @@ func (s *Server) testError(w http.ResponseWriter, r *http.Request) {
 
 func clearCookie(w http.ResponseWriter) {
 	http.SetCookie(w, &http.Cookie{
-		Name:    cookieName,
-		Value:   "",
-		Expires: time.Now().Add(-1 * time.Hour),
-		MaxAge:  -1,
+		Name:     cookieName,
+		Value:    "",
+		Expires:  time.Now().Add(-1 * time.Hour),
+		MaxAge:   -1,
+		SameSite: http.SameSiteLaxMode,
 	})
 }
 
