@@ -20,18 +20,19 @@ const imageURL = (mood) => {
   const image = document.getElementById('image');
   const title = document.getElementById('title');
   const spinner = document.getElementById('spinner');
-  const testarea = document.getElementById('testarea');
+  // const testarea = document.getElementById('testarea');
 
-  const videoWorks = await testVideo(testarea);
+  // const videoWorks = await testVideo(testarea);
+  // console.log(`videoWorks: ${videoWorks}`);
 
-  if (!videoWorks) {
-    title.innerHTML = "Oh no!";
-    status.innerHTML = "Checks failed. Please check your browser's settings and try again.";
-    image.src = imageURL("sad");
-    spinner.innerHTML = "";
-    spinner.style.display = "none";
-    return;
-  }
+  // if (!videoWorks) {
+  //   title.innerHTML = "Oh no!";
+  //   status.innerHTML = "Checks failed. Please check your browser's settings and try again.";
+  //   image.src = imageURL("sad");
+  //   spinner.innerHTML = "";
+  //   spinner.style.display = "none";
+  //   return;
+  // }
 
   status.innerHTML = 'Calculating...';
 
