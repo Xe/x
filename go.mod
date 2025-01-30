@@ -265,5 +265,5 @@ require (
 	golang.org/x/text v0.21.0 // indirect
 	golang.org/x/time v0.5.0
 	golang.org/x/tools v0.24.0
-	google.golang.org/protobuf v1.35.2
+	google.golang.org/protobuf v1.36.4
 )
