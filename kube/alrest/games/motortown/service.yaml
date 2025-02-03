@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: motortown
+spec:
+  type: NodePort
+  selector:
+    app: motortown
+  ports:
+  - port: 7777
+    targetPort: 7777
+    protocol: TCP
+    name: game-tcp
+  - port: 7777
+    targetPort: 7777
+    protocol: UDP
+    name: game-udp
+  - port: 27015
+    targetPort: 27015
+    protocol: TCP
+    name: query-tcp
+  - port: 27015
+    targetPort: 27015
+    protocol: UDP
+    name: query-udp
+  - port: 8080
+    targetPort: 8080
+    protocol: TCP
+    name: admin-http
+  - port: 5900
+    targetPort: 5900
+    protocol: TCP
+    name: vnc

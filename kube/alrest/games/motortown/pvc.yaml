@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: motortown
+spec:
+  storageClassName: longhorn
+  resources:
+    requests:
+      storage: 32Gi
+  volumeMode: Filesystem
+  accessModes:
+  - ReadWriteOnce
