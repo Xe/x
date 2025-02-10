@@ -12,7 +12,7 @@ require (
 	github.com/McKael/madon/v2 v2.4.0
 	github.com/NYTimes/gziphandler v1.1.1
 	github.com/Songmu/gitconfig v0.2.0
-	github.com/a-h/templ v0.3.819
+	github.com/a-h/templ v0.3.833
 	github.com/adrg/frontmatter v0.2.0
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.55.1
 	github.com/bluesky-social/indigo v0.0.0-20240905024844-a4f38639767f
