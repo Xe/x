@@ -23,7 +23,7 @@ spec:
         image: glanceapp/glance:v0.6.4
         imagePullPolicy: IfNotPresent
         args:
-          - "--config=/app/etc/glance.yml"
+        - "--config=/app/etc/glance.yml"
         resources:
           limits:
             memory: "128Mi"
@@ -55,11 +55,11 @@ spec:
           seccompProfile:
             type: RuntimeDefault
         env:
-          - name: BIND
-            value: ":8443"
-          - name: PROXY_TO
-            value: "http://localhost:8080"
+        - name: BIND
+          value: ":8443"
+        - name: PROXY_TO
+          value: "http://localhost:8080"
         volumeMounts:
-          - name: "internal-certs"
-            mountPath: "/xe/pki"
-            readOnly: true
+        - name: "internal-certs"
+          mountPath: "/xe/pki"
+          readOnly: true

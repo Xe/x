@@ -1,8 +1,8 @@
 module within.website/x
 
-go 1.23.1
+go 1.23.3
 
-toolchain go1.23.2
+toolchain go1.23.4
 
 require (
 	al.essio.dev/pkg/shellescape v1.5.1
@@ -14,7 +14,7 @@ require (
 	github.com/Songmu/gitconfig v0.2.0
 	github.com/a-h/templ v0.3.833
 	github.com/adrg/frontmatter v0.2.0
-	github.com/aws/aws-sdk-go-v2/service/s3 v1.55.1
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.74.1
 	github.com/bluesky-social/indigo v0.0.0-20240905024844-a4f38639767f
 	github.com/bluesky-social/jetstream v0.0.0-20241022030937-75fdbaa83787
 	github.com/bwmarrin/discordgo v0.28.1
@@ -92,11 +92,11 @@ require (
 	github.com/Microsoft/go-winio v0.6.1 // indirect
 	github.com/ProtonMail/go-crypto v1.1.4 // indirect
 	github.com/andybalholm/brotli v1.1.1 // indirect
-	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.6.2 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/v4a v1.3.9 // indirect
+	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.6.8 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/v4a v1.3.29 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.12.2 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/checksum v1.3.11 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.17.9 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/checksum v1.5.3 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.18.10 // indirect
 	github.com/bytedance/sonic v1.12.6 // indirect
 	github.com/bytedance/sonic/loader v0.2.0 // indirect
 	github.com/carlmjohnson/versioninfo v0.22.5 // indirect
@@ -120,6 +120,7 @@ require (
 	github.com/go-jose/go-jose/v4 v4.0.2 // indirect
 	github.com/go-logr/logr v1.4.2 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
+	github.com/go-playground/validator/v10 v10.10.0 // indirect
 	github.com/go-sourcemap/sourcemap v2.1.3+incompatible // indirect
 	github.com/gobwas/glob v0.2.3 // indirect
 	github.com/goccy/go-yaml v1.12.0 // indirect

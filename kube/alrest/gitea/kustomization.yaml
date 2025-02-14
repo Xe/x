@@ -9,3 +9,9 @@ resources:
   #- external-dns.yaml
   - ingress.yaml
 namespace: gitea
+
+configMapGenerator:
+- name: anubis-cfg
+  behavior: create
+  files:
+  - ./cfg/anubis/botPolicies.json

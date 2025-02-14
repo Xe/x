@@ -66,6 +66,9 @@ spec:
         - name: custom
           configMap:
             name: gitea-custom
+        - name: anubis
+          configMap:
+            name: anubis-cfg
       containers:
         - name: main
           image: gitea/gitea:1-rootless
@@ -156,12 +159,17 @@ spec:
             value: "4"
           - name: "METRICS_BIND"
             value: ":9090"
+          - name: "POLICY_FNAME"
+            value: "/xe/cfg/anubis/botPolicies.json"
           - name: "SERVE_ROBOTS_TXT"
             value: "true"
           - name: "TARGET"
             value: "http://localhost:3000"
           # - name: "SLOG_LEVEL"
           #   value: "debug"
+          volumeMounts:
+          - name: anubis
+            mountPath: /xe/cfg/anubis
           resources:
             limits:
               cpu: 500m

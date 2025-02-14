@@ -18,7 +18,7 @@ runtime:
     SAVE ARTIFACT ca-certificates.crt
 
 deps:
-    FROM golang:1.23
+    FROM golang:1.24
     WORKDIR /app
 
     COPY go.mod go.sum ./
