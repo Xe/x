@@ -53,5 +53,6 @@ func (b Bot) Valid() error {
 }
 
 type Config struct {
-	Bots []Bot `json:"bots"`
+	Bots  []Bot `json:"bots"`
+	DNSBL bool  `json:"dnsbl"`
 }

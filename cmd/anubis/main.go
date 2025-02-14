@@ -30,6 +30,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"within.website/x"
 	"within.website/x/cmd/anubis/internal/config"
+	"within.website/x/cmd/anubis/internal/dnsbl"
 	"within.website/x/internal"
 	"within.website/x/xess"
 )
@@ -212,6 +213,19 @@ func (s *Server) maybeReverseProxy(w http.ResponseWriter, r *http.Request) {
 		"x-real-ip", r.Header.Get("X-Real-Ip"),
 	)
 	policyApplications.WithLabelValues(cr.Name, string(cr.Rule)).Add(1)
+
+	ip := r.Header.Get("X-Real-Ip")
+
+	if s.policy.DNSBL && ip != "" {
+		resp, err := dnsbl.Lookup(ip)
+		if err != nil {
+			lg.Error("can't look up ip in dnsbl", "err", err)
+		} else {
+			lg.Info("DNSBL hit", "status", resp.String())
+			templ.Handler(base("Oh noes!", errorPage(fmt.Sprintf("DroneBL reported an entry: %s, see https://dronebl.org/lookup?ip=%s", resp.String(), ip))), templ.WithStatus(http.StatusOK)).ServeHTTP(w, r)
+			return
+		}
+	}
 
 	switch cr.Rule {
 	case config.RuleAllow:

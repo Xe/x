@@ -60,5 +60,6 @@
       "user_agent_regex": "Mozilla",
       "action": "CHALLENGE"
     }
-  ]
+  ],
+  "dnsbl": true
 }

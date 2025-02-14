@@ -24,7 +24,8 @@ var (
 type ParsedConfig struct {
 	orig config.Config
 
-	Bots []Bot
+	Bots  []Bot
+	DNSBL bool
 }
 
 type Bot struct {
@@ -84,6 +85,8 @@ func parseConfig(fin io.Reader, fname string) (*ParsedConfig, error) {
 	if err != nil {
 		return nil, fmt.Errorf("errors validating policy config JSON %s: %w", fname, err)
 	}
+
+	result.DNSBL = c.DNSBL
 
 	return result, nil
 }
