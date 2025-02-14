@@ -56,6 +56,11 @@ var (
 		Help: "The total number of challenges validated",
 	})
 
+	droneBLHits = promauto.NewCounterVec(prometheus.CounterOpts{
+		Name: "anubis_dronebl_hits",
+		Help: "The total number of hits from DroneBL",
+	}, []string{"status"})
+
 	failedValidations = promauto.NewCounter(prometheus.CounterOpts{
 		Name: "anubis_failed_validations",
 		Help: "The total number of failed validations",
@@ -185,18 +190,20 @@ func New(target, policyFname string) (*Server, error) {
 	}
 
 	return &Server{
-		rp:     rp,
-		priv:   priv,
-		pub:    pub,
-		policy: policy,
+		rp:         rp,
+		priv:       priv,
+		pub:        pub,
+		policy:     policy,
+		dnsblCache: NewDecayMap[string, dnsbl.DroneBLResponse](),
 	}, nil
 }
 
 type Server struct {
-	rp     *httputil.ReverseProxy
-	priv   ed25519.PrivateKey
-	pub    ed25519.PublicKey
-	policy *ParsedConfig
+	rp         *httputil.ReverseProxy
+	priv       ed25519.PrivateKey
+	pub        ed25519.PublicKey
+	policy     *ParsedConfig
+	dnsblCache *DecayMap[string, dnsbl.DroneBLResponse]
 }
 
 func (s *Server) maybeReverseProxy(w http.ResponseWriter, r *http.Request) {
@@ -217,10 +224,18 @@ func (s *Server) maybeReverseProxy(w http.ResponseWriter, r *http.Request) {
 	ip := r.Header.Get("X-Real-Ip")
 
 	if s.policy.DNSBL && ip != "" {
-		resp, err := dnsbl.Lookup(ip)
-		if err != nil {
-			lg.Error("can't look up ip in dnsbl", "err", err)
-		} else {
+		resp, ok := s.dnsblCache.Get(ip)
+		if !ok {
+			lg.Debug("looking up ip in dnsbl")
+			resp, err := dnsbl.Lookup(ip)
+			if err != nil {
+				lg.Error("can't look up ip in dnsbl", "err", err)
+			}
+			s.dnsblCache.Set(ip, resp, 24*time.Hour)
+			droneBLHits.WithLabelValues(resp.String()).Inc()
+		}
+
+		if resp != dnsbl.AllGood {
 			lg.Info("DNSBL hit", "status", resp.String())
 			templ.Handler(base("Oh noes!", errorPage(fmt.Sprintf("DroneBL reported an entry: %s, see https://dronebl.org/lookup?ip=%s", resp.String(), ip))), templ.WithStatus(http.StatusOK)).ServeHTTP(w, r)
 			return
