@@ -1,0 +1,47 @@
+# apiVersion: v1
+# kind: PersistentVolume
+# metadata:
+#   name: reyn
+# spec:
+#   capacity:
+#     storage: 64Gi
+#   volumeMode: Filesystem
+#   accessModes:
+#     - ReadWriteOnce
+#   persistentVolumeReclaimPolicy: Retain
+#   storageClassName: local-storage
+#   local:
+#     path: /var/mnt/nvme/0/reyn
+#   nodeAffinity:
+#     required:
+#       nodeSelectorTerms:
+#       - matchExpressions:
+#         - key: kubernetes.io/hostname
+#           operator: In
+#           values:
+#           - pneuma
+# ---
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: reyn
+# spec:
+#   resources:
+#     requests:
+#       storage: 64Gi
+#   storageClassName: local-storage
+#   accessModes:
+#     - ReadWriteOnce
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: reyn
+spec:
+  resources:
+    requests:
+      storage: 64Gi
+  volumeMode: Block
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: ssd

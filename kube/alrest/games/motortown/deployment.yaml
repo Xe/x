@@ -45,7 +45,8 @@ spec:
         imagePullPolicy: Always
         command:
         - "/usr/bin/launch_server"
-        - "wine"
+        - /home/steam/.steam/steam/compatibilitytools.d/GE-Proton-9-24/proton
+        - run
         - "/root/motortown/MotorTown/Binaries/Win64/MotorTownServer-Win64-Shipping.exe"
         - "Jeju_World?listen?"
         - "-server"

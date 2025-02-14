@@ -1,0 +1,14 @@
+apiVersion: kubevirt.io/v1
+kind: KubeVirt
+metadata:
+  name: kubevirt
+  namespace: kubevirt
+spec:
+  configuration:
+    developerConfiguration:
+      logVerbosity:
+        virtLauncher: 8
+        virtHandler: 8
+        virtController: 8
+        virtAPI: 8
+        virtOperator: 8

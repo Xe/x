@@ -1,0 +1,50 @@
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: reyn
+spec:
+  runStrategy: Halted
+  template:
+    metadata:
+      labels:
+        kubevirt.io/domain: reyn
+    spec:
+      domain:
+        cpu:
+          cores: 6
+        devices:
+          disks:
+          # - bootOrder: 1
+          #   cdrom:
+          #     bus: sata
+          #   name: cdromiso
+          - disk:
+              bus: virtio
+            name: harddrive
+          # - cdrom:
+          #     bus: sata
+          #   name: virtiocontainerdisk
+        machine:
+          type: q35
+        resources:
+          requests:
+            memory: 16G
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                - key: kubernetes.io/hostname
+                  operator: In
+                  values:
+                  - pneuma
+      volumes:
+      # - name: cdromiso
+      #   persistentVolumeClaim:
+      #     claimName: win10-iso-raw
+      - name: harddrive
+        persistentVolumeClaim:
+          claimName: reyn
+      # - containerDisk:
+      #     image: kubevirt/virtio-container-disk
+      #   name: virtiocontainerdisk

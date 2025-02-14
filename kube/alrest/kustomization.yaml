@@ -1,10 +1,10 @@
 resources:
   - core
+  - games
   - gitea
   - glance
   - minio
   - ollama
-  - palworld
   - pocket-id
   - pvfm
   - registry

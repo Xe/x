@@ -2,3 +2,4 @@ resources:
   - external-dns
   - nfs-provisioner
   - cert-manager-1pass.yaml
+  - local-storage.yaml
