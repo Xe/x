@@ -223,8 +223,8 @@ github.com/cpuguy83/go-md2man/v2 v2.0.0-20190314233015-f79a8a8ca69d/go.mod h1:ma
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
 github.com/cyphar/filepath-securejoin v0.3.6 h1:4d9N5ykBnSp5Xn2JkhocYDkOpURL/18CYMpo6xB9uWM=
 github.com/cyphar/filepath-securejoin v0.3.6/go.mod h1:Sdj7gXlvMcPZsbhwhQ33GguGLDGQL7h7bg04C/+u9jI=
-github.com/danrusei/gobot-bsky v0.1.0 h1:dzAeOQoJtsexXfaQDdef3Z9Q8uIkjR6KTw5xkEh1lDg=
-github.com/danrusei/gobot-bsky v0.1.0/go.mod h1:ptDNCLobjjjdNfY6P5WZaukERx47XrHPBa2kdo5Gza0=
+github.com/danrusei/gobot-bsky v0.2.1 h1:iRvkSdwb8sc0zW6VD7XSA99QvQbVjVDryutsKJayAXc=
+github.com/danrusei/gobot-bsky v0.2.1/go.mod h1:ptDNCLobjjjdNfY6P5WZaukERx47XrHPBa2kdo5Gza0=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc h1:U9qPSI2PIWSS1VwoXQT9A3Wy9MM3WgvqSxFWenqJduM=
