@@ -27,7 +27,7 @@ spec:
         volumeMounts:
         - name: data 
           mountPath: /data
-        image: minio/minio:latest
+        image: quay.io/minio/minio:latest
         imagePullPolicy: Always
         args:
         - server
