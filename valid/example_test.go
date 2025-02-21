@@ -20,7 +20,7 @@ func (e *Example) Valid() error {
 	return errors.Join(errs...)
 }
 
-func ExampleValider_Valid() {
+func ExampleInterface_Valid() {
 	e := Example{Name: ""}
 
 	if err := e.Valid(); err != nil {
