@@ -258,7 +258,7 @@ require (
 	github.com/sacOO7/gowebsocket v0.0.0-20221109081133-70ac927be105
 	github.com/sendgrid/rest v2.6.9+incompatible // indirect
 	golang.org/x/exp v0.0.0-20240719175910-8a7402abbf56
-	golang.org/x/image v0.23.0
+	golang.org/x/image v0.24.0
 	golang.org/x/mod v0.23.0 // indirect
 	golang.org/x/net v0.35.0
 	golang.org/x/sys v0.30.0 // indirect
