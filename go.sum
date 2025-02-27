@@ -284,8 +284,8 @@ github.com/felixge/httpsnoop v1.0.4 h1:NFTV2Zj1bL4mc9sqWACXbQFVBBg2W3GPvqp8/ESS2
 github.com/felixge/httpsnoop v1.0.4/go.mod h1:m8KPJKqk1gH5J9DgRY2ASl2lWCfGKXixSwevea8zH2U=
 github.com/frankban/quicktest v1.14.6 h1:7Xjx+VpznH+oBnejlPUj8oUpdxnVs4f8XU8WnHkI4W8=
 github.com/frankban/quicktest v1.14.6/go.mod h1:4ptaffx2x8+WTWXmUCuVU6aPUX1/Mz7zb5vbUoiM6w0=
-github.com/gen2brain/avif v0.3.1 h1:womS2LKvhS/dSR3zIKUxtJW+riGlY48akGWqc+YgHtE=
-github.com/gen2brain/avif v0.3.1/go.mod h1:s9sI2zo2cF6EdyRVCtnIfwL/Qb3k0TkOIEsz6ovK1ms=
+github.com/gen2brain/avif v0.4.3 h1:pxpXOCIA4YfB6wxDagbNCpXdTh5/1q3huedPx0arqwA=
+github.com/gen2brain/avif v0.4.3/go.mod h1:L0hvma2Pwz8HWgE3w7KkRIUYxnVEZ94ZfVQGKwaIQ40=
 github.com/gen2brain/heic v0.3.0 h1:YDw7cerzjnxmb+/o5RAEpRy9j4jsFYCh9DuP1NDOc7Q=
 github.com/gen2brain/heic v0.3.0/go.mod h1:+x0Y/m2EP1kd6mWvC131B3IK4eoKtLBBqJJ1uJB8CT8=
 github.com/gen2brain/jpegxl v0.4.4 h1:d3N8xvDvKoaancSnkIyQBrSHTnbjhb9iajljiRTAFak=
