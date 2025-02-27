@@ -24,7 +24,7 @@ require (
 	github.com/dop251/goja v0.0.0-20230531210528-d7324b2d74f7
 	github.com/eaburns/peggy v1.0.2
 	github.com/facebookgo/ensure v0.0.0-20160127193407-b4ab57deab51
-	github.com/gen2brain/avif v0.3.1
+	github.com/gen2brain/avif v0.4.3
 	github.com/gen2brain/heic v0.3.0
 	github.com/gen2brain/jpegxl v0.4.4
 	github.com/gen2brain/webp v0.4.4
