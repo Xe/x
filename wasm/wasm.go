@@ -6,10 +6,22 @@ import (
 
 type String uint64
 
+func (value String) Address() uint32 {
+	return uint32(value >> 32)
+}
+
+func (value String) Length() uint32 {
+	return uint32((value << 32) >> 32)
+}
+
 func FromString(value string) String {
 	position := uint32(uintptr(unsafe.Pointer(unsafe.StringData(value))))
 	bytes := uint32(len(value))
 	return String(uint64(position)<<32 | uint64(bytes))
+}
+
+func (value String) String() string {
+	return unsafe.String((*byte)(unsafe.Pointer(uintptr(value.Address()))), value.Length())
 }
 
 type Buffer uint64

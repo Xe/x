@@ -21,6 +21,15 @@ func (value String) LoadBytes(module api.Module) []byte {
 	return data
 }
 
+func (value String) Store(ctx context.Context, module api.Module, data string) (String, error) {
+	buffer, err := Store(ctx, module, []byte(data))
+	if err != nil {
+		return 0, err
+	}
+
+	return String(buffer), nil
+}
+
 func (buffer Buffer) Load(module api.Module) []byte {
 	data, ok := module.Memory().Read(buffer.Address(), buffer.Length())
 	if !ok {
