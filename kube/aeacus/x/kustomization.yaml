@@ -1,3 +1,4 @@
 resources:
-  - stickers
+  - httpdebug.yaml
+  - stickers.yaml
   - within.website
