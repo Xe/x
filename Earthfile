@@ -72,12 +72,16 @@ anubis-amd64:
     CMD ["/app/bin/anubis"]
     USER 1000:1000
 
+    HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 CMD ["/app/bin/anubis", "--healthcheck"]
+
     SAVE IMAGE --push ghcr.io/xe/x/anubis:latest
 
 anubis-arm64:
     FROM +ship --PROGRAM=anubis --GOARCH=arm64
     CMD ["/app/bin/anubis"]
     USER 1000:1000
+
+    HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 CMD ["/app/bin/anubis", "--healthcheck"]
 
     SAVE IMAGE --push ghcr.io/xe/x/anubis:latest
 
