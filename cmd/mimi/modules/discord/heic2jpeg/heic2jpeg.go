@@ -80,11 +80,23 @@ func (m *Module) heic2jpeg(s *discordgo.Session, mc *discordgo.MessageCreate) {
 		}
 		defer resp.Body.Close()
 
-		fname := filepath.Join(dir, filepath.Base(req.URL.Path))
-		fnameStem := strings.TrimSuffix(fname, filepath.Ext(fname))
+		baseName := filepath.Base(req.URL.Path)
+		if strings.Contains(baseName, "/") || strings.Contains(baseName, "\\") || strings.Contains(baseName, "..") {
+			s.ChannelMessageSend(mc.ChannelID, "invalid file name")
+			slog.Error("invalid file name", "file name", baseName)
+			return
+		}
+		fname := filepath.Join(dir, baseName)
+		absPath, err := filepath.Abs(fname)
+		if err != nil || !strings.HasPrefix(absPath, dir) {
+			s.ChannelMessageSend(mc.ChannelID, "invalid file path")
+			slog.Error("invalid file path", "path", absPath)
+			return
+		}
+		fnameStem := strings.TrimSuffix(absPath, filepath.Ext(absPath))
 		fnameJPEG := fnameStem + ".jpeg"
 
-		fout, err := os.Create(fname)
+		fout, err := os.Create(absPath)
 		if err != nil {
 			s.ChannelMessageSend(mc.ChannelID, "failed to save image")
 			slog.Error("failed to save image", "err", err)
