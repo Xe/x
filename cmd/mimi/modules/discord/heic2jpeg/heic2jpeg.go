@@ -88,7 +88,13 @@ func (m *Module) heic2jpeg(s *discordgo.Session, mc *discordgo.MessageCreate) {
 		}
 		fname := filepath.Join(dir, baseName)
 		absPath, err := filepath.Abs(fname)
-		if err != nil || !strings.HasPrefix(absPath, dir) {
+		if err != nil {
+			s.ChannelMessageSend(mc.ChannelID, "invalid file path")
+			slog.Error("invalid file path", "path", absPath)
+			return
+		}
+		relPath, err := filepath.Rel(dir, absPath)
+		if err != nil || strings.HasPrefix(relPath, "..") {
 			s.ChannelMessageSend(mc.ChannelID, "invalid file path")
 			slog.Error("invalid file path", "path", absPath)
 			return
