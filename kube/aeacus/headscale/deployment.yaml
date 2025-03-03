@@ -26,7 +26,7 @@ spec:
       enableServiceLinks: true
       containers:
         - name: headscale
-          image: ghcr.io/juanfont/headscale:v0.24.2
+          image: ghcr.io/juanfont/headscale:v0.25.1
           imagePullPolicy: Always
           args:
             - serve

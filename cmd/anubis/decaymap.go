@@ -37,7 +37,11 @@ func (m *DecayMap[K, V]) Get(key K) (V, bool) {
 
 	if time.Now().After(value.expiry) {
 		m.lock.Lock()
-		delete(m.data, key)
+		// Since previously reading m.data[key], the value may have been updated.
+		// Delete the entry only if the expiry time is still the same.
+		if m.data[key].expiry == value.expiry {
+			delete(m.data, key)
+		}
 		m.lock.Unlock()
 
 		return zilch[V](), false

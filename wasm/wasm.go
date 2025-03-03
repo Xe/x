@@ -2,28 +2,26 @@ package wasm
 
 import (
 	"unsafe"
-
-	"github.com/tetratelabs/wazero/api"
 )
 
 type String uint64
 
-func (value String) Load(module api.Module) string {
-	return string(value.LoadBytes(module))
+func (value String) Address() uint32 {
+	return uint32(value >> 32)
 }
 
-func (value String) LoadBytes(module api.Module) []byte {
-	data, ok := module.Memory().Read(uint32(value>>32), uint32(value))
-	if !ok {
-		panic("memory read out of bounds")
-	}
-	return data
+func (value String) Length() uint32 {
+	return uint32((value << 32) >> 32)
 }
 
 func FromString(value string) String {
 	position := uint32(uintptr(unsafe.Pointer(unsafe.StringData(value))))
 	bytes := uint32(len(value))
 	return String(uint64(position)<<32 | uint64(bytes))
+}
+
+func (value String) String() string {
+	return unsafe.String((*byte)(unsafe.Pointer(uintptr(value.Address()))), value.Length())
 }
 
 type Buffer uint64
