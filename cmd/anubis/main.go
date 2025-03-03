@@ -42,6 +42,7 @@ var (
 	robotsTxt           = flag.Bool("serve-robots-txt", false, "serve a robots.txt file that disallows all robots")
 	policyFname         = flag.String("policy-fname", "", "full path to anubis policy document (defaults to a sensible built-in policy)")
 	target              = flag.String("target", "http://localhost:3923", "target to reverse proxy to")
+	healthcheck         = flag.Bool("healthcheck", false, "run a health check against Anubis")
 
 	//go:embed static botPolicies.json
 	static embed.FS
@@ -84,8 +85,29 @@ const (
 //go:generate zstd -f -k --ultra -22 static/js/main.mjs
 //go:generate brotli -fZk static/js/main.mjs
 
+func doHealthCheck() error {
+	resp, err := http.Get("http://localhost" + *metricsBind + "/metrics")
+	if err != nil {
+		return fmt.Errorf("failed to fetch metrics: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+	}
+
+	return nil
+}
+
 func main() {
 	internal.HandleStartup()
+
+	if *healthcheck {
+		if err := doHealthCheck(); err != nil {
+			log.Fatal(err)
+		}
+		return
+	}
 
 	s, err := New(*target, *policyFname)
 	if err != nil {
