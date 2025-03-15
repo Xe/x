@@ -157,3 +157,9 @@ templ errorPage(message string) {
 		<p><a href="/">Go home</a></p>
 	</div>
 }
+
+templ staticHappy() {
+	<div class="centered-div">
+		<img id="image" width="256" src={ "/.within.website/x/cmd/anubis/static/img/happy.webp?cacheBuster=" + x.Version }/>
+	</div>
+}

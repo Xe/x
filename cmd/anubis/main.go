@@ -41,7 +41,7 @@ var (
 	metricsBind         = flag.String("metrics-bind", ":9090", "TCP port to bind metrics to")
 	robotsTxt           = flag.Bool("serve-robots-txt", false, "serve a robots.txt file that disallows all robots")
 	policyFname         = flag.String("policy-fname", "", "full path to anubis policy document (defaults to a sensible built-in policy)")
-	target              = flag.String("target", "http://localhost:3923", "target to reverse proxy to")
+	target              = flag.String("target", "http://localhost:3923", "target to reverse proxy to, set to empty string to disable proxying")
 	healthcheck         = flag.Bool("healthcheck", false, "run a health check against Anubis")
 
 	//go:embed static botPolicies.json
@@ -177,17 +177,21 @@ func (s *Server) challengeFor(r *http.Request) string {
 }
 
 func New(target, policyFname string) (*Server, error) {
-	u, err := url.Parse(target)
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse target URL: %w", err)
+	var rp *httputil.ReverseProxy
+
+	if target != "" {
+		u, err := url.Parse(target)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse target URL: %w", err)
+		}
+
+		rp = httputil.NewSingleHostReverseProxy(u)
 	}
 
 	pub, priv, err := ed25519.GenerateKey(rand.Reader)
 	if err != nil {
 		return nil, fmt.Errorf("failed to generate ed25519 key: %w", err)
 	}
-
-	rp := httputil.NewSingleHostReverseProxy(u)
 
 	var fin io.ReadCloser
 
@@ -226,6 +230,22 @@ type Server struct {
 	pub        ed25519.PublicKey
 	policy     *ParsedConfig
 	dnsblCache *DecayMap[string, dnsbl.DroneBLResponse]
+}
+
+func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	if s.rp == nil {
+		redir := r.FormValue("redir")
+		if redir != "" {
+			http.Redirect(w, r, redir, http.StatusFound)
+			return
+		}
+
+		templ.Handler(
+			base("You are not a bot!", staticHappy()),
+		).ServeHTTP(w, r)
+	} else {
+		s.rp.ServeHTTP(w, r)
+	}
 }
 
 func (s *Server) maybeReverseProxy(w http.ResponseWriter, r *http.Request) {
@@ -267,7 +287,7 @@ func (s *Server) maybeReverseProxy(w http.ResponseWriter, r *http.Request) {
 	switch cr.Rule {
 	case config.RuleAllow:
 		lg.Debug("allowing traffic to origin (explicit)")
-		s.rp.ServeHTTP(w, r)
+		s.ServeHTTP(w, r)
 		return
 	case config.RuleDeny:
 		clearCookie(w)
@@ -335,7 +355,7 @@ func (s *Server) maybeReverseProxy(w http.ResponseWriter, r *http.Request) {
 	if token.Valid && randomJitter() {
 		r.Header.Add("X-Anubis-Status", "PASS-BRIEF")
 		lg.Debug("cookie is not enrolled into secondary screening")
-		s.rp.ServeHTTP(w, r)
+		s.ServeHTTP(w, r)
 		return
 	}
 
@@ -371,7 +391,7 @@ func (s *Server) maybeReverseProxy(w http.ResponseWriter, r *http.Request) {
 
 	slog.Debug("all checks passed")
 	r.Header.Add("X-Anubis-Status", "PASS-FULL")
-	s.rp.ServeHTTP(w, r)
+	s.ServeHTTP(w, r)
 }
 
 func (s *Server) renderIndex(w http.ResponseWriter, r *http.Request) {
