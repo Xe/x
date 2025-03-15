@@ -123,6 +123,7 @@ func main() {
 
 	mux.HandleFunc("POST /.within.website/x/cmd/anubis/api/make-challenge", s.makeChallenge)
 	mux.HandleFunc("GET /.within.website/x/cmd/anubis/api/pass-challenge", s.passChallenge)
+	mux.HandleFunc("GET /.within.website/x/cmd/anubis/api/check", s.maybeReverseProxyHttpStatusOnly)
 	mux.HandleFunc("GET /.within.website/x/cmd/anubis/api/test-error", s.testError)
 
 	if *robotsTxt {
@@ -139,7 +140,7 @@ func main() {
 		go metricsServer()
 	}
 
-	mux.HandleFunc("/", s.maybeReverseProxy)
+	mux.HandleFunc("/", s.maybeReverseProxyOrPage)
 
 	slog.Info("listening", "url", "http://localhost"+*bind, "difficulty", *challengeDifficulty, "serveRobotsTXT", *robotsTxt, "target", *target, "version", x.Version)
 	log.Fatal(http.ListenAndServe(*bind, mux))
@@ -248,7 +249,15 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (s *Server) maybeReverseProxy(w http.ResponseWriter, r *http.Request) {
+func (s *Server) maybeReverseProxyHttpStatusOnly(w http.ResponseWriter, r *http.Request) {
+	s.maybeReverseProxy(w, r, true)
+}
+
+func (s *Server) maybeReverseProxyOrPage(w http.ResponseWriter, r *http.Request) {
+	s.maybeReverseProxy(w, r, false)
+}
+
+func (s *Server) maybeReverseProxy(w http.ResponseWriter, r *http.Request, httpStatusOnly bool) {
 	cr := s.check(r)
 	r.Header.Add("X-Anubis-Rule", cr.Name)
 	r.Header.Add("X-Anubis-Action", string(cr.Rule))
@@ -306,21 +315,21 @@ func (s *Server) maybeReverseProxy(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		lg.Debug("cookie not found", "path", r.URL.Path)
 		clearCookie(w)
-		s.renderIndex(w, r)
+		s.renderIndex(w, r, httpStatusOnly)
 		return
 	}
 
 	if err := ckie.Valid(); err != nil {
 		lg.Debug("cookie is invalid", "err", err)
 		clearCookie(w)
-		s.renderIndex(w, r)
+		s.renderIndex(w, r, httpStatusOnly)
 		return
 	}
 
 	if time.Now().After(ckie.Expires) && !ckie.Expires.IsZero() {
 		lg.Debug("cookie expired", "path", r.URL.Path)
 		clearCookie(w)
-		s.renderIndex(w, r)
+		s.renderIndex(w, r, httpStatusOnly)
 		return
 	}
 
@@ -331,7 +340,7 @@ func (s *Server) maybeReverseProxy(w http.ResponseWriter, r *http.Request) {
 	if !token.Valid {
 		lg.Debug("invalid token", "path", r.URL.Path)
 		clearCookie(w)
-		s.renderIndex(w, r)
+		s.renderIndex(w, r, httpStatusOnly)
 		return
 	}
 
@@ -341,14 +350,14 @@ func (s *Server) maybeReverseProxy(w http.ResponseWriter, r *http.Request) {
 	if !ok {
 		lg.Debug("exp is not int64", "ok", ok, "typeof(exp)", fmt.Sprintf("%T", exp))
 		clearCookie(w)
-		s.renderIndex(w, r)
+		s.renderIndex(w, r, httpStatusOnly)
 		return
 	}
 
 	if exp := time.Unix(int64(exp), 0); time.Now().After(exp) {
 		lg.Debug("token has expired", "exp", exp.Format(time.RFC3339))
 		clearCookie(w)
-		s.renderIndex(w, r)
+		s.renderIndex(w, r, httpStatusOnly)
 		return
 	}
 
@@ -362,7 +371,7 @@ func (s *Server) maybeReverseProxy(w http.ResponseWriter, r *http.Request) {
 	if claims["challenge"] != s.challengeFor(r) {
 		lg.Debug("invalid challenge", "path", r.URL.Path)
 		clearCookie(w)
-		s.renderIndex(w, r)
+		s.renderIndex(w, r, httpStatusOnly)
 		return
 	}
 
@@ -385,7 +394,7 @@ func (s *Server) maybeReverseProxy(w http.ResponseWriter, r *http.Request) {
 		lg.Debug("invalid response", "path", r.URL.Path)
 		failedValidations.Inc()
 		clearCookie(w)
-		s.renderIndex(w, r)
+		s.renderIndex(w, r, httpStatusOnly)
 		return
 	}
 
@@ -394,7 +403,13 @@ func (s *Server) maybeReverseProxy(w http.ResponseWriter, r *http.Request) {
 	s.ServeHTTP(w, r)
 }
 
-func (s *Server) renderIndex(w http.ResponseWriter, r *http.Request) {
+func (s *Server) renderIndex(w http.ResponseWriter, r *http.Request, returnHttpStatusOnly bool) {
+	if returnHttpStatusOnly {
+		w.WriteHeader(http.StatusUnauthorized)
+		w.Write([]byte("Authorization required"))
+		return
+	}
+
 	templ.Handler(
 		base("Making sure you're not a bot!", index()),
 	).ServeHTTP(w, r)
