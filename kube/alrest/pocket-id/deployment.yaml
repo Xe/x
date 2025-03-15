@@ -20,7 +20,7 @@ spec:
           claimName: pocket-id
       containers:
       - name: main
-        image: ghcr.io/pocket-id/pocket-id:v0.35.0
+        image: ghcr.io/pocket-id/pocket-id:v0.40.0
         imagePullPolicy: IfNotPresent
         securityContext:
           runAsUser: 1000
