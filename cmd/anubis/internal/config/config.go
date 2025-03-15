@@ -28,25 +28,25 @@ var (
 )
 
 func (b Bot) Valid() error {
-	var err error
+	var errs []error
 
 	if b.Name == "" {
-		err = errors.Join(err, ErrBotMustHaveName)
+		errs = append(errs, ErrBotMustHaveName)
 	}
 
 	if b.UserAgentRegex == nil && b.PathRegex == nil {
-		err = errors.Join(err, ErrBotMustHaveUserAgentPathOrBoth)
+		errs = append(errs, ErrBotMustHaveUserAgentPathOrBoth)
 	}
 
 	switch b.Action {
 	case RuleAllow, RuleChallenge, RuleDeny:
 		// okay
 	default:
-		err = errors.Join(err, fmt.Errorf("%w: %q", ErrUnknownAction, b.Action))
+		errs = append(errs, fmt.Errorf("%w: %q", ErrUnknownAction, b.Action))
 	}
 
-	if err != nil {
-		return fmt.Errorf("config: bot entry for %q is not valid: %w", b.Name, err)
+	if errs != nil {
+		return fmt.Errorf("config: bot entry for %q is not valid: %w", b.Name, errors.Join(errs...))
 	}
 
 	return nil
