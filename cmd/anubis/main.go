@@ -287,6 +287,11 @@ func (s *Server) maybeReverseProxy(w http.ResponseWriter, r *http.Request) {
 	case config.RuleDeny:
 		clearCookie(w)
 		lg.Info("explicit deny")
+		if rule == nil {
+			lg.Error("rule is nil, cannot calculate checksum")
+			templ.Handler(base("Oh noes!", errorPage("Other internal server error (contact the admin)")), templ.WithStatus(http.StatusInternalServerError)).ServeHTTP(w, r)
+			return
+		}
 		hash, err := rule.Hash()
 		if err != nil {
 			lg.Error("can't calculate checksum of rule", "err", err)
