@@ -35,6 +35,19 @@ type Bot struct {
 	Action    config.Rule `json:"action"`
 }
 
+func (b Bot) Hash() (string, error) {
+	var pathRex string
+	if b.Path != nil {
+		pathRex = b.Path.String()
+	}
+	var userAgentRex string
+	if b.UserAgent != nil {
+		userAgentRex = b.UserAgent.String()
+	}
+
+	return sha256sum(fmt.Sprintf("%s::%s::%s", b.Name, pathRex, userAgentRex))
+}
+
 func parseConfig(fin io.Reader, fname string) (*ParsedConfig, error) {
 	var c config.Config
 	if err := json.NewDecoder(fin).Decode(&c); err != nil {
@@ -110,20 +123,20 @@ func cr(name string, rule config.Rule) CheckResult {
 }
 
 // Check evaluates the list of rules, and returns the result
-func (s *Server) check(r *http.Request) CheckResult {
+func (s *Server) check(r *http.Request) (CheckResult, *Bot) {
 	for _, b := range s.policy.Bots {
 		if b.UserAgent != nil {
 			if b.UserAgent.MatchString(r.UserAgent()) {
-				return cr("bot/"+b.Name, b.Action)
+				return cr("bot/"+b.Name, b.Action), &b
 			}
 		}
 
 		if b.Path != nil {
 			if b.Path.MatchString(r.URL.Path) {
-				return cr("bot/"+b.Name, b.Action)
+				return cr("bot/"+b.Name, b.Action), &b
 			}
 		}
 	}
 
-	return cr("default/allow", config.RuleAllow)
+	return cr("default/allow", config.RuleAllow), nil
 }

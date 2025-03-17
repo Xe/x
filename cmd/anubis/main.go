@@ -114,6 +114,21 @@ func main() {
 		log.Fatal(err)
 	}
 
+	fmt.Println("Rule error IDs:")
+	for _, rule := range s.policy.Bots {
+		if rule.Action != config.RuleDeny {
+			continue
+		}
+
+		hash, err := rule.Hash()
+		if err != nil {
+			log.Fatalf("can't calculate checksum of rule %s: %v", rule.Name, err)
+		}
+
+		fmt.Printf("* %s: %s\n", rule.Name, hash)
+	}
+	fmt.Println()
+
 	mux := http.NewServeMux()
 	xess.Mount(mux)
 
@@ -229,7 +244,7 @@ type Server struct {
 }
 
 func (s *Server) maybeReverseProxy(w http.ResponseWriter, r *http.Request) {
-	cr := s.check(r)
+	cr, rule := s.check(r)
 	r.Header.Add("X-Anubis-Rule", cr.Name)
 	r.Header.Add("X-Anubis-Action", string(cr.Rule))
 	lg := slog.With(
@@ -272,7 +287,14 @@ func (s *Server) maybeReverseProxy(w http.ResponseWriter, r *http.Request) {
 	case config.RuleDeny:
 		clearCookie(w)
 		lg.Info("explicit deny")
-		templ.Handler(base("Oh noes!", errorPage("Access Denied")), templ.WithStatus(http.StatusOK)).ServeHTTP(w, r)
+		hash, err := rule.Hash()
+		if err != nil {
+			lg.Error("can't calculate checksum of rule", "err", err)
+			templ.Handler(base("Oh noes!", errorPage("Other internal server error (contact the admin)")), templ.WithStatus(http.StatusInternalServerError)).ServeHTTP(w, r)
+			return
+		}
+		lg.Debug("rule hash", "hash", hash)
+		templ.Handler(base("Oh noes!", errorPage(fmt.Sprintf("Access Denied: error code %s", hash))), templ.WithStatus(http.StatusOK)).ServeHTTP(w, r)
 		return
 	case config.RuleChallenge:
 		lg.Debug("challenge requested")
