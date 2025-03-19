@@ -4,7 +4,8 @@
 // tests because undoubtedly the thing you are synchronizing on is going to depend on
 // some unspoken assumption that can and will randomly change. Do something else.
 //
-// If god is dead and you need to do this anyways, add a comment that reads:
+// If you feel humanity is nowhere to be found and you need to do this anyways, add a
+// comment that reads:
 //
 //	//nosleep:bypass put a reason why here
 package nosleep
