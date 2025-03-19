@@ -167,7 +167,7 @@ func (s *ScaleToZeroProxy) mint(ctx context.Context) error {
 
 	addr, ok := instance.AddrFor(s.cfg.Ports[0])
 	if !ok {
-		return fmt.Errorf("somehow can't get port %d for instance %d, is god dead?", s.cfg.Ports[0], instance.ID)
+		return fmt.Errorf("somehow can't get port %d for instance %d, is humanity dead?", s.cfg.Ports[0], instance.ID)
 	}
 
 	s.endpointURL = "http://" + addr + "/"
