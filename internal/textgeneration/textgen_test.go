@@ -23,7 +23,7 @@ func TestApplyCharacter(t *testing.T) {
 
 func TestApplyPreset(t *testing.T) {
 	cr := new(ChatRequest)
-	if err := cr.ApplyPreset("Kobold-Godlike"); err != nil {
+	if err := cr.ApplyPreset("Kobold-Extreme"); err != nil {
 		t.Fatalf("%v", err)
 	}
 }
