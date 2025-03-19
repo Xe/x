@@ -1,8 +1,7 @@
 # Anubis
 
-<center>
-<img width=256 src="static/img/happy.webp" alt="A smiling chibi dark-skinned anthro jackal with brown hair and tall ears looking victorious with a thumbs-up" />
-</center>
+> [!IMPORTANT]  
+> Anubis has moved to [TecharoHQ/anubis](https://github.com/TecharoHQ/anubis). Please update your configuration to change Docker images from `ghcr.io/xe/x/anubis` to `ghcr.io/techarohq/anubis`.
 
 ![enbyware](https://pride-badges.pony.workers.dev/static/v1?label=enbyware&labelColor=%23555&stripeWidth=8&stripeColors=FCF434%2CFFFFFF%2C9C59D1%2C2C2C2C)
 ![GitHub Issues or Pull Requests by label](https://img.shields.io/github/issues/Xe/x/anubis)
@@ -22,7 +21,7 @@ If you want to try this out, connect to [git.xeserv.us](https://git.xeserv.us).
 
 ## Support
 
-If you run into any issues running Anubis, please [open an issue](https://github.com/Xe/x/issues/new?template=Blank+issue) and tag it with the Anubis tag. Please include all the information I would need to diagnose your issue.
+If you run into any issues running Anubis, please [open an issue](https://github.com/TecharoHQ/anubis/issues/new?template=Blank+issue) and tag it with the Anubis tag. Please include all the information I would need to diagnose your issue.
 
 For live chat, please join the [Patreon](https://patreon.com/cadey) and ask in the Patron discord in the channel `#anubis`.
 
@@ -177,7 +176,7 @@ Add Anubis to your compose file pointed at your service:
 ```yaml
 services:
   anubis-nginx:
-    image: ghcr.io/xe/x/anubis:latest
+    image: ghcr.io/techarohq/anubis:latest
     environment:
       BIND: ":8080"
       DIFFICULTY: "5"
@@ -205,7 +204,7 @@ Attach Anubis to your Deployment:
 containers:
   # ...
   - name: anubis
-    image: ghcr.io/xe/x/anubis:latest
+    image: ghcr.io/techarohq/anubis:latest
     imagePullPolicy: Always
     env:
       - name: "BIND"
