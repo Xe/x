@@ -31,7 +31,7 @@ require (
 	github.com/go-gorm/caches/v4 v4.0.5
 	github.com/go-interpreter/wagon v0.6.0
 	github.com/goccy/go-json v0.10.5
-	github.com/golang-jwt/jwt/v5 v5.2.1
+	github.com/golang-jwt/jwt/v5 v5.2.2
 	github.com/gomarkdown/markdown v0.0.0-20240328165702-4d01890c35c0
 	github.com/google/go-github v17.0.0+incompatible
 	github.com/google/subcommands v1.2.0
