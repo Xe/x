@@ -1,6 +1,7 @@
 module within.website/x
 
 go 1.23
+toolchain go1.24.1
 
 require (
 	al.essio.dev/pkg/shellescape v1.5.1
@@ -71,9 +72,9 @@ require (
 	go.etcd.io/bbolt v1.4.0
 	go.jetpack.io/tyson v0.1.1
 	go4.org v0.0.0-20190313082347-94abd6928b1d
-	golang.org/x/crypto v0.33.0
+	golang.org/x/crypto v0.36.0
 	golang.org/x/oauth2 v0.25.0
-	golang.org/x/sync v0.11.0
+	golang.org/x/sync v0.12.0
 	google.golang.org/grpc v1.70.0
 	gorm.io/gorm v1.25.12
 	gorm.io/plugin/prometheus v0.1.0
@@ -260,9 +261,9 @@ require (
 	golang.org/x/exp v0.0.0-20240719175910-8a7402abbf56
 	golang.org/x/image v0.24.0
 	golang.org/x/mod v0.23.0 // indirect
-	golang.org/x/net v0.35.0
-	golang.org/x/sys v0.30.0 // indirect
-	golang.org/x/text v0.22.0 // indirect
+	golang.org/x/net v0.37.0
+	golang.org/x/sys v0.31.0 // indirect
+	golang.org/x/text v0.23.0 // indirect
 	golang.org/x/time v0.10.0
 	golang.org/x/tools v0.30.0
 	google.golang.org/protobuf v1.36.4
