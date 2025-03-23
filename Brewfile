@@ -2,7 +2,7 @@ tap "hashicorp/tap"
 tap "xe/pkgs"
 
 # programming languages
-brew "go@1.23"
+brew "go@1.24"
 brew "node@20"
 brew "deno"
 brew "python@3.11"
