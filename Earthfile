@@ -67,28 +67,6 @@ aerial:
 amano:
     BUILD +ship --PROGRAM=amano --GOARCH=amd64
 
-anubis-amd64:
-    FROM +ship --PROGRAM=anubis --GOARCH=amd64
-    CMD ["/app/bin/anubis"]
-    USER 1000:1000
-
-    HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 CMD ["/app/bin/anubis", "--healthcheck"]
-
-    SAVE IMAGE --push ghcr.io/xe/x/anubis:latest
-
-anubis-arm64:
-    FROM +ship --PROGRAM=anubis --GOARCH=arm64
-    CMD ["/app/bin/anubis"]
-    USER 1000:1000
-
-    HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 CMD ["/app/bin/anubis", "--healthcheck"]
-
-    SAVE IMAGE --push ghcr.io/xe/x/anubis:latest
-
-anubis:
-    BUILD +anubis-amd64
-    BUILD +anubis-arm64
-
 aura:
     FROM +runtime
 
@@ -293,7 +271,6 @@ xedn:
 all:
     BUILD --pass-args --platform=linux/amd64 +aerial
     BUILD --pass-args --platform=linux/amd64 +amano
-    BUILD --pass-args --platform=linux/amd64 +anubis
     BUILD --pass-args --platform=linux/amd64 +aura
     BUILD --pass-args --platform=linux/amd64 +future-sight
     BUILD --pass-args --platform=linux/amd64 +hdrwtch
