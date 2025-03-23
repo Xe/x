@@ -1,0 +1,90 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: anubistest
+  labels:
+    xeiaso.net/thing: http
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      xeiaso.net/thing: http
+  template:
+    metadata:
+      labels:
+        xeiaso.net/thing: http
+    spec:
+      securityContext:
+        fsGroup: 1000
+      volumes:
+        - name: anubis
+          configMap:
+            name: anubis-cfg
+      containers:
+        - name: main
+          image: ghcr.io/xe/x/httpdebug:latest
+          imagePullPolicy: Always
+          resources:
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+            requests:
+              cpu: "250m"
+              memory: "128Mi"
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+            - name: ssh
+              containerPort: 2222
+              protocol: TCP
+        - name: anubis
+          image: reg.xeiaso.net/x/anubis:latest
+          imagePullPolicy: Always
+          env:
+          - name: "BIND"
+            value: ":8080"
+          - name: "DIFFICULTY"
+            value: "4"
+          - name: "METRICS_BIND"
+            value: ":9090"
+          - name: "POLICY_FNAME"
+            value: "/xe/cfg/anubis/botPolicies.json"
+          - name: "SERVE_ROBOTS_TXT"
+            value: "true"
+          - name: "TARGET"
+            value: ""
+          - name: "SLOG_LEVEL"
+            value: "debug"
+          volumeMounts:
+          - name: anubis
+            mountPath: /xe/cfg/anubis
+          resources:
+            limits:
+              cpu: 500m
+              memory: 128Mi
+            requests:
+              cpu: 250m
+              memory: 128Mi
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault

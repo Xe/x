@@ -150,7 +150,7 @@ spec:
               mountPath: "/xe/pki"
               readOnly: true
         - name: anubis
-          image: ghcr.io/xe/x/anubis:latest
+          image: ghcr.io/techarohq/anubis:pr-19
           imagePullPolicy: Always
           env:
           - name: "BIND"

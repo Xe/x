@@ -1,0 +1,12 @@
+resources:
+  - deployment.yaml
+  - service.yaml
+  - ingress.yaml
+
+namespace: default
+
+configMapGenerator:
+- name: anubis-cfg
+  behavior: create
+  files:
+  - ./anubis/botPolicies.json

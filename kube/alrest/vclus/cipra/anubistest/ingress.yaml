@@ -1,0 +1,47 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: anubistest
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/proxy-body-size: 2048g
+    #nginx.ingress.kubernetes.io/auth-url: "https://$host/.within.website/x/cmd/anubis/api/check"
+    #nginx.ingress.kubernetes.io/auth-signin: "http://$host/.within.website/?redir=$scheme://$host$request_uri"
+
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+      - anubistest.xelaso.net
+      secretName: anubistest-xelaso-net-public-tls
+  rules:
+  - host: anubistest.xelaso.net
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: anubistest
+            port: 
+              name: http
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: anubistest-anubis
+
+spec:
+  ingressClassName: nginx
+
+  rules:
+  - host: anubistest.xelaso.net
+    http:
+      paths:
+      - pathType: ImplementationSpecific
+        path: "/.within.website"
+        backend:
+          service:
+            name: anubistest
+            port: 
+              name: anubis
