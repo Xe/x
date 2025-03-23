@@ -35,16 +35,16 @@ main {
 }
 
 ::selection {
-  background: #d3869b;
+  background: oklch(70.54% 0.0976 2.19);
 }
 
 body {
-  background: #1d2021;
-  color: #f9f5d7;
+  background: oklch(24.08% 0.0049 219.67);
+  color: oklch(96.55% 0.0394 100.86);
 }
 
 pre {
-  background-color: #3c3836;
+  background-color: oklch(34.41% 0.0066 48.52);
   padding: 1em;
   border: 0;
   font-family: Iosevka Curly Iaso, monospace;
@@ -53,8 +53,8 @@ pre {
 a,
 a:active,
 a:visited {
-  color: #b16286;
-  background-color: #282828;
+  color: oklch(59.73% 0.1105 352.22);
+  background-color: oklch(27.68% 0 0);
 }
 
 h1,
@@ -67,7 +67,7 @@ h5 {
 }
 
 blockquote {
-  border-left: 1px solid #bdae93;
+  border-left: 1px solid oklch(75.64% 0.041 82.28);
   margin: 0.5em 10px;
   padding: 0.5em 10px;
 }
@@ -78,12 +78,12 @@ footer {
 
 @media (prefers-color-scheme: light) {
   body {
-    background: #f9f5d7;
-    color: #1d2021;
+    background: oklch(96.55% 0.0394 100.86);
+    color: oklch(24.08% 0.0049 219.67);
   }
 
   pre {
-    background-color: #ebdbb2;
+    background-color: oklch(89.41% 0.0566 89.24);
     padding: 1em;
     border: 0;
   }
@@ -91,8 +91,8 @@ footer {
   a,
   a:active,
   a:visited {
-    color: #b16286;
-    background-color: #fbf1c7;
+    color: oklch(59.73% 0.1105 352.22);
+    background-color: oklch(95.55% 0.0555 96.15);
   }
 
   h1,
@@ -104,7 +104,7 @@ footer {
   }
 
   blockquote {
-    border-left: 1px solid #655c54;
+    border-left: 1px solid oklch(48.08% 0.0172 64.07);
     margin: 0.5em 10px;
     padding: 0.5em 10px;
   }
