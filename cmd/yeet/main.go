@@ -16,7 +16,9 @@ import (
 	"strings"
 
 	"github.com/dop251/goja"
+	"within.website/x/cmd/yeet/internal/mkdeb"
 	"within.website/x/cmd/yeet/internal/mkrpm"
+	"within.website/x/cmd/yeet/internal/pkgmeta"
 	"within.website/x/internal"
 	"within.website/x/internal/appsluggr"
 	"within.website/x/internal/kahless"
@@ -176,6 +178,16 @@ func main() {
 
 	lg := log.New(writer.LineSplitting(writer.PrefixWriter("[yeet] ", os.Stdout)), "", 0)
 
+	vm.Set("deb", map[string]any{
+		"build": func(p pkgmeta.Package) string {
+			foutpath, err := mkdeb.Build(p)
+			if err != nil {
+				panic(err)
+			}
+			return foutpath
+		},
+	})
+
 	vm.Set("docker", map[string]any{
 		"build": dockerbuild,
 		"load":  dockerload,
@@ -260,7 +272,7 @@ func main() {
 	})
 
 	vm.Set("rpm", map[string]any{
-		"build": func(p mkrpm.Package) string {
+		"build": func(p pkgmeta.Package) string {
 			foutpath, err := mkrpm.Build(p)
 			if err != nil {
 				panic(err)

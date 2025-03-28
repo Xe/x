@@ -1,4 +1,4 @@
-package mkrpm
+package mkdeb
 
 import (
 	"fmt"
@@ -8,8 +8,8 @@ import (
 	"runtime"
 
 	"github.com/goreleaser/nfpm/v2"
+	_ "github.com/goreleaser/nfpm/v2/deb"
 	"github.com/goreleaser/nfpm/v2/files"
-	_ "github.com/goreleaser/nfpm/v2/rpm"
 	"within.website/x/cmd/yeet/internal"
 	"within.website/x/cmd/yeet/internal/pkgmeta"
 )
@@ -32,7 +32,7 @@ func Build(p pkgmeta.Package) (foutpath string, err error) {
 		p.Version = internal.GitVersion()
 	}
 
-	dir, err := os.MkdirTemp("", "yeet-mkrpm")
+	dir, err := os.MkdirTemp("", "yeet-mkdeb")
 	if err != nil {
 		return "", fmt.Errorf("mkrpm: can't make temporary directory")
 	}
@@ -58,8 +58,8 @@ func Build(p pkgmeta.Package) (foutpath string, err error) {
 		contents = append(contents, &files.Content{Type: files.TypeDir, Destination: d})
 	}
 
-	for repoPath, rpmPath := range p.ConfigFiles {
-		contents = append(contents, &files.Content{Type: files.TypeConfig, Source: repoPath, Destination: rpmPath})
+	for repoPath, osPath := range p.ConfigFiles {
+		contents = append(contents, &files.Content{Type: files.TypeConfig, Source: repoPath, Destination: osPath})
 	}
 
 	if err := filepath.Walk(dir, func(path string, stat os.FileInfo, err error) error {
@@ -75,7 +75,7 @@ func Build(p pkgmeta.Package) (foutpath string, err error) {
 
 		return nil
 	}); err != nil {
-		return "", fmt.Errorf("mkrpm: can't walk output directory: %w", err)
+		return "", fmt.Errorf("mkdeb: can't walk output directory: %w", err)
 	}
 
 	info := nfpm.WithDefaults(&nfpm.Info{
@@ -99,26 +99,26 @@ func Build(p pkgmeta.Package) (foutpath string, err error) {
 	info.Overridables.RPM.Group = p.Group
 
 	if *internal.GPGKeyID != "" {
-		slog.Debug("using GPG key", "file", *internal.GPGKeyFile, "id", *internal.GPGKeyID, "password", *internal.GPGKeyPassword)
-		info.Overridables.RPM.Signature.KeyFile = *internal.GPGKeyFile
-		info.Overridables.RPM.Signature.KeyID = *&internal.GPGKeyID
-		info.Overridables.RPM.Signature.KeyPassphrase = *internal.GPGKeyPassword
+		slog.Debug("using GPG key", "file", *internal.GPGKeyFile, "id", *internal.GPGKeyID)
+		info.Overridables.Deb.Signature.KeyFile = *internal.GPGKeyFile
+		info.Overridables.Deb.Signature.KeyID = internal.GPGKeyID
+		info.Overridables.Deb.Signature.KeyPassphrase = *internal.GPGKeyPassword
 	}
 
-	pkg, err := nfpm.Get("rpm")
+	pkg, err := nfpm.Get("deb")
 	if err != nil {
-		return "", fmt.Errorf("mkrpm: can't get RPM packager: %w", err)
+		return "", fmt.Errorf("mkdeb: can't get RPM packager: %w", err)
 	}
 
 	foutpath = pkg.ConventionalFileName(info)
 	fout, err := os.Create(foutpath)
 	if err != nil {
-		return "", fmt.Errorf("mkrpm: can't create output file: %w", err)
+		return "", fmt.Errorf("mkdeb: can't create output file: %w", err)
 	}
 	defer fout.Close()
 
 	if err := pkg.Package(info, fout); err != nil {
-		return "", fmt.Errorf("mkrpm: can't build package: %w", err)
+		return "", fmt.Errorf("mkdeb: can't build package: %w", err)
 	}
 
 	slog.Debug("built package", "name", p.Name, "version", p.Version, "path", foutpath)
