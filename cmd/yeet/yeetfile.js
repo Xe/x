@@ -1,15 +1,41 @@
 go.install();
 
-["amd64", "arm64"].forEach(goarch => {
-    [deb, rpm].forEach(method => method.build({
-        name: "yeet",
-        description: "Yeet out actions with maximum haste!",
-        homepage: "https://within.website",
-        license: "CC0",
-        goarch,
+yeet.setenv("GOARM", "7");
 
-        build: (out) => {
-            go.build("-o", `${out}/usr/bin/yeet`);
-        },
-    }));
-});
+[
+    // "386",
+    "amd64",
+    // "arm",
+    "arm64",
+    // "loong64",
+    // "mips",
+    // "mips64",
+    // "mips64le",
+    // "mipsle",
+    "riscv64",
+    // "ppc64",
+    // "ppc64le",
+    // "s390x",
+]
+    .forEach(goarch => {
+        [
+            deb,
+            rpm,
+        ]
+            .forEach(method => method.build({
+                name: "yeet",
+                description: "Yeet out actions with maximum haste!",
+                homepage: "https://within.website",
+                license: "CC0",
+                goarch,
+
+                documentation: {
+                    "README.md": "README.md",
+                    "../../LICENSE": "LICENSE",
+                },
+
+                build: (out) => {
+                    go.build("-o", `${out}/usr/bin/yeet`);
+                },
+            }));
+    });

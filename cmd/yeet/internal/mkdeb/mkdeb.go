@@ -28,6 +28,9 @@ func Build(p pkgmeta.Package) (foutpath string, err error) {
 		}
 	}()
 
+	os.MkdirAll("./var", 0755)
+	os.WriteFile(filepath.Join("./var", ".gitignore"), []byte("*\n!.gitignore"), 0644)
+
 	if p.Version == "" {
 		p.Version = internal.GitVersion()
 	}
@@ -60,6 +63,14 @@ func Build(p pkgmeta.Package) (foutpath string, err error) {
 
 	for repoPath, osPath := range p.ConfigFiles {
 		contents = append(contents, &files.Content{Type: files.TypeConfig, Source: repoPath, Destination: osPath})
+	}
+
+	for repoPath, rpmPath := range p.Documentation {
+		contents = append(contents, &files.Content{
+			Type:        files.TypeFile,
+			Source:      repoPath,
+			Destination: filepath.Join("/usr/share/doc", p.Name, rpmPath),
+		})
 	}
 
 	if err := filepath.Walk(dir, func(path string, stat os.FileInfo, err error) error {
@@ -111,7 +122,7 @@ func Build(p pkgmeta.Package) (foutpath string, err error) {
 	}
 
 	foutpath = pkg.ConventionalFileName(info)
-	fout, err := os.Create(foutpath)
+	fout, err := os.Create(filepath.Join("./var", foutpath))
 	if err != nil {
 		return "", fmt.Errorf("mkdeb: can't create output file: %w", err)
 	}
@@ -121,7 +132,7 @@ func Build(p pkgmeta.Package) (foutpath string, err error) {
 		return "", fmt.Errorf("mkdeb: can't build package: %w", err)
 	}
 
-	slog.Debug("built package", "name", p.Name, "version", p.Version, "path", foutpath)
+	slog.Info("built package", "name", p.Name, "arch", p.Goarch, "version", p.Version, "path", fout.Name())
 
 	return foutpath, err
 }

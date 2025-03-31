@@ -28,6 +28,9 @@ func Build(p pkgmeta.Package) (foutpath string, err error) {
 		}
 	}()
 
+	os.MkdirAll("./var", 0755)
+	os.WriteFile(filepath.Join("./var", ".gitignore"), []byte("*\n!.gitignore"), 0644)
+
 	if p.Version == "" {
 		p.Version = internal.GitVersion()
 	}
@@ -59,7 +62,19 @@ func Build(p pkgmeta.Package) (foutpath string, err error) {
 	}
 
 	for repoPath, rpmPath := range p.ConfigFiles {
-		contents = append(contents, &files.Content{Type: files.TypeConfig, Source: repoPath, Destination: rpmPath})
+		contents = append(contents, &files.Content{
+			Type:        files.TypeConfig,
+			Source:      repoPath,
+			Destination: rpmPath,
+		})
+	}
+
+	for repoPath, rpmPath := range p.Documentation {
+		contents = append(contents, &files.Content{
+			Type:        files.TypeRPMDoc,
+			Source:      repoPath,
+			Destination: filepath.Join("/usr/share/doc", p.Name, rpmPath),
+		})
 	}
 
 	if err := filepath.Walk(dir, func(path string, stat os.FileInfo, err error) error {
@@ -101,7 +116,7 @@ func Build(p pkgmeta.Package) (foutpath string, err error) {
 	if *internal.GPGKeyID != "" {
 		slog.Debug("using GPG key", "file", *internal.GPGKeyFile, "id", *internal.GPGKeyID, "password", *internal.GPGKeyPassword)
 		info.Overridables.RPM.Signature.KeyFile = *internal.GPGKeyFile
-		info.Overridables.RPM.Signature.KeyID = *&internal.GPGKeyID
+		info.Overridables.RPM.Signature.KeyID = internal.GPGKeyID
 		info.Overridables.RPM.Signature.KeyPassphrase = *internal.GPGKeyPassword
 	}
 
@@ -111,7 +126,7 @@ func Build(p pkgmeta.Package) (foutpath string, err error) {
 	}
 
 	foutpath = pkg.ConventionalFileName(info)
-	fout, err := os.Create(foutpath)
+	fout, err := os.Create(filepath.Join("./var", foutpath))
 	if err != nil {
 		return "", fmt.Errorf("mkrpm: can't create output file: %w", err)
 	}
@@ -121,7 +136,7 @@ func Build(p pkgmeta.Package) (foutpath string, err error) {
 		return "", fmt.Errorf("mkrpm: can't build package: %w", err)
 	}
 
-	slog.Debug("built package", "name", p.Name, "version", p.Version, "path", foutpath)
+	slog.Info("built package", "name", p.Name, "arch", p.Goarch, "version", p.Version, "path", fout.Name())
 
 	return foutpath, err
 }
