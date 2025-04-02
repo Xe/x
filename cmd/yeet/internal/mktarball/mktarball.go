@@ -17,11 +17,9 @@ import (
 func Build(p pkgmeta.Package) (foutpath string, err error) {
 	defer func() {
 		if r := recover(); r != nil {
-			switch r.(type) {
-			case error:
-				err = r.(error)
+			if err, ok := r.(error); ok {
 				slog.Error("mkrpm: error while building", "err", err)
-			default:
+			} else {
 				err = fmt.Errorf("%v", r)
 				slog.Error("mkrpm: error while building", "err", err)
 			}
@@ -73,8 +71,6 @@ func Build(p pkgmeta.Package) (foutpath string, err error) {
 	os.Setenv("GOOS", p.Platform)
 	os.Setenv("CGO_ENABLED", "0")
 
-	os.WriteFile(filepath.Join(pkgDir, "VERSION"), []byte(p.Version+"\n"), 0666)
-
 	bi := pkgmeta.BuildInput{
 		Output:  pkgDir,
 		Bin:     filepath.Join(pkgDir, "bin"),
@@ -83,6 +79,9 @@ func Build(p pkgmeta.Package) (foutpath string, err error) {
 		Man:     filepath.Join(pkgDir, "man"),
 		Systemd: filepath.Join(pkgDir, "run"),
 	}
+
+	os.MkdirAll(bi.Doc, 0755)
+	os.WriteFile(filepath.Join(bi.Doc, "VERSION"), []byte(p.Version+"\n"), 0666)
 
 	p.Build(bi)
 

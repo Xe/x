@@ -26,9 +26,8 @@ import (
 )
 
 var (
-	fname      = flag.String("fname", "yeetfile.js", "filename for the yeetfile")
-	flyctl     = flag.String("flyctl-path", flyctlPath(), "path to flyctl binary")
-	protocPath = flag.String("protoc-path", "protoc", "path to protoc binary")
+	fname  = flag.String("fname", "yeetfile.js", "filename for the yeetfile")
+	flyctl = flag.String("flyctl-path", flyctlPath(), "path to flyctl binary")
 )
 
 func flyctlPath() string {
@@ -147,15 +146,6 @@ func hostname() string {
 		panic(err)
 	}
 	return result
-}
-
-type protocInput struct {
-	Input  string `json:"input"`
-	Output string `json:"output"`
-	Kinds  []struct {
-		Kind string `json:"kind"`
-		Opt  string `json:"opt"`
-	} `json:"kinds"`
 }
 
 func main() {

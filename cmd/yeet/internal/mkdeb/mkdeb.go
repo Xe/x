@@ -17,12 +17,10 @@ import (
 func Build(p pkgmeta.Package) (foutpath string, err error) {
 	defer func() {
 		if r := recover(); r != nil {
-			switch r.(type) {
-			case error:
-				err = r.(error)
+			if err, ok := r.(error); ok {
 				slog.Error("mkrpm: error while building", "err", err)
-			default:
-				err = fmt.Errorf("mkrpm: error while building: %v", r)
+			} else {
+				err = fmt.Errorf("%v", r)
 				slog.Error("mkrpm: error while building", "err", err)
 			}
 		}
