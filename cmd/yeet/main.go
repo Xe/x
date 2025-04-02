@@ -10,13 +10,13 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
-	"runtime/debug"
 	"strings"
 
 	"al.essio.dev/pkg/shellescape"
 	"github.com/dop251/goja"
 	"within.website/x/cmd/yeet/internal/mkdeb"
 	"within.website/x/cmd/yeet/internal/mkrpm"
+	"within.website/x/cmd/yeet/internal/mktarball"
 	"within.website/x/cmd/yeet/internal/pkgmeta"
 	"within.website/x/internal"
 	"within.website/x/internal/appsluggr"
@@ -87,10 +87,6 @@ func dockerpush(image string) {
 
 func flydeploy() {
 	runcmd(*flyctl, "deploy", "--now")
-}
-
-func nixbuild(target string) {
-	runcmd("nix", "build", target)
 }
 
 func slugbuild(bin string, extraFiles map[string]string) string {
@@ -171,7 +167,6 @@ func main() {
 	defer func() {
 		if r := recover(); r != nil {
 			slog.Error("error in JS", "err", r)
-			debug.PrintStack()
 		}
 	}()
 
@@ -198,6 +193,14 @@ func main() {
 		"build": dockerbuild,
 		"load":  dockerload,
 		"push":  dockerpush,
+	})
+
+	vm.Set("file", map[string]any{
+		"install": func(src, dst string) {
+			if err := mktarball.Copy(src, dst); err != nil {
+				panic(err)
+			}
+		},
 	})
 
 	vm.Set("fly", map[string]any{
@@ -237,6 +240,16 @@ func main() {
 	vm.Set("slug", map[string]any{
 		"build": slugbuild,
 		"push":  slugpush,
+	})
+
+	vm.Set("tarball", map[string]any{
+		"build": func(p pkgmeta.Package) string {
+			foutpath, err := mktarball.Build(p)
+			if err != nil {
+				panic(err)
+			}
+			return foutpath
+		},
 	})
 
 	vm.Set("yeet", map[string]any{

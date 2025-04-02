@@ -34,6 +34,9 @@ func Build(p pkgmeta.Package) (foutpath string, err error) {
 	if p.Version == "" {
 		p.Version = internal.GitVersion()
 	}
+	if p.Platform == "" {
+		p.Platform = "linux"
+	}
 
 	dir, err := os.MkdirTemp("", "yeet-mkrpm")
 	if err != nil {
@@ -49,7 +52,7 @@ func Build(p pkgmeta.Package) (foutpath string, err error) {
 		os.Setenv("CGO_ENABLED", cgoEnabled)
 	}()
 	os.Setenv("GOARCH", p.Goarch)
-	os.Setenv("GOOS", "linux")
+	os.Setenv("GOOS", p.Platform)
 	os.Setenv("CGO_ENABLED", "0")
 
 	p.Build(pkgmeta.BuildInput{
@@ -115,7 +118,7 @@ func Build(p pkgmeta.Package) (foutpath string, err error) {
 		Name:        p.Name,
 		Version:     p.Version,
 		Arch:        p.Goarch,
-		Platform:    "linux",
+		Platform:    p.Platform,
 		Description: p.Description,
 		Maintainer:  fmt.Sprintf("%s <%s>", *internal.UserName, *internal.UserEmail),
 		Homepage:    p.Homepage,

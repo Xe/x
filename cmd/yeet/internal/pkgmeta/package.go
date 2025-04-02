@@ -7,6 +7,7 @@ type Package struct {
 	Homepage    string   `json:"homepage"`
 	Group       string   `json:"group"`
 	License     string   `json:"license"`
+	Platform    string   `json:"platform"` // if not set, default to linux
 	Goarch      string   `json:"goarch"`
 	Replaces    []string `json:"replaces"`
 	Depends     []string `json:"depends"`
