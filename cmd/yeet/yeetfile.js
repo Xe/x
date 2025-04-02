@@ -1,41 +1,25 @@
 go.install();
 
 yeet.setenv("GOARM", "7");
+yeet.setenv("CGO_ENABLED", "0");
 
-[
-    // "386",
-    "amd64",
-    // "arm",
-    "arm64",
-    // "loong64",
-    // "mips",
-    // "mips64",
-    // "mips64le",
-    // "mipsle",
-    "riscv64",
-    // "ppc64",
-    // "ppc64le",
-    // "s390x",
-]
-    .forEach(goarch => {
-        [
-            deb,
-            rpm,
-        ]
-            .forEach(method => method.build({
-                name: "yeet",
-                description: "Yeet out actions with maximum haste!",
-                homepage: "https://within.website",
-                license: "CC0",
-                goarch,
+$`CGO_ENABLED=0 GOARCH=arm64 GOOS=linux go build -o ./var/yeet -ldflags '-s -w -extldflags "-static" -X "within.website/x.Version=${git.tag()}"'`;
 
-                documentation: {
-                    "README.md": "README.md",
-                    "../../LICENSE": "LICENSE",
-                },
+["amd64", "arm64"].forEach(goarch => {
+    [deb, rpm].forEach(method => method.build({
+        name: "yeet",
+        description: "Yeet out actions with maximum haste!",
+        homepage: "https://within.website",
+        license: "CC0",
+        goarch,
 
-                build: (out) => {
-                    go.build("-o", `${out}/usr/bin/yeet`);
-                },
-            }));
-    });
+        documentation: {
+            "README.md": "README.md",
+            "../../LICENSE": "LICENSE",
+        },
+
+        build: ({ bin }) => {
+            $`CGO_ENABLED=0 go build -o ${bin}/yeet -ldflags '-s -w -extldflags "-static" -X "within.website/x.Version=${git.tag()}"'`
+        },
+    }))
+})

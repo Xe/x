@@ -17,6 +17,16 @@ Yeet uses [goja](https://pkg.go.dev/github.com/dop251/goja#section-readme) to ex
 
 To make it useful, yeet exposes a bunch of helper objects full of tools. These tools fall in a few categories, each has its own section.
 
+### `$`
+
+`$` lets you construct shell commands using [tagged templates](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals). This lets you build whatever shell commands you want by mixing Go and JavaScript values freely.
+
+Example:
+
+```js
+$`CGO_ENABLED=0 GOARCH=amd64 GOOS=linux go build -s -w -extldflags "-static" -X "within.website/x.Version=${git.tag()}"`;
+```
+
 ### `docker`
 
 Aliases for `docker` commands.
@@ -174,80 +184,6 @@ Usage:
 
 ```js
 go.install();
-```
-
-### `nix`
-
-Automation for running Nix ecosystem tooling.
-
-#### `nix.build`
-
-Runs `nix build` against a given flakeref.
-
-Usage:
-
-`nix.build(flakeref);`
-
-```js
-nix.build(".#docker");
-docker.load("./result");
-```
-
-#### `nix.eval`
-
-A tagged template that helps you build Nix expressions safely from JavaScript and then evaluates them. See my [nixexpr blogpost](https://xeiaso.net/blog/nixexpr/) for more information about how this works.
-
-Usage:
-
-```js
-const glibcPath = nix.eval`let pkgs = import <nixpkgs>; in pkgs.glibc`;
-```
-
-#### `nix.expr`
-
-A tagged template that helps you build Nix expressions safely from JavaScript. See my [nixexpr blogpost](https://xeiaso.net/blog/nixexpr/) for more information about how this works.
-
-Usage:
-
-```js
-go.build();
-const fname = slug.build("todayinmarch2020");
-
-const url = slug.push(fname);
-const hash = nix.hashURL(url);
-
-const expr = nix.expr`{ stdenv }:
-
-stdenv.mkDerivation {
-  name = "todayinmarch2020";
-  src = builtins.fetchurl {
-    url = ${url};
-    sha256 = ${hash};
-  };
-
-  phases = "installPhase";
-
-  installPhase = ''
-    tar xf $src
-    mkdir -p $out/bin
-    cp bin/main $out/bin/todayinmarch2020
-  '';
-}
-`;
-
-file.write(`${repoRoot}/pkgs/x/todayinmarch2020.nix`, expr);
-```
-
-#### `nix.hashURL`
-
-Hashes the contents of a given URL and returns the `sha256` SRI form. Useful when composing Nix expressions with the `nix.expr` tagged template.
-
-Usage:
-
-`nix.hashURL(url);`
-
-```js
-const hash = nix.hashURL("https://whatever.com/some_file.tgz");
 ```
 
 ### `rpm`

@@ -3,7 +3,7 @@ module within.website/x
 go 1.23
 
 require (
-	al.essio.dev/pkg/shellescape v1.5.1
+	al.essio.dev/pkg/shellescape v1.6.0
 	cirello.io/goherokuname v0.0.0-20190914093443-b436bae8c2c5
 	connectrpc.com/connect v1.18.1
 	github.com/Marcel-ICMC/graw v0.0.0-20230411090719-e24cd8592d25

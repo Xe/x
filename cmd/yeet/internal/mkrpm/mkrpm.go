@@ -42,14 +42,24 @@ func Build(p pkgmeta.Package) (foutpath string, err error) {
 	defer os.RemoveAll(dir)
 	os.MkdirAll(dir, 0755)
 
+	cgoEnabled := os.Getenv("CGO_ENABLED")
 	defer func() {
 		os.Setenv("GOARCH", runtime.GOARCH)
 		os.Setenv("GOOS", runtime.GOOS)
+		os.Setenv("CGO_ENABLED", cgoEnabled)
 	}()
 	os.Setenv("GOARCH", p.Goarch)
 	os.Setenv("GOOS", "linux")
+	os.Setenv("CGO_ENABLED", "0")
 
-	p.Build(dir)
+	p.Build(pkgmeta.BuildInput{
+		Output:  dir,
+		Bin:     filepath.Join(dir, "usr", "bin"),
+		Doc:     filepath.Join(dir, "usr", "share", "doc"),
+		Etc:     filepath.Join(dir, "etc", p.Name),
+		Man:     filepath.Join(dir, "usr", "share", "man"),
+		Systemd: filepath.Join(dir, "usr", "lib", "systemd", "system"),
+	})
 
 	var contents files.Contents
 
@@ -74,6 +84,14 @@ func Build(p pkgmeta.Package) (foutpath string, err error) {
 			Type:        files.TypeRPMDoc,
 			Source:      repoPath,
 			Destination: filepath.Join("/usr/share/doc", p.Name, rpmPath),
+		})
+	}
+
+	for repoPath, rpmPath := range p.Files {
+		contents = append(contents, &files.Content{
+			Type:        files.TypeFile,
+			Source:      repoPath,
+			Destination: rpmPath,
 		})
 	}
 

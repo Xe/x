@@ -20,7 +20,7 @@ var (
 
 const (
 	fallbackName  = "Mimi Yasomi"
-	fallbackEmail = "mimi@xeserv.us"
+	fallbackEmail = "mimi@techaro.lol"
 )
 
 func gpgKeyFileLocation() string {

@@ -2,19 +2,18 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"flag"
 	"fmt"
-	"io"
 	"log"
 	"log/slog"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"runtime"
 	"runtime/debug"
-	"strconv"
 	"strings"
 
+	"al.essio.dev/pkg/shellescape"
 	"github.com/dop251/goja"
 	"within.website/x/cmd/yeet/internal/mkdeb"
 	"within.website/x/cmd/yeet/internal/mkrpm"
@@ -117,28 +116,33 @@ func slugpush(fname string) string {
 	return pubURL
 }
 
-func buildNixExpr(literals []string, exprs ...any) string {
-	result := ""
+func buildShellCommand(literals []string, exprs ...any) string {
+	var sb strings.Builder
 	for i, value := range exprs {
-		formattedValue, _ := json.Marshal(value)
-		formattedValue = []byte(fmt.Sprintf(`(builtins.fromJSON %s)`, strconv.Quote(string(formattedValue))))
-		result += literals[i] + string(formattedValue)
+		sb.WriteString(literals[i])
+		sb.WriteString(shellescape.Quote(fmt.Sprint(value)))
 	}
 
-	result += literals[len(literals)-1]
+	sb.WriteString(literals[len(literals)-1])
 
-	return result
+	return sb.String()
 }
 
-func evalNixExpr(literals []string, exprs ...any) any {
-	expr := buildNixExpr(literals, exprs...)
-	data := []byte(runcmd("nix", "eval", "--json", "--expr", expr))
-	var result any
-	if err := json.Unmarshal(data, &result); err != nil {
+func runShellCommand(literals []string, exprs ...any) string {
+	shPath, err := exec.LookPath("sh")
+	if err != nil {
 		panic(err)
 	}
 
-	return result
+	cmd := buildShellCommand(literals, exprs...)
+
+	slog.Debug("running command", "cmd", cmd)
+	output, err := yeet.Output(context.Background(), shPath, "-c", cmd)
+	if err != nil {
+		panic(err)
+	}
+
+	return output
 }
 
 func hostname() string {
@@ -178,6 +182,8 @@ func main() {
 
 	lg := log.New(writer.LineSplitting(writer.PrefixWriter("[yeet] ", os.Stdout)), "", 0)
 
+	vm.Set("$", runShellCommand)
+
 	vm.Set("deb", map[string]any{
 		"build": func(p pkgmeta.Package) string {
 			foutpath, err := mkdeb.Build(p)
@@ -192,52 +198,6 @@ func main() {
 		"build": dockerbuild,
 		"load":  dockerload,
 		"push":  dockerpush,
-	})
-
-	vm.Set("file", map[string]any{
-		"read": func(fname string) string {
-			data, err := os.ReadFile(fname)
-			if err != nil {
-				panic(err)
-			}
-			return string(data)
-		},
-		"write": func(fname, data string) {
-			if err := os.WriteFile(fname, []byte(data), 0660); err != nil {
-				panic(err)
-			}
-		},
-		"copy": func(from, to string) {
-			st, err := os.Stat(from)
-			if err != nil {
-				panic(err)
-			}
-
-			fin, err := os.Open(from)
-			if err != nil {
-				panic(err)
-			}
-			defer fin.Close()
-
-			dir := filepath.Dir(to)
-			os.MkdirAll(dir, 0777)
-
-			fout, err := os.OpenFile(to, os.O_CREATE, st.Mode())
-			if err != nil {
-				panic(err)
-			}
-			defer fout.Close()
-
-			n, err := io.Copy(fout, fin)
-			if err != nil {
-				panic(err)
-			}
-
-			if n != st.Size() {
-				slog.Error("wrong number of bytes written", "from", from, "to", to, "want", st.Size(), "got", n)
-				panic("copy failed")
-			}
-		},
 	})
 
 	vm.Set("fly", map[string]any{
@@ -262,13 +222,6 @@ func main() {
 	vm.Set("log", map[string]any{
 		"info":    lg.Println,
 		"println": fmt.Println,
-	})
-
-	vm.Set("nix", map[string]any{
-		"build":   nixbuild,
-		"eval":    evalNixExpr,
-		"expr":    buildNixExpr,
-		"hashURL": func(fileURL string) string { return strings.TrimSpace(runcmd("nix-prefetch-url", fileURL)) },
 	})
 
 	vm.Set("rpm", map[string]any{

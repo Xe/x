@@ -49,7 +49,14 @@ func Build(p pkgmeta.Package) (foutpath string, err error) {
 	os.Setenv("GOARCH", p.Goarch)
 	os.Setenv("GOOS", "linux")
 
-	p.Build(dir)
+	p.Build(pkgmeta.BuildInput{
+		Output:  dir,
+		Bin:     filepath.Join(dir, "usr", "bin"),
+		Doc:     filepath.Join(dir, "usr", "share", "doc"),
+		Etc:     filepath.Join(dir, "etc", p.Name),
+		Man:     filepath.Join(dir, "usr", "share", "man"),
+		Systemd: filepath.Join(dir, "usr", "lib", "systemd", "system"),
+	})
 
 	var contents files.Contents
 
@@ -62,7 +69,11 @@ func Build(p pkgmeta.Package) (foutpath string, err error) {
 	}
 
 	for repoPath, osPath := range p.ConfigFiles {
-		contents = append(contents, &files.Content{Type: files.TypeConfig, Source: repoPath, Destination: osPath})
+		contents = append(contents, &files.Content{
+			Type:        files.TypeConfig,
+			Source:      repoPath,
+			Destination: osPath,
+		})
 	}
 
 	for repoPath, rpmPath := range p.Documentation {
@@ -70,6 +81,14 @@ func Build(p pkgmeta.Package) (foutpath string, err error) {
 			Type:        files.TypeFile,
 			Source:      repoPath,
 			Destination: filepath.Join("/usr/share/doc", p.Name, rpmPath),
+		})
+	}
+
+	for repoPath, rpmPath := range p.Files {
+		contents = append(contents, &files.Content{
+			Type:        files.TypeFile,
+			Source:      repoPath,
+			Destination: rpmPath,
 		})
 	}
 
