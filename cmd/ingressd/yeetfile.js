@@ -5,9 +5,8 @@
     license: "CC0",
     goarch,
 
-    build: (out) => {
-        go.build("-o", `${out}/usr/bin/ingressd`);
-        yeet.run("mkdir", "-p", `${out}/usr/lib/systemd/system`);
-        yeet.run("cp", "ingressd.service", `${out}/usr/lib/systemd/system/ingressd.service`);
+    build: ({ bin, systemd }) => {
+        go.build("-o", `${bin}/ingressd`);
+        file.install("ingressd.service", `${systemd}/ingressd.service`);
     },
 }));
