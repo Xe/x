@@ -12,8 +12,24 @@
       },
 
       build: ({ bin, systemd }) => {
-        $`go build -o ${bin}/ingressd -ldflags '-s -w -extldflags "-static" -X "within.website/x.Version=${git.tag()}" ./cmd/ingressd'`
+        $`go build -o ${bin}/ingressd -ldflags '-s -w -extldflags "-static" -X "within.website/x.Version=${git.tag()}"' ./cmd/ingressd`
         file.install("./cmd/ingressd/ingressd.service", `${systemd}/ingressd.service`);
+      },
+    });
+
+    method.build({
+      name: "license",
+      description: "software license generator",
+      homepage: "https://within.website",
+      license: "CC0",
+      goarch,
+
+      documentation: {
+        "LICENSE": "LICENSE",
+      },
+
+      build: ({ bin, systemd }) => {
+        $`go build -o ${bin}/license -ldflags '-s -w -extldflags "-static" -X "within.website/x.Version=${git.tag()}"' ./cmd/license`
       },
     });
 
@@ -29,7 +45,7 @@
       },
 
       build: ({ bin }) => {
-        $`go build -o ${bin}/quickserv -ldflags '-s -w -extldflags "-static" -X "within.website/x.Version=${git.tag()}" ./cmd/quickserv'`
+        $`go build -o ${bin}/quickserv -ldflags '-s -w -extldflags "-static" -X "within.website/x.Version=${git.tag()}"' ./cmd/quickserv`
       },
     });
 
@@ -46,8 +62,24 @@
       },
 
       build: ({ bin }) => {
-        $`CGO_ENABLED=0 go build -o ${bin}/yeet -ldflags '-s -w -extldflags "-static" -X "within.website/x.Version=${git.tag()}" ./cmd/yeet'`
+        $`CGO_ENABLED=0 go build -o ${bin}/yeet -ldflags '-s -w -extldflags "-static" -X "within.website/x.Version=${git.tag()}"' ./cmd/yeet`
       },
-    })
+    });
+
+    method.build({
+      name: "x",
+      description: "the universal x command",
+      homepage: "https://within.website",
+      license: "CC0",
+      goarch,
+
+      documentation: {
+        "LICENSE": "LICENSE",
+      },
+
+      build: ({ bin, systemd }) => {
+        $`go build -o ${bin}/x -ldflags '-s -w -extldflags "-static" -X "within.website/x.Version=${git.tag()}"' ./cmd/x`
+      },
+    });
   });
 });
