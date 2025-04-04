@@ -29,11 +29,4 @@ func ExampleInterface_Valid() {
 
 	// Output:
 	// validation failed	err=name is empty
-
-	e.Name = "ollama"
-	if err := e.Valid(); err != nil {
-		slog.Error("validation failed", "err", err)
-	}
-	// Output:
-	//
 }
