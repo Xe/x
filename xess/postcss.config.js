@@ -3,6 +3,6 @@ module.exports = {
     require("cssnano")({
       preset: "advanced",
     }),
-    require("postcss-url")({ url: "inline" }),
+    //require("postcss-url")({ url: "inline" }),
   ],
 };
