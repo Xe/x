@@ -18,7 +18,8 @@ type Package struct {
 	Documentation map[string]string `json:"documentation"` // pwd-relative source path, file in /usr/share/doc/$Name
 	Files         map[string]string `json:"files"`         // pwd-relative source path, rpm destination path
 
-	Build func(BuildInput) `json:"build"`
+	Build    func(BuildInput)     `json:"build"`
+	Filename func(Package) string `json:"mkFilename"`
 }
 
 type BuildInput struct {

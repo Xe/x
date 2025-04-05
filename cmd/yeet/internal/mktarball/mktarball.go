@@ -14,6 +14,10 @@ import (
 	"within.website/x/cmd/yeet/internal/pkgmeta"
 )
 
+func defaultFname(p pkgmeta.Package) string {
+	return fmt.Sprintf("%s-%s-%s-%s", p.Name, p.Version, p.Platform, p.Goarch)
+}
+
 func Build(p pkgmeta.Package) (foutpath string, err error) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -42,10 +46,15 @@ func Build(p pkgmeta.Package) (foutpath string, err error) {
 	}
 	defer os.RemoveAll(dir)
 
-	pkgDir := filepath.Join(dir, fmt.Sprintf("%s-%s-%s-%s", p.Name, p.Version, p.Platform, p.Goarch))
+	folderName := defaultFname(p)
+	if p.Filename != nil {
+		folderName = p.Filename(p)
+	}
+
+	pkgDir := filepath.Join(dir, folderName)
 	os.MkdirAll(pkgDir, 0755)
 
-	fname := filepath.Join("var", fmt.Sprintf("%s-%s-%s-%s.tar.gz", p.Name, p.Version, p.Platform, p.Goarch))
+	fname := filepath.Join("var", folderName+".tar.gz")
 	fout, err := os.Create(fname)
 	if err != nil {
 		return "", fmt.Errorf("can't make output file: %w", err)

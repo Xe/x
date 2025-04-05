@@ -14,6 +14,7 @@ import (
 
 	"al.essio.dev/pkg/shellescape"
 	"github.com/dop251/goja"
+	yeetinternal "within.website/x/cmd/yeet/internal"
 	"within.website/x/cmd/yeet/internal/mkdeb"
 	"within.website/x/cmd/yeet/internal/mkrpm"
 	"within.website/x/cmd/yeet/internal/mktarball"
@@ -201,7 +202,7 @@ func main() {
 		"repoRoot": func() string {
 			return runcmd("git", "rev-parse", "--show-toplevel")
 		},
-		"tag": gittag,
+		"tag": yeetinternal.GitVersion,
 	})
 
 	vm.Set("go", map[string]any{
