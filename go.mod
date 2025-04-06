@@ -1,6 +1,6 @@
 module within.website/x
 
-go 1.24
+go 1.24.2
 
 require (
 	al.essio.dev/pkg/shellescape v1.6.0

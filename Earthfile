@@ -150,6 +150,9 @@ relayd:
 
     SAVE IMAGE --push ghcr.io/xe/x/relayd:latest
 
+reverseproxyd:
+    BUILD +ship --PROGRAM=reverseproxyd --GOARCH=amd64
+
 sapientwindex:
     FROM +runtime
 
@@ -279,6 +282,7 @@ all:
     BUILD --pass-args --platform=linux/amd64 +mi
     BUILD --pass-args --platform=linux/amd64 +mimi
     BUILD --pass-args --platform=linux/amd64 +relayd
+    BUILD --pass-args --platform=linux/amd64 +reverseproxyd
     BUILD --pass-args --platform=linux/amd64 +sapientwindex
     BUILD --pass-args --platform=linux/amd64 +stealthmountain
     BUILD --pass-args --platform=linux/amd64 +stickers
