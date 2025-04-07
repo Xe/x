@@ -20,6 +20,7 @@ brew "libde265"
 brew "libjpeg"
 brew "aom"
 brew "sqlite"
+brew "ko"
 
 # dhall
 brew "dhall"
