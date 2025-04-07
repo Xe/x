@@ -9,6 +9,9 @@ on:
 permissions:
   contents: read
   actions: write
+  packages: write
+  attestations: write
+  id-token: write
 
 jobs:
   build:
@@ -60,3 +63,6 @@ jobs:
 
     - name: Test
       run: go test ./...
+
+    - name: Build docker images
+      run: go tool yeet

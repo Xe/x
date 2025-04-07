@@ -1,3 +1,25 @@
+yeet.setenv("KO_DOCKER_REPO", "ghcr.io/xe/x");
+yeet.setenv("SOURCE_DATE_EPOCH", ($`git log -1 --format='%ct'`).trim());
+yeet.setenv("VERSION", git.tag());
+
+programs = [
+  "aerial",
+  "amano",
+  "aura",
+  "future-sight",
+  "httpdebug",
+  "quickserv",
+  "relayd",
+  "reverseproxyd",
+  "sapientwindex",
+  "stickers",
+  "todayinmarch2020",
+  "uncle-ted",
+  "within.website",
+].join(",");
+
+$`ko build --platform=all --base-import-paths --tags=latest,${git.tag()} ./cmd/{${programs}}`;
+
 ["amd64", "arm64", "386"].forEach(goarch => {
   [deb, rpm, tarball].forEach(method => {
     method.build({
@@ -46,23 +68,6 @@
 
       build: ({ bin }) => {
         $`go build -o ${bin}/quickserv -ldflags '-s -w -extldflags "-static" -X "within.website/x.Version=${git.tag()}"' ./cmd/quickserv`
-      },
-    });
-
-    method.build({
-      name: "yeet",
-      description: "Yeet out actions with maximum haste!",
-      homepage: "https://within.website",
-      license: "CC0",
-      goarch,
-
-      documentation: {
-        "./cmd/yeet/README.md": "README.md",
-        "LICENSE": "LICENSE",
-      },
-
-      build: ({ bin }) => {
-        $`CGO_ENABLED=0 go build -o ${bin}/yeet -ldflags '-s -w -extldflags "-static" -X "within.website/x.Version=${git.tag()}"' ./cmd/yeet`
       },
     });
 
