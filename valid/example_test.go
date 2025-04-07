@@ -28,5 +28,5 @@ func ExampleInterface_Valid() {
 	}
 
 	// Output:
-	// validation failed	err=name is empty
+	// err=name is empty
 }
