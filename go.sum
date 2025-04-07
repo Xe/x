@@ -98,6 +98,8 @@ github.com/Songmu/gitconfig v0.2.0 h1:pX2++u4KUq+K2k/ZCzGXLtkD3ceCqIdi0tDyb+IbSy
 github.com/Songmu/gitconfig v0.2.0/go.mod h1:cB5bYJer+pl7W8g6RHFwL/0X6aJROVrYuHlvc7PT+hE=
 github.com/TecharoHQ/yeet v0.0.6 h1:q1l02a79gFdpvy6b4+N0O24mGfG1Wz9keM94Aodf9oM=
 github.com/TecharoHQ/yeet v0.0.6/go.mod h1:hYoJc/HZgkRmOSXRjUYJfKQNKqiCS6Uzx1B3Z1fjqJk=
+github.com/TecharoHQ/yeet v0.0.7 h1:dSfyTiWyWsQKxaRjaMVtC/7RCyFtV1j0BC2rcXJvBZo=
+github.com/TecharoHQ/yeet v0.0.7/go.mod h1:hYoJc/HZgkRmOSXRjUYJfKQNKqiCS6Uzx1B3Z1fjqJk=
 github.com/a-h/templ v0.3.833 h1:L/KOk/0VvVTBegtE0fp2RJQiBm7/52Zxv5fqlEHiQUU=
 github.com/a-h/templ v0.3.833/go.mod h1:cAu4AiZhtJfBjMY0HASlyzvkrtjnHWPeEsyGK2YYmfk=
 github.com/adrg/frontmatter v0.2.0 h1:/DgnNe82o03riBd1S+ZDjd43wAmC6W35q67NHeLkPd4=

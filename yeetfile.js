@@ -20,7 +20,7 @@ programs = [
 
 $`ko build --platform=all --base-import-paths --tags=latest,${git.tag()} ./cmd/{${programs}}`;
 
-["amd64", "arm64", "386"].forEach(goarch => {
+["amd64", "arm64"].forEach(goarch => {
   [deb, rpm, tarball].forEach(method => {
     method.build({
       name: "ingressd",
