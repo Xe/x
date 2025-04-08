@@ -18,6 +18,10 @@ jobs:
     runs-on: alrest-x
     steps:
     - uses: actions/checkout@v4
+      with:
+        persist-credentials: false
+        fetch-tags: true
+        fetch-depth: 0
 
     - name: build essential
       run: |
