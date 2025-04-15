@@ -21,7 +21,7 @@ spec:
         args:
         - --source=ingress
         - --provider=aws
-        - --default-targets=131.153.227.239
+        - --default-targets=131.153.227.59
         - --registry=dynamodb
         - --dynamodb-region=ca-central-1
         - --dynamodb-table=external-dns-ingress-aeacus

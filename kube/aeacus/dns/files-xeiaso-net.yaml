@@ -8,4 +8,4 @@ spec:
     recordTTL: 3600
     recordType: CNAME
     targets:
-    - files.xeiaso.net.fly.storage.tigris.dev
+    - xedn.fly.storage.tigris.dev
