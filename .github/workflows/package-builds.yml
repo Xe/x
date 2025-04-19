@@ -68,7 +68,7 @@ jobs:
 
     - name: Build Packages
       run: |
-        go run ./cmd/yeet
+        go tool yeet
 
     - name: Upload released artifacts
       env:
