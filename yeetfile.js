@@ -50,7 +50,7 @@ $`ko build --platform=all --base-import-paths --tags=latest,${git.tag()} ./cmd/{
         "LICENSE": "LICENSE",
       },
 
-      build: ({ bin, systemd }) => {
+      build: ({ bin }) => {
         $`go build -o ${bin}/license -ldflags '-s -w -extldflags "-static" -X "within.website/x.Version=${git.tag()}"' ./cmd/license`
       },
     });
@@ -68,6 +68,22 @@ $`ko build --platform=all --base-import-paths --tags=latest,${git.tag()} ./cmd/{
 
       build: ({ bin }) => {
         $`go build -o ${bin}/quickserv -ldflags '-s -w -extldflags "-static" -X "within.website/x.Version=${git.tag()}"' ./cmd/quickserv`
+      },
+    });
+
+    method.build({
+      name: "uploud",
+      description: "Upload images to the cloud!",
+      homepage: "https://within.website",
+      license: "CC0",
+      goarch,
+
+      documentation: {
+        "LICENSE": "LICENSE",
+      },
+
+      build: ({ bin }) => {
+        $`go build -o ${bin}/uploud -ldflags '-s -w -extldflags "-static" -X "within.website/x.Version=${git.tag()}"' ./cmd/uploud`
       },
     });
 
