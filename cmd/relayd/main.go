@@ -92,8 +92,8 @@ func main() {
 
 		fp := GetTLSFingerprint(req)
 		if fp != nil {
-			req.Header.Set("JA3N-Fingerprint", fp.JA3N().String())
-			req.Header.Set("JA4-Fingerprint", fp.JA4().String())
+			req.Header.Set("X-JA3N-Fingerprint", fp.JA3N().String())
+			req.Header.Set("X-JA4-Fingerprint", fp.JA4().String())
 		}
 	}
 

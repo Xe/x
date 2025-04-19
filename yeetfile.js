@@ -84,8 +84,13 @@ yeet.setenv("CGO_ENABLED", "0");
         "LICENSE": "LICENSE",
       },
 
-      build: ({ bin }) => {
-        $`go build -o ${bin}/relayd -ldflags '-s -w -extldflags "-static" -X "within.website/x.Version=${git.tag()}"' ./cmd/relayd`
+      configFiles: {
+        "cmd/relayd/relayd.env": "/etc/within.website/x/relayd.env"
+      },
+
+      build: ({ bin, systemd }) => {
+        $`go build -o ${bin}/relayd -ldflags '-s -w -extldflags "-static" -X "within.website/x.Version=${git.tag()}"' ./cmd/relayd`;
+        file.install("./cmd/relayd/relayd.service", `${systemd}/relayd.service`);
       },
     });
 

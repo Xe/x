@@ -1,0 +1,12 @@
+[Unit]
+Description="Xe Iaso's TLS relay daemon"
+
+[Service]
+ExecStart=/usr/bin/relayd
+Restart=always
+RestartSec=30s
+EnvironmentFile=/etc/within.website/x/relayd.env
+LimitNOFILE=infinity
+
+[Install]
+WantedBy=multi-user.target
