@@ -20,6 +20,8 @@ programs = [
 
 $`ko build --platform=all --base-import-paths --tags=latest,${git.tag()} ./cmd/{${programs}}`;
 
+yeet.setenv("CGO_ENABLED", "0");
+
 ["amd64", "arm64"].forEach(goarch => {
   [deb, rpm, tarball].forEach(method => {
     method.build({
@@ -68,6 +70,22 @@ $`ko build --platform=all --base-import-paths --tags=latest,${git.tag()} ./cmd/{
 
       build: ({ bin }) => {
         $`go build -o ${bin}/quickserv -ldflags '-s -w -extldflags "-static" -X "within.website/x.Version=${git.tag()}"' ./cmd/quickserv`
+      },
+    });
+
+    method.build({
+      name: "relayd",
+      description: "TLS termination and client fingerprinting",
+      homepage: "https://within.website",
+      license: "CC0",
+      goarch,
+
+      documentation: {
+        "LICENSE": "LICENSE",
+      },
+
+      build: ({ bin }) => {
+        $`go build -o ${bin}/relayd -ldflags '-s -w -extldflags "-static" -X "within.website/x.Version=${git.tag()}"' ./cmd/relayd`
       },
     });
 
