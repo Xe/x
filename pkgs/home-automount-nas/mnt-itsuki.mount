@@ -1,0 +1,14 @@
+[Unit]
+Description=NAS SMB mount
+Requires=network-online.target
+After=network-online.target systemd-resolved.service
+Wants=network-online.target systemd-resolved.service
+
+[Mount]
+What=//192.168.2.241/data
+Where=/mnt/itsuki
+Type=cifs
+Options=user=cadey,password=hunter2,rw,x-systemd.automount,uid=1000
+
+[Install]
+WantedBy=multi-user.target

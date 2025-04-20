@@ -1,0 +1,10 @@
+[Unit]
+Requires=remote-fs-pre.target
+After=remote-fs-pre.target
+
+[Automount]
+Where=/mnt/itsuki
+TimeoutIdleSec=0
+
+[Install]
+WantedBy=remote-fs.target
