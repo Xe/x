@@ -1,0 +1,11 @@
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: azeyma-within-lgbt-dns
+spec:
+  endpoints:
+  - dnsName: "azeyma.within.lgbt"
+    recordTTL: 3600
+    recordType: A
+    targets:
+    - 155.138.129.167

@@ -7,6 +7,7 @@ metadata:
     xeiaso.net/role: valkey
 data:
   VALKEY_PASSWORD: hunter2
+  ALLOW_EMPTY_PASSWORD: "yes"
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -25,15 +26,22 @@ spec:
       labels:
         xeiaso.net/role: valkey
     spec:
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: valkey
       containers:
-        - name: valkey
-          image: 'docker.io/bitnami/valkey:latest'
-          imagePullPolicy: Always
-          ports:
-            - containerPort: 6379
-          envFrom:
-            - configMapRef:
-                name: valkey-secret
+      - name: valkey
+        image: 'docker.io/bitnami/valkey:latest'
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 6379
+        envFrom:
+        - configMapRef:
+            name: valkey-secret
+        volumeMounts:
+        - name: data
+          mountPath: /data
 ---
 apiVersion: v1
 kind: Service
@@ -48,3 +56,18 @@ spec:
     - port: 6379
   selector:
     xeiaso.net/role: valkey
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: valkey
+  namespace: future-sight
+  labels:
+    xeiaso.net/role: valkey
+spec:
+  resources:
+    requests:
+      storage: 5Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce

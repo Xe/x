@@ -150,7 +150,7 @@ spec:
               mountPath: "/xe/pki"
               readOnly: true
         - name: anubis
-          image: ghcr.io/techarohq/anubis:pr-19
+          image: ghcr.io/techarohq/anubis:main
           imagePullPolicy: Always
           env:
           - name: "BIND"
@@ -165,6 +165,11 @@ spec:
             value: "true"
           - name: "TARGET"
             value: "http://localhost:3000"
+          - name: ED25519_PRIVATE_KEY_HEX
+            valueFrom:
+              secretKeyRef:
+                name: anubis-key
+                key: ED25519_PRIVATE_KEY_HEX
           # - name: "SLOG_LEVEL"
           #   value: "debug"
           volumeMounts:
