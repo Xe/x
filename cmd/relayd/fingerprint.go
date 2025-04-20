@@ -55,7 +55,11 @@ type TLSFingerprint struct {
 
 type TLSFingerprintJA3N [md5.Size]byte
 
-func (f TLSFingerprintJA3N) String() string {
+func (f *TLSFingerprintJA3N) String() string {
+	if f == nil {
+		return ""
+	}
+
 	return hex.EncodeToString(f[:])
 }
 
@@ -65,7 +69,11 @@ type TLSFingerprintJA4 struct {
 	C [6]byte
 }
 
-func (f TLSFingerprintJA4) String() string {
+func (f *TLSFingerprintJA4) String() string {
+	if f == nil {
+		return ""
+	}
+
 	return strings.Join([]string{
 		string(f.A[:]),
 		hex.EncodeToString(f.B[:]),
