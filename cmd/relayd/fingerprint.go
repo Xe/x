@@ -7,6 +7,7 @@ import (
 	"crypto/tls"
 	"encoding/hex"
 	"fmt"
+	"log/slog"
 	"net"
 	"net/http"
 	"slices"
@@ -16,34 +17,37 @@ import (
 )
 
 func applyTLSFingerprinter(server *http.Server) {
+	if server.TLSConfig == nil {
+		return
+	}
 	server.TLSConfig = server.TLSConfig.Clone()
 
-	getCertificate := server.TLSConfig.GetCertificate
-	if getCertificate == nil {
-		server.TLSConfig.GetCertificate = func(clientHello *tls.ClientHelloInfo) (*tls.Certificate, error) {
-			ja3n, ja4 := buildTLSFingerprint(clientHello)
-			ptr := clientHello.Context().Value(tlsFingerprintKey{})
-			if fpPtr, ok := ptr.(*TLSFingerprint); ok && ptr != nil && fpPtr != nil {
-				fpPtr.ja3n.Store(&ja3n)
-				fpPtr.ja4.Store(&ja4)
-			}
+	getConfigForClient := server.TLSConfig.GetConfigForClient
 
+	if getConfigForClient == nil {
+		getConfigForClient = func(info *tls.ClientHelloInfo) (*tls.Config, error) {
 			return nil, nil
 		}
-	} else {
-		server.TLSConfig.GetCertificate = func(clientHello *tls.ClientHelloInfo) (*tls.Certificate, error) {
-			ja3n, ja4 := buildTLSFingerprint(clientHello)
-			ptr := clientHello.Context().Value(tlsFingerprintKey{})
-			if fpPtr, ok := ptr.(*TLSFingerprint); ok && ptr != nil && fpPtr != nil {
-				fpPtr.ja3n.Store(&ja3n)
-				fpPtr.ja4.Store(&ja4)
-			}
+	}
 
-			return getCertificate(clientHello)
+	server.TLSConfig.GetConfigForClient = func(clientHello *tls.ClientHelloInfo) (*tls.Config, error) {
+		ja3n, ja4 := buildTLSFingerprint(clientHello)
+		ptr := clientHello.Context().Value(tlsFingerprintKey{})
+		if fpPtr, ok := ptr.(*TLSFingerprint); ok && ptr != nil && fpPtr != nil {
+			fpPtr.ja3n.Store(&ja3n)
+			fpPtr.ja4.Store(&ja4)
 		}
+		return getConfigForClient(clientHello)
 	}
 	server.ConnContext = func(ctx context.Context, c net.Conn) context.Context {
-		return context.WithValue(ctx, tlsFingerprintKey{}, &TLSFingerprint{})
+		ctx = context.WithValue(ctx, tlsFingerprintKey{}, &TLSFingerprint{})
+		tcpFP, err := assignTCPFingerprint(c)
+		if err == nil {
+			ctx = context.WithValue(ctx, tcpFingerprintKey{}, tcpFP)
+		} else {
+			slog.Debug("ja4t error", "err", err)
+		}
+		return ctx
 	}
 }
 

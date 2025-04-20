@@ -99,6 +99,10 @@ func main() {
 				req.Header.Set("X-JA4-Fingerprint", fp.JA4().String())
 			}
 		}
+
+		if tcpFP := GetTCPFingerprint(req); tcpFP != nil {
+			req.Header.Set("X-JA4T-Fingerprint", tcpFP.String())
+		}
 	}
 
 	srv := &http.Server{

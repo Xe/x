@@ -1,0 +1,72 @@
+package main
+
+import (
+	"fmt"
+	"net"
+	"net/http"
+	"strings"
+
+	"github.com/mikioh/tcp"
+	"github.com/mikioh/tcpinfo"
+)
+
+func assignTCPFingerprint(c net.Conn) (*JA4T, error) {
+	tc, err := tcp.NewConn(c)
+	if err != nil {
+		return nil, err
+	}
+
+	var o tcpinfo.Info
+	var b [256]byte
+	i, err := tc.Option(o.Level(), o.Name(), b[:])
+	if err != nil {
+		return nil, err
+	}
+
+	ci, ok := i.(*tcpinfo.Info)
+	if !ok {
+		return nil, fmt.Errorf("can't make %T into *tcpinfo.Info")
+	}
+
+	result := &JA4T{
+		Window:      uint32(ci.Sys.SenderWindow),
+		MSS:         uint16(ci.SenderMSS),
+		WindowScale: 0,
+	}
+	fmt.Println(result.String())
+
+	return result, nil
+}
+
+type tcpFingerprintKey struct{}
+
+func GetTCPFingerprint(r *http.Request) *JA4T {
+	ptr := r.Context().Value(tcpFingerprintKey{})
+	if fpPtr, ok := ptr.(*JA4T); ok && ptr != nil && fpPtr != nil {
+		return fpPtr
+	}
+	return nil
+}
+
+type JA4T struct {
+	Window      uint32
+	Options     []uint8
+	MSS         uint16
+	WindowScale uint8
+}
+
+func (j JA4T) String() string {
+	var sb strings.Builder
+	fmt.Fprintf(&sb, "%d_", j.Window)
+
+	for i, opt := range j.Options {
+		fmt.Fprint(&sb, opt)
+		if i-1 != len(j.Options) {
+			fmt.Fprint(&sb, "-")
+		}
+	}
+	fmt.Fprint(&sb, "_")
+	fmt.Fprintf(&sb, "%d_%d", j.MSS, j.WindowScale)
+
+	return sb.String()
+}
