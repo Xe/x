@@ -1,9 +1,11 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"net"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/mikioh/tcp"
@@ -25,15 +27,27 @@ func assignTCPFingerprint(c net.Conn) (*JA4T, error) {
 
 	ci, ok := i.(*tcpinfo.Info)
 	if !ok {
-		return nil, fmt.Errorf("can't make %T into *tcpinfo.Info")
+		return nil, fmt.Errorf("can't make %T into *tcpinfo.Info", i)
 	}
 
+	json.NewEncoder(os.Stdout).Encode(ci)
+
 	result := &JA4T{
-		Window:      uint32(ci.Sys.SenderWindow),
-		MSS:         uint16(ci.SenderMSS),
-		WindowScale: 0,
+		Window: uint32(ci.Sys.SenderWindow),
+		MSS:    uint16(ci.SenderMSS),
 	}
-	fmt.Println(result.String())
+
+	for _, opt := range ci.PeerOptions {
+		switch opt.(type) {
+		case tcpinfo.WindowScale:
+			result.Options = append(result.Options, 3, uint8(opt.(tcpinfo.WindowScale)))
+			result.WindowScale = uint8(opt.(tcpinfo.WindowScale))
+		case tcpinfo.SACKPermitted:
+			result.Options = append(result.Options, 4, 1)
+		case tcpinfo.Timestamps:
+			result.Options = append(result.Options, 8, 1)
+		}
+	}
 
 	return result, nil
 }
@@ -61,7 +75,7 @@ func (j JA4T) String() string {
 
 	for i, opt := range j.Options {
 		fmt.Fprint(&sb, opt)
-		if i-1 != len(j.Options) {
+		if i != len(j.Options)-1 {
 			fmt.Fprint(&sb, "-")
 		}
 	}

@@ -41,12 +41,16 @@ func applyTLSFingerprinter(server *http.Server) {
 	}
 	server.ConnContext = func(ctx context.Context, c net.Conn) context.Context {
 		ctx = context.WithValue(ctx, tlsFingerprintKey{}, &TLSFingerprint{})
-		tcpFP, err := assignTCPFingerprint(c)
-		if err == nil {
-			ctx = context.WithValue(ctx, tcpFingerprintKey{}, tcpFP)
-		} else {
-			slog.Debug("ja4t error", "err", err)
+
+		if tc, ok := c.(*tls.Conn); ok {
+			tcpFP, err := assignTCPFingerprint(tc.NetConn())
+			if err == nil {
+				ctx = context.WithValue(ctx, tcpFingerprintKey{}, tcpFP)
+			} else {
+				slog.Debug("ja4t error", "err", err)
+			}
 		}
+
 		return ctx
 	}
 }
