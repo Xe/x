@@ -93,15 +93,15 @@ func main() {
 		fp := GetTLSFingerprint(req)
 		if fp != nil {
 			if fp.JA3N() != nil {
-				req.Header.Set("X-JA3N-Fingerprint", fp.JA3N().String())
+				req.Header.Set("X-TLS-Fingerprint-JA3N", fp.JA3N().String())
 			}
 			if fp.JA4() != nil {
-				req.Header.Set("X-JA4-Fingerprint", fp.JA4().String())
+				req.Header.Set("X-TLS-Fingerprint-JA4", fp.JA4().String())
 			}
 		}
 
 		if tcpFP := GetTCPFingerprint(req); tcpFP != nil {
-			req.Header.Set("X-JA4T-Fingerprint", tcpFP.String())
+			req.Header.Set("X-TCP-Fingerprint-JA4T", tcpFP.String())
 		}
 	}
 
