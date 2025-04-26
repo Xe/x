@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"crypto/tls"
 	"flag"
 	"fmt"
@@ -13,10 +14,12 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
+	"strings"
 	"sync"
 	"syscall"
 	"time"
 
+	"github.com/google/uuid"
 	"within.website/x/internal"
 )
 
@@ -82,6 +85,16 @@ func main() {
 	h := httputil.NewSingleHostReverseProxy(u)
 	oldDirector := h.Director
 
+	if u.Scheme == "unix" {
+		h = &httputil.ReverseProxy{
+			Transport: &http.Transport{
+				DialContext: func(_ context.Context, _, _ string) (net.Conn, error) {
+					return net.Dial("unix", strings.TrimPrefix(*proxyTo, "unix://"))
+				},
+			},
+		}
+	}
+
 	h.Director = func(req *http.Request) {
 		oldDirector(req)
 
@@ -103,6 +116,13 @@ func main() {
 		if tcpFP := GetTCPFingerprint(req); tcpFP != nil {
 			req.Header.Set("X-TCP-Fingerprint-JA4T", tcpFP.String())
 		}
+
+		req.Header.Set("X-Forwarded-Host", req.URL.Host)
+		req.Header.Set("X-Forwarded-Proto", "https")
+		req.Header.Set("X-Forwarded-Scheme", "https")
+		req.Header.Set("X-Request-Id", uuid.NewString())
+		req.Header.Set("X-Scheme", "https")
+		req.Header.Set("X-HTTP-Version", req.Proto)
 	}
 
 	srv := &http.Server{

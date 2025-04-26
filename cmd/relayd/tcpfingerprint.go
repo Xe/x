@@ -1,11 +1,9 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"net"
 	"net/http"
-	"os"
 	"strings"
 
 	"github.com/mikioh/tcp"
@@ -29,8 +27,6 @@ func assignTCPFingerprint(c net.Conn) (*JA4T, error) {
 	if !ok {
 		return nil, fmt.Errorf("can't make %T into *tcpinfo.Info", i)
 	}
-
-	json.NewEncoder(os.Stdout).Encode(ci)
 
 	result := &JA4T{
 		Window: uint32(ci.Sys.SenderWindow),
