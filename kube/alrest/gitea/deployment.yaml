@@ -56,6 +56,8 @@ spec:
     spec:
       securityContext:
         fsGroup: 1000
+      imagePullSecrets:
+      - name: techarohq-botstopper
       volumes:
         - name: data
           persistentVolumeClaim:
@@ -69,6 +71,9 @@ spec:
         - name: anubis
           configMap:
             name: anubis-cfg
+        - name: botstopper-css
+          configMap:
+            name: botstopper-custom-css
       containers:
         - name: main
           image: gitea/gitea:1-rootless
@@ -150,17 +155,21 @@ spec:
               mountPath: "/xe/pki"
               readOnly: true
         - name: anubis
-          image: ghcr.io/techarohq/anubis:main
+          image: ghcr.io/techarohq/botstopper/anubis:latest
           imagePullPolicy: Always
           env:
           - name: "BIND"
             value: ":8080"
           - name: "DIFFICULTY"
             value: "4"
+          - name: "ERROR_TITLE"
+            value: "Error detected"
           - name: "METRICS_BIND"
             value: ":9090"
+          - name: "OVERLAY_FOLDER"
+            value: "/xe/cfg/botstopper"
           - name: "POLICY_FNAME"
-            value: "/xe/cfg/anubis/botPolicies.json"
+            value: "/xe/cfg/anubis/botPolicies.yaml"
           - name: "SERVE_ROBOTS_TXT"
             value: "true"
           - name: "TARGET"
@@ -175,6 +184,8 @@ spec:
           volumeMounts:
           - name: anubis
             mountPath: /xe/cfg/anubis
+          - name: botstopper-css
+            mountPath: /xe/cfg/botstopper/static/css
           resources:
             limits:
               cpu: 500m

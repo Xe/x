@@ -1,0 +1,24 @@
+:root {
+  --body-sans-font: sans-serif;
+  --body-preformatted-font: monospace;
+  --body-title-font: serif;
+
+  --dark-background: #000000;
+  --dark-text: #ffffff;
+  --dark-text-selection: #d3869b;
+  --dark-preformatted-background: #3c3836;
+  --dark-link-foreground: #b16286;
+  --dark-link-background: #282828;
+  --dark-blockquote-border-left: 1px solid #bdae93;
+
+  --light-background: #ffffff;
+  --light-text: #000000;
+  --light-text-selection: #d3869b;
+  --light-preformatted-background: #ebdbb2;
+  --light-link-foreground: #b16286;
+  --light-link-background: #fbf1c7;
+  --light-blockquote-border-left: 1px solid #655c54;
+
+  --progress-bar-outline: #afafaf solid 4px;
+  --progress-bar-fill: #4f4f4f;
+}

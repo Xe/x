@@ -15,3 +15,9 @@ configMapGenerator:
   behavior: create
   files:
   - ./cfg/anubis/botPolicies.json
+  - ./cfg/anubis/botPolicies.yaml
+
+- name: botstopper-custom-css
+  behavior: create
+  files:
+  - ./cfg/botstopper/custom.css
