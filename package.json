@@ -1,0 +1,45 @@
+{
+  "name": "@xe/x",
+  "version": "1.13.6",
+  "description": "Xe's /x/perimental playground",
+  "main": "yeetfile.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "generate": "go generate ./...",
+    "test": "npm run generate && go test ./...",
+    "prepare": "husky"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Xe/x.git"
+  },
+  "author": "Xe Iaso <me@xeiaso.net>",
+  "license": "CC0-1.0",
+  "bugs": {
+    "url": "https://github.com/Xe/x/issues"
+  },
+  "homepage": "https://github.com/Xe/x#readme",
+  "devDependencies": {
+    "@commitlint/cli": "^19.8.0",
+    "@commitlint/config-conventional": "^19.8.0",
+    "husky": "^9.1.7"
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ],
+    "rules": {
+      "footer-max-line-length": [
+        2,
+        "always",
+        99999
+      ],
+      "signed-off-by": [
+        2,
+        "always"
+      ]
+    }
+  }
+}
