@@ -2,10 +2,12 @@ package tokipona
 
 import (
 	"bytes"
+	"embed"
 	"encoding/json"
-
-	"within.website/x/langs/tokipona/internal"
 )
+
+//go:embed tokipona.json
+var static embed.FS
 
 // Word is a single word in the Toki Pona dictionary.
 type Word struct {
@@ -18,7 +20,7 @@ type Word struct {
 
 // LoadWords loads the embedded Toki Pona dictionary.
 func LoadWords() ([]Word, error) {
-	data, err := internal.Asset("tokipona.json")
+	data, err := static.ReadFile("tokipona.json")
 	fin := bytes.NewBuffer(data)
 
 	var result []Word

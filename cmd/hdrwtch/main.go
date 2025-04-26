@@ -20,7 +20,7 @@ import (
 )
 
 //go:generate tailwindcss --input styles.css --output static/css/styles.css
-//go:generate go run github.com/a-h/templ/cmd/templ@latest generate
+//go:generate go tool templ generate
 
 var (
 	botToken     = flag.String("bot-token", "", "Telegram bot token")

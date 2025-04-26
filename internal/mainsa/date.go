@@ -26,7 +26,7 @@ const (
 	sunosInSuli = sunosInTawa * tawasInSuli
 )
 
-//go:generate stringer -type=Tawa
+//go:generate go tool stringer -type=Tawa
 
 // Tawa is a set of 3 cycles, or a season.
 type Tawa int
@@ -39,7 +39,7 @@ const (
 	Lete
 )
 
-//go:generate stringer -type=Sike
+//go:generate go tool stringer -type=Sike
 
 // Sike is a set of 3 threads, or a month.
 type Sike int
@@ -51,7 +51,7 @@ const (
 	Monsi
 )
 
-//go:generate stringer -type=Nanpa
+//go:generate go tool stringer -type=Nanpa
 
 // Nanpa is a generic toki pona number
 type Nanpa int
