@@ -9,7 +9,7 @@ require (
 	github.com/Marcel-ICMC/graw v0.0.0-20230411090719-e24cd8592d25
 	github.com/McKael/madon/v2 v2.4.0
 	github.com/NYTimes/gziphandler v1.1.1
-	github.com/a-h/templ v0.3.833
+	github.com/a-h/templ v0.3.857
 	github.com/adrg/frontmatter v0.2.0
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.74.1
 	github.com/bluesky-social/indigo v0.0.0-20240905024844-a4f38639767f
@@ -41,6 +41,8 @@ require (
 	github.com/kr/pretty v0.3.1
 	github.com/lib/pq v1.10.9
 	github.com/mattn/go-sqlite3 v1.14.24
+	github.com/mikioh/tcp v0.0.0-20190314235350-803a9b46060c
+	github.com/mikioh/tcpinfo v0.0.0-20190314235526-30a79bb1804b
 	github.com/multiformats/go-multibase v0.2.0
 	github.com/mymmrac/telego v0.31.5
 	github.com/nats-io/nats.go v1.38.0
@@ -68,9 +70,9 @@ require (
 	go.etcd.io/bbolt v1.4.0
 	go.jetpack.io/tyson v0.1.1
 	go4.org v0.0.0-20190313082347-94abd6928b1d
-	golang.org/x/crypto v0.36.0
+	golang.org/x/crypto v0.37.0
 	golang.org/x/oauth2 v0.25.0
-	golang.org/x/sync v0.12.0
+	golang.org/x/sync v0.13.0
 	google.golang.org/grpc v1.70.0
 	gorm.io/gorm v1.25.12
 	gorm.io/plugin/prometheus v0.1.0
@@ -88,6 +90,7 @@ require (
 	github.com/ProtonMail/go-crypto v1.1.6 // indirect
 	github.com/Songmu/gitconfig v0.2.0 // indirect
 	github.com/TecharoHQ/yeet v0.0.7 // indirect
+	github.com/a-h/parse v0.0.0-20250122154542-74294addb73e // indirect
 	github.com/andybalholm/brotli v1.1.1 // indirect
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.6.8 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/v4a v1.3.29 // indirect
@@ -99,6 +102,7 @@ require (
 	github.com/bytedance/sonic/loader v0.2.0 // indirect
 	github.com/carlmjohnson/versioninfo v0.22.5 // indirect
 	github.com/cavaliergopher/cpio v1.0.1 // indirect
+	github.com/cli/browser v1.3.0 // indirect
 	github.com/cli/go-gh v0.1.0 // indirect
 	github.com/cloudflare/circl v1.6.0 // indirect
 	github.com/cloudwego/base64x v0.1.4 // indirect
@@ -113,6 +117,7 @@ require (
 	github.com/fasthttp/router v1.5.3 // indirect
 	github.com/fatih/color v1.17.0 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
+	github.com/fsnotify/fsnotify v1.8.0 // indirect
 	github.com/go-git/gcfg v1.5.1-0.20230307220236-3a3c6141e376 // indirect
 	github.com/go-git/go-billy/v5 v5.6.2 // indirect
 	github.com/go-git/go-git/v5 v5.14.0 // indirect
@@ -166,8 +171,6 @@ require (
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mattn/go-tty v0.0.3 // indirect
-	github.com/mikioh/tcp v0.0.0-20190314235350-803a9b46060c // indirect
-	github.com/mikioh/tcpinfo v0.0.0-20190314235526-30a79bb1804b // indirect
 	github.com/mikioh/tcpopt v0.0.0-20190314235656-172688c1accc // indirect
 	github.com/minio/sha256-simd v1.0.1 // indirect
 	github.com/mitchellh/copystructure v1.2.0 // indirect
@@ -180,6 +183,7 @@ require (
 	github.com/multiformats/go-multihash v0.2.3 // indirect
 	github.com/multiformats/go-varint v0.0.7 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
+	github.com/natefinch/atomic v1.0.1 // indirect
 	github.com/nats-io/nkeys v0.4.9 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
 	github.com/ncruces/julianday v1.0.0 // indirect
@@ -264,13 +268,17 @@ require (
 	github.com/sendgrid/rest v2.6.9+incompatible // indirect
 	golang.org/x/exp v0.0.0-20240719175910-8a7402abbf56
 	golang.org/x/image v0.24.0
-	golang.org/x/mod v0.23.0 // indirect
-	golang.org/x/net v0.38.0
-	golang.org/x/sys v0.31.0 // indirect
-	golang.org/x/text v0.23.0 // indirect
+	golang.org/x/mod v0.24.0 // indirect
+	golang.org/x/net v0.39.0
+	golang.org/x/sys v0.32.0 // indirect
+	golang.org/x/text v0.24.0 // indirect
 	golang.org/x/time v0.10.0
-	golang.org/x/tools v0.30.0
+	golang.org/x/tools v0.32.0
 	google.golang.org/protobuf v1.36.4
 )
 
-tool github.com/TecharoHQ/yeet/cmd/yeet
+tool (
+	github.com/TecharoHQ/yeet/cmd/yeet
+	github.com/a-h/templ/cmd/templ
+	golang.org/x/tools/cmd/stringer
+)

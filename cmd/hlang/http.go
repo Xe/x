@@ -16,7 +16,7 @@ import (
 	"within.website/x/xess"
 )
 
-//go:generate go run github.com/a-h/templ/cmd/templ@latest generate
+//go:generate go tool templ generate
 
 var (
 	maxBytes = flag.Int64("max-playground-bytes", 75, "how many bytes of data should users be allowed to post to the playground?")

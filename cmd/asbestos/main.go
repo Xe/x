@@ -15,7 +15,7 @@ import (
 	"within.website/x/xess"
 )
 
-//go:generate go run github.com/a-h/templ/cmd/templ@latest generate
+//go:generate go tool templ generate
 
 var (
 	bind  = flag.String("bind", ":8069", "http port to bind on")

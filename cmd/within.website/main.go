@@ -62,7 +62,7 @@ func (r Repo) RegisterHandlers(mux *http.ServeMux, lg *slog.Logger) {
 	lg.Debug("registered repo handler", "repo", r)
 }
 
-//go:generate go run github.com/a-h/templ/cmd/templ@latest generate
+//go:generate go tool templ generate
 
 func main() {
 	internal.HandleStartup()

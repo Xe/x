@@ -18,7 +18,7 @@ import (
 	"within.website/x/xess"
 )
 
-//go:generate go run github.com/a-h/templ/cmd/templ@latest generate
+//go:generate go tool templ generate
 
 var (
 	apiURL = flag.String("api-url", "https://waifuwave.fly.dev/generate", "API backend URL")

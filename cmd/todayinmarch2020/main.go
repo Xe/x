@@ -15,7 +15,7 @@ import (
 	"within.website/x/xess"
 )
 
-//go:generate go run github.com/a-h/templ/cmd/templ@latest generate
+//go:generate go tool templ generate
 
 var (
 	port     = flag.String("port", "23698", "TCP port to listen on")

@@ -27,7 +27,7 @@ import (
 	"within.website/x/xess"
 )
 
-//go:generate go run github.com/a-h/templ/cmd/templ@latest generate
+//go:generate go tool templ generate
 
 var (
 	token           = flag.String("token", "", "Token for authentication")

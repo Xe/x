@@ -8,7 +8,7 @@ import (
 	"within.website/x/cmd/mi/models"
 )
 
-//go:generate go run github.com/a-h/templ/cmd/templ@latest generate
+//go:generate go tool templ generate
 
 func New(dao *models.DAO) *Glance {
 	return &Glance{dao: dao}

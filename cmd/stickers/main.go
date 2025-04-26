@@ -24,7 +24,7 @@ import (
 	"within.website/x/xess"
 )
 
-//go:generate go run github.com/a-h/templ/cmd/templ@latest generate
+//go:generate go tool templ generate
 
 var (
 	bind       = flag.String("bind", ":3923", "TCP address to bind to")
