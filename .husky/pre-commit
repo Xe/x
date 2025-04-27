@@ -1,2 +1,4 @@
 npx lint-staged
-npm test
+if echo "$1" | grep -q "\[skip ci\]"; then
+  npm test
+fi
