@@ -78,3 +78,4 @@ jobs:
 
       - name: Build docker images
         run: go tool yeet
+        if: github.event_name != 'pull_request'
