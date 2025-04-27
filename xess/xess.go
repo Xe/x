@@ -7,6 +7,7 @@ import (
 	"embed"
 	"net/http"
 
+	"github.com/a-h/templ"
 	"within.website/x"
 	"within.website/x/internal"
 )
@@ -28,4 +29,11 @@ func init() {
 
 func Mount(mux *http.ServeMux) {
 	mux.Handle("/.within.website/x/xess/", internal.UnchangingCache(http.StripPrefix("/.within.website/x/xess/", http.FileServerFS(Static))))
+}
+
+func NotFound(w http.ResponseWriter, r *http.Request) {
+	templ.Handler(
+		Simple("Not found: "+r.URL.Path, fourohfour(r.URL.Path)),
+		templ.WithStatus(http.StatusNotFound),
+	)
 }
