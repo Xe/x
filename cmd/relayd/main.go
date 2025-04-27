@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 	"crypto/tls"
+	"database/sql"
+	"errors"
 	"flag"
 	"fmt"
 	"log"
@@ -19,16 +21,20 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/avct/uasurfer"
 	"github.com/google/uuid"
+	"github.com/jackc/puddle/v2"
+	_ "modernc.org/sqlite"
 	"within.website/x/internal"
 )
 
 var (
-	bind      = flag.String("bind", ":3004", "port to listen on")
-	certDir   = flag.String("cert-dir", "/xe/pki", "where to read mounted certificates from")
-	certFname = flag.String("cert-fname", "tls.crt", "certificate filename")
-	keyFname  = flag.String("key-fname", "tls.key", "key filename")
-	proxyTo   = flag.String("proxy-to", "http://localhost:5000", "where to reverse proxy to")
+	bind       = flag.String("bind", ":3004", "port to listen on")
+	certDir    = flag.String("cert-dir", "/xe/pki", "where to read mounted certificates from")
+	certFname  = flag.String("cert-fname", "tls.crt", "certificate filename")
+	fpDatabase = flag.String("fp-database", "", "location of fingerprint database")
+	keyFname   = flag.String("key-fname", "tls.key", "key filename")
+	proxyTo    = flag.String("proxy-to", "http://localhost:5000", "where to reverse proxy to")
 )
 
 func main() {
@@ -38,6 +44,7 @@ func main() {
 		"bind", *bind,
 		"cert-dir", *certDir,
 		"cert-fname", *certFname,
+		"fp-database", *fpDatabase,
 		"key-fname", *keyFname,
 		"proxy-to", *proxyTo,
 	)
@@ -82,6 +89,24 @@ func main() {
 		log.Fatal(err)
 	}
 
+	var db *sql.DB
+
+	if fpDatabase != nil {
+		var err error
+		db, err = sql.Open("sqlite", *fpDatabase)
+		if err != nil {
+			log.Fatal(err)
+		}
+		if err := db.Ping(); err != nil {
+			log.Fatal(err)
+		}
+	}
+
+	uaParser, err := uaParserPool()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	h := httputil.NewSingleHostReverseProxy(u)
 	oldDirector := h.Director
 
@@ -116,6 +141,47 @@ func main() {
 		// if tcpFP := GetTCPFingerprint(req); tcpFP != nil {
 		// 	req.Header.Set("X-TCP-Fingerprint-JA4T", tcpFP.String())
 		// }
+
+		if uap, err := uaParser.Acquire(req.Context()); err == nil {
+			defer uap.Release()
+
+			uasurfer.ParseUserAgent(req.UserAgent(), uap.Value())
+
+			vers := uap.Value().Browser.Version
+
+			req.Header.Set("Xe-X-Relayd-UserAgent-Browser", uap.Value().Browser.Name.StringTrimPrefix())
+			req.Header.Set("Xe-X-Relayd-UserAgent-Browser-Version", fmt.Sprintf("%d.%d.%d", vers.Major, vers.Minor, vers.Patch))
+			req.Header.Set("Xe-X-Relayd-UserAgent-OS", uap.Value().OS.Name.StringTrimPrefix())
+			req.Header.Set("Xe-X-Relayd-UserAgent-Platform", uap.Value().OS.Platform.StringTrimPrefix())
+		}
+
+		if ja4 := req.Header.Get("X-TLS-Fingerprint-JA4"); db != nil && ja4 != "" {
+			var application, userAgent, notes sql.NullString
+			if err := db.QueryRowContext(req.Context(), "SELECT application, user_agent_string, notes FROM fingerprints WHERE ja4_fingerprint = ?", ja4).Scan(&application, &userAgent, &notes); err == nil {
+				slog.Debug("found a hit", "application", application, "userAgent", userAgent, "notes", notes)
+				if application.Valid {
+					req.Header.Set("Xe-X-Relayd-Ja4-Application", application.String)
+				}
+
+				if userAgent.Valid {
+					req.Header.Set("Xe-X-Relayd-Ja4-UserAgent", userAgent.String)
+				}
+
+				if notes.Valid {
+					req.Header.Set("Xe-X-Relayd-Ja4-Notes", notes.String)
+				}
+			} else if errors.Is(err, sql.ErrNoRows) {
+				userAgent := req.UserAgent()
+				notes := fmt.Sprintf("Observed via relayd on host %s at %s", req.Host, time.Now().Format(time.RFC3339))
+				if _, err := db.ExecContext(req.Context(), "INSERT INTO fingerprints(user_agent_string, notes, ja4_fingerprint) VALUES (?, ?, ?)", userAgent, notes, ja4); err != nil {
+					slog.Error("can't insert fingerprint into database", "err", err)
+				}
+
+				req.Header.Set("Xe-X-Relayd-New-Client", "true")
+			} else {
+				slog.Debug("can't read from database", "err", err)
+			}
+		}
 
 		req.Header.Set("X-Forwarded-Host", req.URL.Host)
 		req.Header.Set("X-Forwarded-Proto", "https")
@@ -214,4 +280,21 @@ func (kpr *keypairReloader) GetCertificate(*tls.ClientHelloInfo) (*tls.Certifica
 	}
 
 	return kpr.cert, nil
+}
+
+func uaParserPool() (*puddle.Pool[*uasurfer.UserAgent], error) {
+	cons := func(context.Context) (*uasurfer.UserAgent, error) {
+		return &uasurfer.UserAgent{}, nil
+	}
+	des := func(ua *uasurfer.UserAgent) {
+		ua.Reset()
+	}
+
+	pool, err := puddle.NewPool(&puddle.Config[*uasurfer.UserAgent]{
+		Constructor: cons,
+		Destructor:  des,
+		MaxSize:     512,
+	})
+
+	return pool, err
 }

@@ -7,6 +7,12 @@ Restart=always
 RestartSec=30s
 EnvironmentFile=/etc/within.website/x/relayd.env
 LimitNOFILE=infinity
+DynamicUser=true
+CacheDirectory=relayd
+CacheDirectoryMode=0755
+StateDirectory=relayd
+StateDirectoryMode=0755
+ReadWritePaths=/run
 
 [Install]
 WantedBy=multi-user.target
