@@ -41,8 +41,6 @@ require (
 	github.com/kr/pretty v0.3.1
 	github.com/lib/pq v1.10.9
 	github.com/mattn/go-sqlite3 v1.14.24
-	github.com/mikioh/tcp v0.0.0-20190314235350-803a9b46060c
-	github.com/mikioh/tcpinfo v0.0.0-20190314235526-30a79bb1804b
 	github.com/multiformats/go-multibase v0.2.0
 	github.com/mymmrac/telego v0.31.5
 	github.com/nats-io/nats.go v1.38.0
@@ -66,7 +64,6 @@ require (
 	github.com/thoj/go-ircevent v0.0.0-20210723090443-73e444401d64
 	github.com/tmc/scp v0.0.0-20170824174625-f7b48647feef
 	github.com/twitchtv/twirp v8.1.3+incompatible
-	github.com/whyrusleeping/cbor-gen v0.1.3-0.20240904181319-8dc02b38228c
 	github.com/whyrusleeping/go-did v0.0.0-20230824162731-404d1707d5d6
 	go.etcd.io/bbolt v1.4.0
 	go.jetpack.io/tyson v0.1.1
@@ -74,7 +71,6 @@ require (
 	golang.org/x/crypto v0.37.0
 	golang.org/x/oauth2 v0.25.0
 	golang.org/x/sync v0.13.0
-	golang.org/x/xerrors v0.0.0-20240716161551-93cc26a95ae9
 	google.golang.org/grpc v1.70.0
 	gorm.io/gorm v1.25.12
 	gorm.io/plugin/prometheus v0.1.0
@@ -173,7 +169,6 @@ require (
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mattn/go-tty v0.0.3 // indirect
-	github.com/mikioh/tcpopt v0.0.0-20190314235656-172688c1accc // indirect
 	github.com/minio/sha256-simd v1.0.1 // indirect
 	github.com/mitchellh/copystructure v1.2.0 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
@@ -208,6 +203,7 @@ require (
 	github.com/valyala/fasthttp v1.58.0 // indirect
 	github.com/valyala/fastjson v1.6.4 // indirect
 	github.com/whyrusleeping/cbor v0.0.0-20171005072247-63513f603b11 // indirect
+	github.com/whyrusleeping/cbor-gen v0.1.3-0.20240904181319-8dc02b38228c // indirect
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
 	gitlab.com/digitalxero/go-conventional-commit v1.0.7 // indirect
 	gitlab.com/yawning/secp256k1-voi v0.0.0-20230925100816-f2616030848b // indirect
@@ -220,6 +216,7 @@ require (
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect
 	golang.org/x/arch v0.6.0 // indirect
+	golang.org/x/xerrors v0.0.0-20240716161551-93cc26a95ae9 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20241223144023-3abc09e42ca8 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
@@ -272,7 +269,7 @@ require (
 	golang.org/x/net v0.39.0
 	golang.org/x/sys v0.32.0 // indirect
 	golang.org/x/text v0.24.0 // indirect
-	golang.org/x/time v0.10.0
+	golang.org/x/time v0.11.0
 	golang.org/x/tools v0.32.0
 	google.golang.org/protobuf v1.36.4
 )
