@@ -1,3 +1,13 @@
+# [1.16.0](https://github.com/Xe/x/compare/v1.15.0...v1.16.0) (2025-04-27)
+
+### Bug Fixes
+
+- **gitea:** use >- instead of > ([972cc99](https://github.com/Xe/x/commit/972cc990716c8593fc1f1d7061e6b707c6bccc51))
+
+### Features
+
+- **relayd:** store and query TLS fingerprints ([ef94cbc](https://github.com/Xe/x/commit/ef94cbcc7f9f90ef5c238413ee3305c305743a42))
+
 # [1.15.0](https://github.com/Xe/x/compare/v1.14.1...v1.15.0) (2025-04-27)
 
 ### Features
