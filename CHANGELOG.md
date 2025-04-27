@@ -1,3 +1,9 @@
+# [1.15.0](https://github.com/Xe/x/compare/v1.14.1...v1.15.0) (2025-04-27)
+
+### Features
+
+- **ci:** allow automatically cutting a new release via messages ([b12801a](https://github.com/Xe/x/commit/b12801a2445bbaa8840acd00d76653100a4f6bbe))
+
 ## [1.14.1](https://github.com/Xe/x/compare/v1.14.0...v1.14.1) (2025-04-27)
 
 # [1.14.0](https://github.com/Xe/x/compare/v1.13.6...v1.14.0) (2025-04-27)
