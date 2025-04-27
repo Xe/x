@@ -1,0 +1,16 @@
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: halone-within-lgbt-dns
+spec:
+  endpoints:
+    - dnsName: "halone.within.lgbt"
+      recordTTL: 3600
+      recordType: A
+      targets:
+        - 45.77.215.25
+    - dnsName: "halone.within.lgbt"
+      recordTTL: 3600
+      recordType: AAAA
+      targets:
+        - 2001:19f0:8000:1317:5400:05ff:fe6a:20cf
