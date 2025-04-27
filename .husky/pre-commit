@@ -1,4 +1,6 @@
 if echo "$1" | grep -q "\[skip ci\]"; then
   npx lint-staged
   npm test
+else 
+  echo "not found [skip ci] in commit message"
 fi
