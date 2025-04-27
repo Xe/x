@@ -22,114 +22,128 @@ $`ko build --platform=all --base-import-paths --tags=latest,${git.tag()} ./cmd/{
 
 yeet.setenv("CGO_ENABLED", "0");
 
+const pkgs = [];
+
 ["amd64", "arm64"].forEach((goarch) => {
-  [deb, rpm, tarball].forEach((method) => {
-    method.build({
-      name: "ingressd",
-      description: "ingress for my homelab",
-      homepage: "https://within.website",
-      license: "CC0",
-      goarch,
+  [deb, rpm].forEach((method) => {
+    pkgs.push(
+      method.build({
+        name: "ingressd",
+        description: "ingress for my homelab",
+        homepage: "https://within.website",
+        license: "CC0",
+        goarch,
 
-      documentation: {
-        LICENSE: "LICENSE",
-      },
+        documentation: {
+          LICENSE: "LICENSE",
+        },
 
-      build: ({ bin, systemd }) => {
-        $`go build -o ${bin}/ingressd -ldflags '-s -w -extldflags "-static" -X "within.website/x.Version=${git.tag()}"' ./cmd/ingressd`;
-        file.install(
-          "./cmd/ingressd/ingressd.service",
-          `${systemd}/ingressd.service`,
-        );
-      },
-    });
+        build: ({ bin, systemd }) => {
+          $`go build -o ${bin}/ingressd -ldflags '-s -w -extldflags "-static" -X "within.website/x.Version=${git.tag()}"' ./cmd/ingressd`;
+          file.install(
+            "./cmd/ingressd/ingressd.service",
+            `${systemd}/ingressd.service`,
+          );
+        },
+      }),
+    );
 
-    method.build({
-      name: "license",
-      description: "software license generator",
-      homepage: "https://within.website",
-      license: "CC0",
-      goarch,
+    pkgs.push(
+      method.build({
+        name: "license",
+        description: "software license generator",
+        homepage: "https://within.website",
+        license: "CC0",
+        goarch,
 
-      documentation: {
-        LICENSE: "LICENSE",
-      },
+        documentation: {
+          LICENSE: "LICENSE",
+        },
 
-      build: ({ bin }) => {
-        $`go build -o ${bin}/license -ldflags '-s -w -extldflags "-static" -X "within.website/x.Version=${git.tag()}"' ./cmd/license`;
-      },
-    });
+        build: ({ bin }) => {
+          $`go build -o ${bin}/license -ldflags '-s -w -extldflags "-static" -X "within.website/x.Version=${git.tag()}"' ./cmd/license`;
+        },
+      }),
+    );
 
-    method.build({
-      name: "quickserv",
-      description: "Like python3 -m http.server but a single binary",
-      homepage: "https://within.website",
-      license: "CC0",
-      goarch,
+    pkgs.push(
+      method.build({
+        name: "quickserv",
+        description: "Like python3 -m http.server but a single binary",
+        homepage: "https://within.website",
+        license: "CC0",
+        goarch,
 
-      documentation: {
-        LICENSE: "LICENSE",
-      },
+        documentation: {
+          LICENSE: "LICENSE",
+        },
 
-      build: ({ bin }) => {
-        $`go build -o ${bin}/quickserv -ldflags '-s -w -extldflags "-static" -X "within.website/x.Version=${git.tag()}"' ./cmd/quickserv`;
-      },
-    });
+        build: ({ bin }) => {
+          $`go build -o ${bin}/quickserv -ldflags '-s -w -extldflags "-static" -X "within.website/x.Version=${git.tag()}"' ./cmd/quickserv`;
+        },
+      }),
+    );
 
-    method.build({
-      name: "relayd",
-      description: "TLS termination and client fingerprinting",
-      homepage: "https://within.website",
-      license: "CC0",
-      goarch,
+    pkgs.push(
+      method.build({
+        name: "relayd",
+        description: "TLS termination and client fingerprinting",
+        homepage: "https://within.website",
+        license: "CC0",
+        goarch,
 
-      documentation: {
-        LICENSE: "LICENSE",
-      },
+        documentation: {
+          LICENSE: "LICENSE",
+        },
 
-      configFiles: {
-        "cmd/relayd/relayd.env": "/etc/within.website/x/relayd.env",
-      },
+        configFiles: {
+          "cmd/relayd/relayd.env": "/etc/within.website/x/relayd.env",
+        },
 
-      build: ({ bin, systemd }) => {
-        $`go build -o ${bin}/relayd -ldflags '-s -w -extldflags "-static" -X "within.website/x.Version=${git.tag()}"' ./cmd/relayd`;
-        file.install(
-          "./cmd/relayd/relayd.service",
-          `${systemd}/relayd.service`,
-        );
-      },
-    });
+        build: ({ bin, systemd }) => {
+          $`go build -o ${bin}/relayd -ldflags '-s -w -extldflags "-static" -X "within.website/x.Version=${git.tag()}"' ./cmd/relayd`;
+          file.install(
+            "./cmd/relayd/relayd.service",
+            `${systemd}/relayd.service`,
+          );
+        },
+      }),
+    );
 
-    method.build({
-      name: "uploud",
-      description: "Upload images to the cloud!",
-      homepage: "https://within.website",
-      license: "CC0",
-      goarch,
+    pkgs.push(
+      method.build({
+        name: "uploud",
+        description: "Upload images to the cloud!",
+        homepage: "https://within.website",
+        license: "CC0",
+        goarch,
 
-      documentation: {
-        LICENSE: "LICENSE",
-      },
+        documentation: {
+          LICENSE: "LICENSE",
+        },
 
-      build: ({ bin }) => {
-        $`go build -o ${bin}/uploud -ldflags '-s -w -extldflags "-static" -X "within.website/x.Version=${git.tag()}"' ./cmd/uploud`;
-      },
-    });
+        build: ({ bin }) => {
+          $`go build -o ${bin}/uploud -ldflags '-s -w -extldflags "-static" -X "within.website/x.Version=${git.tag()}"' ./cmd/uploud`;
+        },
+      }),
+    );
 
-    method.build({
-      name: "x",
-      description: "the universal x command",
-      homepage: "https://within.website",
-      license: "CC0",
-      goarch,
+    pkgs.push(
+      method.build({
+        name: "x",
+        description: "the universal x command",
+        homepage: "https://within.website",
+        license: "CC0",
+        goarch,
 
-      documentation: {
-        LICENSE: "LICENSE",
-      },
+        documentation: {
+          LICENSE: "LICENSE",
+        },
 
-      build: ({ bin, systemd }) => {
-        $`go build -o ${bin}/x -ldflags '-s -w -extldflags "-static" -X "within.website/x.Version=${git.tag()}"' ./cmd/x`;
-      },
-    });
+        build: ({ bin, systemd }) => {
+          $`go build -o ${bin}/x -ldflags '-s -w -extldflags "-static" -X "within.website/x.Version=${git.tag()}"' ./cmd/x`;
+        },
+      }),
+    );
   });
 });

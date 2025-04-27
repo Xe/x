@@ -66,6 +66,7 @@ require (
 	github.com/thoj/go-ircevent v0.0.0-20210723090443-73e444401d64
 	github.com/tmc/scp v0.0.0-20170824174625-f7b48647feef
 	github.com/twitchtv/twirp v8.1.3+incompatible
+	github.com/whyrusleeping/cbor-gen v0.1.3-0.20240904181319-8dc02b38228c
 	github.com/whyrusleeping/go-did v0.0.0-20230824162731-404d1707d5d6
 	go.etcd.io/bbolt v1.4.0
 	go.jetpack.io/tyson v0.1.1
@@ -73,6 +74,7 @@ require (
 	golang.org/x/crypto v0.37.0
 	golang.org/x/oauth2 v0.25.0
 	golang.org/x/sync v0.13.0
+	golang.org/x/xerrors v0.0.0-20240716161551-93cc26a95ae9
 	google.golang.org/grpc v1.70.0
 	gorm.io/gorm v1.25.12
 	gorm.io/plugin/prometheus v0.1.0
@@ -89,7 +91,7 @@ require (
 	github.com/Microsoft/go-winio v0.6.2 // indirect
 	github.com/ProtonMail/go-crypto v1.1.6 // indirect
 	github.com/Songmu/gitconfig v0.2.0 // indirect
-	github.com/TecharoHQ/yeet v0.0.7 // indirect
+	github.com/TecharoHQ/yeet v0.2.1 // indirect
 	github.com/a-h/parse v0.0.0-20250122154542-74294addb73e // indirect
 	github.com/andybalholm/brotli v1.1.1 // indirect
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.6.8 // indirect
@@ -206,7 +208,6 @@ require (
 	github.com/valyala/fasthttp v1.58.0 // indirect
 	github.com/valyala/fastjson v1.6.4 // indirect
 	github.com/whyrusleeping/cbor v0.0.0-20171005072247-63513f603b11 // indirect
-	github.com/whyrusleeping/cbor-gen v0.1.3-0.20240904181319-8dc02b38228c // indirect
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
 	gitlab.com/digitalxero/go-conventional-commit v1.0.7 // indirect
 	gitlab.com/yawning/secp256k1-voi v0.0.0-20230925100816-f2616030848b // indirect
@@ -219,7 +220,6 @@ require (
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect
 	golang.org/x/arch v0.6.0 // indirect
-	golang.org/x/xerrors v0.0.0-20240716161551-93cc26a95ae9 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20241223144023-3abc09e42ca8 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect

@@ -24,9 +24,15 @@
   "devDependencies": {
     "@commitlint/cli": "^19.8.0",
     "@commitlint/config-conventional": "^19.8.0",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/commit-analyzer": "^13.0.1",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^11.0.2",
+    "@semantic-release/release-notes-generator": "^14.0.3",
     "husky": "^9.1.7",
     "lint-staged": "^15.5.1",
-    "prettier": "^3.5.3"
+    "prettier": "^3.5.3",
+    "semantic-release": "^24.2.3"
   },
   "commitlint": {
     "extends": [
@@ -58,5 +64,130 @@
     "semi": true,
     "trailingComma": "all",
     "printWidth": 80
+  },
+  "release": {
+    "branches": [
+      "master"
+    ],
+    "plugins": [
+      [
+        "@semantic-release/commit-analyzer",
+        {
+          "preset": "conventionalcommits",
+          "releaseRules": [
+            {
+              "type": "add",
+              "release": "minor"
+            },
+            {
+              "breaking": true,
+              "release": "minor"
+            },
+            {
+              "type": "feat",
+              "release": "minor"
+            },
+            {
+              "type": "fix",
+              "release": "patch"
+            },
+            {
+              "type": "change",
+              "release": "minor"
+            },
+            {
+              "type": "deprecate",
+              "release": "minor"
+            },
+            {
+              "type": "remove",
+              "release": "minor"
+            },
+            {
+              "type": "security",
+              "release": "patch"
+            },
+            {
+              "type": "chore",
+              "release": "patch"
+            },
+            {
+              "type": "docs",
+              "scope": "README",
+              "release": "patch"
+            },
+            {
+              "type": "refactor",
+              "release": "patch"
+            },
+            {
+              "type": "style",
+              "release": "patch"
+            },
+            {
+              "type": "perf",
+              "release": "patch"
+            },
+            {
+              "type": "test",
+              "release": "patch"
+            }
+          ],
+          "parserOpts": {
+            "noteKeywords": [
+              "BREAKING CHANGE",
+              "BREAKING CHANGES",
+              "BREAKING"
+            ]
+          }
+        }
+      ],
+      "@semantic-release/release-notes-generator",
+      [
+        "@semantic-release/exec",
+        {
+          "verifyReleaseCmd": "echo ${nextRelease.version} > .VERSION"
+        }
+      ],
+      [
+        "@semantic-release/exec",
+        {
+          "verifyReleaseCmd": "mkdir -p var/pkgs && go tool yeet --force-git-version=$(cat .VERSION) --package-dest-dir ./var/pkgs && rm .VERSION"
+        }
+      ],
+      [
+        "@semantic-release/github",
+        {
+          "assets": [
+            "var/pkgs/**"
+          ]
+        }
+      ],
+      [
+        "@semantic-release/npm",
+        {
+          "npmPublish": false
+        }
+      ],
+      [
+        "@semantic-release/changelog",
+        {
+          "changeLogFile": "CHANGLOG.md"
+        }
+      ],
+      [
+        "@semantic-release/git",
+        {
+          "assets": [
+            "CHANGELOG.md",
+            "package.json"
+          ],
+          "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}\n\nSigned-Off-By: Mimi Yasomi <mimi@techaro.lol>"
+        }
+      ]
+    ]
+  },
+  "dependencies": {
+    "@semantic-release/exec": "^7.0.3"
   }
 }

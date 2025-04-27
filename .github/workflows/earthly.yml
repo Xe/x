@@ -2,11 +2,11 @@ name: Docker image updates
 
 on:
   push:
-    branches: ["master"]
+    branches: ["xmaster"]
     # Publish semver tags as releases.
-    tags: ["v*.*.*"]
+    tags: ["xv*.*.*"]
   pull_request:
-    branches: ["master"]
+    branches: ["xmaster"]
 
 jobs:
   docker-build:
