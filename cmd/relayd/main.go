@@ -125,6 +125,16 @@ func main() {
 		if err := db.Ping(); err != nil {
 			log.Fatal(err)
 		}
+
+		if _, err := db.Exec(`CREATE TABLE IF NOT EXISTS fingerprints
+			( "application" TEXT
+			, "user_agent_string" TEXT
+			, "notes" TEXT
+			, "ja4_fingerprint" TEXT
+			, ip_address TEXT
+			)`); err != nil {
+			log.Fatal(err)
+		}
 	}
 
 	h := httputil.NewSingleHostReverseProxy(u)
@@ -180,7 +190,8 @@ func main() {
 			} else if errors.Is(err, sql.ErrNoRows) {
 				userAgent := req.UserAgent()
 				notes := fmt.Sprintf("Observed via relayd on host %s at %s", req.Host, time.Now().Format(time.RFC3339))
-				if _, err := db.ExecContext(req.Context(), "INSERT INTO fingerprints(user_agent_string, notes, ja4_fingerprint) VALUES (?, ?, ?)", userAgent, notes, ja4); err != nil {
+				ip, _, _ := net.SplitHostPort(req.RemoteAddr)
+				if _, err := db.ExecContext(req.Context(), "INSERT INTO fingerprints(user_agent_string, notes, ja4_fingerprint, ip_address) VALUES (?, ?, ?, ?)", userAgent, notes, ja4, ip); err != nil {
 					slog.Error("can't insert fingerprint into database", "err", err)
 				}
 
