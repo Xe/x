@@ -70,4 +70,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GHCR_PUSH }}
         run: |
           npm ci
-          npx semantic-release --debug
+          npx semantic-release
