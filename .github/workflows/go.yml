@@ -16,6 +16,7 @@ permissions:
 jobs:
   build:
     runs-on: alrest-x
+    if: ${{ !contains(github.event.head_commit.message, '[skip ci]') }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -77,5 +78,12 @@ jobs:
           password: ${{ secrets.GHCR_PUSH }}
 
       - name: Build docker images
-        run: go tool yeet
         if: github.event_name != 'pull_request'
+        run: go tool yeet
+
+      - name: "Cut release if 'Release-Status: cut' in commit message"
+        if: "${{ github.ref == 'refs/heads/master' && contains(github.event.head_commit.message, 'Release-Status: cut') }}"
+        uses: benc-uk/workflow-dispatch@e2e5e9a103e331dad343f381a29e654aea3cf8fc # v1.2.4
+        with:
+          workflow: "release.yaml"
+
