@@ -113,9 +113,9 @@ func main() {
 			}
 		}
 
-		if tcpFP := GetTCPFingerprint(req); tcpFP != nil {
-			req.Header.Set("X-TCP-Fingerprint-JA4T", tcpFP.String())
-		}
+		// if tcpFP := GetTCPFingerprint(req); tcpFP != nil {
+		// 	req.Header.Set("X-TCP-Fingerprint-JA4T", tcpFP.String())
+		// }
 
 		req.Header.Set("X-Forwarded-Host", req.URL.Host)
 		req.Header.Set("X-Forwarded-Proto", "https")
