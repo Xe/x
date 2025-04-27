@@ -1,11 +1,1 @@
-case "$1" in
-  *"[skip ci]"*)
-    echo "Found [skip ci]"
-    exit 0
-    ;;
-  *)
-    echo "No [skip ci] found"
-    npx lint-staged
-    npm test
-    ;;
-esac
+npx lint-staged

@@ -1,1 +1,12 @@
 npx --no-install commitlint --edit "$1"
+
+case "$1" in
+  *"[skip ci]"*)
+    echo "Found [skip ci]"
+    exit 0
+    ;;
+  *)
+    echo "No [skip ci] found"
+    npm test
+    ;;
+esac
