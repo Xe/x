@@ -1,7 +1,11 @@
-if printf "%s" "$1" | grep -q '\[skip ci\]'; then
-  echo "Found [skip ci]"
-  exit 0
-fi
-
-npx lint-staged
-npm test
+case "$1" in
+  *"[skip ci]"*)
+    echo "Found [skip ci]"
+    exit 0
+    ;;
+  *)
+    echo "No [skip ci] found"
+    npx lint-staged
+    npm test
+    ;;
+esac
