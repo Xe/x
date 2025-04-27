@@ -21,20 +21,25 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/avct/uasurfer"
 	"github.com/google/uuid"
-	"github.com/jackc/puddle/v2"
+	"golang.org/x/crypto/acme/autocert"
 	_ "modernc.org/sqlite"
 	"within.website/x/internal"
+	"within.website/x/xess"
 )
 
 var (
-	bind       = flag.String("bind", ":3004", "port to listen on")
-	certDir    = flag.String("cert-dir", "/xe/pki", "where to read mounted certificates from")
-	certFname  = flag.String("cert-fname", "tls.crt", "certificate filename")
-	fpDatabase = flag.String("fp-database", "", "location of fingerprint database")
-	keyFname   = flag.String("key-fname", "tls.key", "key filename")
-	proxyTo    = flag.String("proxy-to", "http://localhost:5000", "where to reverse proxy to")
+	useAutocert         = flag.Bool("use-autocert", false, "if true, provision certs with autocert")
+	autocertCacheDir    = flag.String("autocert-cache-dir", "", "location to store cached certificates and ACME account details")
+	autocertDomainNames = flag.String("autocert-domain-names", "", "comma-separated list of TLS hostnames to allow")
+	autocertEmail       = flag.String("autocert-email", "", "ACME account contact email")
+	bind                = flag.String("bind", ":3004", "port to listen on")
+	certDir             = flag.String("cert-dir", "/xe/pki", "where to read mounted certificates from")
+	certFname           = flag.String("cert-fname", "tls.crt", "certificate filename")
+	fpDatabase          = flag.String("fp-database", "", "location of fingerprint database")
+	keyFname            = flag.String("key-fname", "tls.key", "key filename")
+	httpBind            = flag.String("http-bind", "", "if set, plain HTTP port to listen on to forward requests to https")
+	proxyTo             = flag.String("proxy-to", "http://localhost:5000", "where to reverse proxy to")
 )
 
 func main() {
@@ -47,44 +52,64 @@ func main() {
 		"fp-database", *fpDatabase,
 		"key-fname", *keyFname,
 		"proxy-to", *proxyTo,
+		"use-autocert", *useAutocert,
+		"autocert-cache-dir", *autocertCacheDir,
+		"autocert-domain-names", *autocertDomainNames,
+		"autocert-email", *autocertEmail,
 	)
 
-	cert := filepath.Join(*certDir, *certFname)
-	key := filepath.Join(*certDir, *keyFname)
+	var tc *tls.Config
 
-	st, err := os.Stat(cert)
-
-	if err != nil {
-		slog.Error("can't stat cert file", "certFname", cert)
-		os.Exit(1)
-	}
-
-	lastModified := st.ModTime()
-
-	go func(lm time.Time) {
-		t := time.NewTicker(time.Hour)
-		defer t.Stop()
-
-		for range t.C {
-			st, err := os.Stat(cert)
-			if err != nil {
-				slog.Error("can't stat file", "fname", cert, "err", err)
-				continue
-			}
-
-			if st.ModTime().After(lm) {
-				slog.Info("new cert detected", "oldTime", lm.Format(time.RFC3339), "newTime", st.ModTime().Format(time.RFC3339))
-				os.Exit(0)
-			}
+	switch *useAutocert {
+	case true:
+		slog.Info("using autocert")
+		var fail bool
+		if *autocertCacheDir == "" {
+			fmt.Fprintln(os.Stderr, "cannot use --autocert without --autocert-cache-dir")
+			fail = true
 		}
-	}(lastModified)
+		if *autocertDomainNames == "" {
+			fmt.Fprintln(os.Stderr, "cannot use --autocert without --autocert-domain-names")
+			fail = true
+		}
+		if *autocertEmail == "" {
+			fmt.Fprintln(os.Stderr, "cannot use --autocert without --autocert-email")
+			fail = true
+		}
+		if *httpBind != ":80" {
+			fmt.Fprintln(os.Stderr, "cannot use --autocert without --http-bind=:80")
+			fail = true
+		}
+
+		if fail {
+			log.Fatal("autocert configuration errors")
+		}
+
+		m := &autocert.Manager{
+			Cache:      autocert.DirCache(*autocertCacheDir),
+			Prompt:     autocert.AcceptTOS,
+			Email:      *autocertEmail,
+			HostPolicy: autocert.HostWhitelist(strings.Split(*autocertDomainNames, ",")...),
+		}
+
+		go func() {
+			slog.Info("listening for plain HTTP", "http-bind", *httpBind)
+			log.Fatal(http.ListenAndServe(*httpBind, m.HTTPHandler(http.HandlerFunc(xess.NotFound))))
+		}()
+
+		tc = m.TLSConfig()
+	case false:
+		cert := filepath.Join(*certDir, *certFname)
+		key := filepath.Join(*certDir, *keyFname)
+
+		kpr, err := NewKeypairReloader(cert, key)
+		if err != nil {
+			log.Fatal(err)
+		}
+		tc = &tls.Config{GetCertificate: kpr.GetCertificate}
+	}
 
 	u, err := url.Parse(*proxyTo)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	kpr, err := NewKeypairReloader(cert, key)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -100,11 +125,6 @@ func main() {
 		if err := db.Ping(); err != nil {
 			log.Fatal(err)
 		}
-	}
-
-	uaParser, err := uaParserPool()
-	if err != nil {
-		log.Fatal(err)
 	}
 
 	h := httputil.NewSingleHostReverseProxy(u)
@@ -141,19 +161,6 @@ func main() {
 		// if tcpFP := GetTCPFingerprint(req); tcpFP != nil {
 		// 	req.Header.Set("X-TCP-Fingerprint-JA4T", tcpFP.String())
 		// }
-
-		if uap, err := uaParser.Acquire(req.Context()); err == nil {
-			defer uap.Release()
-
-			uasurfer.ParseUserAgent(req.UserAgent(), uap.Value())
-
-			vers := uap.Value().Browser.Version
-
-			req.Header.Set("Xe-X-Relayd-UserAgent-Browser", uap.Value().Browser.Name.StringTrimPrefix())
-			req.Header.Set("Xe-X-Relayd-UserAgent-Browser-Version", fmt.Sprintf("%d.%d.%d", vers.Major, vers.Minor, vers.Patch))
-			req.Header.Set("Xe-X-Relayd-UserAgent-OS", uap.Value().OS.Name.StringTrimPrefix())
-			req.Header.Set("Xe-X-Relayd-UserAgent-Platform", uap.Value().OS.Platform.StringTrimPrefix())
-		}
 
 		if ja4 := req.Header.Get("X-TLS-Fingerprint-JA4"); db != nil && ja4 != "" {
 			var application, userAgent, notes sql.NullString
@@ -192,11 +199,9 @@ func main() {
 	}
 
 	srv := &http.Server{
-		Addr:    *bind,
-		Handler: h,
-		TLSConfig: &tls.Config{
-			GetCertificate: kpr.GetCertificate,
-		},
+		Addr:      *bind,
+		Handler:   h,
+		TLSConfig: tc,
 	}
 
 	applyTLSFingerprinter(srv)
@@ -280,21 +285,4 @@ func (kpr *keypairReloader) GetCertificate(*tls.ClientHelloInfo) (*tls.Certifica
 	}
 
 	return kpr.cert, nil
-}
-
-func uaParserPool() (*puddle.Pool[*uasurfer.UserAgent], error) {
-	cons := func(context.Context) (*uasurfer.UserAgent, error) {
-		return &uasurfer.UserAgent{}, nil
-	}
-	des := func(ua *uasurfer.UserAgent) {
-		ua.Reset()
-	}
-
-	pool, err := puddle.NewPool(&puddle.Config[*uasurfer.UserAgent]{
-		Constructor: cons,
-		Destructor:  des,
-		MaxSize:     512,
-	})
-
-	return pool, err
 }

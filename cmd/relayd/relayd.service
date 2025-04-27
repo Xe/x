@@ -13,6 +13,7 @@ CacheDirectoryMode=0755
 StateDirectory=relayd
 StateDirectoryMode=0755
 ReadWritePaths=/run
+AmbientCapabilities=CAP_NET_BIND_SERVICE
 
 [Install]
 WantedBy=multi-user.target
