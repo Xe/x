@@ -14,7 +14,8 @@ import (
 )
 
 var (
-	bind = flag.String("bind", ":3000", "TCP port to bind to")
+	bind   = flag.String("bind", ":3000", "TCP port to bind to")
+	silent = flag.Bool("silent", false, "if set, don't log http headers")
 )
 
 func main() {
@@ -34,8 +35,12 @@ func main() {
 			fmt.Fprint(w, "<pre id=\"main\"><code>")
 		}
 
-		fmt.Println("---")
-		r.Write(io.MultiWriter(w, os.Stdout))
+		if !*silent {
+			fmt.Println("---")
+			r.Header.Write(io.MultiWriter(w, os.Stdout))
+		} else {
+			r.Header.Write(w)
+		}
 
 		if contains {
 			fmt.Fprintln(w, "</pre></code>")

@@ -1,0 +1,13 @@
+[Unit]
+Description="http debugger"
+
+[Service]
+ExecStart=/usr/bin/httpdebug
+Restart=always
+RestartSec=30s
+EnvironmentFile=/etc/within.website/x/httpdebug.env
+LimitNOFILE=infinity
+DynamicUser=true
+
+[Install]
+WantedBy=multi-user.target

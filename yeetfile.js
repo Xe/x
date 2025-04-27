@@ -28,6 +28,32 @@ const pkgs = [];
   [deb, rpm].forEach((method) => {
     pkgs.push(
       method.build({
+        name: "httpdebug",
+        description: "HTTP protocol debugger",
+        homepage: "https://within.website",
+        license: "CC0",
+        goarch,
+
+        documentation: {
+          LICENSE: "LICENSE",
+        },
+
+        configFiles: {
+          "cmd/httpdebug/httpdebug.env": "/etc/within.website/x/httpdebug.env",
+        },
+
+        build: ({ bin, systemd }) => {
+          $`go build -o ${bin}/httpdebug -ldflags '-s -w -extldflags "-static" -X "within.website/x.Version=${git.tag()}"' ./cmd/httpdebug`;
+          file.install(
+            "./cmd/httpdebug/httpdebug.service",
+            `${systemd}/httpdebug.service`,
+          );
+        },
+      }),
+    );
+
+    pkgs.push(
+      method.build({
         name: "ingressd",
         description: "ingress for my homelab",
         homepage: "https://within.website",
