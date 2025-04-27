@@ -67,7 +67,7 @@ jobs:
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
       - name: release
         env:
-          GITHUB_TOKEN: ${{ secrets.TECHAROHQ_HACK_WRITE_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GHCR_PUSH }}
         run: |
           npm ci
           npx semantic-release --debug
