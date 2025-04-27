@@ -21,6 +21,5 @@ export const ImageService = {
       O: GenerateImageResponse,
       kind: MethodKind.Unary,
     },
-  }
+  },
 } as const;
-

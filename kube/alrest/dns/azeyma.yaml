@@ -4,8 +4,8 @@ metadata:
   name: azeyma-within-lgbt-dns
 spec:
   endpoints:
-  - dnsName: "azeyma.within.lgbt"
-    recordTTL: 3600
-    recordType: A
-    targets:
-    - 155.138.129.167
+    - dnsName: "azeyma.within.lgbt"
+      recordTTL: 3600
+      recordType: A
+      targets:
+        - 155.138.129.167

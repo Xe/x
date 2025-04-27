@@ -9,4 +9,4 @@ spec:
       storage: 32Gi
   volumeMode: Filesystem
   accessModes:
-  - ReadWriteOnce
+    - ReadWriteOnce

@@ -1,5 +1,5 @@
 yeet.setenv("KO_DOCKER_REPO", "ghcr.io/xe/x");
-yeet.setenv("SOURCE_DATE_EPOCH", ($`git log -1 --format='%ct'`).trim());
+yeet.setenv("SOURCE_DATE_EPOCH", $`git log -1 --format='%ct'`.trim());
 yeet.setenv("VERSION", git.tag());
 
 programs = [
@@ -22,8 +22,8 @@ $`ko build --platform=all --base-import-paths --tags=latest,${git.tag()} ./cmd/{
 
 yeet.setenv("CGO_ENABLED", "0");
 
-["amd64", "arm64"].forEach(goarch => {
-  [deb, rpm, tarball].forEach(method => {
+["amd64", "arm64"].forEach((goarch) => {
+  [deb, rpm, tarball].forEach((method) => {
     method.build({
       name: "ingressd",
       description: "ingress for my homelab",
@@ -32,12 +32,15 @@ yeet.setenv("CGO_ENABLED", "0");
       goarch,
 
       documentation: {
-        "LICENSE": "LICENSE",
+        LICENSE: "LICENSE",
       },
 
       build: ({ bin, systemd }) => {
-        $`go build -o ${bin}/ingressd -ldflags '-s -w -extldflags "-static" -X "within.website/x.Version=${git.tag()}"' ./cmd/ingressd`
-        file.install("./cmd/ingressd/ingressd.service", `${systemd}/ingressd.service`);
+        $`go build -o ${bin}/ingressd -ldflags '-s -w -extldflags "-static" -X "within.website/x.Version=${git.tag()}"' ./cmd/ingressd`;
+        file.install(
+          "./cmd/ingressd/ingressd.service",
+          `${systemd}/ingressd.service`,
+        );
       },
     });
 
@@ -49,11 +52,11 @@ yeet.setenv("CGO_ENABLED", "0");
       goarch,
 
       documentation: {
-        "LICENSE": "LICENSE",
+        LICENSE: "LICENSE",
       },
 
       build: ({ bin }) => {
-        $`go build -o ${bin}/license -ldflags '-s -w -extldflags "-static" -X "within.website/x.Version=${git.tag()}"' ./cmd/license`
+        $`go build -o ${bin}/license -ldflags '-s -w -extldflags "-static" -X "within.website/x.Version=${git.tag()}"' ./cmd/license`;
       },
     });
 
@@ -65,11 +68,11 @@ yeet.setenv("CGO_ENABLED", "0");
       goarch,
 
       documentation: {
-        "LICENSE": "LICENSE",
+        LICENSE: "LICENSE",
       },
 
       build: ({ bin }) => {
-        $`go build -o ${bin}/quickserv -ldflags '-s -w -extldflags "-static" -X "within.website/x.Version=${git.tag()}"' ./cmd/quickserv`
+        $`go build -o ${bin}/quickserv -ldflags '-s -w -extldflags "-static" -X "within.website/x.Version=${git.tag()}"' ./cmd/quickserv`;
       },
     });
 
@@ -81,16 +84,19 @@ yeet.setenv("CGO_ENABLED", "0");
       goarch,
 
       documentation: {
-        "LICENSE": "LICENSE",
+        LICENSE: "LICENSE",
       },
 
       configFiles: {
-        "cmd/relayd/relayd.env": "/etc/within.website/x/relayd.env"
+        "cmd/relayd/relayd.env": "/etc/within.website/x/relayd.env",
       },
 
       build: ({ bin, systemd }) => {
         $`go build -o ${bin}/relayd -ldflags '-s -w -extldflags "-static" -X "within.website/x.Version=${git.tag()}"' ./cmd/relayd`;
-        file.install("./cmd/relayd/relayd.service", `${systemd}/relayd.service`);
+        file.install(
+          "./cmd/relayd/relayd.service",
+          `${systemd}/relayd.service`,
+        );
       },
     });
 
@@ -102,11 +108,11 @@ yeet.setenv("CGO_ENABLED", "0");
       goarch,
 
       documentation: {
-        "LICENSE": "LICENSE",
+        LICENSE: "LICENSE",
       },
 
       build: ({ bin }) => {
-        $`go build -o ${bin}/uploud -ldflags '-s -w -extldflags "-static" -X "within.website/x.Version=${git.tag()}"' ./cmd/uploud`
+        $`go build -o ${bin}/uploud -ldflags '-s -w -extldflags "-static" -X "within.website/x.Version=${git.tag()}"' ./cmd/uploud`;
       },
     });
 
@@ -118,11 +124,11 @@ yeet.setenv("CGO_ENABLED", "0");
       goarch,
 
       documentation: {
-        "LICENSE": "LICENSE",
+        LICENSE: "LICENSE",
       },
 
       build: ({ bin, systemd }) => {
-        $`go build -o ${bin}/x -ldflags '-s -w -extldflags "-static" -X "within.website/x.Version=${git.tag()}"' ./cmd/x`
+        $`go build -o ${bin}/x -ldflags '-s -w -extldflags "-static" -X "within.website/x.Version=${git.tag()}"' ./cmd/x`;
       },
     });
   });

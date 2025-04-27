@@ -4,28 +4,27 @@ WebSockets Extension
 This extension adds support for WebSockets to htmx.  See /www/extensions/ws.md for usage instructions.
 */
 
-(function() {
+(function () {
   /** @type {import("../htmx").HtmxInternalApi} */
-  var api
+  var api;
 
-  htmx.defineExtension('ws', {
-
+  htmx.defineExtension("ws", {
     /**
      * init is called once, when this extension is first registered.
      * @param {import("../htmx").HtmxInternalApi} apiRef
      */
-    init: function(apiRef) {
+    init: function (apiRef) {
       // Store reference to internal API
-      api = apiRef
+      api = apiRef;
 
       // Default function for creating new EventSource objects
       if (!htmx.createWebSocket) {
-        htmx.createWebSocket = createWebSocket
+        htmx.createWebSocket = createWebSocket;
       }
 
       // Default setting for reconnect delay
       if (!htmx.config.wsReconnectDelay) {
-        htmx.config.wsReconnectDelay = 'full-jitter'
+        htmx.config.wsReconnectDelay = "full-jitter";
       }
     },
 
@@ -35,44 +34,48 @@ This extension adds support for WebSockets to htmx.  See /www/extensions/ws.md f
      * @param {string} name
      * @param {Event} evt
      */
-    onEvent: function(name, evt) {
-      var parent = evt.target || evt.detail.elt
+    onEvent: function (name, evt) {
+      var parent = evt.target || evt.detail.elt;
       switch (name) {
         // Try to close the socket when elements are removed
-        case 'htmx:beforeCleanupElement':
-
-          var internalData = api.getInternalData(parent)
+        case "htmx:beforeCleanupElement":
+          var internalData = api.getInternalData(parent);
 
           if (internalData.webSocket) {
-            internalData.webSocket.close()
+            internalData.webSocket.close();
           }
-          return
+          return;
 
-          // Try to create websockets when elements are processed
-        case 'htmx:beforeProcessNode':
-
-          forEach(queryAttributeOnThisOrChildren(parent, 'ws-connect'), function(child) {
-            ensureWebSocket(child)
-          })
-          forEach(queryAttributeOnThisOrChildren(parent, 'ws-send'), function(child) {
-            ensureWebSocketSend(child)
-          })
+        // Try to create websockets when elements are processed
+        case "htmx:beforeProcessNode":
+          forEach(
+            queryAttributeOnThisOrChildren(parent, "ws-connect"),
+            function (child) {
+              ensureWebSocket(child);
+            },
+          );
+          forEach(
+            queryAttributeOnThisOrChildren(parent, "ws-send"),
+            function (child) {
+              ensureWebSocketSend(child);
+            },
+          );
       }
-    }
-  })
+    },
+  });
 
   function splitOnWhitespace(trigger) {
-    return trigger.trim().split(/\s+/)
+    return trigger.trim().split(/\s+/);
   }
 
   function getLegacyWebsocketURL(elt) {
-    var legacySSEValue = api.getAttributeValue(elt, 'hx-ws')
+    var legacySSEValue = api.getAttributeValue(elt, "hx-ws");
     if (legacySSEValue) {
-      var values = splitOnWhitespace(legacySSEValue)
+      var values = splitOnWhitespace(legacySSEValue);
       for (var i = 0; i < values.length; i++) {
-        var value = values[i].split(/:(.+)/)
-        if (value[0] === 'connect') {
-          return value[1]
+        var value = values[i].split(/:(.+)/);
+        if (value[0] === "connect") {
+          return value[1];
         }
       }
     }
@@ -88,68 +91,78 @@ This extension adds support for WebSockets to htmx.  See /www/extensions/ws.md f
     // If the element containing the WebSocket connection no longer exists, then
     // do not connect/reconnect the WebSocket.
     if (!api.bodyContains(socketElt)) {
-      return
+      return;
     }
 
     // Get the source straight from the element's value
-    var wssSource = api.getAttributeValue(socketElt, 'ws-connect')
+    var wssSource = api.getAttributeValue(socketElt, "ws-connect");
 
-    if (wssSource == null || wssSource === '') {
-      var legacySource = getLegacyWebsocketURL(socketElt)
+    if (wssSource == null || wssSource === "") {
+      var legacySource = getLegacyWebsocketURL(socketElt);
       if (legacySource == null) {
-        return
+        return;
       } else {
-        wssSource = legacySource
+        wssSource = legacySource;
       }
     }
 
     // Guarantee that the wssSource value is a fully qualified URL
-    if (wssSource.indexOf('/') === 0) {
-      var base_part = location.hostname + (location.port ? ':' + location.port : '')
-      if (location.protocol === 'https:') {
-        wssSource = 'wss://' + base_part + wssSource
-      } else if (location.protocol === 'http:') {
-        wssSource = 'ws://' + base_part + wssSource
+    if (wssSource.indexOf("/") === 0) {
+      var base_part =
+        location.hostname + (location.port ? ":" + location.port : "");
+      if (location.protocol === "https:") {
+        wssSource = "wss://" + base_part + wssSource;
+      } else if (location.protocol === "http:") {
+        wssSource = "ws://" + base_part + wssSource;
       }
     }
 
-    var socketWrapper = createWebsocketWrapper(socketElt, function() {
-      return htmx.createWebSocket(wssSource)
-    })
+    var socketWrapper = createWebsocketWrapper(socketElt, function () {
+      return htmx.createWebSocket(wssSource);
+    });
 
-    socketWrapper.addEventListener('message', function(event) {
+    socketWrapper.addEventListener("message", function (event) {
       if (maybeCloseWebSocketSource(socketElt)) {
-        return
+        return;
       }
 
-      var response = event.data
-      if (!api.triggerEvent(socketElt, 'htmx:wsBeforeMessage', {
-        message: response,
-        socketWrapper: socketWrapper.publicInterface
-      })) {
-        return
+      var response = event.data;
+      if (
+        !api.triggerEvent(socketElt, "htmx:wsBeforeMessage", {
+          message: response,
+          socketWrapper: socketWrapper.publicInterface,
+        })
+      ) {
+        return;
       }
 
-      api.withExtensions(socketElt, function(extension) {
-        response = extension.transformResponse(response, null, socketElt)
-      })
+      api.withExtensions(socketElt, function (extension) {
+        response = extension.transformResponse(response, null, socketElt);
+      });
 
-      var settleInfo = api.makeSettleInfo(socketElt)
-      var fragment = api.makeFragment(response)
+      var settleInfo = api.makeSettleInfo(socketElt);
+      var fragment = api.makeFragment(response);
 
       if (fragment.children.length) {
-        var children = Array.from(fragment.children)
+        var children = Array.from(fragment.children);
         for (var i = 0; i < children.length; i++) {
-          api.oobSwap(api.getAttributeValue(children[i], 'hx-swap-oob') || 'true', children[i], settleInfo)
+          api.oobSwap(
+            api.getAttributeValue(children[i], "hx-swap-oob") || "true",
+            children[i],
+            settleInfo,
+          );
         }
       }
 
-      api.settleImmediately(settleInfo.tasks)
-      api.triggerEvent(socketElt, 'htmx:wsAfterMessage', { message: response, socketWrapper: socketWrapper.publicInterface })
-    })
+      api.settleImmediately(settleInfo.tasks);
+      api.triggerEvent(socketElt, "htmx:wsAfterMessage", {
+        message: response,
+        socketWrapper: socketWrapper.publicInterface,
+      });
+    });
 
     // Put the WebSocket into the HTML Element's custom data.
-    api.getInternalData(socketElt).webSocket = socketWrapper
+    api.getInternalData(socketElt).webSocket = socketWrapper;
   }
 
   /**
@@ -179,120 +192,138 @@ This extension adds support for WebSockets to htmx.  See /www/extensions/ws.md f
       /** @type {Object<string, Function[]>} */
       events: {},
 
-      addEventListener: function(event, handler) {
+      addEventListener: function (event, handler) {
         if (this.socket) {
-          this.socket.addEventListener(event, handler)
+          this.socket.addEventListener(event, handler);
         }
 
         if (!this.events[event]) {
-          this.events[event] = []
+          this.events[event] = [];
         }
 
-        this.events[event].push(handler)
+        this.events[event].push(handler);
       },
 
-      sendImmediately: function(message, sendElt) {
+      sendImmediately: function (message, sendElt) {
         if (!this.socket) {
-          api.triggerErrorEvent()
+          api.triggerErrorEvent();
         }
-        if (!sendElt || api.triggerEvent(sendElt, 'htmx:wsBeforeSend', {
-          message,
-          socketWrapper: this.publicInterface
-        })) {
-          this.socket.send(message)
-          sendElt && api.triggerEvent(sendElt, 'htmx:wsAfterSend', {
+        if (
+          !sendElt ||
+          api.triggerEvent(sendElt, "htmx:wsBeforeSend", {
             message,
-            socketWrapper: this.publicInterface
+            socketWrapper: this.publicInterface,
           })
+        ) {
+          this.socket.send(message);
+          sendElt &&
+            api.triggerEvent(sendElt, "htmx:wsAfterSend", {
+              message,
+              socketWrapper: this.publicInterface,
+            });
         }
       },
 
-      send: function(message, sendElt) {
+      send: function (message, sendElt) {
         if (this.socket.readyState !== this.socket.OPEN) {
-          this.messageQueue.push({ message, sendElt })
+          this.messageQueue.push({ message, sendElt });
         } else {
-          this.sendImmediately(message, sendElt)
+          this.sendImmediately(message, sendElt);
         }
       },
 
-      handleQueuedMessages: function() {
+      handleQueuedMessages: function () {
         while (this.messageQueue.length > 0) {
-          var queuedItem = this.messageQueue[0]
+          var queuedItem = this.messageQueue[0];
           if (this.socket.readyState === this.socket.OPEN) {
-            this.sendImmediately(queuedItem.message, queuedItem.sendElt)
-            this.messageQueue.shift()
+            this.sendImmediately(queuedItem.message, queuedItem.sendElt);
+            this.messageQueue.shift();
           } else {
-            break
+            break;
           }
         }
       },
 
-      init: function() {
+      init: function () {
         if (this.socket && this.socket.readyState === this.socket.OPEN) {
           // Close discarded socket
-          this.socket.close()
+          this.socket.close();
         }
 
         // Create a new WebSocket and event handlers
         /** @type {WebSocket} */
-        var socket = socketFunc()
+        var socket = socketFunc();
 
         // The event.type detail is added for interface conformance with the
         // other two lifecycle events (open and close) so a single handler method
         // can handle them polymorphically, if required.
-        api.triggerEvent(socketElt, 'htmx:wsConnecting', { event: { type: 'connecting' } })
+        api.triggerEvent(socketElt, "htmx:wsConnecting", {
+          event: { type: "connecting" },
+        });
 
-        this.socket = socket
+        this.socket = socket;
 
-        socket.onopen = function(e) {
-          wrapper.retryCount = 0
-          api.triggerEvent(socketElt, 'htmx:wsOpen', { event: e, socketWrapper: wrapper.publicInterface })
-          wrapper.handleQueuedMessages()
-        }
+        socket.onopen = function (e) {
+          wrapper.retryCount = 0;
+          api.triggerEvent(socketElt, "htmx:wsOpen", {
+            event: e,
+            socketWrapper: wrapper.publicInterface,
+          });
+          wrapper.handleQueuedMessages();
+        };
 
-        socket.onclose = function(e) {
+        socket.onclose = function (e) {
           // If socket should not be connected, stop further attempts to establish connection
           // If Abnormal Closure/Service Restart/Try Again Later, then set a timer to reconnect after a pause.
-          if (!maybeCloseWebSocketSource(socketElt) && [1006, 1012, 1013].indexOf(e.code) >= 0) {
-            var delay = getWebSocketReconnectDelay(wrapper.retryCount)
-            setTimeout(function() {
-              wrapper.retryCount += 1
-              wrapper.init()
-            }, delay)
+          if (
+            !maybeCloseWebSocketSource(socketElt) &&
+            [1006, 1012, 1013].indexOf(e.code) >= 0
+          ) {
+            var delay = getWebSocketReconnectDelay(wrapper.retryCount);
+            setTimeout(function () {
+              wrapper.retryCount += 1;
+              wrapper.init();
+            }, delay);
           }
 
           // Notify client code that connection has been closed. Client code can inspect `event` field
           // to determine whether closure has been valid or abnormal
-          api.triggerEvent(socketElt, 'htmx:wsClose', { event: e, socketWrapper: wrapper.publicInterface })
-        }
+          api.triggerEvent(socketElt, "htmx:wsClose", {
+            event: e,
+            socketWrapper: wrapper.publicInterface,
+          });
+        };
 
-        socket.onerror = function(e) {
-          api.triggerErrorEvent(socketElt, 'htmx:wsError', { error: e, socketWrapper: wrapper })
-          maybeCloseWebSocketSource(socketElt)
-        }
+        socket.onerror = function (e) {
+          api.triggerErrorEvent(socketElt, "htmx:wsError", {
+            error: e,
+            socketWrapper: wrapper,
+          });
+          maybeCloseWebSocketSource(socketElt);
+        };
 
-        var events = this.events
-        Object.keys(events).forEach(function(k) {
-          events[k].forEach(function(e) {
-            socket.addEventListener(k, e)
-          })
-        })
+        var events = this.events;
+        Object.keys(events).forEach(function (k) {
+          events[k].forEach(function (e) {
+            socket.addEventListener(k, e);
+          });
+        });
       },
 
-      close: function() {
-        this.socket.close()
-      }
-    }
+      close: function () {
+        this.socket.close();
+      },
+    };
 
-    wrapper.init()
+    wrapper.init();
 
     wrapper.publicInterface = {
       send: wrapper.send.bind(wrapper),
       sendImmediately: wrapper.sendImmediately.bind(wrapper),
-      queue: wrapper.messageQueue
-    }
+      queue: wrapper.messageQueue,
+    };
 
-    return wrapper
+    return wrapper;
   }
 
   /**
@@ -301,13 +332,13 @@ This extension adds support for WebSockets to htmx.  See /www/extensions/ws.md f
    * @param {HTMLElement} elt
    */
   function ensureWebSocketSend(elt) {
-    var legacyAttribute = api.getAttributeValue(elt, 'hx-ws')
-    if (legacyAttribute && legacyAttribute !== 'send') {
-      return
+    var legacyAttribute = api.getAttributeValue(elt, "hx-ws");
+    if (legacyAttribute && legacyAttribute !== "send") {
+      return;
     }
 
-    var webSocketParent = api.getClosestMatch(elt, hasWebSocket)
-    processWebSocketSend(webSocketParent, elt)
+    var webSocketParent = api.getClosestMatch(elt, hasWebSocket);
+    processWebSocketSend(webSocketParent, elt);
   }
 
   /**
@@ -316,7 +347,7 @@ This extension adds support for WebSockets to htmx.  See /www/extensions/ws.md f
    * @returns {boolean}
    */
   function hasWebSocket(node) {
-    return api.getInternalData(node).webSocket != null
+    return api.getInternalData(node).webSocket != null;
   }
 
   /**
@@ -326,23 +357,23 @@ This extension adds support for WebSockets to htmx.  See /www/extensions/ws.md f
    * @param {HTMLElement} sendElt
    */
   function processWebSocketSend(socketElt, sendElt) {
-    var nodeData = api.getInternalData(sendElt)
-    var triggerSpecs = api.getTriggerSpecs(sendElt)
-    triggerSpecs.forEach(function(ts) {
-      api.addTriggerHandler(sendElt, ts, nodeData, function(elt, evt) {
+    var nodeData = api.getInternalData(sendElt);
+    var triggerSpecs = api.getTriggerSpecs(sendElt);
+    triggerSpecs.forEach(function (ts) {
+      api.addTriggerHandler(sendElt, ts, nodeData, function (elt, evt) {
         if (maybeCloseWebSocketSource(socketElt)) {
-          return
+          return;
         }
 
         /** @type {WebSocketWrapper} */
-        var socketWrapper = api.getInternalData(socketElt).webSocket
-        var headers = api.getHeaders(sendElt, api.getTarget(sendElt))
-        var results = api.getInputValues(sendElt, 'post')
-        var errors = results.errors
-        var rawParameters = Object.assign({}, results.values)
-        var expressionVars = api.getExpressionVars(sendElt)
-        var allParameters = api.mergeObjects(rawParameters, expressionVars)
-        var filteredParameters = api.filterValues(allParameters, sendElt)
+        var socketWrapper = api.getInternalData(socketElt).webSocket;
+        var headers = api.getHeaders(sendElt, api.getTarget(sendElt));
+        var results = api.getInputValues(sendElt, "post");
+        var errors = results.errors;
+        var rawParameters = Object.assign({}, results.values);
+        var expressionVars = api.getExpressionVars(sendElt);
+        var allParameters = api.mergeObjects(rawParameters, expressionVars);
+        var filteredParameters = api.filterValues(allParameters, sendElt);
 
         var sendConfig = {
           parameters: filteredParameters,
@@ -352,32 +383,34 @@ This extension adds support for WebSockets to htmx.  See /www/extensions/ws.md f
 
           triggeringEvent: evt,
           messageBody: undefined,
-          socketWrapper: socketWrapper.publicInterface
-        }
+          socketWrapper: socketWrapper.publicInterface,
+        };
 
-        if (!api.triggerEvent(elt, 'htmx:wsConfigSend', sendConfig)) {
-          return
+        if (!api.triggerEvent(elt, "htmx:wsConfigSend", sendConfig)) {
+          return;
         }
 
         if (errors && errors.length > 0) {
-          api.triggerEvent(elt, 'htmx:validation:halted', errors)
-          return
+          api.triggerEvent(elt, "htmx:validation:halted", errors);
+          return;
         }
 
-        var body = sendConfig.messageBody
+        var body = sendConfig.messageBody;
         if (body === undefined) {
-          var toSend = Object.assign({}, sendConfig.parameters)
-          if (sendConfig.headers) { toSend.HEADERS = headers }
-          body = JSON.stringify(toSend)
+          var toSend = Object.assign({}, sendConfig.parameters);
+          if (sendConfig.headers) {
+            toSend.HEADERS = headers;
+          }
+          body = JSON.stringify(toSend);
         }
 
-        socketWrapper.send(body, elt)
+        socketWrapper.send(body, elt);
 
         if (evt && api.shouldCancel(evt, elt)) {
-          evt.preventDefault()
+          evt.preventDefault();
         }
-      })
-    })
+      });
+    });
   }
 
   /**
@@ -387,17 +420,19 @@ This extension adds support for WebSockets to htmx.  See /www/extensions/ws.md f
    */
   function getWebSocketReconnectDelay(retryCount) {
     /** @type {"full-jitter" | ((retryCount:number) => number)} */
-    var delay = htmx.config.wsReconnectDelay
-    if (typeof delay === 'function') {
-      return delay(retryCount)
+    var delay = htmx.config.wsReconnectDelay;
+    if (typeof delay === "function") {
+      return delay(retryCount);
     }
-    if (delay === 'full-jitter') {
-      var exp = Math.min(retryCount, 6)
-      var maxDelay = 1000 * Math.pow(2, exp)
-      return maxDelay * Math.random()
+    if (delay === "full-jitter") {
+      var exp = Math.min(retryCount, 6);
+      var maxDelay = 1000 * Math.pow(2, exp);
+      return maxDelay * Math.random();
     }
 
-    logError('htmx.config.wsReconnectDelay must either be a function or the string "full-jitter"')
+    logError(
+      'htmx.config.wsReconnectDelay must either be a function or the string "full-jitter"',
+    );
   }
 
   /**
@@ -411,10 +446,10 @@ This extension adds support for WebSockets to htmx.  See /www/extensions/ws.md f
    */
   function maybeCloseWebSocketSource(elt) {
     if (!api.bodyContains(elt)) {
-      api.getInternalData(elt).webSocket.close()
-      return true
+      api.getInternalData(elt).webSocket.close();
+      return true;
     }
-    return false
+    return false;
   }
 
   /**
@@ -425,9 +460,9 @@ This extension adds support for WebSockets to htmx.  See /www/extensions/ws.md f
    * @returns WebSocket
    */
   function createWebSocket(url) {
-    var sock = new WebSocket(url, [])
-    sock.binaryType = htmx.config.wsBinaryType
-    return sock
+    var sock = new WebSocket(url, []);
+    sock.binaryType = htmx.config.wsBinaryType;
+    return sock;
   }
 
   /**
@@ -437,19 +472,30 @@ This extension adds support for WebSockets to htmx.  See /www/extensions/ws.md f
    * @param {string} attributeName
    */
   function queryAttributeOnThisOrChildren(elt, attributeName) {
-    var result = []
+    var result = [];
 
     // If the parent element also contains the requested attribute, then add it to the results too.
-    if (api.hasAttribute(elt, attributeName) || api.hasAttribute(elt, 'hx-ws')) {
-      result.push(elt)
+    if (
+      api.hasAttribute(elt, attributeName) ||
+      api.hasAttribute(elt, "hx-ws")
+    ) {
+      result.push(elt);
     }
 
     // Search all child nodes that match the requested attribute
-    elt.querySelectorAll('[' + attributeName + '], [data-' + attributeName + '], [data-hx-ws], [hx-ws]').forEach(function(node) {
-      result.push(node)
-    })
+    elt
+      .querySelectorAll(
+        "[" +
+          attributeName +
+          "], [data-" +
+          attributeName +
+          "], [data-hx-ws], [hx-ws]",
+      )
+      .forEach(function (node) {
+        result.push(node);
+      });
 
-    return result
+    return result;
   }
 
   /**
@@ -460,8 +506,8 @@ This extension adds support for WebSockets to htmx.  See /www/extensions/ws.md f
   function forEach(arr, func) {
     if (arr) {
       for (var i = 0; i < arr.length; i++) {
-        func(arr[i])
+        func(arr[i]);
       }
     }
   }
-})()
+})();

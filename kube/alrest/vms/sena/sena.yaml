@@ -44,6 +44,6 @@ spec:
           requests:
             memory: 2048M
       volumes:
-      - name: disk0
-        persistentVolumeClaim:
-          claimName: "sena"
+        - name: disk0
+          persistentVolumeClaim:
+            claimName: "sena"

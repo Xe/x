@@ -10,16 +10,16 @@ spec:
   ingressClassName: nginx
   tls:
     - hosts:
-      - h.within.lgbt
+        - h.within.lgbt
       secretName: hlang-within-lgbt-public-tls
   rules:
-  - host: h.within.lgbt
-    http:
-      paths:
-      - pathType: Prefix
-        path: "/"
-        backend:
-          service:
-            name: keda-add-ons-http-interceptor-proxy
-            port: 
-              number: 8080
+    - host: h.within.lgbt
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: keda-add-ons-http-interceptor-proxy
+                port:
+                  number: 8080

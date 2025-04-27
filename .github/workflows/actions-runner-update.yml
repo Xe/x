@@ -15,17 +15,17 @@ jobs:
   build-image:
     runs-on: alrest-x
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Log into registry 
-      if: github.event_name != 'pull_request'
-      uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0
-      with:
-        registry: ghcr.io
-        username: xe
-        password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Log into registry
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0
+        with:
+          registry: ghcr.io
+          username: xe
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: "Build/deploy docker image"
-      run: |
-        cd kube/runner-ci
-        ./build.sh
+      - name: "Build/deploy docker image"
+        run: |
+          cd kube/runner-ci
+          ./build.sh

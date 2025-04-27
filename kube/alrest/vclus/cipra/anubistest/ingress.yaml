@@ -12,19 +12,19 @@ spec:
   ingressClassName: nginx
   tls:
     - hosts:
-      - anubistest.xelaso.net
+        - anubistest.xelaso.net
       secretName: anubistest-xelaso-net-public-tls
   rules:
-  - host: anubistest.xelaso.net
-    http:
-      paths:
-      - pathType: Prefix
-        path: "/"
-        backend:
-          service:
-            name: anubistest
-            port: 
-              name: http
+    - host: anubistest.xelaso.net
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: anubistest
+                port:
+                  name: http
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -35,13 +35,13 @@ spec:
   ingressClassName: nginx
 
   rules:
-  - host: anubistest.xelaso.net
-    http:
-      paths:
-      - pathType: ImplementationSpecific
-        path: "/.within.website"
-        backend:
-          service:
-            name: anubistest
-            port: 
-              name: anubis
+    - host: anubistest.xelaso.net
+      http:
+        paths:
+          - pathType: ImplementationSpecific
+            path: "/.within.website"
+            backend:
+              service:
+                name: anubistest
+                port:
+                  name: anubis

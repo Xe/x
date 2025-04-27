@@ -4,8 +4,8 @@ metadata:
   name: load-balancer-dns
 spec:
   endpoints:
-  - dnsName: aeacus.xeserv.us
-    recordTTL: 3600
-    recordType: A
-    targets:
-    - 131.153.227.239
+    - dnsName: aeacus.xeserv.us
+      recordTTL: 3600
+      recordType: A
+      targets:
+        - 131.153.227.239

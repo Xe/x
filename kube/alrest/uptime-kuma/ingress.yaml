@@ -7,45 +7,45 @@ metadata:
 spec:
   ingressClassName: nginx
   tls:
-  - hosts:
-    - status.xeserv.us
-    secretName: status-xeserv-us-tls
+    - hosts:
+        - status.xeserv.us
+      secretName: status-xeserv-us-tls
   rules:
-  - host: status.xeserv.us
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: uptime-kuma
-            port:
-              number: 80
-      - path: /status
-        pathType: Prefix
-        backend:
-          service:
-            name: uptime-kuma
-            port:
-              number: 3001
-      - path: /assets
-        pathType: Prefix
-        backend:
-          service:
-            name: uptime-kuma
-            port:
-              number: 3001
-      - path: /icon.svg
-        pathType: Prefix
-        backend:
-          service:
-            name: uptime-kuma
-            port:
-              number: 3001
-      - path: /api/status-page/heartbeat
-        pathType: Prefix
-        backend:
-          service:
-            name: uptime-kuma
-            port:
-              number: 3001
+    - host: status.xeserv.us
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: uptime-kuma
+                port:
+                  number: 80
+          - path: /status
+            pathType: Prefix
+            backend:
+              service:
+                name: uptime-kuma
+                port:
+                  number: 3001
+          - path: /assets
+            pathType: Prefix
+            backend:
+              service:
+                name: uptime-kuma
+                port:
+                  number: 3001
+          - path: /icon.svg
+            pathType: Prefix
+            backend:
+              service:
+                name: uptime-kuma
+                port:
+                  number: 3001
+          - path: /api/status-page/heartbeat
+            pathType: Prefix
+            backend:
+              service:
+                name: uptime-kuma
+                port:
+                  number: 3001

@@ -9,10 +9,10 @@
 > Extract media information from torrent-like filename
 
 A Go port of [Jānis](https://github.com/jzjzjzj)' awesome
-[library](https://github.com/jzjzjzj/parse-torrent-name) written in 
+[library](https://github.com/jzjzjzj/parse-torrent-name) written in
 javascript.
 
-Extract all possible media information present in filenames. Multiple regex 
+Extract all possible media information present in filenames. Multiple regex
 rules are applied on filename string each of which extracts correponding
 information from the filename. If a regex rule matches, the corresponding part
 is removed from the filename. In the end, the remaining part is taken as the
@@ -70,7 +70,7 @@ PTN.parse('The Martian 2015 540p HDRip KORSUB x264 AAC2 0-FGT')
 # }
 ```
 
-### TV episodes 
+### TV episodes
 
 ```py
 PTN.parse('Mr Robot S01E05 HDTV x264-KILLERS[ettv]')
@@ -90,40 +90,40 @@ PTN.parse('friends.s02e01.720p.bluray-sujaidr')
 #     'title': 'friends',
 #     'resolution': '720p',
 #     'group': 'sujaidr',
-#     'quality': 'bluray'    
+#     'quality': 'bluray'
 # }
 ```
 
 ### Note
 
-PTN does not garantee the fields `group`, `excess` and `episodeName` as these 
-fields might be interchanged with each other. This shoudn't affect most 
-applications since episode name can be fetched from an online database 
+PTN does not garantee the fields `group`, `excess` and `episodeName` as these
+fields might be interchanged with each other. This shoudn't affect most
+applications since episode name can be fetched from an online database
 after getting the season and episode number correctly.
 
 ### Parts extracted
 
-* audio
-* codec
-* container
-* episode
-* episodeName
-* excess
-* extended
-* garbage
-* group
-* hardcoded
-* language
-* proper
-* quality
-* region
-* repack
-* resolution
-* season
-* title
-* website
-* widescreen
-* year
+- audio
+- codec
+- container
+- episode
+- episodeName
+- excess
+- extended
+- garbage
+- group
+- hardcoded
+- language
+- proper
+- quality
+- region
+- repack
+- resolution
+- season
+- title
+- website
+- widescreen
+- year
 
 ## Install
 

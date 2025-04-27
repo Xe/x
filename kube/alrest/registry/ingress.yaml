@@ -8,16 +8,16 @@ spec:
   ingressClassName: nginx
   tls:
     - hosts:
-      - reg.xeiaso.net
+        - reg.xeiaso.net
       secretName: reg-xeiaso-net-public-tls
   rules:
-  - host: reg.xeiaso.net
-    http:
-      paths:
-      - pathType: Prefix
-        path: "/"
-        backend:
-          service:
-            name: registry
-            port: 
-              name: http
+    - host: reg.xeiaso.net
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: registry
+                port:
+                  name: http

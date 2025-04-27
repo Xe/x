@@ -12,16 +12,16 @@ spec:
   ingressClassName: nginx
   tls:
     - hosts:
-      - home.cetacean.club
+        - home.cetacean.club
       secretName: home-cetacean-club-tls
   rules:
-  - host: home.cetacean.club
-    http:
-      paths:
-      - pathType: Prefix
-        path: "/front"
-        backend:
-          service:
-            name: mi
-            port: 
-              name: http
+    - host: home.cetacean.club
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/front"
+            backend:
+              service:
+                name: mi
+                port:
+                  name: http

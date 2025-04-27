@@ -27,12 +27,30 @@ const giteaRepo = (name: string, description: string): Repo => {
 };
 
 const repos: Repo[] = [
-  githubRepo("derpigo", "A Derpibooru/Furbooru API client in Go. This is used to monitor Derpibooru/Furbooru for images by artists I care about and archive them."),
-  githubRepo("eclier", "A command router for Go programs that implements every command in Lua. This was an experiment for making extensible command-line applications with Lua for extending them."),
-  githubRepo("gcss", "A CSS preprocessor for Go. This is a legacy Go package that I am bringing forward to modern Go standards."),
-  giteaRepo("gopher", "A Gopher (RFC 1436) client/server stack for Go applications. This allows users to write custom Gopher clients and servers."),
-  githubRepo("ln", "The natural log function for Go: an easy package for structured logging. This is the logging stack that I use for most of my personal projects."),
-  githubRepo("x", "Various experimental things. /x/ is my monorepo of side projects, hobby programming, and other explorations of how programming in Go can be."),
+  githubRepo(
+    "derpigo",
+    "A Derpibooru/Furbooru API client in Go. This is used to monitor Derpibooru/Furbooru for images by artists I care about and archive them.",
+  ),
+  githubRepo(
+    "eclier",
+    "A command router for Go programs that implements every command in Lua. This was an experiment for making extensible command-line applications with Lua for extending them.",
+  ),
+  githubRepo(
+    "gcss",
+    "A CSS preprocessor for Go. This is a legacy Go package that I am bringing forward to modern Go standards.",
+  ),
+  giteaRepo(
+    "gopher",
+    "A Gopher (RFC 1436) client/server stack for Go applications. This allows users to write custom Gopher clients and servers.",
+  ),
+  githubRepo(
+    "ln",
+    "The natural log function for Go: an easy package for structured logging. This is the logging stack that I use for most of my personal projects.",
+  ),
+  githubRepo(
+    "x",
+    "Various experimental things. /x/ is my monorepo of side projects, hobby programming, and other explorations of how programming in Go can be.",
+  ),
 ];
 
 export default repos;

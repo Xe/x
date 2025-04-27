@@ -1,32 +1,32 @@
 {
-  "main.title" : "CutleryPlus",
-  "main.subtitle" : "Messer, die legte in Besteck geschnitten.",
-  "menu" : {
-    "home" : "Home",
+  "main.title": "CutleryPlus",
+  "main.subtitle": "Messer, die legte in Besteck geschnitten.",
+  "menu": {
+    "home": "Home",
     "products": {
       "self": "Produkte",
-      "forks" : "Gabeln",
-      "knives" : "Messer",
-      "spoons" : "Löffel"
+      "forks": "Gabeln",
+      "knives": "Messer",
+      "spoons": "Löffel"
     },
-    "gallery" : "Galerie",
-    "about" :  "Über uns",
-    "contact" : "Kontakt"
+    "gallery": "Galerie",
+    "about": "Über uns",
+    "contact": "Kontakt"
   },
-  "home" : {
+  "home": {
     "title": "Willkommen in CutleryPlus!",
-    "text" : {
+    "text": {
       "p1": "Lorem ipsum...",
       "p2": "Ein weiterer ipsum lorem."
     }
   },
-  "error" : {
-    "404" : "Seite {0} wurde nicht gefunden.",
-    "500" : "Stimmt etwas nicht auf unserer Seite ist, versuchen Sie es erneut.",
-    "contact" : {
-      "name" : "Sie müssen Ihren Namen eingeben.",
-      "email" : "Sie müssen Ihre E-Mail ein.",
-      "text" : "Sie können eine leere Nachricht nicht zu senden."
+  "error": {
+    "404": "Seite {0} wurde nicht gefunden.",
+    "500": "Stimmt etwas nicht auf unserer Seite ist, versuchen Sie es erneut.",
+    "contact": {
+      "name": "Sie müssen Ihren Namen eingeben.",
+      "email": "Sie müssen Ihre E-Mail ein.",
+      "text": "Sie können eine leere Nachricht nicht zu senden."
     }
   }
 }

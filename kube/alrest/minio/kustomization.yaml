@@ -1,5 +1,5 @@
 resources:
-- deployment.yaml
-- external-dns.yaml
-- pvc.yaml
-- service.yaml
+  - deployment.yaml
+  - external-dns.yaml
+  - pvc.yaml
+  - service.yaml

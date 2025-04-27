@@ -15,47 +15,47 @@ spec:
       securityContext:
         fsGroup: 1000
       volumes:
-      - name: data
-        persistentVolumeClaim:
-          claimName: pocket-id
-      containers:
-      - name: main
-        image: ghcr.io/pocket-id/pocket-id:v0.43.1
-        imagePullPolicy: IfNotPresent
-        securityContext:
-          runAsUser: 1000
-          runAsGroup: 1000
-          runAsNonRoot: false
-          allowPrivilegeEscalation: false
-          capabilities:
-            drop:
-            - ALL
-          seccompProfile:
-            type: RuntimeDefault
-        envFrom:
-        - configMapRef:
-            name: pocket-id
-        resources:
-          limits:
-            memory: "512Mi"
-            cpu: "1"
-        ports:
-        - containerPort: 8080
-          name: backend
-        - containerPort: 3000
-          name: frontend
-        - containerPort: 80
-          name: http
-        livenessProbe:
-          httpGet:
-            path: /health
-            port: http
-          initialDelaySeconds: 200
-          timeoutSeconds: 5
-          periodSeconds: 10
-          successThreshold: 1
-          failureThreshold: 10
-        volumeMounts:
         - name: data
-          mountPath: /app/backend/data
-          subPath: data
+          persistentVolumeClaim:
+            claimName: pocket-id
+      containers:
+        - name: main
+          image: ghcr.io/pocket-id/pocket-id:v0.43.1
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            runAsNonRoot: false
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
+          envFrom:
+            - configMapRef:
+                name: pocket-id
+          resources:
+            limits:
+              memory: "512Mi"
+              cpu: "1"
+          ports:
+            - containerPort: 8080
+              name: backend
+            - containerPort: 3000
+              name: frontend
+            - containerPort: 80
+              name: http
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 200
+            timeoutSeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 10
+          volumeMounts:
+            - name: data
+              mountPath: /app/backend/data
+              subPath: data

@@ -21,3 +21,4 @@ spec:
     app.kubernetes.io/name: sftpgo
     app.kubernetes.io/instance: release-name
 ---
+

@@ -13,93 +13,93 @@ spec:
         app: minio
     spec:
       volumes:
-      - name: data
-        persistentVolumeClaim:
-          claimName: minio
-      - name: api-certs
-        secret:
-          secretName: minio-alrest-internal-tls
-      - name: webui-certs
-        secret:
-          secretName: minio-ui-alrest-internal-tls
+        - name: data
+          persistentVolumeClaim:
+            claimName: minio
+        - name: api-certs
+          secret:
+            secretName: minio-alrest-internal-tls
+        - name: webui-certs
+          secret:
+            secretName: minio-ui-alrest-internal-tls
       containers:
-      - name: minio
-        volumeMounts:
-        - name: data 
-          mountPath: /data
-        image: quay.io/minio/minio:latest
-        imagePullPolicy: Always
-        args:
-        - server
-        - /data
-        - --console-address=:9001
-        env:
-        - name: MINIO_ROOT_USER
-          value: root
-        - name: MINIO_ROOT_PASSWORD
-          value: hunter22
-        - name: MINIO_IDENTITY_OPENID_REDIRECT_URI
-          value: https://minio-ui.xeserv.us/oauth_callback
-        ports:
-        - containerPort: 9000
-          name: http
-        - containerPort: 9001
-          name: webui
-      - name: relayd-api
-        image: ghcr.io/xe/x/relayd:latest
-        imagePullPolicy: "Always"
-        resources:
-          limits:
-            cpu: "500m"
-            memory: "512Mi"
-          requests:
-            cpu: "100m"
-            memory: "256Mi"
-        securityContext:
-          runAsUser: 1000
-          runAsGroup: 1000
-          runAsNonRoot: true
-          allowPrivilegeEscalation: false
-          capabilities:
-            drop:
-              - ALL
-          seccompProfile:
-            type: RuntimeDefault
-        env:
-          - name: BIND
-            value: ":8443"
-          - name: PROXY_TO
-            value: "http://localhost:9000"
-        volumeMounts:
-          - name: "api-certs"
-            mountPath: "/xe/pki"
-            readOnly: true
-      - name: relayd-webui
-        image: ghcr.io/xe/x/relayd:latest
-        imagePullPolicy: "Always"
-        resources:
-          limits:
-            cpu: "500m"
-            memory: "512Mi"
-          requests:
-            cpu: "100m"
-            memory: "256Mi"
-        securityContext:
-          runAsUser: 1000
-          runAsGroup: 1000
-          runAsNonRoot: true
-          allowPrivilegeEscalation: false
-          capabilities:
-            drop:
-              - ALL
-          seccompProfile:
-            type: RuntimeDefault
-        env:
-          - name: BIND
-            value: ":8444"
-          - name: PROXY_TO
-            value: "http://localhost:9001"
-        volumeMounts:
-          - name: "webui-certs"
-            mountPath: "/xe/pki"
-            readOnly: true
+        - name: minio
+          volumeMounts:
+            - name: data
+              mountPath: /data
+          image: quay.io/minio/minio:latest
+          imagePullPolicy: Always
+          args:
+            - server
+            - /data
+            - --console-address=:9001
+          env:
+            - name: MINIO_ROOT_USER
+              value: root
+            - name: MINIO_ROOT_PASSWORD
+              value: hunter22
+            - name: MINIO_IDENTITY_OPENID_REDIRECT_URI
+              value: https://minio-ui.xeserv.us/oauth_callback
+          ports:
+            - containerPort: 9000
+              name: http
+            - containerPort: 9001
+              name: webui
+        - name: relayd-api
+          image: ghcr.io/xe/x/relayd:latest
+          imagePullPolicy: "Always"
+          resources:
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
+          env:
+            - name: BIND
+              value: ":8443"
+            - name: PROXY_TO
+              value: "http://localhost:9000"
+          volumeMounts:
+            - name: "api-certs"
+              mountPath: "/xe/pki"
+              readOnly: true
+        - name: relayd-webui
+          image: ghcr.io/xe/x/relayd:latest
+          imagePullPolicy: "Always"
+          resources:
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
+          env:
+            - name: BIND
+              value: ":8444"
+            - name: PROXY_TO
+              value: "http://localhost:9001"
+          volumeMounts:
+            - name: "webui-certs"
+              mountPath: "/xe/pki"
+              readOnly: true

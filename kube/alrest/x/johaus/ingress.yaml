@@ -10,16 +10,16 @@ spec:
   ingressClassName: nginx
   tls:
     - hosts:
-      - johaus.cetacean.club
+        - johaus.cetacean.club
       secretName: johaus-public-tls
   rules:
-  - host: johaus.cetacean.club
-    http:
-      paths:
-      - pathType: Prefix
-        path: "/"
-        backend:
-          service:
-            name: johaus
-            port: 
-              name: http
+    - host: johaus.cetacean.club
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: johaus
+                port:
+                  name: http

@@ -4,8 +4,8 @@ metadata:
   name: files-xeiaso-net-cname
 spec:
   endpoints:
-  - dnsName: "files.xeiaso.net"
-    recordTTL: 3600
-    recordType: CNAME
-    targets:
-    - xedn.fly.storage.tigris.dev
+    - dnsName: "files.xeiaso.net"
+      recordTTL: 3600
+      recordType: CNAME
+      targets:
+        - xedn.fly.storage.tigris.dev

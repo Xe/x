@@ -36,42 +36,42 @@ spec:
           cores: 2
         devices:
           disks:
-          - disk:
-              bus: virtio
-            name: disk0
-          - cdrom:
-              bus: sata
-              readonly: true
-            name: cloudinitdisk
+            - disk:
+                bus: virtio
+              name: disk0
+            - cdrom:
+                bus: sata
+                readonly: true
+              name: cloudinitdisk
         machine:
           type: q35
         resources:
           requests:
             memory: 1024M
       volumes:
-      - name: disk0
-        persistentVolumeClaim:
-          claimName: "ubuntu-24.04"
-      - cloudInitNoCloud:
-          userData: |
-            #cloud-config
-            hostname: noble
-            ssh_pwauth: True
-            disable_root: false
+        - name: disk0
+          persistentVolumeClaim:
+            claimName: "ubuntu-24.04"
+        - cloudInitNoCloud:
+            userData: |
+              #cloud-config
+              hostname: noble
+              ssh_pwauth: True
+              disable_root: false
 
-            write_files:
-              -   encoding: b64
-                  content: bmV0d29yazoKICB2ZXJzaW9uOiAyCiAgZXRoZXJuZXRzOgogICAgaWQwOgogICAgICBkaGNwNDogdHJ1ZQogICAgICBtYXRjaDoKICAgICAgICBuYW1lOiBlbnAqCg==
-                  owner: root:root
-                  path: /etc/netplan/99-net-fix.yaml
-                  permissions: '0644'
+              write_files:
+                -   encoding: b64
+                    content: bmV0d29yazoKICB2ZXJzaW9uOiAyCiAgZXRoZXJuZXRzOgogICAgaWQwOgogICAgICBkaGNwNDogdHJ1ZQogICAgICBtYXRjaDoKICAgICAgICBuYW1lOiBlbnAqCg==
+                    owner: root:root
+                    path: /etc/netplan/99-net-fix.yaml
+                    permissions: '0644'
 
-            users:
-              - name: xe
-                groups: [ wheel ]
-                sudo: [ "ALL=(ALL) NOPASSWD:ALL" ]
-                shell: /bin/bash
-                ssh-authorized-keys:
-                  - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIF6/+q2dBHEfETomAH7rvDPXHulSXnhcV/szxTAWiKZA cadey@defoko
-                  - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJIH27tCTJZwJxp+bcWRALtrk7SqnwXZ4/Ae67jIO0eF cadey@shiroko
-        name: cloudinitdisk
+              users:
+                - name: xe
+                  groups: [ wheel ]
+                  sudo: [ "ALL=(ALL) NOPASSWD:ALL" ]
+                  shell: /bin/bash
+                  ssh-authorized-keys:
+                    - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIF6/+q2dBHEfETomAH7rvDPXHulSXnhcV/szxTAWiKZA cadey@defoko
+                    - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJIH27tCTJZwJxp+bcWRALtrk7SqnwXZ4/Ae67jIO0eF cadey@shiroko
+          name: cloudinitdisk

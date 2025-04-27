@@ -6,13 +6,12 @@ For example, consider what you would do to restart a Fly app after the health ch
 
 ```json
 {
-    "meta": {
-        "service": "xe-pronouns",
-        "condition": "health check failed"
-    },
+  "meta": {
+    "service": "xe-pronouns",
+    "condition": "health check failed"
+  },
 
-    "health_check_url": "https://pronouns.within.lgbt/.within/health",
-    "details": "Run your own copy of health checks.\n\nIf your health check fails, restart the app.\nIf it succeeds, close the incident.\n\nWait for one minute afte restarting the app.\nRun the health check again after restarting the app.\n\nIf it fails again, escalate to the on-call engineer."
+  "health_check_url": "https://pronouns.within.lgbt/.within/health",
+  "details": "Run your own copy of health checks.\n\nIf your health check fails, restart the app.\nIf it succeeds, close the incident.\n\nWait for one minute afte restarting the app.\nRun the health check again after restarting the app.\n\nIf it fails again, escalate to the on-call engineer."
 }
 ```
-

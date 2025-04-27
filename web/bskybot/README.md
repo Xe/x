@@ -6,9 +6,9 @@ Gobot-bsky - a simple GO lib to write Bluesky bots
 
 Has to provide:
 
-* a handle -  example bluesky handle: "example.bsky.social"
-* an apikey - is used for authetication and the retrieval of the access token and refresh token. To create a new one: Settings --> App Passwords 
-* the server (PDS) - the Bluesky's "PDS Service" is bsky.social. 
+- a handle - example bluesky handle: "example.bsky.social"
+- an apikey - is used for authetication and the retrieval of the access token and refresh token. To create a new one: Settings --> App Passwords
+- the server (PDS) - the Bluesky's "PDS Service" is bsky.social.
 
 ```go
 import 	gobot "github.com/danrusei/gobot-bsky"

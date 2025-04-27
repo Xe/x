@@ -23,16 +23,16 @@ spec:
   ingressClassName: nginx
   tls:
     - hosts:
-      - git.xeserv.us
+        - git.xeserv.us
       secretName: gitea-internal-tls
   rules:
-  - host: git.xeserv.us
-    http:
-      paths:
-      - pathType: Prefix
-        path: "/"
-        backend:
-          service:
-            name: git
-            port: 
-              name: anubis
+    - host: git.xeserv.us
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: git
+                port:
+                  name: anubis

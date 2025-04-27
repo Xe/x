@@ -2,11 +2,11 @@ name: Docker image updates
 
 on:
   push:
-    branches: [ "master" ]
+    branches: ["master"]
     # Publish semver tags as releases.
-    tags: [ 'v*.*.*' ]
+    tags: ["v*.*.*"]
   pull_request:
-    branches: [ "master" ]
+    branches: ["master"]
 
 jobs:
   docker-build:
@@ -26,7 +26,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           version: "latest" # or pin to an specific version, e.g. "0.8.1"
-      - name: Log into registry 
+      - name: Log into registry
         if: github.event_name != 'pull_request'
         uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0
         with:

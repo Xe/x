@@ -7,5 +7,3 @@ These are manpages for a selected group of commands that I consider really usefu
 - gzip all the files (`$ gzip *.1`)
 - copy to (`/usr/share/man/man1/`)
 - `$ man appsluggr`
-
-

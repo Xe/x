@@ -3,7 +3,7 @@ kind: ConfigMap
 metadata:
   name: within-website
 data:
-  "config.ts": |   
+  "config.ts": |
     export interface Repo {
         kind: "gitea" | "github";
         domain: string;

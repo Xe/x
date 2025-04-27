@@ -8,7 +8,7 @@ metadata:
     kubevirt.io/storage-observed-api-version: v1
   creationTimestamp: "2024-05-17T18:31:13Z"
   finalizers:
-  - foregroundDeleteKubeVirt
+    - foregroundDeleteKubeVirt
   generation: 4
   name: kubevirt
   namespace: kubevirt
@@ -24,134 +24,135 @@ spec:
   workloadUpdateStrategy: {}
 status:
   conditions:
-  - lastProbeTime: "2025-01-21T23:47:36Z"
-    lastTransitionTime: "2025-01-21T23:47:36Z"
-    message: All components are ready.
-    reason: AllComponentsReady
-    status: "True"
-    type: Available
-  - lastProbeTime: "2025-01-21T23:47:36Z"
-    lastTransitionTime: "2025-01-21T23:47:36Z"
-    message: All components are ready.
-    reason: AllComponentsReady
-    status: "False"
-    type: Progressing
-  - lastProbeTime: "2025-01-21T23:47:36Z"
-    lastTransitionTime: "2025-01-21T23:47:36Z"
-    message: All components are ready.
-    reason: AllComponentsReady
-    status: "False"
-    type: Degraded
-  - lastProbeTime: "2024-12-29T00:41:01Z"
-    lastTransitionTime: null
-    message: All resources were created.
-    reason: AllResourcesCreated
-    status: "True"
-    type: Created
+    - lastProbeTime: "2025-01-21T23:47:36Z"
+      lastTransitionTime: "2025-01-21T23:47:36Z"
+      message: All components are ready.
+      reason: AllComponentsReady
+      status: "True"
+      type: Available
+    - lastProbeTime: "2025-01-21T23:47:36Z"
+      lastTransitionTime: "2025-01-21T23:47:36Z"
+      message: All components are ready.
+      reason: AllComponentsReady
+      status: "False"
+      type: Progressing
+    - lastProbeTime: "2025-01-21T23:47:36Z"
+      lastTransitionTime: "2025-01-21T23:47:36Z"
+      message: All components are ready.
+      reason: AllComponentsReady
+      status: "False"
+      type: Degraded
+    - lastProbeTime: "2024-12-29T00:41:01Z"
+      lastTransitionTime: null
+      message: All resources were created.
+      reason: AllResourcesCreated
+      status: "True"
+      type: Created
   defaultArchitecture: amd64
   generations:
-  - group: apiextensions.k8s.io/v1
-    lastGeneration: 3
-    name: virtualmachineinstances.kubevirt.io
-    resource: customresourcedefinitions
-  - group: apiextensions.k8s.io/v1
-    lastGeneration: 3
-    name: virtualmachineinstancepresets.kubevirt.io
-    resource: customresourcedefinitions
-  - group: apiextensions.k8s.io/v1
-    lastGeneration: 3
-    name: virtualmachineinstancereplicasets.kubevirt.io
-    resource: customresourcedefinitions
-  - group: apiextensions.k8s.io/v1
-    lastGeneration: 3
-    name: virtualmachines.kubevirt.io
-    resource: customresourcedefinitions
-  - group: apiextensions.k8s.io/v1
-    lastGeneration: 3
-    name: virtualmachineinstancemigrations.kubevirt.io
-    resource: customresourcedefinitions
-  - group: apiextensions.k8s.io/v1
-    lastGeneration: 4
-    name: virtualmachinesnapshots.snapshot.kubevirt.io
-    resource: customresourcedefinitions
-  - group: apiextensions.k8s.io/v1
-    lastGeneration: 4
-    name: virtualmachinesnapshotcontents.snapshot.kubevirt.io
-    resource: customresourcedefinitions
-  - group: apiextensions.k8s.io/v1
-    lastGeneration: 4
-    name: virtualmachinerestores.snapshot.kubevirt.io
-    resource: customresourcedefinitions
-  - group: apiextensions.k8s.io/v1
-    lastGeneration: 3
-    name: virtualmachineinstancetypes.instancetype.kubevirt.io
-    resource: customresourcedefinitions
-  - group: apiextensions.k8s.io/v1
-    lastGeneration: 3
-    name: virtualmachineclusterinstancetypes.instancetype.kubevirt.io
-    resource: customresourcedefinitions
-  - group: apiextensions.k8s.io/v1
-    lastGeneration: 3
-    name: virtualmachinepools.pool.kubevirt.io
-    resource: customresourcedefinitions
-  - group: apiextensions.k8s.io/v1
-    lastGeneration: 2
-    name: migrationpolicies.migrations.kubevirt.io
-    resource: customresourcedefinitions
-  - group: apiextensions.k8s.io/v1
-    lastGeneration: 3
-    name: virtualmachinepreferences.instancetype.kubevirt.io
-    resource: customresourcedefinitions
-  - group: apiextensions.k8s.io/v1
-    lastGeneration: 3
-    name: virtualmachineclusterpreferences.instancetype.kubevirt.io
-    resource: customresourcedefinitions
-  - group: apiextensions.k8s.io/v1
-    lastGeneration: 4
-    name: virtualmachineexports.export.kubevirt.io
-    resource: customresourcedefinitions
-  - group: apiextensions.k8s.io/v1
-    lastGeneration: 2
-    name: virtualmachineclones.clone.kubevirt.io
-    resource: customresourcedefinitions
-  - group: admissionregistration.k8s.io
-    lastGeneration: 98
-    name: virt-operator-validator
-    resource: validatingwebhookconfigurations
-  - group: admissionregistration.k8s.io
-    lastGeneration: 99
-    name: virt-api-validator
-    resource: validatingwebhookconfigurations
-  - group: admissionregistration.k8s.io
-    lastGeneration: 98
-    name: virt-api-mutator
-    resource: mutatingwebhookconfigurations
-  - group: apps
-    lastGeneration: 4
-    name: virt-api
-    namespace: kubevirt
-    resource: deployments
-  - group: apps
-    lastGeneration: 1
-    name: virt-api-pdb
-    namespace: kubevirt
-    resource: poddisruptionbudgets
-  - group: apps
-    lastGeneration: 4
-    name: virt-controller
-    namespace: kubevirt
-    resource: deployments
-  - group: apps
-    lastGeneration: 1
-    name: virt-controller-pdb
-    namespace: kubevirt
-    resource: poddisruptionbudgets
-  - group: apps
-    lastGeneration: 7
-    name: virt-handler
-    namespace: kubevirt
-    resource: daemonsets
-  observedDeploymentConfig: '{"id":"181122bb566b78f3958f071886d59e622871f649","namespace":"kubevirt","registry":"quay.io/kubevirt","kubeVirtVersion":"v1.4.0","virtOperatorImage":"quay.io/kubevirt/virt-operator:v1.4.0","additionalProperties":{"CertificateRotationStrategy":"\u003cv1.KubeVirtCertificateRotateStrategy
+    - group: apiextensions.k8s.io/v1
+      lastGeneration: 3
+      name: virtualmachineinstances.kubevirt.io
+      resource: customresourcedefinitions
+    - group: apiextensions.k8s.io/v1
+      lastGeneration: 3
+      name: virtualmachineinstancepresets.kubevirt.io
+      resource: customresourcedefinitions
+    - group: apiextensions.k8s.io/v1
+      lastGeneration: 3
+      name: virtualmachineinstancereplicasets.kubevirt.io
+      resource: customresourcedefinitions
+    - group: apiextensions.k8s.io/v1
+      lastGeneration: 3
+      name: virtualmachines.kubevirt.io
+      resource: customresourcedefinitions
+    - group: apiextensions.k8s.io/v1
+      lastGeneration: 3
+      name: virtualmachineinstancemigrations.kubevirt.io
+      resource: customresourcedefinitions
+    - group: apiextensions.k8s.io/v1
+      lastGeneration: 4
+      name: virtualmachinesnapshots.snapshot.kubevirt.io
+      resource: customresourcedefinitions
+    - group: apiextensions.k8s.io/v1
+      lastGeneration: 4
+      name: virtualmachinesnapshotcontents.snapshot.kubevirt.io
+      resource: customresourcedefinitions
+    - group: apiextensions.k8s.io/v1
+      lastGeneration: 4
+      name: virtualmachinerestores.snapshot.kubevirt.io
+      resource: customresourcedefinitions
+    - group: apiextensions.k8s.io/v1
+      lastGeneration: 3
+      name: virtualmachineinstancetypes.instancetype.kubevirt.io
+      resource: customresourcedefinitions
+    - group: apiextensions.k8s.io/v1
+      lastGeneration: 3
+      name: virtualmachineclusterinstancetypes.instancetype.kubevirt.io
+      resource: customresourcedefinitions
+    - group: apiextensions.k8s.io/v1
+      lastGeneration: 3
+      name: virtualmachinepools.pool.kubevirt.io
+      resource: customresourcedefinitions
+    - group: apiextensions.k8s.io/v1
+      lastGeneration: 2
+      name: migrationpolicies.migrations.kubevirt.io
+      resource: customresourcedefinitions
+    - group: apiextensions.k8s.io/v1
+      lastGeneration: 3
+      name: virtualmachinepreferences.instancetype.kubevirt.io
+      resource: customresourcedefinitions
+    - group: apiextensions.k8s.io/v1
+      lastGeneration: 3
+      name: virtualmachineclusterpreferences.instancetype.kubevirt.io
+      resource: customresourcedefinitions
+    - group: apiextensions.k8s.io/v1
+      lastGeneration: 4
+      name: virtualmachineexports.export.kubevirt.io
+      resource: customresourcedefinitions
+    - group: apiextensions.k8s.io/v1
+      lastGeneration: 2
+      name: virtualmachineclones.clone.kubevirt.io
+      resource: customresourcedefinitions
+    - group: admissionregistration.k8s.io
+      lastGeneration: 98
+      name: virt-operator-validator
+      resource: validatingwebhookconfigurations
+    - group: admissionregistration.k8s.io
+      lastGeneration: 99
+      name: virt-api-validator
+      resource: validatingwebhookconfigurations
+    - group: admissionregistration.k8s.io
+      lastGeneration: 98
+      name: virt-api-mutator
+      resource: mutatingwebhookconfigurations
+    - group: apps
+      lastGeneration: 4
+      name: virt-api
+      namespace: kubevirt
+      resource: deployments
+    - group: apps
+      lastGeneration: 1
+      name: virt-api-pdb
+      namespace: kubevirt
+      resource: poddisruptionbudgets
+    - group: apps
+      lastGeneration: 4
+      name: virt-controller
+      namespace: kubevirt
+      resource: deployments
+    - group: apps
+      lastGeneration: 1
+      name: virt-controller-pdb
+      namespace: kubevirt
+      resource: poddisruptionbudgets
+    - group: apps
+      lastGeneration: 7
+      name: virt-handler
+      namespace: kubevirt
+      resource: daemonsets
+  observedDeploymentConfig:
+    '{"id":"181122bb566b78f3958f071886d59e622871f649","namespace":"kubevirt","registry":"quay.io/kubevirt","kubeVirtVersion":"v1.4.0","virtOperatorImage":"quay.io/kubevirt/virt-operator:v1.4.0","additionalProperties":{"CertificateRotationStrategy":"\u003cv1.KubeVirtCertificateRotateStrategy
     Value\u003e","Configuration":"\u003cv1.KubeVirtConfiguration Value\u003e","CustomizeComponents":"\u003cv1.CustomizeComponents
     Value\u003e","ImagePullPolicy":"IfNotPresent","ImagePullSecrets":"null","Infra":"\u003c*v1.ComponentConfig
     Value\u003e","MonitorAccount":"","MonitorNamespace":"","ProductComponent":"","ProductName":"","ProductVersion":"","ServiceMonitorNamespace":"","UninstallStrategy":"","WorkloadUpdateStrategy":"\u003cv1.KubeVirtWorkloadUpdateStrategy
@@ -163,7 +164,8 @@ status:
   operatorVersion: v1.4.0
   outdatedVirtualMachineInstanceWorkloads: 0
   phase: Deployed
-  targetDeploymentConfig: '{"id":"181122bb566b78f3958f071886d59e622871f649","namespace":"kubevirt","registry":"quay.io/kubevirt","kubeVirtVersion":"v1.4.0","virtOperatorImage":"quay.io/kubevirt/virt-operator:v1.4.0","additionalProperties":{"CertificateRotationStrategy":"\u003cv1.KubeVirtCertificateRotateStrategy
+  targetDeploymentConfig:
+    '{"id":"181122bb566b78f3958f071886d59e622871f649","namespace":"kubevirt","registry":"quay.io/kubevirt","kubeVirtVersion":"v1.4.0","virtOperatorImage":"quay.io/kubevirt/virt-operator:v1.4.0","additionalProperties":{"CertificateRotationStrategy":"\u003cv1.KubeVirtCertificateRotateStrategy
     Value\u003e","Configuration":"\u003cv1.KubeVirtConfiguration Value\u003e","CustomizeComponents":"\u003cv1.CustomizeComponents
     Value\u003e","ImagePullPolicy":"IfNotPresent","ImagePullSecrets":"null","Infra":"\u003c*v1.ComponentConfig
     Value\u003e","MonitorAccount":"","MonitorNamespace":"","ProductComponent":"","ProductName":"","ProductVersion":"","ServiceMonitorNamespace":"","UninstallStrategy":"","WorkloadUpdateStrategy":"\u003cv1.KubeVirtWorkloadUpdateStrategy

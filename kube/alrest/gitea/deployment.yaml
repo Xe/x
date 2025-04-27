@@ -57,7 +57,7 @@ spec:
       securityContext:
         fsGroup: 1000
       imagePullSecrets:
-      - name: techarohq-botstopper
+        - name: techarohq-botstopper
       volumes:
         - name: data
           persistentVolumeClaim:
@@ -158,34 +158,34 @@ spec:
           image: ghcr.io/techarohq/botstopper/anubis:latest
           imagePullPolicy: Always
           env:
-          - name: "BIND"
-            value: ":8080"
-          - name: "DIFFICULTY"
-            value: "4"
-          - name: "ERROR_TITLE"
-            value: "Error detected"
-          - name: "METRICS_BIND"
-            value: ":9090"
-          - name: "OVERLAY_FOLDER"
-            value: "/xe/cfg/botstopper"
-          - name: "POLICY_FNAME"
-            value: "/xe/cfg/anubis/botPolicies.yaml"
-          - name: "SERVE_ROBOTS_TXT"
-            value: "true"
-          - name: "TARGET"
-            value: "http://localhost:3000"
-          - name: ED25519_PRIVATE_KEY_HEX
-            valueFrom:
-              secretKeyRef:
-                name: anubis-key
-                key: ED25519_PRIVATE_KEY_HEX
+            - name: "BIND"
+              value: ":8080"
+            - name: "DIFFICULTY"
+              value: "4"
+            - name: "ERROR_TITLE"
+              value: "Error detected"
+            - name: "METRICS_BIND"
+              value: ":9090"
+            - name: "OVERLAY_FOLDER"
+              value: "/xe/cfg/botstopper"
+            - name: "POLICY_FNAME"
+              value: "/xe/cfg/anubis/botPolicies.yaml"
+            - name: "SERVE_ROBOTS_TXT"
+              value: "true"
+            - name: "TARGET"
+              value: "http://localhost:3000"
+            - name: ED25519_PRIVATE_KEY_HEX
+              valueFrom:
+                secretKeyRef:
+                  name: anubis-key
+                  key: ED25519_PRIVATE_KEY_HEX
           # - name: "SLOG_LEVEL"
           #   value: "debug"
           volumeMounts:
-          - name: anubis
-            mountPath: /xe/cfg/anubis
-          - name: botstopper-css
-            mountPath: /xe/cfg/botstopper/static/css
+            - name: anubis
+              mountPath: /xe/cfg/anubis
+            - name: botstopper-css
+              mountPath: /xe/cfg/botstopper/static/css
           resources:
             limits:
               cpu: 500m

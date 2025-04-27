@@ -5,13 +5,13 @@ metadata:
 data:
   PUID: "1000"
   PGID: "1000"
-  PORT: "8211"  # Optional but recommended
-  PLAYERS: "32"  # Optional but recommended
-  SERVER_PASSWORD: "worldofpals"  # Optional but recommended
+  PORT: "8211" # Optional but recommended
+  PLAYERS: "32" # Optional but recommended
+  SERVER_PASSWORD: "worldofpals" # Optional but recommended
   MULTITHREADING: "true"
   RCON_ENABLED: "true"
   RCON_PORT: "25575"
   TZ: UTC
-  COMMUNITY: "false"  # Enable this if you want your server to show up in the community servers tab, USE WITH SERVER_PASSWORD!
+  COMMUNITY: "false" # Enable this if you want your server to show up in the community servers tab, USE WITH SERVER_PASSWORD!
   SERVER_NAME: "Furryhole Palworld"
   SERVER_DESCRIPTION: "owo what's this?"

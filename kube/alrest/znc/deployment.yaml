@@ -15,23 +15,28 @@ spec:
         app: znc
     spec:
       volumes:
-      - name: config
-        persistentVolumeClaim:
-          claimName: znc
+        - name: config
+          persistentVolumeClaim:
+            claimName: znc
       initContainers:
-      - name: init-config
-        image: znc:latest
-        imagePullPolicy: Always
-        command: ['/bin/sh', '-c', "until [ -f /znc-data/configs/znc.conf ]; do echo waiting for znc.conf; sleep 2; done"]
-        volumeMounts:
-          - mountPath: /znc-data
-            name: config
+        - name: init-config
+          image: znc:latest
+          imagePullPolicy: Always
+          command:
+            [
+              "/bin/sh",
+              "-c",
+              "until [ -f /znc-data/configs/znc.conf ]; do echo waiting for znc.conf; sleep 2; done",
+            ]
+          volumeMounts:
+            - mountPath: /znc-data
+              name: config
       containers:
-      - name: znc
-        image: znc:latest
-        ports:
-        - containerPort: 1337
-        - containerPort: 6667
-        volumeMounts:
-          - mountPath: /znc-data
-            name: config
+        - name: znc
+          image: znc:latest
+          ports:
+            - containerPort: 1337
+            - containerPort: 6667
+          volumeMounts:
+            - mountPath: /znc-data
+              name: config

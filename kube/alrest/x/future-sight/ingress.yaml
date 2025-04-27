@@ -11,16 +11,16 @@ spec:
   ingressClassName: nginx
   tls:
     - hosts:
-      - preview.xeiaso.net
+        - preview.xeiaso.net
       secretName: preview-xeiaso-net-tls
   rules:
-  - host: preview.xeiaso.net
-    http:
-      paths:
-      - pathType: Prefix
-        path: "/"
-        backend:
-          service:
-            name: future-sight
-            port: 
-              name: web
+    - host: preview.xeiaso.net
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: future-sight
+                port:
+                  name: web

@@ -24,7 +24,9 @@
   "devDependencies": {
     "@commitlint/cli": "^19.8.0",
     "@commitlint/config-conventional": "^19.8.0",
-    "husky": "^9.1.7"
+    "husky": "^9.1.7",
+    "lint-staged": "^15.5.1",
+    "prettier": "^3.5.3"
   },
   "commitlint": {
     "extends": [
@@ -41,5 +43,20 @@
         "always"
       ]
     }
+  },
+  "lint-staged": {
+    "**/*.{js,ts,html,json,css,scss,md,mdx}": [
+      "prettier -w"
+    ],
+    "**/*.{go}": [
+      "go tool goimports -w"
+    ]
+  },
+  "prettier": {
+    "singleQuote": false,
+    "tabWidth": 2,
+    "semi": true,
+    "trailingComma": "all",
+    "printWidth": 80
   }
 }

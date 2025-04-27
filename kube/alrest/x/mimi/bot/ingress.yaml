@@ -8,16 +8,16 @@ spec:
   ingressClassName: nginx
   tls:
     - hosts:
-      - mimi.techaro.lol
+        - mimi.techaro.lol
       secretName: mimi-techaro-lol-public-tls
   rules:
-  - host: mimi.techaro.lol
-    http:
-      paths:
-      - pathType: Prefix
-        path: "/"
-        backend:
-          service:
-            name: mimi
-            port: 
-              name: http
+    - host: mimi.techaro.lol
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: mimi
+                port:
+                  name: http

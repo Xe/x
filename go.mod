@@ -280,5 +280,6 @@ require (
 tool (
 	github.com/TecharoHQ/yeet/cmd/yeet
 	github.com/a-h/templ/cmd/templ
+	golang.org/x/tools/cmd/goimports
 	golang.org/x/tools/cmd/stringer
 )

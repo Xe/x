@@ -4,8 +4,8 @@ metadata:
   name: ellenjoe-wildcard
 spec:
   endpoints:
-  - dnsName: "*.ellenjoe.within.lgbt"
-    recordTTL: 3600
-    recordType: A
-    targets:
-    - 100.127.81.4
+    - dnsName: "*.ellenjoe.within.lgbt"
+      recordTTL: 3600
+      recordType: A
+      targets:
+        - 100.127.81.4

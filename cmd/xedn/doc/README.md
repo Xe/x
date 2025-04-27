@@ -25,4 +25,3 @@ file is requested, hopefully making sure that each file that is
 commonly used is never requested from backend servers. This does make
 genuinely updating content hard, so users of XeDN are encouraged to
 assume that the backend is an _append-only_ store.
-

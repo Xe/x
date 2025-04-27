@@ -14,13 +14,13 @@ spec:
           cores: 6
         devices:
           disks:
-          # - bootOrder: 1
-          #   cdrom:
-          #     bus: sata
-          #   name: cdromiso
-          - disk:
-              bus: virtio
-            name: harddrive
+            # - bootOrder: 1
+            #   cdrom:
+            #     bus: sata
+            #   name: cdromiso
+            - disk:
+                bus: virtio
+              name: harddrive
           # - cdrom:
           #     bus: sata
           #   name: virtiocontainerdisk
@@ -34,17 +34,17 @@ spec:
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
               - matchExpressions:
-                - key: kubernetes.io/hostname
-                  operator: In
-                  values:
-                  - pneuma
+                  - key: kubernetes.io/hostname
+                    operator: In
+                    values:
+                      - pneuma
       volumes:
-      # - name: cdromiso
-      #   persistentVolumeClaim:
-      #     claimName: win10-iso-raw
-      - name: harddrive
-        persistentVolumeClaim:
-          claimName: reyn
+        # - name: cdromiso
+        #   persistentVolumeClaim:
+        #     claimName: win10-iso-raw
+        - name: harddrive
+          persistentVolumeClaim:
+            claimName: reyn
       # - containerDisk:
       #     image: kubevirt/virtio-container-disk
       #   name: virtiocontainerdisk

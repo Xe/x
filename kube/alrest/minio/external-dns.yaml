@@ -4,16 +4,16 @@ metadata:
   name: minio
 spec:
   endpoints:
-  - dnsName: minio.xeserv.us
-    recordTTL: 3600
-    recordType: A
-    targets:
-    - 10.219.35.168
-  - dnsName: minio-ui.xeserv.us
-    recordTTL: 3600
-    recordType: A
-    targets:
-    - 10.213.19.165
+    - dnsName: minio.xeserv.us
+      recordTTL: 3600
+      recordType: A
+      targets:
+        - 10.219.35.168
+    - dnsName: minio-ui.xeserv.us
+      recordTTL: 3600
+      recordType: A
+      targets:
+        - 10.213.19.165
 ---
 apiVersion: cert-manager.io/v1
 kind: Certificate

@@ -54,23 +54,23 @@ spec:
           image: reg.xeiaso.net/x/anubis:latest
           imagePullPolicy: Always
           env:
-          - name: "BIND"
-            value: ":8080"
-          - name: "DIFFICULTY"
-            value: "4"
-          - name: "METRICS_BIND"
-            value: ":9090"
-          - name: "POLICY_FNAME"
-            value: "/xe/cfg/anubis/botPolicies.json"
-          - name: "SERVE_ROBOTS_TXT"
-            value: "true"
-          - name: "TARGET"
-            value: ""
-          - name: "SLOG_LEVEL"
-            value: "debug"
+            - name: "BIND"
+              value: ":8080"
+            - name: "DIFFICULTY"
+              value: "4"
+            - name: "METRICS_BIND"
+              value: ":9090"
+            - name: "POLICY_FNAME"
+              value: "/xe/cfg/anubis/botPolicies.json"
+            - name: "SERVE_ROBOTS_TXT"
+              value: "true"
+            - name: "TARGET"
+              value: ""
+            - name: "SLOG_LEVEL"
+              value: "debug"
           volumeMounts:
-          - name: anubis
-            mountPath: /xe/cfg/anubis
+            - name: anubis
+              mountPath: /xe/cfg/anubis
           resources:
             limits:
               cpu: 500m

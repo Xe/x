@@ -1,7 +1,7 @@
 kind: HTTPScaledObject
 apiVersion: http.keda.sh/v1alpha1
 metadata:
-   name: hlang
+  name: hlang
 spec:
   hosts:
     - h.christine.website
@@ -21,4 +21,4 @@ spec:
     requestRate:
       granularity: 1s
       targetValue: 100
-      window: 1m  
+      window: 1m

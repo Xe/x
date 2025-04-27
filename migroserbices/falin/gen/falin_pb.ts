@@ -3,7 +3,14 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
+import type {
+  BinaryReadOptions,
+  FieldList,
+  JsonReadOptions,
+  JsonValue,
+  PartialMessage,
+  PlainMessage,
+} from "@bufbuild/protobuf";
 import { Message, proto3, protoInt64 } from "@bufbuild/protobuf";
 
 /**
@@ -41,28 +48,46 @@ export class GenerateImageRequest extends Message<GenerateImageRequest> {
   }
 
   static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "within.website.x.falin.v1alpha1.GenerateImageRequest";
+  static readonly typeName =
+    "within.website.x.falin.v1alpha1.GenerateImageRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "prompt", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "model", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "seed", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
     { no: 4, name: "num_images", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-    { no: 5, name: "enable_safety_checker", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    {
+      no: 5,
+      name: "enable_safety_checker",
+      kind: "scalar",
+      T: 8 /* ScalarType.BOOL */,
+    },
   ]);
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GenerateImageRequest {
+  static fromBinary(
+    bytes: Uint8Array,
+    options?: Partial<BinaryReadOptions>,
+  ): GenerateImageRequest {
     return new GenerateImageRequest().fromBinary(bytes, options);
   }
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GenerateImageRequest {
+  static fromJson(
+    jsonValue: JsonValue,
+    options?: Partial<JsonReadOptions>,
+  ): GenerateImageRequest {
     return new GenerateImageRequest().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GenerateImageRequest {
+  static fromJsonString(
+    jsonString: string,
+    options?: Partial<JsonReadOptions>,
+  ): GenerateImageRequest {
     return new GenerateImageRequest().fromJsonString(jsonString, options);
   }
 
-  static equals(a: GenerateImageRequest | PlainMessage<GenerateImageRequest> | undefined, b: GenerateImageRequest | PlainMessage<GenerateImageRequest> | undefined): boolean {
+  static equals(
+    a: GenerateImageRequest | PlainMessage<GenerateImageRequest> | undefined,
+    b: GenerateImageRequest | PlainMessage<GenerateImageRequest> | undefined,
+  ): boolean {
     return proto3.util.equals(GenerateImageRequest, a, b);
   }
 }
@@ -102,22 +127,39 @@ export class ImageOutput extends Message<ImageOutput> {
     { no: 1, name: "url", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "width", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
     { no: 3, name: "height", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-    { no: 4, name: "content_type", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    {
+      no: 4,
+      name: "content_type",
+      kind: "scalar",
+      T: 9 /* ScalarType.STRING */,
+    },
   ]);
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ImageOutput {
+  static fromBinary(
+    bytes: Uint8Array,
+    options?: Partial<BinaryReadOptions>,
+  ): ImageOutput {
     return new ImageOutput().fromBinary(bytes, options);
   }
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ImageOutput {
+  static fromJson(
+    jsonValue: JsonValue,
+    options?: Partial<JsonReadOptions>,
+  ): ImageOutput {
     return new ImageOutput().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ImageOutput {
+  static fromJsonString(
+    jsonString: string,
+    options?: Partial<JsonReadOptions>,
+  ): ImageOutput {
     return new ImageOutput().fromJsonString(jsonString, options);
   }
 
-  static equals(a: ImageOutput | PlainMessage<ImageOutput> | undefined, b: ImageOutput | PlainMessage<ImageOutput> | undefined): boolean {
+  static equals(
+    a: ImageOutput | PlainMessage<ImageOutput> | undefined,
+    b: ImageOutput | PlainMessage<ImageOutput> | undefined,
+  ): boolean {
     return proto3.util.equals(ImageOutput, a, b);
   }
 }
@@ -142,26 +184,38 @@ export class GenerateImageResponse extends Message<GenerateImageResponse> {
   }
 
   static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "within.website.x.falin.v1alpha1.GenerateImageResponse";
+  static readonly typeName =
+    "within.website.x.falin.v1alpha1.GenerateImageResponse";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "images", kind: "message", T: ImageOutput, repeated: true },
     { no: 2, name: "prompt", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GenerateImageResponse {
+  static fromBinary(
+    bytes: Uint8Array,
+    options?: Partial<BinaryReadOptions>,
+  ): GenerateImageResponse {
     return new GenerateImageResponse().fromBinary(bytes, options);
   }
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GenerateImageResponse {
+  static fromJson(
+    jsonValue: JsonValue,
+    options?: Partial<JsonReadOptions>,
+  ): GenerateImageResponse {
     return new GenerateImageResponse().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GenerateImageResponse {
+  static fromJsonString(
+    jsonString: string,
+    options?: Partial<JsonReadOptions>,
+  ): GenerateImageResponse {
     return new GenerateImageResponse().fromJsonString(jsonString, options);
   }
 
-  static equals(a: GenerateImageResponse | PlainMessage<GenerateImageResponse> | undefined, b: GenerateImageResponse | PlainMessage<GenerateImageResponse> | undefined): boolean {
+  static equals(
+    a: GenerateImageResponse | PlainMessage<GenerateImageResponse> | undefined,
+    b: GenerateImageResponse | PlainMessage<GenerateImageResponse> | undefined,
+  ): boolean {
     return proto3.util.equals(GenerateImageResponse, a, b);
   }
 }
-

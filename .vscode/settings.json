@@ -1,8 +1,8 @@
 {
-    "nixEnvSelector.nixFile": "${workspaceRoot}/flake.nix",
-    "[markdown]": {
-        "editor.wordWrap": "wordWrapColumn",
-        "editor.wordWrapColumn": 80,
-        "editor.wordBasedSuggestions": "off"
-    },
+  "nixEnvSelector.nixFile": "${workspaceRoot}/flake.nix",
+  "[markdown]": {
+    "editor.wordWrap": "wordWrapColumn",
+    "editor.wordWrapColumn": 80,
+    "editor.wordBasedSuggestions": "off"
+  }
 }

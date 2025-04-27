@@ -4,11 +4,11 @@ metadata:
   name: gitea
 spec:
   endpoints:
-  - dnsName: git.xeserv.us
-    recordTTL: 3600
-    recordType: A
-    targets:
-    - 10.219.80.171
+    - dnsName: git.xeserv.us
+      recordTTL: 3600
+      recordType: A
+      targets:
+        - 10.219.80.171
 ---
 apiVersion: cert-manager.io/v1
 kind: Certificate

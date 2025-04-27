@@ -20,5 +20,3 @@ To build the Rust module from inside the Nix flake:
 
 This adds about two megabytes to the resulting binary, including the AOT
 WebAssembly runtime wazero: https://wazero.io/
-
-

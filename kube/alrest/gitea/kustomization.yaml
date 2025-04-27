@@ -11,13 +11,13 @@ resources:
 namespace: gitea
 
 configMapGenerator:
-- name: anubis-cfg
-  behavior: create
-  files:
-  - ./cfg/anubis/botPolicies.json
-  - ./cfg/anubis/botPolicies.yaml
+  - name: anubis-cfg
+    behavior: create
+    files:
+      - ./cfg/anubis/botPolicies.json
+      - ./cfg/anubis/botPolicies.yaml
 
-- name: botstopper-custom-css
-  behavior: create
-  files:
-  - ./cfg/botstopper/custom.css
+  - name: botstopper-custom-css
+    behavior: create
+    files:
+      - ./cfg/botstopper/custom.css

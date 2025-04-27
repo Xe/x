@@ -64,7 +64,7 @@ export default {
     channel: "",
     nick: "",
     user: "",
-    real: ""
+    real: "",
   },
   xdcc: {
     server: "",
@@ -72,21 +72,21 @@ export default {
     channel: "",
     nick: "",
     user: "",
-    real: ""
+    real: "",
   },
   transmission: {
     host: "",
     user: "",
     password: "",
     https: true,
-    rpcURI: "/transmission/rpc"
+    rpcURI: "/transmission/rpc",
   },
   shows: [
     {
       title: "Show Name",
       diskPath: "/data/TV/Show Name",
-      quality: "1080p"
-    }
+      quality: "1080p",
+    },
   ],
   rssKey: "",
   tailscale: {
@@ -99,7 +99,8 @@ export default {
     token: "",
     mentionUser: 0,
   },
-  wireguard: { // for downloading files over DCC (XDCC)
+  wireguard: {
+    // for downloading files over DCC (XDCC)
     privateKey: "",
     address: [],
     dns: "",

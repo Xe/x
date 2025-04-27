@@ -2,1058 +2,671 @@
   {
     "name": "a",
     "gloss": "ah",
-    "grammar": [
-      "interj"
-    ]
+    "grammar": ["interj"]
   },
   {
     "name": "akesi",
     "category": "animal",
     "gloss": "reptile",
-    "grammar": [
-      "n"
-    ]
+    "grammar": ["n"]
   },
   {
     "name": "ala",
     "gloss": "no",
-    "grammar": [
-      "mod",
-      "n",
-      "interj"
-    ]
+    "grammar": ["mod", "n", "interj"]
   },
   {
     "name": "ali",
     "gloss": "all",
-    "grammar": [
-      "n",
-      "mod"
-    ]
+    "grammar": ["n", "mod"]
   },
   {
     "name": "ale",
     "gloss": "all",
-    "grammar": [
-      "n",
-      "mod"
-    ]
+    "grammar": ["n", "mod"]
   },
   {
     "name": "anpa",
     "gloss": "under",
-    "grammar": [
-      "n",
-      "mod"
-    ]
+    "grammar": ["n", "mod"]
   },
   {
     "name": "ante",
     "gloss": "different",
-    "grammar": [
-      "n",
-      "mod",
-      "conj",
-      "vt"
-    ]
+    "grammar": ["n", "mod", "conj", "vt"]
   },
   {
     "name": "anu",
     "category": "separator",
     "gloss": "or",
-    "grammar": [
-      "conj"
-    ]
+    "grammar": ["conj"]
   },
   {
     "name": "awen",
     "gloss": "remain",
-    "grammar": [
-      "vi",
-      "vt",
-      "mod"
-    ]
+    "grammar": ["vi", "vt", "mod"]
   },
   {
     "name": "e",
     "category": "separator",
     "gloss": "object marker",
-    "grammar": [
-      "sep"
-    ]
+    "grammar": ["sep"]
   },
   {
     "name": "en",
     "category": "separator",
     "gloss": "and",
-    "grammar": [
-      "conj"
-    ]
+    "grammar": ["conj"]
   },
   {
     "name": "esun",
     "gloss": "shop",
-    "grammar": [
-      "n"
-    ]
+    "grammar": ["n"]
   },
   {
     "name": "ijo",
     "gloss": "thing",
-    "grammar": [
-      "n",
-      "mod",
-      "vt"
-    ]
+    "grammar": ["n", "mod", "vt"]
   },
   {
     "name": "ike",
     "gloss": "evil",
-    "grammar": [
-      "mod",
-      "interj",
-      "n",
-      "vt",
-      "vi"
-    ]
+    "grammar": ["mod", "interj", "n", "vt", "vi"]
   },
   {
     "name": "ilo",
     "gloss": "tool",
-    "grammar": [
-      "n"
-    ]
+    "grammar": ["n"]
   },
   {
     "name": "insa",
     "gloss": "inside",
-    "grammar": [
-      "n",
-      "mod"
-    ]
+    "grammar": ["n", "mod"]
   },
   {
     "name": "jaki",
     "gloss": "dirty",
-    "grammar": [
-      "mod",
-      "n",
-      "vt",
-      "interj"
-    ]
+    "grammar": ["mod", "n", "vt", "interj"]
   },
   {
     "name": "jan",
     "category": "animal",
     "gloss": "person",
-    "grammar": [
-      "n",
-      "mod",
-      "vt"
-    ]
+    "grammar": ["n", "mod", "vt"]
   },
   {
     "name": "jelo",
     "category": "color",
     "gloss": "yellow",
-    "grammar": [
-      "mod"
-    ]
+    "grammar": ["mod"]
   },
   {
     "name": "jo",
     "gloss": "have",
-    "grammar": [
-      "vt",
-      "n"
-    ]
+    "grammar": ["vt", "n"]
   },
   {
     "name": "kala",
     "category": "animal",
     "gloss": "fish",
-    "grammar": [
-      "n"
-    ]
+    "grammar": ["n"]
   },
   {
     "name": "kalama",
     "gloss": "sound",
-    "grammar": [
-      "n",
-      "vi",
-      "vt"
-    ]
+    "grammar": ["n", "vi", "vt"]
   },
   {
     "name": "kama",
     "gloss": "come",
-    "grammar": [
-      "vi",
-      "n",
-      "mod",
-      "vt"
-    ]
+    "grammar": ["vi", "n", "mod", "vt"]
   },
   {
     "name": "kasi",
     "gloss": "plant",
-    "grammar": [
-      "n"
-    ]
+    "grammar": ["n"]
   },
   {
     "name": "ken",
     "gloss": "possible",
-    "grammar": [
-      "vi",
-      "n",
-      "vt"
-    ]
+    "grammar": ["vi", "n", "vt"]
   },
   {
     "name": "kepeken",
     "gloss": "use",
-    "grammar": [
-      "vt",
-      "prep"
-    ]
+    "grammar": ["vt", "prep"]
   },
   {
     "name": "kili",
     "gloss": "fruit",
-    "grammar": [
-      "n"
-    ]
+    "grammar": ["n"]
   },
   {
     "name": "kin",
     "gloss": "also",
-    "grammar": [
-      "mod"
-    ]
+    "grammar": ["mod"]
   },
   {
     "name": "kiwen",
     "gloss": "rock",
-    "grammar": [
-      "mod",
-      "n"
-    ]
+    "grammar": ["mod", "n"]
   },
   {
     "name": "ko",
     "gloss": "squishy",
-    "grammar": [
-      "n"
-    ]
+    "grammar": ["n"]
   },
   {
     "name": "kon",
     "gloss": "soul",
-    "grammar": [
-      "n",
-      "mod"
-    ]
+    "grammar": ["n", "mod"]
   },
   {
     "name": "kule",
     "gloss": "color",
-    "grammar": [
-      "n",
-      "mod",
-      "vt"
-    ]
+    "grammar": ["n", "mod", "vt"]
   },
   {
     "name": "kulupu",
     "gloss": "group",
-    "grammar": [
-      "n",
-      "mod"
-    ]
+    "grammar": ["n", "mod"]
   },
   {
     "name": "kute",
     "gloss": "listen",
-    "grammar": [
-      "vt",
-      "mod"
-    ]
+    "grammar": ["vt", "mod"]
   },
   {
     "name": "la",
     "category": "separator",
     "gloss": "in context",
-    "grammar": [
-      "sep"
-    ]
+    "grammar": ["sep"]
   },
   {
     "name": "lape",
     "gloss": "rest",
-    "grammar": [
-      "n",
-      "vi",
-      "mod"
-    ]
+    "grammar": ["n", "vi", "mod"]
   },
   {
     "name": "laso",
     "category": "color",
     "gloss": "blue/green",
-    "grammar": [
-      "mod"
-    ]
+    "grammar": ["mod"]
   },
   {
     "name": "lawa",
     "gloss": "head",
-    "grammar": [
-      "n",
-      "mod",
-      "vt"
-    ]
+    "grammar": ["n", "mod", "vt"]
   },
   {
     "name": "len",
     "gloss": "cloth",
-    "grammar": [
-      "n"
-    ]
+    "grammar": ["n"]
   },
   {
     "name": "lete",
     "gloss": "cold",
-    "grammar": [
-      "n",
-      "mod",
-      "vt"
-    ]
+    "grammar": ["n", "mod", "vt"]
   },
   {
     "name": "li",
     "category": "separator",
     "gloss": "is",
-    "grammar": [
-      "sep"
-    ]
+    "grammar": ["sep"]
   },
   {
     "name": "lili",
     "gloss": "small",
-    "grammar": [
-      "mod",
-      "vt"
-    ]
+    "grammar": ["mod", "vt"]
   },
   {
     "name": "linja",
     "gloss": "string",
-    "grammar": [
-      "n"
-    ]
+    "grammar": ["n"]
   },
   {
     "name": "lipu",
     "gloss": "paper",
-    "grammar": [
-      "n"
-    ]
+    "grammar": ["n"]
   },
   {
     "name": "loje",
     "category": "color",
     "gloss": "red",
-    "grammar": [
-      "mod"
-    ]
+    "grammar": ["mod"]
   },
   {
     "name": "lon",
     "gloss": "located",
-    "grammar": [
-      "prep",
-      "vi"
-    ]
+    "grammar": ["prep", "vi"]
   },
   {
     "name": "luka",
     "gloss": "hand",
-    "grammar": [
-      "n"
-    ]
+    "grammar": ["n"]
   },
   {
     "name": "lukin",
     "gloss": "see",
-    "grammar": [
-      "vt",
-      "vi",
-      "mod"
-    ]
+    "grammar": ["vt", "vi", "mod"]
   },
   {
     "name": "lupa",
     "gloss": "hole",
-    "grammar": [
-      "n"
-    ]
+    "grammar": ["n"]
   },
   {
     "name": "ma",
     "gloss": "land",
-    "grammar": [
-      "n"
-    ]
+    "grammar": ["n"]
   },
   {
     "name": "mama",
     "category": "animal",
     "gloss": "parent",
-    "grammar": [
-      "n",
-      "mod"
-    ]
+    "grammar": ["n", "mod"]
   },
   {
     "name": "mani",
     "gloss": "money",
-    "grammar": [
-      "n"
-    ]
+    "grammar": ["n"]
   },
   {
     "name": "meli",
     "category": "animal",
     "gloss": "female",
-    "grammar": [
-      "n",
-      "mod"
-    ]
+    "grammar": ["n", "mod"]
   },
   {
     "name": "mi",
     "gloss": "I/we",
-    "grammar": [
-      "n",
-      "mod"
-    ]
+    "grammar": ["n", "mod"]
   },
   {
     "name": "mije",
     "category": "animal",
     "gloss": "male",
-    "grammar": [
-      "n",
-      "mod"
-    ]
+    "grammar": ["n", "mod"]
   },
   {
     "name": "moku",
     "gloss": "food",
-    "grammar": [
-      "n",
-      "vt"
-    ]
+    "grammar": ["n", "vt"]
   },
   {
     "name": "moli",
     "gloss": "death",
-    "grammar": [
-      "n",
-      "vi",
-      "vt",
-      "mod"
-    ]
+    "grammar": ["n", "vi", "vt", "mod"]
   },
   {
     "name": "monsi",
     "gloss": "back",
-    "grammar": [
-      "n",
-      "mod"
-    ]
+    "grammar": ["n", "mod"]
   },
   {
     "name": "mu",
     "gloss": "moo!",
-    "grammar": [
-      "interj"
-    ]
+    "grammar": ["interj"]
   },
   {
     "name": "mun",
     "gloss": "moon",
-    "grammar": [
-      "n",
-      "mod"
-    ]
+    "grammar": ["n", "mod"]
   },
   {
     "name": "musi",
     "gloss": "play",
-    "grammar": [
-      "n",
-      "mod",
-      "vi",
-      "vt"
-    ]
+    "grammar": ["n", "mod", "vi", "vt"]
   },
   {
     "name": "mute",
     "gloss": "many",
-    "grammar": [
-      "mod",
-      "n",
-      "vt"
-    ]
+    "grammar": ["mod", "n", "vt"]
   },
   {
     "name": "namako",
     "gloss": "extra",
-    "grammar": [
-      "n",
-      "mod"
-    ]
+    "grammar": ["n", "mod"]
   },
   {
     "name": "nanpa",
     "gloss": "number",
-    "grammar": [
-      "n"
-    ]
+    "grammar": ["n"]
   },
   {
     "name": "nasa",
     "gloss": "crazy",
-    "grammar": [
-      "mod",
-      "vt"
-    ]
+    "grammar": ["mod", "vt"]
   },
   {
     "name": "nasin",
     "gloss": "manner",
-    "grammar": [
-      "n"
-    ]
+    "grammar": ["n"]
   },
   {
     "name": "nena",
     "gloss": "bump",
-    "grammar": [
-      "n"
-    ]
+    "grammar": ["n"]
   },
   {
     "name": "ni",
     "gloss": "this",
-    "grammar": [
-      "mod"
-    ]
+    "grammar": ["mod"]
   },
   {
     "name": "nimi",
     "gloss": "name",
-    "grammar": [
-      "n"
-    ]
+    "grammar": ["n"]
   },
   {
     "name": "noka",
     "gloss": "leg",
-    "grammar": [
-      "n"
-    ]
+    "grammar": ["n"]
   },
   {
     "name": "o",
     "gloss": "imperative",
-    "grammar": [
-      "sep",
-      "interj"
-    ]
+    "grammar": ["sep", "interj"]
   },
   {
     "name": "oko",
     "gloss": "eye",
-    "grammar": [
-      "n"
-    ]
+    "grammar": ["n"]
   },
   {
     "name": "olin",
     "gloss": "love",
-    "grammar": [
-      "n",
-      "mod",
-      "vt"
-    ]
+    "grammar": ["n", "mod", "vt"]
   },
   {
     "name": "ona",
     "gloss": "he/she/it",
-    "grammar": [
-      "n",
-      "mod"
-    ]
+    "grammar": ["n", "mod"]
   },
   {
     "name": "open",
     "gloss": "open",
-    "grammar": [
-      "vt"
-    ]
+    "grammar": ["vt"]
   },
   {
     "name": "pakala",
     "gloss": "destroy",
-    "grammar": [
-      "n",
-      "vt",
-      "vi",
-      "interj"
-    ]
+    "grammar": ["n", "vt", "vi", "interj"]
   },
   {
     "name": "pali",
     "gloss": "make",
-    "grammar": [
-      "n",
-      "mod",
-      "vt",
-      "vi"
-    ]
+    "grammar": ["n", "mod", "vt", "vi"]
   },
   {
     "name": "palisa",
     "gloss": "rod",
-    "grammar": [
-      "n"
-    ]
+    "grammar": ["n"]
   },
   {
     "name": "pan",
     "gloss": "grain",
-    "grammar": [
-      "n"
-    ]
+    "grammar": ["n"]
   },
   {
     "name": "pana",
     "gloss": "give",
-    "grammar": [
-      "vt",
-      "n"
-    ]
+    "grammar": ["vt", "n"]
   },
   {
     "name": "pi",
     "category": "separator",
     "gloss": "of",
-    "grammar": [
-      "sep"
-    ]
+    "grammar": ["sep"]
   },
   {
     "name": "pilin",
     "gloss": "feel",
-    "grammar": [
-      "n",
-      "vi",
-      "vt"
-    ]
+    "grammar": ["n", "vi", "vt"]
   },
   {
     "name": "pimeja",
     "category": "color",
     "gloss": "black",
-    "grammar": [
-      "mod",
-      "n",
-      "vt"
-    ]
+    "grammar": ["mod", "n", "vt"]
   },
   {
     "name": "pini",
     "gloss": "end",
-    "grammar": [
-      "n",
-      "mod",
-      "vt"
-    ]
+    "grammar": ["n", "mod", "vt"]
   },
   {
     "name": "pipi",
     "category": "animal",
     "gloss": "insect",
-    "grammar": [
-      "n"
-    ]
+    "grammar": ["n"]
   },
   {
     "name": "poka",
     "gloss": "side",
-    "grammar": [
-      "n",
-      "mod",
-      "prep"
-    ]
+    "grammar": ["n", "mod", "prep"]
   },
   {
     "name": "poki",
     "gloss": "box",
-    "grammar": [
-      "n"
-    ]
+    "grammar": ["n"]
   },
   {
     "name": "pona",
     "gloss": "good",
-    "grammar": [
-      "n",
-      "mod",
-      "interj",
-      "vt"
-    ]
+    "grammar": ["n", "mod", "interj", "vt"]
   },
   {
     "name": "pu",
     "gloss": "toki ponist",
-    "grammar": [
-      "n",
-      "mod",
-      "vi"
-    ]
+    "grammar": ["n", "mod", "vi"]
   },
   {
     "name": "sama",
     "gloss": "similar",
-    "grammar": [
-      "mod",
-      "prep"
-    ]
+    "grammar": ["mod", "prep"]
   },
   {
     "name": "seli",
     "gloss": "warm",
-    "grammar": [
-      "n",
-      "mod",
-      "vt"
-    ]
+    "grammar": ["n", "mod", "vt"]
   },
   {
     "name": "selo",
     "gloss": "surface",
-    "grammar": [
-      "n"
-    ]
+    "grammar": ["n"]
   },
   {
     "name": "seme",
     "gloss": "what",
-    "grammar": [
-      "n",
-      "mod",
-      "vi"
-    ]
+    "grammar": ["n", "mod", "vi"]
   },
   {
     "name": "sewi",
     "gloss": "superior",
-    "grammar": [
-      "n",
-      "mod"
-    ]
+    "grammar": ["n", "mod"]
   },
   {
     "name": "sijelo",
     "gloss": "body",
-    "grammar": [
-      "n"
-    ]
+    "grammar": ["n"]
   },
   {
     "name": "sike",
     "gloss": "circle",
-    "grammar": [
-      "n",
-      "mod"
-    ]
+    "grammar": ["n", "mod"]
   },
   {
     "name": "sin",
     "gloss": "new",
-    "grammar": [
-      "mod",
-      "vt"
-    ]
+    "grammar": ["mod", "vt"]
   },
   {
     "name": "sina",
     "gloss": "you",
-    "grammar": [
-      "n",
-      "mod"
-    ]
+    "grammar": ["n", "mod"]
   },
   {
     "name": "sinpin",
     "gloss": "front",
-    "grammar": [
-      "n"
-    ]
+    "grammar": ["n"]
   },
   {
     "name": "sitelen",
     "gloss": "draw",
-    "grammar": [
-      "n",
-      "vt"
-    ]
+    "grammar": ["n", "vt"]
   },
   {
     "name": "sona",
     "gloss": "wisdom",
-    "grammar": [
-      "n",
-      "vt",
-      "vi"
-    ]
+    "grammar": ["n", "vt", "vi"]
   },
   {
     "name": "soweli",
     "category": "animal",
     "gloss": "mammal",
-    "grammar": [
-      "n"
-    ]
+    "grammar": ["n"]
   },
   {
     "name": "suli",
     "gloss": "big",
-    "grammar": [
-      "mod",
-      "vt",
-      "n"
-    ]
+    "grammar": ["mod", "vt", "n"]
   },
   {
     "name": "suno",
     "gloss": "light",
-    "grammar": [
-      "n"
-    ]
+    "grammar": ["n"]
   },
   {
     "name": "supa",
     "gloss": "table",
-    "grammar": [
-      "n"
-    ]
+    "grammar": ["n"]
   },
   {
     "name": "suwi",
     "gloss": "sweet",
-    "grammar": [
-      "n",
-      "mod",
-      "vt"
-    ]
+    "grammar": ["n", "mod", "vt"]
   },
   {
     "name": "tan",
     "gloss": "because",
-    "grammar": [
-      "prep",
-      "n"
-    ]
+    "grammar": ["prep", "n"]
   },
   {
     "name": "taso",
     "gloss": "only",
-    "grammar": [
-      "mod",
-      "conj"
-    ]
+    "grammar": ["mod", "conj"]
   },
   {
     "name": "tawa",
     "gloss": "move",
-    "grammar": [
-      "prep",
-      "vi",
-      "n",
-      "mod",
-      "vt"
-    ]
+    "grammar": ["prep", "vi", "n", "mod", "vt"]
   },
   {
     "name": "telo",
     "gloss": "liquid",
-    "grammar": [
-      "n",
-      "vt"
-    ]
+    "grammar": ["n", "vt"]
   },
   {
     "name": "tenpo",
     "gloss": "time",
-    "grammar": [
-      "n"
-    ]
+    "grammar": ["n"]
   },
   {
     "name": "toki",
     "gloss": "talking",
-    "grammar": [
-      "n",
-      "mod",
-      "vt",
-      "vi",
-      "interj"
-    ]
+    "grammar": ["n", "mod", "vt", "vi", "interj"]
   },
   {
     "name": "tomo",
     "gloss": "house",
-    "grammar": [
-      "n",
-      "mod"
-    ]
+    "grammar": ["n", "mod"]
   },
   {
     "name": "tu",
     "gloss": "two",
-    "grammar": [
-      "mod",
-      "n"
-    ]
+    "grammar": ["mod", "n"]
   },
   {
     "name": "unpa",
     "gloss": "sex",
-    "grammar": [
-      "n",
-      "mod",
-      "vt",
-      "vi"
-    ]
+    "grammar": ["n", "mod", "vt", "vi"]
   },
   {
     "name": "uta",
     "gloss": "mouth",
-    "grammar": [
-      "n",
-      "mod"
-    ]
+    "grammar": ["n", "mod"]
   },
   {
     "name": "utala",
     "gloss": "attack",
-    "grammar": [
-      "n",
-      "vt"
-    ]
+    "grammar": ["n", "vt"]
   },
   {
     "name": "walo",
     "category": "color",
     "gloss": "white",
-    "grammar": [
-      "mod",
-      "n"
-    ]
+    "grammar": ["mod", "n"]
   },
   {
     "name": "wan",
     "gloss": "one",
-    "grammar": [
-      "mod",
-      "n",
-      "vt"
-    ]
+    "grammar": ["mod", "n", "vt"]
   },
   {
     "name": "waso",
     "category": "animal",
     "gloss": "bird",
-    "grammar": [
-      "n"
-    ]
+    "grammar": ["n"]
   },
   {
     "name": "wawa",
     "gloss": "power",
-    "grammar": [
-      "n",
-      "mod",
-      "vt"
-    ]
+    "grammar": ["n", "mod", "vt"]
   },
   {
     "name": "weka",
     "gloss": "away",
-    "grammar": [
-      "mod",
-      "n",
-      "vt"
-    ]
+    "grammar": ["mod", "n", "vt"]
   },
   {
     "name": "wile",
     "gloss": "need",
-    "grammar": [
-      "vt",
-      "n",
-      "mod"
-    ]
+    "grammar": ["vt", "n", "mod"]
   },
   {
     "name": ".",
     "category": "separator",
     "gloss": "period",
     "type": "punctuation",
-    "grammar": [
-      "punct"
-    ]
+    "grammar": ["punct"]
   },
   {
     "name": "?",
     "category": "separator",
     "gloss": "question",
     "type": "punctuation",
-    "grammar": [
-      "punct"
-    ]
+    "grammar": ["punct"]
   },
   {
     "name": "!",
     "category": "separator",
     "gloss": "exclamation",
     "type": "punctuation",
-    "grammar": [
-      "punct"
-    ]
+    "grammar": ["punct"]
   },
   {
     "name": ":",
     "category": "separator",
     "gloss": "colon",
     "type": "punctuation",
-    "grammar": [
-      "punct"
-    ]
+    "grammar": ["punct"]
   },
   {
     "name": ",",
     "category": "separator",
     "gloss": "comma",
     "type": "punctuation",
-    "grammar": [
-      "punct"
-    ]
+    "grammar": ["punct"]
   }
 ]

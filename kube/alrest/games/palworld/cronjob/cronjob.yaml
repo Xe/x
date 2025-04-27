@@ -5,7 +5,7 @@ metadata:
   name: restart-deployment
 spec:
   concurrencyPolicy: Forbid
-  schedule: '30 9 * * *'
+  schedule: "30 9 * * *"
   jobTemplate:
     spec:
       backoffLimit: 1

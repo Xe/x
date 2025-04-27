@@ -16,7 +16,7 @@ spec:
       nodeSelector:
         xeiaso.net/gpu: rtx2060-6gb
       containers:
-      - name: main
-        image: fedirz/faster-whisper-server:latest-cuda
-        ports:
-        - containerPort: 8000
+        - name: main
+          image: fedirz/faster-whisper-server:latest-cuda
+          ports:
+            - containerPort: 8000

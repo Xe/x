@@ -43,5 +43,5 @@ spec:
       storage: 64Gi
   volumeMode: Block
   accessModes:
-  - ReadWriteOnce
+    - ReadWriteOnce
   storageClassName: ssd

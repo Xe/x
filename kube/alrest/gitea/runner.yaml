@@ -36,31 +36,31 @@ spec:
     spec:
       restartPolicy: Always
       volumes:
-      - name: docker-certs
-        emptyDir: {}
-      - name: runner-data
-        emptyDir: {}
-      - name: docker-daemon-config
-        configMap:
-          name: docker-daemon-config
-      containers:
-      - name: runner
-        image: gitea/act_runner:nightly-dind
-        imagePullPolicy: Always
-        env:
-        - name: GITEA_INSTANCE_URL
-          value: http://git.gitea.svc.alrest.xeserv.us
-        - name: GITEA_RUNNER_REGISTRATION_TOKEN
-          valueFrom:
-            secretKeyRef:
-              name: runner-secret
-              key: token
-        securityContext:
-          privileged: true
-          runAsUser: 0
-        volumeMounts:
+        - name: docker-certs
+          emptyDir: {}
         - name: runner-data
-          mountPath: /data
-          subPath: "actions"
+          emptyDir: {}
         - name: docker-daemon-config
-          mountPath: "/etc/docker"
+          configMap:
+            name: docker-daemon-config
+      containers:
+        - name: runner
+          image: gitea/act_runner:nightly-dind
+          imagePullPolicy: Always
+          env:
+            - name: GITEA_INSTANCE_URL
+              value: http://git.gitea.svc.alrest.xeserv.us
+            - name: GITEA_RUNNER_REGISTRATION_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: runner-secret
+                  key: token
+          securityContext:
+            privileged: true
+            runAsUser: 0
+          volumeMounts:
+            - name: runner-data
+              mountPath: /data
+              subPath: "actions"
+            - name: docker-daemon-config
+              mountPath: "/etc/docker"

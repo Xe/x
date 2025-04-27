@@ -18,60 +18,59 @@ spec:
       nodeSelector:
         xeiaso.net/cpu: ryzen-5950X
       volumes:
-      - name: datadir
-        persistentVolumeClaim:
-          claimName: motortown
+        - name: datadir
+          persistentVolumeClaim:
+            claimName: motortown
       initContainers:
-      - name: update
-        image: steamcmd/steamcmd:latest
-        imagePullPolicy: Always
-        env:
-        - name: UPDATE_COMMAND
-          valueFrom:
-            secretKeyRef:
-              name: motortown-secrets
-              key: UPDATE_COMMAND
-        command: ["/bin/bash"]
-        args:
-          - "-c"
-          - "${UPDATE_COMMAND}"
-        volumeMounts:
-        - mountPath: /root
-          name: datadir
+        - name: update
+          image: steamcmd/steamcmd:latest
+          imagePullPolicy: Always
+          env:
+            - name: UPDATE_COMMAND
+              valueFrom:
+                secretKeyRef:
+                  name: motortown-secrets
+                  key: UPDATE_COMMAND
+          command: ["/bin/bash"]
+          args:
+            - "-c"
+            - "${UPDATE_COMMAND}"
+          volumeMounts:
+            - mountPath: /root
+              name: datadir
       nodeName: pneuma
       containers:
-      - name: motortown
-        image: ghcr.io/xe/steamcmd-wine-xvfb
-        imagePullPolicy: Always
-        command:
-        - "/usr/bin/launch_server"
-        - /home/steam/.steam/steam/compatibilitytools.d/GE-Proton-9-24/proton
-        - run
-        - "/root/motortown/MotorTown/Binaries/Win64/MotorTownServer-Win64-Shipping.exe"
-        - "Jeju_World?listen?"
-        - "-server"
-        - "-log"
-        - "-useperfthreads"
-        - "-Port=7777"
-        - "-QueryPort=27015"
-        volumeMounts:
-        - mountPath: /root
-          name: datadir
-        ports:
-        - containerPort: 7777
-          hostPort: 7777
-          protocol: TCP
-          name: game-tcp
-        - containerPort: 7777
-          hostPort: 7777
-          protocol: UDP
-          name: game-udp
-        - containerPort: 27015
-          hostPort: 27015
-          protocol: TCP
-          name: query-tcp
-        - containerPort: 27015
-          hostPort: 27015
-          protocol: UDP
-          name: query-udp
-        
+        - name: motortown
+          image: ghcr.io/xe/steamcmd-wine-xvfb
+          imagePullPolicy: Always
+          command:
+            - "/usr/bin/launch_server"
+            - /home/steam/.steam/steam/compatibilitytools.d/GE-Proton-9-24/proton
+            - run
+            - "/root/motortown/MotorTown/Binaries/Win64/MotorTownServer-Win64-Shipping.exe"
+            - "Jeju_World?listen?"
+            - "-server"
+            - "-log"
+            - "-useperfthreads"
+            - "-Port=7777"
+            - "-QueryPort=27015"
+          volumeMounts:
+            - mountPath: /root
+              name: datadir
+          ports:
+            - containerPort: 7777
+              hostPort: 7777
+              protocol: TCP
+              name: game-tcp
+            - containerPort: 7777
+              hostPort: 7777
+              protocol: UDP
+              name: game-udp
+            - containerPort: 27015
+              hostPort: 27015
+              protocol: TCP
+              name: query-tcp
+            - containerPort: 27015
+              hostPort: 27015
+              protocol: UDP
+              name: query-udp

@@ -10,16 +10,16 @@ spec:
   ingressClassName: nginx
   tls:
     - hosts:
-      - within.website
+        - within.website
       secretName: within-website-public-tls
   rules:
-  - host: within.website
-    http:
-      paths:
-      - pathType: Prefix
-        path: "/"
-        backend:
-          service:
-            name: within-website
-            port: 
-              name: http
+    - host: within.website
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: within-website
+                port:
+                  name: http

@@ -4,13 +4,13 @@ metadata:
   name: nekomata
 spec:
   endpoints:
-  - dnsName: nekomata.within.lgbt
-    recordTTL: 3600
-    recordType: A
-    targets:
-    - 195.26.244.235
-  - dnsName: nekomata.within.lgbt
-    recordTTL: 3600
-    recordType: AAAA
-    targets:
-    - 2605:a140:2244:0333::1
+    - dnsName: nekomata.within.lgbt
+      recordTTL: 3600
+      recordType: A
+      targets:
+        - 195.26.244.235
+    - dnsName: nekomata.within.lgbt
+      recordTTL: 3600
+      recordType: AAAA
+      targets:
+        - 2605:a140:2244:0333::1

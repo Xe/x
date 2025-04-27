@@ -1,1 +1,107 @@
-@import url(https://cdn.xeiaso.net/static/css/iosevka/family.css);:root{--background-color:236;--text-color:55;--accent-color:200;--width:80ch;--padding:0;--font-family:"Iosevka Aile Iaso",sans-serif;--header-font-family:"Iosevka Etoile Iaso",serif;--pre-font-family:"Iosevka Curly Iaso",monospace}:root{--selection:hsla(var(--accent-color), 80%, 30%, 100%);--selection-light:hsla(var(--accent-color), 50%, 80%, 100%);--background:hsla(var(--background-color), 100%, 10%, 100%);--background-light:hsla(var(--background-color), 10%, 95%, 100%);--text:hsla(var(--text-color), 0%, 90%, 100%);--text-light:hsla(var(--text-color), 90%, 5%, 100%);--pre-background:hsla(var(--background-color), 90%, 5%, 100%);--pre-background-light:hsla(var(--background-color), 10%, 80%, 100%);--a-background:hsla(var(--background-color), 90%, 5%, 100%);--a-background-light:hsla(var(--background-color), 30%, 90%, 100%);--a-color:hsla(var(--accent-color), 70%, 85%, 100%);--a-color-light:hsla(var(--accent-color), 80%, 10%, 100%);--blockquote-border:0.5ch solid hsla(var(--accent-color), 80%, 80%, 100%);--blockquote-border-light:0.5ch solid hsla(var(--accent-color), 50%, 30%, 100%)}main{font-family:var(--font-family);max-width:var(--width);padding:var(--padding);margin:auto}@media only screen and (max-device-width:736px){main{padding:0}}::selection{background:var(--selection)}body{background:var(--background);color:var(--text)}pre{font-family:var(--pre-font-family);background-color:var(--pre-background);padding:1em;border:0}a,a:active,a:visited{color:var(--selection);background-color:var(--a-background)}h1,h2,h3,h4,h5,h6{font-family:var(--header-font-family);margin-bottom:.1rem}blockquote{border-left:var(--blockquote-border);margin:.5em 10px;padding:.5em 10px}footer{align:center}@media (prefers-color-scheme:light){::selection{background:var(--selection-light)}body{background:var(--background-light);color:var(--text-light)}pre{background-color:var(--pre-background-light);padding:1em;border:0}a,a:active,a:visited{color:var(--a-color-light);background-color:var(--a-background-light)}h1,h2,h3,h4,h5{margin-bottom:.1rem}blockquote{border-left:var(--blockquote-border-light);margin:.5em 10px;padding:.5em 10px}}
+@import url(https://cdn.xeiaso.net/static/css/iosevka/family.css);
+:root {
+  --background-color: 236;
+  --text-color: 55;
+  --accent-color: 200;
+  --width: 80ch;
+  --padding: 0;
+  --font-family: "Iosevka Aile Iaso", sans-serif;
+  --header-font-family: "Iosevka Etoile Iaso", serif;
+  --pre-font-family: "Iosevka Curly Iaso", monospace;
+}
+:root {
+  --selection: hsla(var(--accent-color), 80%, 30%, 100%);
+  --selection-light: hsla(var(--accent-color), 50%, 80%, 100%);
+  --background: hsla(var(--background-color), 100%, 10%, 100%);
+  --background-light: hsla(var(--background-color), 10%, 95%, 100%);
+  --text: hsla(var(--text-color), 0%, 90%, 100%);
+  --text-light: hsla(var(--text-color), 90%, 5%, 100%);
+  --pre-background: hsla(var(--background-color), 90%, 5%, 100%);
+  --pre-background-light: hsla(var(--background-color), 10%, 80%, 100%);
+  --a-background: hsla(var(--background-color), 90%, 5%, 100%);
+  --a-background-light: hsla(var(--background-color), 30%, 90%, 100%);
+  --a-color: hsla(var(--accent-color), 70%, 85%, 100%);
+  --a-color-light: hsla(var(--accent-color), 80%, 10%, 100%);
+  --blockquote-border: 0.5ch solid hsla(var(--accent-color), 80%, 80%, 100%);
+  --blockquote-border-light: 0.5ch solid
+    hsla(var(--accent-color), 50%, 30%, 100%);
+}
+main {
+  font-family: var(--font-family);
+  max-width: var(--width);
+  padding: var(--padding);
+  margin: auto;
+}
+@media only screen and (max-device-width: 736px) {
+  main {
+    padding: 0;
+  }
+}
+::selection {
+  background: var(--selection);
+}
+body {
+  background: var(--background);
+  color: var(--text);
+}
+pre {
+  font-family: var(--pre-font-family);
+  background-color: var(--pre-background);
+  padding: 1em;
+  border: 0;
+}
+a,
+a:active,
+a:visited {
+  color: var(--selection);
+  background-color: var(--a-background);
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--header-font-family);
+  margin-bottom: 0.1rem;
+}
+blockquote {
+  border-left: var(--blockquote-border);
+  margin: 0.5em 10px;
+  padding: 0.5em 10px;
+}
+footer {
+  align: center;
+}
+@media (prefers-color-scheme: light) {
+  ::selection {
+    background: var(--selection-light);
+  }
+  body {
+    background: var(--background-light);
+    color: var(--text-light);
+  }
+  pre {
+    background-color: var(--pre-background-light);
+    padding: 1em;
+    border: 0;
+  }
+  a,
+  a:active,
+  a:visited {
+    color: var(--a-color-light);
+    background-color: var(--a-background-light);
+  }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5 {
+    margin-bottom: 0.1rem;
+  }
+  blockquote {
+    border-left: var(--blockquote-border-light);
+    margin: 0.5em 10px;
+    padding: 0.5em 10px;
+  }
+}

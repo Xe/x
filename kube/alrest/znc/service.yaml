@@ -6,10 +6,10 @@ spec:
   selector:
     app: znc
   ports:
-  - port: 80
-    targetPort: 1337
-    name: http
-  - port: 6667
-    targetPort: 6667
-    name: irc
+    - port: 80
+      targetPort: 1337
+      name: http
+    - port: 6667
+      targetPort: 6667
+      name: irc
   type: ClusterIP

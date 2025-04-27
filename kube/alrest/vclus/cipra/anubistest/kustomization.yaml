@@ -6,7 +6,7 @@ resources:
 namespace: default
 
 configMapGenerator:
-- name: anubis-cfg
-  behavior: create
-  files:
-  - ./anubis/botPolicies.json
+  - name: anubis-cfg
+    behavior: create
+    files:
+      - ./anubis/botPolicies.json

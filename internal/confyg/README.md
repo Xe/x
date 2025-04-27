@@ -101,8 +101,9 @@ var (
 
 func main() {
   flag.Parse()
-  
+
   if *config != "" {
     flagconfyg.CmdParse(*config)
   }
 }
+```

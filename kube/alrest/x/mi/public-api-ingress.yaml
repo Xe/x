@@ -19,16 +19,16 @@ spec:
   ingressClassName: nginx
   tls:
     - hosts:
-      - mi.cetacean.club
+        - mi.cetacean.club
       secretName: mi-public-tls
   rules:
-  - host: mi.cetacean.club
-    http:
-      paths:
-      - pathType: Prefix
-        path: "/"
-        backend:
-          service:
-            name: mi
-            port: 
-              name: http
+    - host: mi.cetacean.club
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: mi
+                port:
+                  name: http

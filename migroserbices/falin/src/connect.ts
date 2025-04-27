@@ -17,36 +17,42 @@ interface falOutput {
 }
 
 export default function (router: ConnectRouter) {
-  router.rpc(ImageService, ImageService.methods.generateImage, async (req): Promise<GenerateImageResponse> => {
-    try {
-      const result: falOutput = await fal.run(req.model, {
-        input: {
-          prompt: req.prompt,
-          seed: req.seed || undefined,
-          image_size: {
-            width: 1344,
-            height: 768,
+  router.rpc(
+    ImageService,
+    ImageService.methods.generateImage,
+    async (req): Promise<GenerateImageResponse> => {
+      try {
+        const result: falOutput = await fal.run(req.model, {
+          input: {
+            prompt: req.prompt,
+            seed: req.seed || undefined,
+            image_size: {
+              width: 1344,
+              height: 768,
+            },
+            num_images: req.numImages || 1,
+            enable_safety_checker: req.enableSafetyChecker || true,
           },
-          num_images: req.numImages || 1,
-          enable_safety_checker: req.enableSafetyChecker || true,
-        }
-      });
+        });
 
-      const images = result.images.map(img => new ImageOutput({
-        url: img.url,
-        width: img.width,
-        height: img.height,
-        contentType: img.content_type,
-      }));
+        const images = result.images.map(
+          (img) =>
+            new ImageOutput({
+              url: img.url,
+              width: img.width,
+              height: img.height,
+              contentType: img.content_type,
+            }),
+        );
 
-      return new GenerateImageResponse({
-        images,
-        prompt: result.prompt,
-      });
-    }
-    catch (e) {
-      console.log(e);
-      throw e;
-    }
-  });
+        return new GenerateImageResponse({
+          images,
+          prompt: result.prompt,
+        });
+      } catch (e) {
+        console.log(e);
+        throw e;
+      }
+    },
+  );
 }

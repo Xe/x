@@ -6,9 +6,9 @@ spec:
   selector:
     app: glance
   ports:
-  - port: 80
-    targetPort: 8080
-    name: http
-  - port: 443
-    targetPort: 8443
-    name: https
+    - port: 80
+      targetPort: 8080
+      name: http
+    - port: 443
+      targetPort: 8443
+      name: https

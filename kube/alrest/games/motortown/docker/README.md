@@ -25,7 +25,7 @@ FROM fragsoc/steamcmd-wine-xvfb
 CMD "./MyServer.exe"
 ```
 
-If you need to, you can override the default `ENTRYPOINT` ([`/usr/bin/launch_server`](launch_server.sh)) with your own combination of tools. 
+If you need to, you can override the default `ENTRYPOINT` ([`/usr/bin/launch_server`](launch_server.sh)) with your own combination of tools.
 
 ## Similar Tools
 

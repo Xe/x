@@ -12,16 +12,16 @@ spec:
   ingressClassName: nginx
   tls:
     - hosts:
-      - te.xeiaso.net
+        - te.xeiaso.net
       secretName: twitch-events-xeiaso-net-tls
   rules:
-  - host: te.xeiaso.net
-    http:
-      paths:
-      - pathType: Prefix
-        path: "/twitch"
-        backend:
-          service:
-            name: mi
-            port: 
-              name: http
+    - host: te.xeiaso.net
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/twitch"
+            backend:
+              service:
+                name: mi
+                port:
+                  name: http

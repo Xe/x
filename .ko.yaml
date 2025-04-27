@@ -1,46 +1,46 @@
 defaultBaseImage: cgr.dev/chainguard/static
 defaultPlatforms:
-- linux/arm64
-- linux/amd64
+  - linux/arm64
+  - linux/amd64
 
 builds:
-- &base
-  id: reverseproxyd
-  main: ./cmd/reverseproxyd
-  ldflags:
-  - -s -w
-  - -extldflags "-static"
-  - -X within.website/x.Version={{.Env.VERSION}}
-- <<: *base
-  id: relayd
-  main: ./cmd/relayd
-- <<: *base
-  id: quickserv
-  main: ./cmd/quickserv
-- <<: *base
-  id: amano
-  main: ./cmd/amano
-- <<: *base
-  id: aerial
-  main: ./cmd/aerial
-- <<: *base
-  id: aura
-  main: ./cmd/aura
-- <<: *base
-  id: future-sight
-  main: ./cmd/future-sight
-- <<: *base
-  id: stickers
-  main: ./cmd/stickers
-- <<: *base
-  id: httpdebug
-  main: ./cmd/httpdebug
-- <<: *base
-  id: uncle-ted
-  main: ./cmd/uncle-ted
-- <<: *base
-  id: within.website
-  main: ./cmd/within.website
-- <<: *base
-  id: sapientwindex
-  main: ./cmd/sapientwindex
+  - &base
+    id: reverseproxyd
+    main: ./cmd/reverseproxyd
+    ldflags:
+      - -s -w
+      - -extldflags "-static"
+      - -X within.website/x.Version={{.Env.VERSION}}
+  - <<: *base
+    id: relayd
+    main: ./cmd/relayd
+  - <<: *base
+    id: quickserv
+    main: ./cmd/quickserv
+  - <<: *base
+    id: amano
+    main: ./cmd/amano
+  - <<: *base
+    id: aerial
+    main: ./cmd/aerial
+  - <<: *base
+    id: aura
+    main: ./cmd/aura
+  - <<: *base
+    id: future-sight
+    main: ./cmd/future-sight
+  - <<: *base
+    id: stickers
+    main: ./cmd/stickers
+  - <<: *base
+    id: httpdebug
+    main: ./cmd/httpdebug
+  - <<: *base
+    id: uncle-ted
+    main: ./cmd/uncle-ted
+  - <<: *base
+    id: within.website
+    main: ./cmd/within.website
+  - <<: *base
+    id: sapientwindex
+    main: ./cmd/sapientwindex

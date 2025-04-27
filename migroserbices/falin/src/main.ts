@@ -13,9 +13,11 @@ app.use(express.json());
 app.use(morgan("combined"));
 app.all(falProxy.route, cors(), falProxy.handler);
 
-app.use(expressConnectMiddleware({
-  routes
-}));
+app.use(
+  expressConnectMiddleware({
+    routes,
+  }),
+);
 
 app.get("/healthz", function (_req, res) {
   res.send("OK");

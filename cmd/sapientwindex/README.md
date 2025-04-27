@@ -10,9 +10,9 @@ given webhook. Avatars are automatically created using Stable Diffusion.
 If you have a Kubernetes cluster, create a generic secret called
 `sapientwindex` in the default namespace with the following fields:
 
-* `DISCORD_WEBHOOK_URL`: The webhook URL to use for Discord
-* `REDDIT_USERNAME`: Your reddit username
-* `SUBREDDITS`: The subreddits you want to scrape, separated by commas
+- `DISCORD_WEBHOOK_URL`: The webhook URL to use for Discord
+- `REDDIT_USERNAME`: Your reddit username
+- `SUBREDDITS`: The subreddits you want to scrape, separated by commas
 
 Run `kubectl apply -f manifest.yaml` and you should be good.
 
@@ -37,12 +37,12 @@ terms for this hosted option.
 
 In order to host this yourself, you need the following things:
 
-* A linux system that is on 24/7 to run this on (WSL on a gaming tower
+- A linux system that is on 24/7 to run this on (WSL on a gaming tower
   is fine)
-* An x86-64 CPU (any computer sold in the last decade is fine)
-* A discord webhook for the channel in question
-* A reddit account for attributing the bot to yourself
-* A list of subreddits to monitor
+- An x86-64 CPU (any computer sold in the last decade is fine)
+- A discord webhook for the channel in question
+- A reddit account for attributing the bot to yourself
+- A list of subreddits to monitor
 
 1. Install [Docker
    Desktop](https://docs.docker.com/desktop/install/windows-install/)
@@ -60,7 +60,7 @@ In order to host this yourself, you need the following things:
    {"time":"2024-05-09T16:39:08.546206894Z","level":"INFO","source":{"function":"main.main","file":"within.website/x/cmd/sapientwindex/main.go","line":28},"msg":"starting up","subreddit":"tulpas","scan_duration":"30s"}
    ```
    then everything is good to go.
-   
+
 ### Updating the bot
 
 To update the bot, run these commands:
@@ -77,7 +77,7 @@ To update the bot, run these commands:
    ```
    docker run --name sapientwindex -e DISCORD_WEBHOOK_URL=<paste webhook here> -e REDDIT_USERNAME=<your reddit username> -e SUBREDDITS=<list,of,subreddits> -dit ghcr.io/xe/x/sapientwindex:latest
    ```
-   
+
 Updates to the bot will be done very infrequently.
 
 ## Support

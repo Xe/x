@@ -10,16 +10,16 @@ spec:
   ingressClassName: nginx
   tls:
     - hosts:
-      - todayinmarch2020.xn--sz8hf6d.ws
+        - todayinmarch2020.xn--sz8hf6d.ws
       secretName: todayinmarch2020-public-tls
   rules:
-  - host: todayinmarch2020.xn--sz8hf6d.ws
-    http:
-      paths:
-      - pathType: Prefix
-        path: "/"
-        backend:
-          service:
-            name: keda-add-ons-http-interceptor-proxy
-            port: 
-              number: 8080
+    - host: todayinmarch2020.xn--sz8hf6d.ws
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: keda-add-ons-http-interceptor-proxy
+                port:
+                  number: 8080

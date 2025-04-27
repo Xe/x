@@ -27,21 +27,21 @@ spec:
         xeiaso.net/role: valkey
     spec:
       volumes:
-      - name: data
-        persistentVolumeClaim:
-          claimName: valkey
-      containers:
-      - name: valkey
-        image: 'docker.io/bitnami/valkey:latest'
-        imagePullPolicy: Always
-        ports:
-        - containerPort: 6379
-        envFrom:
-        - configMapRef:
-            name: valkey-secret
-        volumeMounts:
         - name: data
-          mountPath: /data
+          persistentVolumeClaim:
+            claimName: valkey
+      containers:
+        - name: valkey
+          image: "docker.io/bitnami/valkey:latest"
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 6379
+          envFrom:
+            - configMapRef:
+                name: valkey-secret
+          volumeMounts:
+            - name: data
+              mountPath: /data
 ---
 apiVersion: v1
 kind: Service

@@ -15,12 +15,10 @@ spec:
         app.kubernetes.io/instance: release-name
     spec:
       hostNetwork: false
-      securityContext:
-        {}
+      securityContext: {}
       containers:
         - name: sftpgo
-          securityContext:
-            {}
+          securityContext: {}
           image: "ghcr.io/drakkan/sftpgo:v2.5.4"
           imagePullPolicy: IfNotPresent
           args:

@@ -10,16 +10,16 @@ spec:
   ingressClassName: nginx
   tls:
     - hosts:
-      - h.christine.website
+        - h.christine.website
       secretName: hlang-christine-website-public-tls
   rules:
-  - host: h.christine.website
-    http:
-      paths:
-      - pathType: Prefix
-        path: "/"
-        backend:
-          service:
-            name: keda-add-ons-http-interceptor-proxy
-            port: 
-              number: 8080
+    - host: h.christine.website
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: keda-add-ons-http-interceptor-proxy
+                port:
+                  number: 8080

@@ -1,8 +1,8 @@
 {
-    "recommendations": [
-        "bbenoist.nix",
-        "pinage404.nix-extension-pack",
-        "golang.go",
-        "jinliming2.vscode-go-template"
-    ]
+  "recommendations": [
+    "bbenoist.nix",
+    "pinage404.nix-extension-pack",
+    "golang.go",
+    "jinliming2.vscode-go-template"
+  ]
 }

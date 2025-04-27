@@ -13,16 +13,16 @@ spec:
   ingressClassName: nginx
   tls:
     - hosts:
-      - idp.xeserv.us
+        - idp.xeserv.us
       secretName: idp-xeserv-us-public-tls
   rules:
-  - host: idp.xeserv.us
-    http:
-      paths:
-      - pathType: Prefix
-        path: "/"
-        backend:
-          service:
-            name: pocket-id
-            port: 
-              name: http
+    - host: idp.xeserv.us
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: pocket-id
+                port:
+                  name: http

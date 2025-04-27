@@ -17,15 +17,8 @@ export const allowLine = (nick, channel) => {
 };
 
 export const parseLine = (msg) => {
-  const [
-    _blank,
-    category,
-    torrentName,
-    freeleech,
-    baseURL,
-    id,
-    size,
-  ] = msg.split(regex);
+  const [_blank, category, torrentName, freeleech, baseURL, id, size] =
+    msg.split(regex);
 
   return {
     torrent: {

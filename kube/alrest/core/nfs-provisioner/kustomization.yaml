@@ -6,10 +6,10 @@ resources:
 patchesStrategicMerge:
   - patch_nfs_details.yaml
 patches:
-- target:
-    kind: StorageClass
-    name: nfs-client
-  patch: |-
-    - op: replace
-      path: /metadata/name
-      value: itsuki
+  - target:
+      kind: StorageClass
+      name: nfs-client
+    patch: |-
+      - op: replace
+        path: /metadata/name
+        value: itsuki

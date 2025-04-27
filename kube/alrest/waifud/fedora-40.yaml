@@ -36,28 +36,28 @@ spec:
           cores: 2
         devices:
           disks:
-          - disk:
-              bus: virtio
-            name: disk0
-          - cdrom:
-              bus: sata
-              readonly: true
-            name: cloudinitdisk
+            - disk:
+                bus: virtio
+              name: disk0
+            - cdrom:
+                bus: sata
+                readonly: true
+              name: cloudinitdisk
         machine:
           type: q35
         resources:
           requests:
             memory: 1024M
       volumes:
-      - name: disk0
-        persistentVolumeClaim:
-          claimName: fedora-40
-      - cloudInitNoCloud:
-          userData: |
-            #cloud-config
-            hostname: fedora-40
-            ssh_pwauth: True
-            disable_root: false
-            ssh_authorized_keys:
-            - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIF6/+q2dBHEfETomAH7rvDPXHulSXnhcV/szxTAWiKZA cadey@defoko.local
-        name: cloudinitdisk
+        - name: disk0
+          persistentVolumeClaim:
+            claimName: fedora-40
+        - cloudInitNoCloud:
+            userData: |
+              #cloud-config
+              hostname: fedora-40
+              ssh_pwauth: True
+              disable_root: false
+              ssh_authorized_keys:
+              - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIF6/+q2dBHEfETomAH7rvDPXHulSXnhcV/szxTAWiKZA cadey@defoko.local
+          name: cloudinitdisk

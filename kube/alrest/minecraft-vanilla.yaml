@@ -23,11 +23,11 @@ metadata:
 spec:
   type: ClusterIP
   ports:
-  - port: 25565
-    name: main
-  - port: 25575
-    name: rcon
-    protocol: UDP
+    - port: 25565
+      name: main
+    - port: 25575
+      name: rcon
+      protocol: UDP
   selector:
     app.kubernetes.io/name: minecraft
 ---
@@ -48,50 +48,52 @@ spec:
         app.kubernetes.io/name: minecraft
     spec:
       containers:
-      - image: ghcr.io/xe/made-cap:latest
-        imagePullPolicy: Always
-        name: vanilla
-        env:
-          # Use secret in real usage
-        - name: EULA
-          value: "true"
-        - name: "MEMORY"
-          value: "4G"
-        - name: "USE_AIKAR_FLAGS"
-          value: "true"
-        securityContext:
-          runAsUser: 1000
-          runAsGroup: 1000
-          runAsNonRoot: true
-          allowPrivilegeEscalation: false
-          capabilities:
-            drop:
-              - ALL
-          seccompProfile:
-            type: RuntimeDefault
-        ports:
-        - containerPort: 25565
-          name: main
-        - containerPort: 25575
-          name: rcon
-          protocol: UDP
-        readinessProbe:
-          exec:
-            command: [ "/usr/local/bin/mc-monitor", "status", "--host", "localhost" ]
-          # Give it i + p * f seconds to be ready, so 120 seconds
-          initialDelaySeconds: 20
-          periodSeconds: 5
-          failureThreshold: 20
-        # Monitor ongoing liveness
-        livenessProbe:
-          exec:
-            command: ["/usr/local/bin/mc-monitor", "status", "--host", "localhost"]
-          initialDelaySeconds: 120
-          periodSeconds: 60
-        volumeMounts:
-        - name: mc-data
-          mountPath: /data
+        - image: ghcr.io/xe/made-cap:latest
+          imagePullPolicy: Always
+          name: vanilla
+          env:
+            # Use secret in real usage
+            - name: EULA
+              value: "true"
+            - name: "MEMORY"
+              value: "4G"
+            - name: "USE_AIKAR_FLAGS"
+              value: "true"
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
+          ports:
+            - containerPort: 25565
+              name: main
+            - containerPort: 25575
+              name: rcon
+              protocol: UDP
+          readinessProbe:
+            exec:
+              command:
+                ["/usr/local/bin/mc-monitor", "status", "--host", "localhost"]
+            # Give it i + p * f seconds to be ready, so 120 seconds
+            initialDelaySeconds: 20
+            periodSeconds: 5
+            failureThreshold: 20
+          # Monitor ongoing liveness
+          livenessProbe:
+            exec:
+              command:
+                ["/usr/local/bin/mc-monitor", "status", "--host", "localhost"]
+            initialDelaySeconds: 120
+            periodSeconds: 60
+          volumeMounts:
+            - name: mc-data
+              mountPath: /data
       volumes:
-      - name: mc-data
-        persistentVolumeClaim:
-          claimName: vanilla
+        - name: mc-data
+          persistentVolumeClaim:
+            claimName: vanilla

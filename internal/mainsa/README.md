@@ -1,8 +1,9 @@
 # ma Insa
 
-This package contains constants and conversion functions for the paracosm that I created, `ma Insa` (lit: land inside). 
+This package contains constants and conversion functions for the paracosm that I created, `ma Insa` (lit: land inside).
 
 I really created this paracosm by traveling around to different parts of it (or: where things would be if it did exist clearly, etc) then asking and answering two questions:
+
 - what _is there_?
 - and what is it _like_?
 
@@ -15,7 +16,7 @@ NPC's in the paracosm speak [Toki Pona](http://tokipona.net/tp/default.aspx) and
 
 ## Dates
 
-A date, or `tenpo nimi`, is a combination of the following information: 
+A date, or `tenpo nimi`, is a combination of the following information:
 
 - the year
 - the season

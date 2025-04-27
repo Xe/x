@@ -26,33 +26,33 @@ spec:
         app: minio
     spec:
       volumes:
-      - name: data
-        persistentVolumeClaim:
-          claimName: minio
+        - name: data
+          persistentVolumeClaim:
+            claimName: minio
       containers:
-      - name: minio
-        volumeMounts:
-        - name: data 
-          mountPath: /data
-        image: minio/minio
-        args:
-        - server
-        - /data
-        - --console-address=:9001
-        env:
-        - name: MINIO_ACCESS_KEY
-          value: "minio"
-        - name: MINIO_SECRET_KEY
-          value: "minio123"
-        - name: MINIO_ROOT_USER
-          value: root
-        - name: MINIO_ROOT_PASSWORD
-          value: hunter22
-        ports:
-        - containerPort: 9000
-          name: http
-        - containerPort: 9001
-          name: webui
+        - name: minio
+          volumeMounts:
+            - name: data
+              mountPath: /data
+          image: minio/minio
+          args:
+            - server
+            - /data
+            - --console-address=:9001
+          env:
+            - name: MINIO_ACCESS_KEY
+              value: "minio"
+            - name: MINIO_SECRET_KEY
+              value: "minio123"
+            - name: MINIO_ROOT_USER
+              value: root
+            - name: MINIO_ROOT_PASSWORD
+              value: hunter22
+          ports:
+            - containerPort: 9000
+              name: http
+            - containerPort: 9001
+              name: webui
 ---
 apiVersion: batch/v1
 kind: Job
@@ -63,17 +63,17 @@ spec:
   template:
     spec:
       containers:
-      - name: create-bucket
-        image: minio/mc
-        command: ["/bin/sh"]
-        args:
-          - "-c"
-          - |
-                  /usr/bin/mc config host add k8s http://minio:9000 minio minio123;
-                  /usr/bin/mc rm -r --force myminio/xesite-preview-versions;
-                  /usr/bin/mc mb myminio/xesite-preview-versions;
-                  /usr/bin/mc policy download myminio/xesite-preview-versions;
-                  exit 0;
+        - name: create-bucket
+          image: minio/mc
+          command: ["/bin/sh"]
+          args:
+            - "-c"
+            - |
+              /usr/bin/mc config host add k8s http://minio:9000 minio minio123;
+              /usr/bin/mc rm -r --force myminio/xesite-preview-versions;
+              /usr/bin/mc mb myminio/xesite-preview-versions;
+              /usr/bin/mc policy download myminio/xesite-preview-versions;
+              exit 0;
       restartPolicy: Never
   backoffLimit: 4
 ---

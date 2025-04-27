@@ -1,7 +1,7 @@
 kind: HTTPScaledObject
 apiVersion: http.keda.sh/v1alpha1
 metadata:
-   name: todayinmarch2020
+  name: todayinmarch2020
 spec:
   hosts:
     - todayinmarch2020.xn--sz8hf6d.ws

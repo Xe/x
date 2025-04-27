@@ -8,16 +8,16 @@ spec:
   ingressClassName: nginx
   tls:
     - hosts:
-      - pvfm.within.lgbt
+        - pvfm.within.lgbt
       secretName: pvfm-within-lgbt-public-tls
   rules:
-  - host: pvfm.within.lgbt
-    http:
-      paths:
-      - pathType: Prefix
-        path: "/"
-        backend:
-          service:
-            name: aura
-            port: 
-              name: http
+    - host: pvfm.within.lgbt
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: aura
+                port:
+                  name: http

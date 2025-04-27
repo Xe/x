@@ -2,7 +2,7 @@ name: Regenerate generated files
 
 on:
   push:
-    branches: [ "master" ]
+    branches: ["master"]
 
 permissions:
   pull-requests: write
@@ -20,7 +20,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential
-      
+
       - uses: Homebrew/actions/setup-homebrew@master
 
       - name: Setup Homebrew cellar cache
@@ -42,8 +42,8 @@ jobs:
 
       - name: Install Brew dependencies
         run: |
-           brew bundle
-      
+          brew bundle
+
       - name: Generate generated files
         run: |
           go generate ./... ||:

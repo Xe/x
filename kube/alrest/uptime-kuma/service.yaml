@@ -6,8 +6,8 @@ spec:
   selector:
     app: uptime-kuma
   ports:
-  - name: http
-    port: 80
-    targetPort: 4180
-  - name: backend
-    port: 3001
+    - name: http
+      port: 80
+      targetPort: 4180
+    - name: backend
+      port: 3001

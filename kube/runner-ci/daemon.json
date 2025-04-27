@@ -1,5 +1,3 @@
 {
-  "registry-mirrors": [
-    "https://pt-dh.int.xeserv.us"
-  ]
+  "registry-mirrors": ["https://pt-dh.int.xeserv.us"]
 }
