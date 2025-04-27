@@ -1,9 +1,15 @@
 name: Cut Release
 on:
   workflow_dispatch: {}
+
+permissions:
+  contents: write
+  actions: write
+  packages: write
+
 jobs:
   release:
-    runs-on: ubuntu-latest
+    runs-on: alrest-x
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
@@ -49,6 +55,14 @@ jobs:
           key: ${{ runner.os }}-golang-${{ hashFiles('**/go.sum') }}
           restore-keys: |
             ${{ runner.os }}-golang-
+
+      - name: Log into registry
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0
+        with:
+          registry: ghcr.io
+          username: xe
+          password: ${{ secrets.GHCR_PUSH }}
 
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
       - name: release
