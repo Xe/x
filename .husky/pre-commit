@@ -1,7 +1,7 @@
-if echo "$1" | grep -q "\[skip ci\]"; then
-  npx lint-staged
-  npm test
-else 
-  echo "Skipping CI for commit with [skip ci] in message"
+if printf "%s" "$1" | grep -q '\[skip ci\]'; then
+  echo "Found [skip ci]"
   exit 0
 fi
+
+npx lint-staged
+npm test
