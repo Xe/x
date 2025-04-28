@@ -75,7 +75,7 @@ require (
 	gorm.io/gorm v1.25.12
 	gorm.io/plugin/prometheus v0.1.0
 	modernc.org/sqlite v1.37.0
-	nhooyr.io/websocket v1.8.11
+	nhooyr.io/websocket v1.8.17
 )
 
 require (
