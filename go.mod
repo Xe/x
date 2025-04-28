@@ -23,7 +23,7 @@ require (
 	github.com/eaburns/peggy v1.0.2
 	github.com/facebookgo/ensure v0.0.0-20160127193407-b4ab57deab51
 	github.com/gen2brain/avif v0.4.3
-	github.com/gen2brain/heic v0.3.0
+	github.com/gen2brain/heic v0.4.4
 	github.com/gen2brain/jpegxl v0.4.4
 	github.com/gen2brain/webp v0.4.4
 	github.com/go-gorm/caches/v4 v4.0.5
@@ -74,6 +74,7 @@ require (
 	google.golang.org/grpc v1.70.0
 	gorm.io/gorm v1.25.12
 	gorm.io/plugin/prometheus v0.1.0
+	modernc.org/sqlite v1.37.0
 	nhooyr.io/websocket v1.8.11
 )
 
@@ -90,7 +91,6 @@ require (
 	github.com/TecharoHQ/yeet v0.2.1 // indirect
 	github.com/a-h/parse v0.0.0-20250122154542-74294addb73e // indirect
 	github.com/andybalholm/brotli v1.1.1 // indirect
-	github.com/avct/uasurfer v0.0.0-20250320214457-f1f6afeb74db // indirect
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.6.8 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/v4a v1.3.29 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.12.3 // indirect
@@ -154,7 +154,6 @@ require (
 	github.com/ipfs/go-metrics-interface v0.0.1 // indirect
 	github.com/ipld/go-car/v2 v2.13.1 // indirect
 	github.com/ipld/go-ipld-prime v0.21.0 // indirect
-	github.com/jackc/puddle/v2 v2.2.2 // indirect
 	github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 // indirect
 	github.com/jbenet/goprocess v0.1.4 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
@@ -230,7 +229,6 @@ require (
 	modernc.org/libc v1.62.1 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.9.1 // indirect
-	modernc.org/sqlite v1.37.0 // indirect
 )
 
 require (
