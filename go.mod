@@ -43,7 +43,7 @@ require (
 	github.com/mattn/go-sqlite3 v1.14.24
 	github.com/multiformats/go-multibase v0.2.0
 	github.com/mymmrac/telego v0.31.5
-	github.com/nats-io/nats.go v1.38.0
+	github.com/nats-io/nats.go v1.41.2
 	github.com/ncruces/go-sqlite3 v0.16.0
 	github.com/ncruces/go-sqlite3/gormlite v0.16.0
 	github.com/nicklaw5/helix/v2 v2.31.0
@@ -183,7 +183,7 @@ require (
 	github.com/multiformats/go-varint v0.0.7 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/natefinch/atomic v1.0.1 // indirect
-	github.com/nats-io/nkeys v0.4.9 // indirect
+	github.com/nats-io/nkeys v0.4.11 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
 	github.com/ncruces/go-strftime v0.1.9 // indirect
 	github.com/ncruces/julianday v1.0.0 // indirect
