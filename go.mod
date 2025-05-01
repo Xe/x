@@ -54,7 +54,7 @@ require (
 	github.com/posener/complete v1.2.3
 	github.com/redis/go-redis/v9 v9.5.5
 	github.com/robfig/cron/v3 v3.0.1
-	github.com/rodaine/table v1.2.0
+	github.com/rodaine/table v1.3.0
 	github.com/rogpeppe/go-internal v1.14.1
 	github.com/rs/cors v1.11.0
 	github.com/sebest/xff v0.0.0-20210106013422-671bd2870b3a
@@ -261,7 +261,7 @@ require (
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 // indirect
 	github.com/klauspost/compress v1.18.0 // indirect
 	github.com/kr/text v0.2.0 // indirect
-	github.com/mattn/go-runewidth v0.0.15 // indirect
+	github.com/mattn/go-runewidth v0.0.16 // indirect
 	github.com/oklog/ulid/v2 v2.1.0
 	github.com/prometheus/client_golang v1.20.5
 	github.com/prometheus/client_model v0.6.1 // indirect
