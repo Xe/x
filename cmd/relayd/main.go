@@ -153,6 +153,8 @@ func main() {
 	h.Director = func(req *http.Request) {
 		oldDirector(req)
 
+		reqID := uuid.Must(uuid.NewV7())
+
 		host, _, _ := net.SplitHostPort(req.RemoteAddr)
 		if host != "" {
 			req.Header.Set("X-Real-Ip", host)
@@ -204,7 +206,7 @@ func main() {
 		req.Header.Set("X-Forwarded-Host", req.URL.Host)
 		req.Header.Set("X-Forwarded-Proto", "https")
 		req.Header.Set("X-Forwarded-Scheme", "https")
-		req.Header.Set("X-Request-Id", uuid.NewString())
+		req.Header.Set("X-Request-Id", reqID.String())
 		req.Header.Set("X-Scheme", "https")
 		req.Header.Set("X-HTTP-Version", req.Proto)
 	}
