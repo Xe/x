@@ -43,11 +43,16 @@ spec:
         - name: docker-daemon-config
           configMap:
             name: docker-daemon-config
+        - name: gitea-runner-cfg
+          configMap:
+            name: gitea-runner-cfg
       containers:
         - name: runner
           image: gitea/act_runner:nightly-dind
           imagePullPolicy: Always
           env:
+            - name: CONFIG_FILE
+              value: "/etc/gitea-runner/config.yaml"
             - name: GITEA_INSTANCE_URL
               value: http://git.gitea.svc.alrest.xeserv.us
             - name: GITEA_RUNNER_REGISTRATION_TOKEN
@@ -64,3 +69,5 @@ spec:
               subPath: "actions"
             - name: docker-daemon-config
               mountPath: "/etc/docker"
+            - name: gitea-runner-cfg
+              mountPath: "/etc/gitea-runner"

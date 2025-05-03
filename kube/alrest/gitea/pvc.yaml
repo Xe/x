@@ -1,11 +1,12 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: gitea
+  name: gitea-2-return-of-samus
 spec:
   accessModes:
     - ReadWriteOnce
-  storageClassName: rotational
+    - ReadWriteMany
+  storageClassName: longhorn
   resources:
     requests:
-      storage: 64Gi
+      storage: 130Gi

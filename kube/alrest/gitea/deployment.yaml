@@ -61,7 +61,7 @@ spec:
       volumes:
         - name: data
           persistentVolumeClaim:
-            claimName: gitea
+            claimName: gitea-2-return-of-samus
         - name: internal-certs
           secret:
             secretName: gitea-internal-tls
@@ -155,7 +155,7 @@ spec:
               mountPath: "/xe/pki"
               readOnly: true
         - name: anubis
-          image: ghcr.io/techarohq/botstopper/anubis:latest
+          image: ghcr.io/techarohq/anubis:latest
           imagePullPolicy: Always
           env:
             - name: "BIND"
@@ -168,8 +168,6 @@ spec:
               value: ":9090"
             - name: "OVERLAY_FOLDER"
               value: "/xe/cfg/botstopper"
-            - name: "POLICY_FNAME"
-              value: "/xe/cfg/anubis/botPolicies.yaml"
             - name: "SERVE_ROBOTS_TXT"
               value: "true"
             - name: "TARGET"

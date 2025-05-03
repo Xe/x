@@ -21,3 +21,8 @@ configMapGenerator:
     behavior: create
     files:
       - ./cfg/botstopper/custom.css
+  
+  - name: gitea-runner-cfg
+    behavior: create
+    files:
+      - ./cfg/runner/config.yaml
