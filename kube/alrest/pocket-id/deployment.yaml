@@ -4,6 +4,8 @@ metadata:
   name: pocket-id
 spec:
   replicas: 1
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: pocket-id
@@ -20,7 +22,7 @@ spec:
             claimName: pocket-id
       containers:
         - name: main
-          image: ghcr.io/pocket-id/pocket-id:v0.43.1
+          image: ghcr.io/pocket-id/pocket-id:v0.51.0
           imagePullPolicy: IfNotPresent
           securityContext:
             runAsUser: 1000
