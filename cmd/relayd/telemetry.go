@@ -22,7 +22,7 @@ var (
 	telemetryBucket          = flag.String("telemetry-bucket", "relayd-logs", "object storage bucket to dump logs to")
 	telemetryPathStyle       = flag.Bool("telemetry-path-style", false, "if true, use s3 path style")
 	telemetryHost            = flag.String("telemetry-host", "", "hostname to disambiguate telemetry")
-	telemetryBundleCount     = flag.Int("telemetry-bundle-count", 50, "maximum number of items per telemetry bundle")
+	telemetryBundleCount     = flag.Int("telemetry-bundle-count", 512, "maximum number of items per telemetry bundle")
 	telemetryContextDeadline = flag.Duration("telemetry-context-deadline", time.Minute, "maximum time for the telemetry context deadline")
 )
 

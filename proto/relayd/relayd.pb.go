@@ -37,6 +37,7 @@ type RequestLog struct {
 	Ja3N          string                 `protobuf:"bytes,9,opt,name=ja3n,proto3" json:"ja3n,omitempty"`
 	Ja4           string                 `protobuf:"bytes,10,opt,name=ja4,proto3" json:"ja4,omitempty"`
 	RequestId     string                 `protobuf:"bytes,11,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
+	StatusCode    int32                  `protobuf:"varint,12,opt,name=status_code,json=statusCode,proto3" json:"status_code,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -148,11 +149,18 @@ func (x *RequestLog) GetRequestId() string {
 	return ""
 }
 
+func (x *RequestLog) GetStatusCode() int32 {
+	if x != nil {
+		return x.StatusCode
+	}
+	return 0
+}
+
 var File_relayd_proto protoreflect.FileDescriptor
 
 const file_relayd_proto_rawDesc = "" +
 	"\n" +
-	"\frelayd.proto\x12\x17within.website.x.relayd\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xb5\x04\n" +
+	"\frelayd.proto\x12\x17within.website.x.relayd\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xd6\x04\n" +
 	"\n" +
 	"RequestLog\x12=\n" +
 	"\frequest_date\x18\x01 \x01(\v2\x1a.google.protobuf.TimestampR\vrequestDate\x12>\n" +
@@ -167,7 +175,9 @@ const file_relayd_proto_rawDesc = "" +
 	"\x03ja4\x18\n" +
 	" \x01(\tR\x03ja4\x12\x1d\n" +
 	"\n" +
-	"request_id\x18\v \x01(\tR\trequestId\x1a8\n" +
+	"request_id\x18\v \x01(\tR\trequestId\x12\x1f\n" +
+	"\vstatus_code\x18\f \x01(\x05R\n" +
+	"statusCode\x1a8\n" +
 	"\n" +
 	"QueryEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
