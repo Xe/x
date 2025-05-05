@@ -1,26 +1,26 @@
-yeet.setenv("KO_DOCKER_REPO", "ghcr.io/xe/x");
-yeet.setenv("SOURCE_DATE_EPOCH", $`git log -1 --format='%ct'`.trim());
-yeet.setenv("VERSION", git.tag());
+// yeet.setenv("KO_DOCKER_REPO", "ghcr.io/xe/x");
+// yeet.setenv("SOURCE_DATE_EPOCH", $`git log -1 --format='%ct'`.trim());
+// yeet.setenv("VERSION", git.tag());
 
-programs = [
-  "aerial",
-  "amano",
-  "aura",
-  "future-sight",
-  "httpdebug",
-  "quickserv",
-  "relayd",
-  "reverseproxyd",
-  "sapientwindex",
-  "stickers",
-  "todayinmarch2020",
-  "uncle-ted",
-  "within.website",
-].join(",");
+// programs = [
+//   "aerial",
+//   "amano",
+//   "aura",
+//   "future-sight",
+//   "httpdebug",
+//   "quickserv",
+//   "relayd",
+//   "reverseproxyd",
+//   "sapientwindex",
+//   "stickers",
+//   "todayinmarch2020",
+//   "uncle-ted",
+//   "within.website",
+// ].join(",");
 
-$`ko build --platform=all --base-import-paths --tags=latest,${git.tag()} ./cmd/{${programs}}`;
+// $`ko build --platform=all --base-import-paths --tags=latest,${git.tag()} ./cmd/{${programs}}`;
 
-yeet.setenv("CGO_ENABLED", "0");
+// yeet.setenv("CGO_ENABLED", "0");
 
 const pkgs = [];
 

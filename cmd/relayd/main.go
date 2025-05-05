@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
@@ -23,8 +24,10 @@ import (
 
 	"github.com/google/uuid"
 	"golang.org/x/crypto/acme/autocert"
+	"google.golang.org/protobuf/types/known/durationpb"
 	_ "modernc.org/sqlite"
 	"within.website/x/internal"
+	"within.website/x/proto/relayd"
 	"within.website/x/xess"
 )
 
@@ -56,6 +59,8 @@ func main() {
 		"autocert-cache-dir", *autocertCacheDir,
 		"autocert-domain-names", *autocertDomainNames,
 		"autocert-email", *autocertEmail,
+		"telemetry-enable", *telemetryEnable,
+		"telemetry-bucket", *telemetryBucket,
 	)
 
 	var tc *tls.Config
@@ -116,6 +121,11 @@ func main() {
 
 	var db *sql.DB
 
+	ts, err := NewTelemetrySink(context.Background())
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	if fpDatabase != nil {
 		var err error
 		db, err = sql.Open("sqlite", *fpDatabase)
@@ -132,83 +142,97 @@ func main() {
 			, "notes" TEXT
 			, "ja4_fingerprint" TEXT
 			, ip_address TEXT
+			, headers TEXT
+			)`); err != nil {
+			log.Fatal(err)
+		}
+
+		if _, err := db.Exec(`CREATE TABLE IF NOT EXISTS request_logs
+			( "timestamp" TEXT
+			, "method" TEXT
+			, "path" TEXT
+			, "query" TEXT
+			, "ip_address" TEXT
+			, "ja3n" TEXT
+			, "ja4" TEXT
+			, "headers" TEXT
+			, "request_time" TEXT
 			)`); err != nil {
 			log.Fatal(err)
 		}
 	}
 
-	h := httputil.NewSingleHostReverseProxy(u)
-	oldDirector := h.Director
+	rp := httputil.NewSingleHostReverseProxy(u)
+
+	h := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		t0 := time.Now()
+
+		var foundJa3n, foundJa4 string
+
+		host, _, _ := net.SplitHostPort(r.RemoteAddr)
+		if host != "" {
+			r.Header.Set("X-Real-Ip", host)
+		}
+
+		fp := GetTLSFingerprint(r)
+		if fp != nil {
+			if fp.JA3N() != nil {
+				foundJa3n = fp.JA3N().String()
+			}
+			if fp.JA4() != nil {
+				foundJa4 = fp.JA4().String()
+			}
+		}
+
+		reqID := uuid.Must(uuid.NewV7()).String()
+		rl := relayd.RequestLogFromRequest(r, host, reqID, foundJa3n, foundJa4)
+
+		r.Header.Set("X-Forwarded-Host", r.URL.Host)
+		r.Header.Set("X-Forwarded-Proto", "https")
+		r.Header.Set("X-Forwarded-Scheme", "https")
+		r.Header.Set("X-Request-Id", reqID)
+		r.Header.Set("X-Scheme", "https")
+		r.Header.Set("X-HTTP-Version", r.Proto)
+		r.Header.Set("X-TLS-Fingerprint-JA3N", foundJa3n)
+		r.Header.Set("X-TLS-Fingerprint-JA4", foundJa4)
+
+		headers, _ := json.Marshal(r.Header)
+
+		if ja4 := foundJa4; db != nil && ja4 != "" {
+			var application, userAgent, notes sql.NullString
+			if err := db.QueryRowContext(r.Context(), "SELECT application, user_agent_string, notes FROM fingerprints WHERE ja4_fingerprint = ?", ja4).Scan(&application, &userAgent, &notes); err == nil {
+				slog.Debug("found a hit", "application", application, "userAgent", userAgent, "notes", notes)
+			} else if errors.Is(err, sql.ErrNoRows) {
+				userAgent := r.UserAgent()
+				notes := fmt.Sprintf("Observed via relayd on host %s at %s", r.Host, time.Now().Format(time.RFC3339))
+				if _, err := db.ExecContext(r.Context(), "INSERT INTO fingerprints(user_agent_string, notes, ja4_fingerprint, ip_address, headers) VALUES (?, ?, ?, ?, ?)", userAgent, notes, ja4, host, string(headers)); err != nil {
+					slog.Error("can't insert fingerprint into database", "err", err)
+				}
+
+				r.Header.Set("Xe-X-Relayd-New-Client", "true")
+			} else {
+				slog.Debug("can't read from database", "err", err)
+			}
+
+			rp.ServeHTTP(w, r)
+
+			done := time.Since(t0)
+			rl.ResponseTime = durationpb.New(done)
+
+			if ts != nil {
+				ts.Add(rl)
+			}
+		}
+	})
 
 	if u.Scheme == "unix" {
-		h = &httputil.ReverseProxy{
+		rp = &httputil.ReverseProxy{
 			Transport: &http.Transport{
 				DialContext: func(_ context.Context, _, _ string) (net.Conn, error) {
 					return net.Dial("unix", strings.TrimPrefix(*proxyTo, "unix://"))
 				},
 			},
 		}
-	}
-
-	h.Director = func(req *http.Request) {
-		oldDirector(req)
-
-		reqID := uuid.Must(uuid.NewV7())
-
-		host, _, _ := net.SplitHostPort(req.RemoteAddr)
-		if host != "" {
-			req.Header.Set("X-Real-Ip", host)
-		}
-
-		fp := GetTLSFingerprint(req)
-		if fp != nil {
-			if fp.JA3N() != nil {
-				req.Header.Set("X-TLS-Fingerprint-JA3N", fp.JA3N().String())
-			}
-			if fp.JA4() != nil {
-				req.Header.Set("X-TLS-Fingerprint-JA4", fp.JA4().String())
-			}
-		}
-
-		// if tcpFP := GetTCPFingerprint(req); tcpFP != nil {
-		// 	req.Header.Set("X-TCP-Fingerprint-JA4T", tcpFP.String())
-		// }
-
-		if ja4 := req.Header.Get("X-TLS-Fingerprint-JA4"); db != nil && ja4 != "" {
-			var application, userAgent, notes sql.NullString
-			if err := db.QueryRowContext(req.Context(), "SELECT application, user_agent_string, notes FROM fingerprints WHERE ja4_fingerprint = ?", ja4).Scan(&application, &userAgent, &notes); err == nil {
-				slog.Debug("found a hit", "application", application, "userAgent", userAgent, "notes", notes)
-				if application.Valid {
-					req.Header.Set("Xe-X-Relayd-Ja4-Application", application.String)
-				}
-
-				if userAgent.Valid {
-					req.Header.Set("Xe-X-Relayd-Ja4-UserAgent", userAgent.String)
-				}
-
-				if notes.Valid {
-					req.Header.Set("Xe-X-Relayd-Ja4-Notes", notes.String)
-				}
-			} else if errors.Is(err, sql.ErrNoRows) {
-				userAgent := req.UserAgent()
-				notes := fmt.Sprintf("Observed via relayd on host %s at %s", req.Host, time.Now().Format(time.RFC3339))
-				ip, _, _ := net.SplitHostPort(req.RemoteAddr)
-				if _, err := db.ExecContext(req.Context(), "INSERT INTO fingerprints(user_agent_string, notes, ja4_fingerprint, ip_address) VALUES (?, ?, ?, ?)", userAgent, notes, ja4, ip); err != nil {
-					slog.Error("can't insert fingerprint into database", "err", err)
-				}
-
-				req.Header.Set("Xe-X-Relayd-New-Client", "true")
-			} else {
-				slog.Debug("can't read from database", "err", err)
-			}
-		}
-
-		req.Header.Set("X-Forwarded-Host", req.URL.Host)
-		req.Header.Set("X-Forwarded-Proto", "https")
-		req.Header.Set("X-Forwarded-Scheme", "https")
-		req.Header.Set("X-Request-Id", reqID.String())
-		req.Header.Set("X-Scheme", "https")
-		req.Header.Set("X-HTTP-Version", req.Proto)
 	}
 
 	srv := &http.Server{

@@ -50,7 +50,7 @@ func main() {
 	}
 
 	s3c := s3.NewFromConfig(cfg, func(o *s3.Options) {
-		o.UsePathStyle = true
+		o.UsePathStyle = false
 	})
 
 	presigner := Presigner{s3.NewPresignClient(s3c)}

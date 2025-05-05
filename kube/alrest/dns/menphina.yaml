@@ -1,0 +1,16 @@
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: menphina-within-lgbt-dns
+spec:
+  endpoints:
+    - dnsName: "menphina.within.lgbt"
+      recordTTL: 3600
+      recordType: A
+      targets:
+        - 64.176.81.139
+    - dnsName: "menphina.within.lgbt"
+      recordTTL: 3600
+      recordType: AAAA
+      targets:
+        - 2401:c080:1400:7df6:5400:05ff:fe6a:29e3

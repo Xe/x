@@ -7,15 +7,6 @@ metadata:
     name: gitea-data-migrator
 spec:
   volumes:
-  - name: old
-    persistentVolumeClaim:
-      claimName: gitea
-  - name: new
-    persistentVolumeClaim:
-      claimName: gitea-old-data
-  - name: 22gi
-    persistentVolumeClaim:
-      claimName: gitea-22gi
   - name: return-of-samus
     persistentVolumeClaim:
       claimName: gitea-2-return-of-samus
@@ -26,11 +17,5 @@ spec:
     - sleep
     - infinity
     volumeMounts:
-    - name: old
-      mountPath: /pvc/old
-    - name: new
-      mountPath: /pvc/new
-    - name: 22gi
-      mountPath: /pvc/22gi
     - name: return-of-samus
       mountPath: /pvc/return-of-samus

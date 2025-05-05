@@ -1,0 +1,21 @@
+syntax = "proto3";
+package within.website.x.relayd;
+option go_package = "within.website/x/proto/relayd";
+
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+
+message RequestLog {
+  google.protobuf.Timestamp request_date = 1;
+  google.protobuf.Duration response_time = 2;
+  string host = 3;
+  string method = 4;
+  string path = 5;
+  map<string, string> query = 6;
+  map<string, string> headers = 7;
+  string remote_ip = 8;
+  string ja3n = 9;
+  string ja4 = 10;
+  string request_id = 11;
+  int32 status_code = 12;
+}
