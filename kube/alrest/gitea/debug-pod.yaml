@@ -7,15 +7,15 @@ metadata:
     name: gitea-data-migrator
 spec:
   volumes:
-  - name: return-of-samus
-    persistentVolumeClaim:
-      claimName: gitea-2-return-of-samus
-  containers:
-  - name: gitea-data-migrator
-    image: alpine:edge
-    args:
-    - sleep
-    - infinity
-    volumeMounts:
     - name: return-of-samus
-      mountPath: /pvc/return-of-samus
+      persistentVolumeClaim:
+        claimName: gitea-2-return-of-samus
+  containers:
+    - name: gitea-data-migrator
+      image: alpine:edge
+      args:
+        - sleep
+        - infinity
+      volumeMounts:
+        - name: return-of-samus
+          mountPath: /pvc/return-of-samus

@@ -68,7 +68,7 @@ container:
   # And other options to be used when the container is started (eg, --add-host=my.gitea.url:host-gateway).
   options:
   # The parent directory of a job's working directory.
-  # NOTE: There is no need to add the first '/' of the path as act_runner will add it automatically. 
+  # NOTE: There is no need to add the first '/' of the path as act_runner will add it automatically.
   # If the path starts with '/', the '/' will be trimmed.
   # For example, if the parent directory is /path/to/my/dir, workdir_parent should be path/to/my/dir
   # If it's empty, /workspace will be used.
