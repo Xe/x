@@ -1,4 +1,4 @@
-rpm.build({
+const pkgName = rpm.build({
   name: "home-automount-nas",
   description: "Automount the NAS drive on boot",
   homepage: "https://xeiaso.net",
@@ -10,3 +10,5 @@ rpm.build({
     file.install("./mnt-itsuki.mount", `${systemd}/mnt-itsuki.mount`);
   },
 });
+
+gitea.uploadPackage("xe", "x", "current", pkgName);

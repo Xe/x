@@ -1,10 +1,9 @@
 [Unit]
-Requires=remote-fs-pre.target
-After=remote-fs-pre.target
+After=NetworkManager.service
 
 [Automount]
 Where=/mnt/itsuki
 TimeoutIdleSec=0
 
 [Install]
-WantedBy=remote-fs.target
+WantedBy=graphical.target
