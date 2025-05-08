@@ -203,9 +203,10 @@ function fish_prompt
         (__theme_print_time) \
         (__theme_print_userhost) \
         (__theme_print_pwd) \
-        (__theme_print_git_status) \
-        (__theme_print_jobs) \
         (__theme_print_pwd_rw) \
+        (__theme_print_git_status) \
+        (__kube_prompt) \
+        (__theme_print_jobs) \
     )
     set -l line2 (string join " " \
         (__theme_print_virtualenv) \
