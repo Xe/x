@@ -1,0 +1,3 @@
+Copyright (c) {{.Year}} {{.Name}} <{{.Email}}>
+
+All rights reserved.

@@ -9,8 +9,6 @@ import (
 	"os"
 	"os/exec"
 	"sort"
-	"text/template"
-	"time"
 
 	"github.com/posener/complete"
 	"within.website/x/cmd/license/licenses"
@@ -35,9 +33,9 @@ func init() {
 		os.Exit(2)
 	}
 
-	var names []string
-	for name := range licenses.List {
-		names = append(names, name)
+	names, err := licenses.List()
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	sort.Strings(names)
@@ -50,15 +48,13 @@ func main() {
 
 	if *showAll {
 		fmt.Println("Licenses available:")
-		var names []string
-		for license := range licenses.List {
-			names = append(names, license)
+		names, err := licenses.List()
+		if err != nil {
+			log.Fatal(err)
 		}
 
-		sort.Strings(names)
-
-		for _, license := range names {
-			fmt.Printf("  %s\n", license)
+		for _, name := range names {
+			fmt.Println("*", name)
 		}
 
 		os.Exit(1)
@@ -72,13 +68,10 @@ func main() {
 
 	outfile := "LICENSE"
 
-	var licensetext string
-	if _, ok := licenses.List[kind]; !ok {
+	if !licenses.Has(kind) {
 		fmt.Printf("invalid license kind %s\n", kind)
 		os.Exit(1)
 	}
-
-	licensetext = licenses.List[kind]
 
 	if kind == "unlicense" && *out {
 		outfile = "UNLICENSE"
@@ -127,18 +120,7 @@ func main() {
 		defer fmt.Println()
 	}
 
-	tmpl, err := template.New("license").Parse(licensetext)
-	if err != nil {
+	if err := licenses.Hydrate(kind, *name, *email, wr); err != nil {
 		log.Fatal(err)
 	}
-
-	err = tmpl.Execute(wr, struct {
-		Name  string
-		Email string
-		Year  int
-	}{
-		Name:  *name,
-		Email: *email,
-		Year:  time.Now().Year(),
-	})
 }

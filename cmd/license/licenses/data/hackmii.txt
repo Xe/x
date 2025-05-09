@@ -1,0 +1,6 @@
+Copyright (C) {{.Year}} {{.Name}} <{{.Email}}>
+
+you are not allowed to in anyway use this material (including but is not
+limited to: source code, images, binaries, documents) for use in
+competeting purpuse in ANY WAY. You are also not allowed to redistribute
+NOR mirror the code & binarys in any way, link to us instead!

@@ -1,0 +1,100 @@
+Copyright (c) {{.Year}} {{.Name}} <{{.Email}}>
+
+The following license is modified from the MIT license.
+
+Anti-Fascist MIT License:
+
+The following conditions must be met by any person obtaining a copy of this
+software:
+
+- You MAY NOT be a fascist.
+- You MUST not financially support fascists.
+- You MUST not publicly voice support for fascists.
+- You MAY NOT be a member of any fascist organization, even if you are a member to infiltrate for anti-fascist purposes. 
+
+"Fascist" can be understood as any group or individual who promotes the political ideology of fascism.
+
+"Fascism" can be broken down into 11 ideological features as well as 8 tactics that can form a fascist system in varying combinations, 
+for the sake of simplicity and brevity the individual or organization in question must match to at least 5 features or tactics 
+or a combination of the two determined by the individual licencer. 
+
+Said licencer may provide a list if an individual or group matches to at least 5 features upon request from the individual 
+or group in question.
+
+
+
+The ideological features are listed below.
+
+1. Hyper-nationalism
+2. Militarism.
+3. Glorification of violence and readiness to use it in politics.
+4. Fetishization of youth.
+5. Fetishization of masculinity.
+6. Leader cult.
+7. Lost-golden-age syndrome.
+8. Self-definition by opposition.
+9. Mass mobilization and mass party.
+10. Hierarchical party structure and tendency to purge the disloyal. 
+11. Theatricality.
+
+Fascist tactics include
+
+1) Persecution of national minorities.
+2) Persecution of racial minorities.
+3) Persecution of religious minorities (Anti-Semitism, Islamophobia and others).
+4) Promotion of a type of national purity.
+5) Promotion of a state run by ideologically oriented corporate bodies.
+6) Persecution of gender or sexual minorities.
+7) Persecution of the disabled.
+8) Formation of extra-legal forces (brownshirts) to defend fascist values.
+
+Special criterea: Meeting only one point of the special criterea is enough to consider someone or a group to 
+be fascist for the purposes of this licence.
+
+1. Promotion of any theories that state members of the jewish ethnicity or faith control 
+or largely control the world, finance, or other global major power system.
+
+2. Denial of the holocaust or any other historically proven genocide.
+
+3. Promotion of ethnostates.
+
+4. Advocating for eugenics. Either positive or negative eugenics. Promotion for the rights of abortion are not considered eugenics.
+
+5. Advocating for the removal of rights or legal protections from a class or group of people.
+
+Former fascists: People or organizations who used to promote the political ideology of fascism but no longer do so 
+must meet the following criterea to be able to use this software.
+
+1. Publicly disavow past fascist deeds and ideologies.
+2. Expose any and all known fascists former allies to the public. 
+   A suggested route would be through the one peoples project (onepeoplesproject.com). 
+   If they can confirm you have done so that will count as meeting condition two.
+3. Publicly destroy any and all fascist paraphenelia you have in your posession including removal of tattoos and body markings              affiliated with fascist groups or gangs.
+
+
+
+ANTI-FASCIST-MIT LICENSE:
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+The above licence agreement conditions are met in full.
+
+The Anti-Fascist MIT License may only be used under the terms of the Anti-Fascist MIT License.
+
+Any modified versions of this software must also include the Anti-Fascist MIT Licence.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
