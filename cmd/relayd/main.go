@@ -192,7 +192,7 @@ func main() {
 		r.Header.Set("X-Forwarded-Scheme", "https")
 		r.Header.Set("X-Request-Id", reqID)
 		r.Header.Set("X-Scheme", "https")
-		r.Header.Set("X-HTTP-Version", r.Proto)
+		r.Header.Set("X-HTTP-Protocol", r.Proto)
 		r.Header.Set("X-TLS-Fingerprint-JA3N", foundJa3n)
 		r.Header.Set("X-TLS-Fingerprint-JA4", foundJa4)
 
