@@ -70,7 +70,7 @@ require (
 	go4.org v0.0.0-20190313082347-94abd6928b1d
 	golang.org/x/crypto v0.37.0
 	golang.org/x/oauth2 v0.26.0
-	golang.org/x/sync v0.13.0
+	golang.org/x/sync v0.14.0
 	google.golang.org/grpc v1.72.0
 	gorm.io/gorm v1.25.12
 	gorm.io/plugin/prometheus v0.1.0
