@@ -68,7 +68,7 @@ require (
 	go.etcd.io/bbolt v1.4.0
 	go.jetpack.io/tyson v0.1.1
 	go4.org v0.0.0-20190313082347-94abd6928b1d
-	golang.org/x/crypto v0.37.0
+	golang.org/x/crypto v0.38.0
 	golang.org/x/oauth2 v0.26.0
 	golang.org/x/sync v0.14.0
 	google.golang.org/grpc v1.72.0
@@ -274,11 +274,11 @@ require (
 	golang.org/x/exp v0.0.0-20250305212735-054e65f0b394
 	golang.org/x/image v0.24.0
 	golang.org/x/mod v0.24.0 // indirect
-	golang.org/x/net v0.39.0
-	golang.org/x/sys v0.32.0 // indirect
-	golang.org/x/text v0.24.0 // indirect
+	golang.org/x/net v0.40.0
+	golang.org/x/sys v0.33.0 // indirect
+	golang.org/x/text v0.25.0 // indirect
 	golang.org/x/time v0.11.0
-	golang.org/x/tools v0.32.0
+	golang.org/x/tools v0.33.0
 	google.golang.org/protobuf v1.36.5
 )
 
