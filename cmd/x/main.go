@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/google/subcommands"
+	"within.website/x/cmd/x/cmd/grpchc"
 	"within.website/x/internal"
 )
 
@@ -12,6 +13,8 @@ func main() {
 	subcommands.Register(subcommands.HelpCommand(), "")
 	subcommands.Register(subcommands.FlagsCommand(), "")
 	subcommands.Register(subcommands.CommandsCommand(), "")
+
+	subcommands.Register(&grpchc.GRPCHealth{}, "grpc")
 
 	// Switch tracker
 	subcommands.Register(&miListSwitches{}, "switch-tracker")
@@ -22,12 +25,6 @@ func main() {
 	subcommands.Register(&miListEvents{}, "events")
 	subcommands.Register(&miAddEvent{}, "events")
 	subcommands.Register(&miRemoveEvent{}, "events")
-
-	// Sanguisuga
-	subcommands.Register(&sanguisugaAnimeList{}, "sanguisuga")
-	subcommands.Register(&sanguisugaAnimeTrack{}, "sanguisuga")
-	subcommands.Register(&sanguisugaTVList{}, "sanguisuga")
-	subcommands.Register(&sanguisugaTVTrack{}, "sanguisuga")
 
 	internal.HandleStartup()
 	ctx := context.Background()
