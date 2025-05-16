@@ -9,7 +9,7 @@ require (
 	github.com/Marcel-ICMC/graw v0.0.0-20230411090719-e24cd8592d25
 	github.com/McKael/madon/v2 v2.4.0
 	github.com/NYTimes/gziphandler v1.1.1
-	github.com/a-h/templ v0.3.857
+	github.com/a-h/templ v0.3.865
 	github.com/adrg/frontmatter v0.2.0
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.74.1
 	github.com/bluesky-social/indigo v0.0.0-20240905024844-a4f38639767f
