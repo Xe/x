@@ -1,0 +1,11 @@
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: load-balancer-dns
+spec:
+  endpoints:
+    - dnsName: aeacus.xeserv.us
+      recordTTL: 3600
+      recordType: A
+      targets:
+        - 131.153.227.239

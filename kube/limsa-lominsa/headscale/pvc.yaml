@@ -1,0 +1,14 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: headscale-config
+  labels:
+    app.kubernetes.io/instance: headscale
+    app.kubernetes.io/name: headscale
+spec:
+  storageClassName: vultr-block-storage-hdd
+  accessModes:
+    - "ReadWriteOnce"
+  resources:
+    requests:
+      storage: "40Gi"

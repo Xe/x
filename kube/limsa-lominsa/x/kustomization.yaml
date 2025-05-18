@@ -1,0 +1,8 @@
+resources:
+  - cdn-post.yaml
+  - httpdebug.yaml
+  - pronouns.yaml
+  - scootaloose.yaml
+  - stickers.yaml
+  - tulpanomicon.yaml
+  - within.website

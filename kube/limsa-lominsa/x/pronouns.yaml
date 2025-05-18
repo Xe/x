@@ -1,0 +1,16 @@
+apiVersion: x.within.website/v1
+kind: App
+metadata:
+  name: pronouns
+
+spec:
+  image: reg.xeiaso.net/xe/pronouns
+  autoUpdate: true
+  replicas: 2
+
+  ingress:
+    enabled: true
+    host: pronouns.within.lgbt
+
+  healthcheck:
+    enabled: true

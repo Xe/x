@@ -1,0 +1,11 @@
+apiVersion: x.within.website/v1
+kind: App
+metadata:
+  name: cdn-post
+
+spec:
+  image: reg.xeiaso.net/tigrisdata/global-replication-post
+
+  ingress:
+    enabled: true
+    host: global-replication-post.within.lgbt

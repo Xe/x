@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: within-website
+  labels:
+    app.kubernetes.io/name: within-website
+  annotations:
+    keel.sh/policy: all
+    keel.sh/trigger: poll
+    keel.sh/pollSchedule: "@hourly"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: within-website
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: within-website
+    spec:
+      securityContext:
+        fsGroup: 1000
+      volumes:
+        - name: tyson
+          configMap:
+            name: within-website
+      containers:
+        - name: main
+          image: ghcr.io/xe/x/within-website:latest
+          imagePullPolicy: "Always"
+          resources:
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+            requests:
+              cpu: "250m"
+              memory: "128Mi"
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8080
+              httpHeaders:
+                - name: X-Kubernetes
+                  value: "is kinda okay"
+            initialDelaySeconds: 3
+            periodSeconds: 3
+          env:
+            - name: TYSON_CONFIG
+              value: "/etc/within.website/config.ts"
+            - name: PORT
+              value: "8080"
+            - name: SLOG_LEVEL
+              value: DEBUG
+          volumeMounts:
+            - name: tyson
+              mountPath: /etc/within.website
+              readOnly: true

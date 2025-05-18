@@ -1,0 +1,20 @@
+apiVersion: x.within.website/v1
+kind: App
+metadata:
+  name: stickers
+
+spec:
+  image: ghcr.io/xe/x/stickers:latest
+  autoUpdate: true
+
+  healthcheck:
+    enabled: true
+
+  ingress:
+    enabled: true
+    host: stickers.xeiaso.net
+
+  secrets:
+    - name: tigris-creds
+      itemPath: "vaults/lc5zo4zjz3if3mkeuhufjmgmui/items/kvc2jqoyriem75ny4mvm6keguy"
+      environment: true

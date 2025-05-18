@@ -1,0 +1,17 @@
+apiVersion: x.within.website/v1
+kind: App
+metadata:
+  name: tulpanomicon
+
+spec:
+  image: reg.xeiaso.net/tulpamancy/tulpanomicon:latest
+  autoUpdate: true
+  runAsRoot: true
+  port: 80
+
+  ingress:
+    enabled: true
+    host: tulpanomicon.guide
+
+  onion:
+    enabled: true

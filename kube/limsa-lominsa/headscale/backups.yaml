@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: crontab
+data:
+  crontab: |
+    0 7 * * * rclone sync "$KSCB_SRC" "$KSCB_DST/limsa-lominsa/`hostname | cut -d'-' -f1`" -v --backup-dir="$KSCB_DST/`hostname | cut -d'-' -f1`-`date +%d`"
+    0 1 1 * * rclone sync "$KSCB_SRC" "$KSCB_DST/limsa-lominsa/`hostname | cut -d'-' -f1`" -v

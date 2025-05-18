@@ -1,0 +1,4 @@
+resources:
+  - cert-manager
+  - external-dns
+  #- load-balancer-dns.yaml

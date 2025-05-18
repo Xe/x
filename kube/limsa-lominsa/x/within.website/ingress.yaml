@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: within-website
+  labels:
+    app.kubernetes.io/name: within-website
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - within.website
+      secretName: within-website-public-tls
+  rules:
+    - host: within.website
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: within-website
+                port:
+                  name: http

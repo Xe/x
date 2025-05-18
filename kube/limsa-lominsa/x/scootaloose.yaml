@@ -1,0 +1,29 @@
+apiVersion: x.within.website/v1
+kind: App
+metadata:
+  name: scootaloose
+
+spec:
+  image: reg.xeiaso.net/internal/us/scootaloose.com
+  autoUpdate: true
+  runAsRoot: true
+  port: 80
+
+  ingress:
+    enabled: true
+    host: scootaloose.com
+
+  healthcheck:
+    enabled: true
+---
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: scootaloose-atproto
+spec:
+  endpoints:
+    - dnsName: _atproto.scootaloose.com
+      recordTTL: 3600
+      recordType: TXT
+      targets:
+        - "did=did:plc:5ls6mm27drgymieegzh52g5w"
