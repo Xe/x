@@ -17,7 +17,7 @@ require (
 	github.com/bwmarrin/discordgo v0.28.1
 	github.com/c-bata/go-prompt v0.2.6
 	github.com/cenkalti/backoff/v4 v4.3.0
-	github.com/coreos/go-oidc/v3 v3.12.0
+	github.com/coreos/go-oidc/v3 v3.14.1
 	github.com/danrusei/gobot-bsky v0.1.0
 	github.com/disintegration/imaging v1.6.2
 	github.com/eaburns/peggy v1.0.2
@@ -69,7 +69,7 @@ require (
 	go.jetpack.io/tyson v0.1.1
 	go4.org v0.0.0-20190313082347-94abd6928b1d
 	golang.org/x/crypto v0.38.0
-	golang.org/x/oauth2 v0.26.0
+	golang.org/x/oauth2 v0.28.0
 	golang.org/x/sync v0.14.0
 	google.golang.org/grpc v1.72.0
 	gorm.io/gorm v1.25.12
