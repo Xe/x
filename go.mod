@@ -11,7 +11,7 @@ require (
 	github.com/NYTimes/gziphandler v1.1.1
 	github.com/a-h/templ v0.3.865
 	github.com/adrg/frontmatter v0.2.0
-	github.com/aws/aws-sdk-go-v2/service/s3 v1.74.1
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.79.3
 	github.com/bluesky-social/indigo v0.0.0-20240905024844-a4f38639767f
 	github.com/bluesky-social/jetstream v0.0.0-20241022030937-75fdbaa83787
 	github.com/bwmarrin/discordgo v0.28.1
@@ -91,11 +91,11 @@ require (
 	github.com/TecharoHQ/yeet v0.2.1 // indirect
 	github.com/a-h/parse v0.0.0-20250122154542-74294addb73e // indirect
 	github.com/andybalholm/brotli v1.1.1 // indirect
-	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.6.8 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/v4a v1.3.29 // indirect
+	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.6.10 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/v4a v1.3.34 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.12.3 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/checksum v1.5.3 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.18.10 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/checksum v1.7.1 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.18.15 // indirect
 	github.com/blakesmith/ar v0.0.0-20190502131153-809d4375e1fb // indirect
 	github.com/bytedance/sonic v1.12.6 // indirect
 	github.com/bytedance/sonic/loader v0.2.0 // indirect
