@@ -22,7 +22,7 @@ require (
 	github.com/disintegration/imaging v1.6.2
 	github.com/eaburns/peggy v1.0.2
 	github.com/facebookgo/ensure v0.0.0-20160127193407-b4ab57deab51
-	github.com/gen2brain/avif v0.4.3
+	github.com/gen2brain/avif v0.4.4
 	github.com/gen2brain/heic v0.4.4
 	github.com/gen2brain/jpegxl v0.4.4
 	github.com/gen2brain/webp v0.5.4
@@ -111,7 +111,7 @@ require (
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/dop251/goja v0.0.0-20250309171923-bcd7cc6bf64c // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
-	github.com/ebitengine/purego v0.8.2 // indirect
+	github.com/ebitengine/purego v0.8.3 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/evanw/esbuild v0.19.11 // indirect
 	github.com/fasthttp/router v1.5.3 // indirect
