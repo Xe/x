@@ -4,8 +4,8 @@ package main
 import (
 	"context"
 	"flag"
-	"log"
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/google/go-github/github"

@@ -5,12 +5,13 @@
 package announceconnect
 
 import (
-	connect "connectrpc.com/connect"
 	context "context"
 	errors "errors"
-	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	http "net/http"
 	strings "strings"
+
+	connect "connectrpc.com/connect"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	jsonfeed "within.website/x/buf/external/jsonfeed"
 	announce "within.website/x/buf/mimi/announce"
 )

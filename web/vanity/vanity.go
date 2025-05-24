@@ -43,7 +43,6 @@ func WithGoModProxy(importPath, proxyServer string) Option {
 // specific lines within it.
 //
 // More information can be found at https://github.com/golang/gddo/wiki/Source-Code-Links.
-//
 func WithSource(prefix, home, directory, file string) Option {
 	sourceTag := "<meta name=\"go-source\" content=\"" + prefix + " " +
 		home + " " + directory + " " + file + "\">"

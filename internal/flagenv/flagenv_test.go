@@ -8,8 +8,8 @@ import (
 	"strings"
 	"testing"
 
-	"within.website/x/internal/flagenv"
 	"github.com/facebookgo/ensure"
+	"within.website/x/internal/flagenv"
 )
 
 func named(t, v string) string { return strings.ToUpper(t + v) }

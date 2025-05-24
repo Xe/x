@@ -5,11 +5,12 @@
 package genconnect
 
 import (
-	connect "connectrpc.com/connect"
 	context "context"
 	errors "errors"
 	http "net/http"
 	strings "strings"
+
+	connect "connectrpc.com/connect"
 	gen "within.website/x/migroserbices/falin/gen"
 )
 

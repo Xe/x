@@ -98,4 +98,3 @@ func parseQual(val string) float64 {
 	}
 	return 1
 }
-

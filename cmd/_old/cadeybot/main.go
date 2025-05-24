@@ -10,10 +10,10 @@ import (
 	"syscall"
 	"time"
 
-	"within.website/x/internal"
-	"within.website/x/internal/flagenv"
 	"github.com/bwmarrin/discordgo"
 	_ "github.com/joho/godotenv"
+	"within.website/x/internal"
+	"within.website/x/internal/flagenv"
 )
 
 var (

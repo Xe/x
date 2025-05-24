@@ -5,12 +5,13 @@
 package miconnect
 
 import (
-	connect "connectrpc.com/connect"
 	context "context"
 	errors "errors"
-	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	http "net/http"
 	strings "strings"
+
+	connect "connectrpc.com/connect"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	mi "within.website/x/buf/mi"
 )
 
