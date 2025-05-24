@@ -7,7 +7,7 @@
     "doc": "docs"
   },
   "scripts": {
-    "generate": "go generate ./...",
+    "generate": "go generate ./... && go tool goimports -w .",
     "test": "npm run generate && go test ./...",
     "prepare": "husky"
   },
