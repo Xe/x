@@ -7,7 +7,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-func RequestLogFromRequest(r *http.Request, ipAddress, requestID, ja3n, ja4 string) *RequestLog {
+func RequestLogFromRequest(r *http.Request, ipAddress, requestID, ja4 string) *RequestLog {
 
 	result := &RequestLog{
 		RequestDate: timestamppb.Now(),
@@ -17,7 +17,6 @@ func RequestLogFromRequest(r *http.Request, ipAddress, requestID, ja3n, ja4 stri
 		Query:       map[string]string{},
 		Headers:     map[string]string{},
 		RemoteIp:    ipAddress,
-		Ja3N:        ja3n,
 		Ja4:         ja4,
 		RequestId:   requestID,
 	}

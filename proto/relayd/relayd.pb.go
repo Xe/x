@@ -25,19 +25,20 @@ const (
 )
 
 type RequestLog struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	RequestDate   *timestamppb.Timestamp `protobuf:"bytes,1,opt,name=request_date,json=requestDate,proto3" json:"request_date,omitempty"`
-	ResponseTime  *durationpb.Duration   `protobuf:"bytes,2,opt,name=response_time,json=responseTime,proto3" json:"response_time,omitempty"`
-	Host          string                 `protobuf:"bytes,3,opt,name=host,proto3" json:"host,omitempty"`
-	Method        string                 `protobuf:"bytes,4,opt,name=method,proto3" json:"method,omitempty"`
-	Path          string                 `protobuf:"bytes,5,opt,name=path,proto3" json:"path,omitempty"`
-	Query         map[string]string      `protobuf:"bytes,6,rep,name=query,proto3" json:"query,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	Headers       map[string]string      `protobuf:"bytes,7,rep,name=headers,proto3" json:"headers,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	RemoteIp      string                 `protobuf:"bytes,8,opt,name=remote_ip,json=remoteIp,proto3" json:"remote_ip,omitempty"`
-	Ja3N          string                 `protobuf:"bytes,9,opt,name=ja3n,proto3" json:"ja3n,omitempty"`
-	Ja4           string                 `protobuf:"bytes,10,opt,name=ja4,proto3" json:"ja4,omitempty"`
-	RequestId     string                 `protobuf:"bytes,11,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
-	StatusCode    int32                  `protobuf:"varint,12,opt,name=status_code,json=statusCode,proto3" json:"status_code,omitempty"`
+	state        protoimpl.MessageState `protogen:"open.v1"`
+	RequestDate  *timestamppb.Timestamp `protobuf:"bytes,1,opt,name=request_date,json=requestDate,proto3" json:"request_date,omitempty"`
+	ResponseTime *durationpb.Duration   `protobuf:"bytes,2,opt,name=response_time,json=responseTime,proto3" json:"response_time,omitempty"`
+	Host         string                 `protobuf:"bytes,3,opt,name=host,proto3" json:"host,omitempty"`
+	Method       string                 `protobuf:"bytes,4,opt,name=method,proto3" json:"method,omitempty"`
+	Path         string                 `protobuf:"bytes,5,opt,name=path,proto3" json:"path,omitempty"`
+	Query        map[string]string      `protobuf:"bytes,6,rep,name=query,proto3" json:"query,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	Headers      map[string]string      `protobuf:"bytes,7,rep,name=headers,proto3" json:"headers,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	RemoteIp     string                 `protobuf:"bytes,8,opt,name=remote_ip,json=remoteIp,proto3" json:"remote_ip,omitempty"`
+	// Deprecated: Marked as deprecated in relayd.proto.
+	Ja3N          string `protobuf:"bytes,9,opt,name=ja3n,proto3" json:"ja3n,omitempty"`
+	Ja4           string `protobuf:"bytes,10,opt,name=ja4,proto3" json:"ja4,omitempty"`
+	RequestId     string `protobuf:"bytes,11,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
+	StatusCode    int32  `protobuf:"varint,12,opt,name=status_code,json=statusCode,proto3" json:"status_code,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -128,6 +129,7 @@ func (x *RequestLog) GetRemoteIp() string {
 	return ""
 }
 
+// Deprecated: Marked as deprecated in relayd.proto.
 func (x *RequestLog) GetJa3N() string {
 	if x != nil {
 		return x.Ja3N
@@ -160,7 +162,7 @@ var File_relayd_proto protoreflect.FileDescriptor
 
 const file_relayd_proto_rawDesc = "" +
 	"\n" +
-	"\frelayd.proto\x12\x17within.website.x.relayd\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xd6\x04\n" +
+	"\frelayd.proto\x12\x17within.website.x.relayd\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xda\x04\n" +
 	"\n" +
 	"RequestLog\x12=\n" +
 	"\frequest_date\x18\x01 \x01(\v2\x1a.google.protobuf.TimestampR\vrequestDate\x12>\n" +
@@ -170,8 +172,8 @@ const file_relayd_proto_rawDesc = "" +
 	"\x04path\x18\x05 \x01(\tR\x04path\x12D\n" +
 	"\x05query\x18\x06 \x03(\v2..within.website.x.relayd.RequestLog.QueryEntryR\x05query\x12J\n" +
 	"\aheaders\x18\a \x03(\v20.within.website.x.relayd.RequestLog.HeadersEntryR\aheaders\x12\x1b\n" +
-	"\tremote_ip\x18\b \x01(\tR\bremoteIp\x12\x12\n" +
-	"\x04ja3n\x18\t \x01(\tR\x04ja3n\x12\x10\n" +
+	"\tremote_ip\x18\b \x01(\tR\bremoteIp\x12\x16\n" +
+	"\x04ja3n\x18\t \x01(\tB\x02\x18\x01R\x04ja3n\x12\x10\n" +
 	"\x03ja4\x18\n" +
 	" \x01(\tR\x03ja4\x12\x1d\n" +
 	"\n" +

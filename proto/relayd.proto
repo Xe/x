@@ -14,7 +14,7 @@ message RequestLog {
   map<string, string> query = 6;
   map<string, string> headers = 7;
   string remote_ip = 8;
-  string ja3n = 9;
+  string ja3n = 9 [deprecated = true];
   string ja4 = 10;
   string request_id = 11;
   int32 status_code = 12;

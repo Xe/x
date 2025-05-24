@@ -167,7 +167,7 @@ func main() {
 	h := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		t0 := time.Now()
 
-		var foundJa3n, foundJa4 string
+		var foundJa4 string
 
 		host, _, _ := net.SplitHostPort(r.RemoteAddr)
 		if host != "" {
@@ -176,16 +176,13 @@ func main() {
 
 		fp := GetTLSFingerprint(r)
 		if fp != nil {
-			if fp.JA3N() != nil {
-				foundJa3n = fp.JA3N().String()
-			}
 			if fp.JA4() != nil {
 				foundJa4 = fp.JA4().String()
 			}
 		}
 
 		reqID := uuid.Must(uuid.NewV7()).String()
-		rl := relayd.RequestLogFromRequest(r, host, reqID, foundJa3n, foundJa4)
+		rl := relayd.RequestLogFromRequest(r, host, reqID, foundJa4)
 
 		r.Header.Set("X-Forwarded-Host", r.URL.Host)
 		r.Header.Set("X-Forwarded-Proto", "https")
@@ -193,7 +190,6 @@ func main() {
 		r.Header.Set("X-Request-Id", reqID)
 		r.Header.Set("X-Scheme", "https")
 		r.Header.Set("X-HTTP-Protocol", r.Proto)
-		r.Header.Set("X-TLS-Fingerprint-JA3N", foundJa3n)
 		r.Header.Set("X-TLS-Fingerprint-JA4", foundJa4)
 
 		headers, _ := json.Marshal(r.Header)

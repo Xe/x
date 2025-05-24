@@ -1,16 +1,16 @@
 apiVersion: externaldns.k8s.io/v1alpha1
 kind: DNSEndpoint
 metadata:
-  name: ellenjoe-wildcard
+  name: penelope-wildcard
 spec:
   endpoints:
-    - dnsName: "*.ellenjoe.within.lgbt"
+    - dnsName: "*.penelope.within.lgbt"
       recordTTL: 3600
       recordType: A
       targets:
-        - 100.127.81.4
-    - dnsName: "*.ellenjoe.within.lgbt"
+        - 100.90.105.81
+    - dnsName: "*.penelope.within.lgbt"
       recordTTL: 3600
       recordType: AAAA
       targets:
-        - fd7a:115c:a1e0:7935:5e23:be9b:d4f9:6105
+        - fd7a:115c:a1e0:8952:be9f:4a65:92c9:fec8

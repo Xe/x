@@ -173,3 +173,7 @@ const pkgs = [];
     );
   });
 });
+
+pkgs
+  .filter((pkg) => pkg.endsWith("rpm"))
+  .forEach((pkg) => gitea.uploadPackage("xe", "x", "current", pkg));
