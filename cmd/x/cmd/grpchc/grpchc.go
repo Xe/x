@@ -2,6 +2,7 @@ package grpchc
 
 import (
 	"context"
+	"crypto/tls"
 	"flag"
 	"fmt"
 	"sort"
@@ -10,6 +11,7 @@ import (
 	"github.com/google/subcommands"
 	"github.com/rodaine/table"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 )
@@ -52,7 +54,7 @@ func (gh *GRPCHealth) Execute(ctx context.Context, f *flag.FlagSet, _ ...interfa
 	case true:
 		conn, err = grpc.NewClient(u, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	case false:
-		conn, err = grpc.NewClient(u)
+		conn, err = grpc.NewClient(u, grpc.WithTransportCredentials(credentials.NewTLS(&tls.Config{})))
 	}
 	if err != nil {
 		fmt.Printf("can't connect to %s: %v\n", u, err)
