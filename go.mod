@@ -24,7 +24,7 @@ require (
 	github.com/facebookgo/ensure v0.0.0-20160127193407-b4ab57deab51
 	github.com/gen2brain/avif v0.4.4
 	github.com/gen2brain/heic v0.4.4
-	github.com/gen2brain/jpegxl v0.4.4
+	github.com/gen2brain/jpegxl v0.4.5
 	github.com/gen2brain/webp v0.5.4
 	github.com/go-gorm/caches/v4 v4.0.5
 	github.com/go-interpreter/wagon v0.6.0
