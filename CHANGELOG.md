@@ -1,3 +1,9 @@
+# [1.20.0](https://github.com/Xe/x/compare/v1.19.0...v1.20.0) (2025-05-30)
+
+### Features
+
+- **yeetfile:** build riscv64 binaries ([aa0c069](https://github.com/Xe/x/commit/aa0c069cd638b4d3670385f3b9b0934eb186b720))
+
 # [1.19.0](https://github.com/Xe/x/compare/v1.18.0...v1.19.0) (2025-05-29)
 
 ### Bug Fixes
