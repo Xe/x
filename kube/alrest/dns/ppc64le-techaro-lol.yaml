@@ -1,0 +1,11 @@
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: ppc64le-techaro-lol-dns
+spec:
+  endpoints:
+    - dnsName: "ppc64le.techaro.lol"
+      recordTTL: 3600
+      recordType: A
+      targets:
+        - 23.247.189.200
