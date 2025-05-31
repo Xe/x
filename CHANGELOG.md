@@ -1,3 +1,15 @@
+# [1.21.0](https://github.com/Xe/x/compare/v1.20.0...v1.21.0) (2025-05-31)
+
+### Bug Fixes
+
+- **pvfm/bot:** cache seen messages for up to 10 minutes ([76268a9](https://github.com/Xe/x/commit/76268a97a921358579b8c96feefd4a36f01f6478))
+- **recording:** don't delete temporary files ([472754d](https://github.com/Xe/x/commit/472754d2f38c51e6dd77b29c4faf645fb2311caf))
+
+### Features
+
+- **aura:** build with docker buildx bake ([126a3cf](https://github.com/Xe/x/commit/126a3cf9934d4e07647ec08cd6d96ab27f1f9eca))
+- **x:** grpchc can do TLS now ([cc4be82](https://github.com/Xe/x/commit/cc4be8203f35b67d58b9d1edf0c2c4ab363e0a96))
+
 # [1.20.0](https://github.com/Xe/x/compare/v1.19.0...v1.20.0) (2025-05-30)
 
 ### Features
