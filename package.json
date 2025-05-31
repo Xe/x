@@ -193,6 +193,6 @@
     ]
   },
   "dependencies": {
-    "@semantic-release/exec": "^7.0.3"
+    "@semantic-release/exec": "^7.1.0"
   }
 }
