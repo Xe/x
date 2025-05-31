@@ -1,0 +1,6 @@
+[techaro-unstable]
+name=Techaro Packages (unstable)
+baseurl=https://pkgs.techaro.lol/rpm/unstable
+enabled=1
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/techaro-pkgs-unstable.asc

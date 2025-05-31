@@ -1,0 +1,1 @@
+deb [signed-by=/etc/apt/keyrings/techaro-pkgs-unstable.pub.asc] https://pkgs.techaro.lol/deb/unstable stable main
