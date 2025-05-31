@@ -215,7 +215,6 @@ func (a *aura) Permissons(s *discordgo.Session, m *discordgo.Message, parv []str
 }
 
 func (a *aura) roles(s *discordgo.Session, m *discordgo.Message, parv []string) error {
-	log.Println("got here")
 	ch, err := s.Channel(m.ChannelID)
 	if err != nil {
 		return err
@@ -357,7 +356,7 @@ func (a *aura) waitAndAnnounce(s *discordgo.Session, m *discordgo.Message, r *re
 
 	slink := fmt.Sprintf("https://%s/id/%s", *recordingDomain, id)
 
-	s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("Recording complete (%s): %s", time.Now().Sub(r.StartTime()).String(), slink))
+	s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("Recording complete (%s): %s", time.Since(r.StartTime()).String(), slink))
 }
 
 func urlencode(inp string) string {
