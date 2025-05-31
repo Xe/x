@@ -7,9 +7,9 @@ import (
 	"sync"
 	"time"
 
-	"golang.org/x/time/rate"
-
 	"github.com/bwmarrin/discordgo"
+	"golang.org/x/time/rate"
+	"within.website/x/decaymap"
 )
 
 var (
@@ -103,7 +103,8 @@ func NewBasicCommand(verb, helptext string, permissions, handler Handler) Comman
 // CommandSet is a group of bot commands similar to an http.ServeMux.
 type CommandSet struct {
 	sync.Mutex
-	cmds map[string]CommandHandler
+	cmds         map[string]CommandHandler
+	seenMessages *decaymap.Impl[string, struct{}]
 
 	Prefix string
 }
@@ -111,9 +112,16 @@ type CommandSet struct {
 // NewCommandSet creates a new command set with the `help` command pre-loaded.
 func NewCommandSet() *CommandSet {
 	cs := &CommandSet{
-		cmds:   map[string]CommandHandler{},
-		Prefix: DefaultPrefix,
+		cmds:         map[string]CommandHandler{},
+		seenMessages: decaymap.New[string, struct{}](),
+		Prefix:       DefaultPrefix,
 	}
+
+	go func() {
+		for range time.Tick(10 * time.Minute) {
+			cs.seenMessages.Cleanup()
+		}
+	}()
 
 	cs.AddCmd("help", "Shows help for the bot", NoPermissions, cs.help)
 
@@ -150,6 +158,12 @@ func (cs *CommandSet) Add(h CommandHandler) error {
 
 // Run makes a CommandSet compatible with discordgo event dispatching.
 func (cs *CommandSet) Run(s *discordgo.Session, msg *discordgo.Message) error {
+	if _, has := cs.seenMessages.Get(msg.ID); has {
+		return nil
+	}
+
+	cs.seenMessages.Set(msg.ID, struct{}{}, 5*time.Second)
+
 	cs.Lock()
 	defer cs.Unlock()
 
