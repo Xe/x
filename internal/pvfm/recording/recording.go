@@ -144,24 +144,19 @@ func Move(source, destination string) error {
 func moveCrossDevice(source, destination string) error {
 	src, err := os.Open(source)
 	if err != nil {
-		return fmt.Errorf("Open(source): %w", err)
+		return fmt.Errorf("open %s: %w", source, err)
 	}
 	defer src.Close()
 
 	dst, err := os.Create(destination)
 	if err != nil {
-		return fmt.Errorf("Create(destination): %w", err)
+		return fmt.Errorf("create %s: %w", destination, err)
 	}
 	defer dst.Close()
 
 	_, err = io.Copy(dst, src)
 	if err != nil {
-		return fmt.Errorf("Copy: %w", err)
-	}
-
-	err = os.Remove(source)
-	if err != nil {
-		return fmt.Errorf("Remove(source): %w", err)
+		return fmt.Errorf("copy: %w", err)
 	}
 
 	return nil

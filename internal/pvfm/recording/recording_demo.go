@@ -9,7 +9,7 @@ import (
 	"os"
 	"os/signal"
 
-	"github.com/PonyvilleFM/aura/recording"
+	"within.website/x/internal/pvfm/recording"
 )
 
 var (
