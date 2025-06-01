@@ -184,7 +184,7 @@ func main() {
 		reqID := uuid.Must(uuid.NewV7()).String()
 		rl := relayd.RequestLogFromRequest(r, host, reqID, foundJa4)
 
-		r.Header.Set("X-Forwarded-Host", r.URL.Host)
+		r.Header.Set("X-Forwarded-Host", r.Host)
 		r.Header.Set("X-Forwarded-Proto", "https")
 		r.Header.Set("X-Forwarded-Scheme", "https")
 		r.Header.Set("X-Request-Id", reqID)
