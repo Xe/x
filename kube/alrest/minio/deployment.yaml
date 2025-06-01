@@ -27,7 +27,7 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /data
-          image: quay.io/minio/minio:latest
+          image: quay.io/minio/minio:RELEASE.2025-04-22T22-12-26Z
           imagePullPolicy: Always
           args:
             - server
