@@ -1,0 +1,13 @@
+apiVersion: x.within.website/v1
+kind: App
+metadata:
+  name: httpdebug
+
+spec:
+  image: ghcr.io/xe/x/httpdebug:latest
+  autoUpdate: true
+
+  ingress:
+    enabled: true
+    className: traefik
+    host: httpdebug.ellenjoe.within.lgbt
