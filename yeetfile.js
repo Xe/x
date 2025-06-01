@@ -136,23 +136,25 @@ const pkgs = [];
       }),
     );
 
-    pkgs.push(
-      method.build({
-        name: "uploud",
-        description: "Upload images to the cloud!",
-        homepage: "https://within.website",
-        license: "CC0",
-        goarch,
+    if (goarch == "amd64" || goarch == "arm64") {
+      pkgs.push(
+        method.build({
+          name: "uploud",
+          description: "Upload images to the cloud!",
+          homepage: "https://within.website",
+          license: "CC0",
+          goarch,
 
-        documentation: {
-          LICENSE: "LICENSE",
-        },
+          documentation: {
+            LICENSE: "LICENSE",
+          },
 
-        build: ({ bin }) => {
-          $`go build -o ${bin}/uploud -ldflags '-s -w -extldflags "-static" -X "within.website/x.Version=${git.tag()}"' ./cmd/uploud`;
-        },
-      }),
-    );
+          build: ({ bin }) => {
+            $`go build -o ${bin}/uploud -ldflags '-s -w -extldflags "-static" -X "within.website/x.Version=${git.tag()}"' ./cmd/uploud`;
+          },
+        }),
+      );
+    }
 
     pkgs.push(
       method.build({
