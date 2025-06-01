@@ -5,7 +5,6 @@ yeet.setenv("VERSION", git.tag());
 programs = [
   "aerial",
   "amano",
-  "aura",
   "future-sight",
   "httpdebug",
   "quickserv",
@@ -19,6 +18,7 @@ programs = [
 ].join(",");
 
 $`ko build --platform=all --base-import-paths --tags=latest,${git.tag()} ./cmd/{${programs}}`;
+$`docker buildx bake --push`;
 
 yeet.setenv("CGO_ENABLED", "0");
 
