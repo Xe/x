@@ -1,3 +1,15 @@
+# [1.22.0](https://github.com/Xe/x/compare/v1.21.0...v1.22.0) (2025-06-11)
+
+### Bug Fixes
+
+- **cmd/relayd:** set the right Host header ([6db9999](https://github.com/Xe/x/commit/6db99999b5de18ae9da2cb995473141b96a46fae))
+- **mi:** make old routes work to avoid breaking tools ([b51ae17](https://github.com/Xe/x/commit/b51ae174ba2eb47a4d2d06db706dbee6969a5444))
+- **yeetfile:** only build uploud where purego is supported ([8c12cfa](https://github.com/Xe/x/commit/8c12cfa67be87d5f1cfd8a5315160a5197f22ac1))
+
+### Features
+
+- **ingressd:** grpc health checking ([0870e5d](https://github.com/Xe/x/commit/0870e5df3513789b16fc33a588f01370dad55a76))
+
 # [1.21.0](https://github.com/Xe/x/compare/v1.20.0...v1.21.0) (2025-05-31)
 
 ### Bug Fixes
