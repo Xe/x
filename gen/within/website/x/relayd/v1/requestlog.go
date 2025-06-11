@@ -1,4 +1,4 @@
-package relayd
+package relaydv1
 
 import (
 	"net/http"
@@ -8,7 +8,6 @@ import (
 )
 
 func RequestLogFromRequest(r *http.Request, ipAddress, requestID, ja4 string) *RequestLog {
-
 	result := &RequestLog{
 		RequestDate: timestamppb.Now(),
 		Host:        r.Host,
@@ -26,6 +25,10 @@ func RequestLogFromRequest(r *http.Request, ipAddress, requestID, ja4 string) *R
 	}
 
 	for k, v := range r.Header {
+		if k == "Cookie" {
+			result.Headers[k] = "Omitted cookie values"
+		}
+
 		result.Headers[k] = strings.Join(v, ",")
 	}
 

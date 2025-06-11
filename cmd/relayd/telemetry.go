@@ -14,7 +14,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/google/uuid"
 	"within.website/x/bundler"
-	"within.website/x/proto/relayd"
+	relayd "within.website/x/gen/within/website/x/relayd/v1"
 )
 
 var (

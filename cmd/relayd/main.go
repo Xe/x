@@ -26,8 +26,8 @@ import (
 	"golang.org/x/crypto/acme/autocert"
 	"google.golang.org/protobuf/types/known/durationpb"
 	_ "modernc.org/sqlite"
+	relayd "within.website/x/gen/within/website/x/relayd/v1"
 	"within.website/x/internal"
-	"within.website/x/proto/relayd"
 	"within.website/x/xess"
 )
 
