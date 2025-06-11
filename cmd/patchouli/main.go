@@ -17,9 +17,9 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"gorm.io/gorm"
 	gormPrometheus "gorm.io/plugin/prometheus"
-	"within.website/x/buf/patchouli"
-	"within.website/x/buf/patchouli/patchouliconnect"
 	"within.website/x/cmd/patchouli/ytdlp"
+	patchouliv1 "within.website/x/gen/within/website/x/patchouli/v1"
+	"within.website/x/gen/within/website/x/patchouli/v1/patchouliv1connect"
 	"within.website/x/internal"
 )
 
@@ -44,7 +44,7 @@ func main() {
 	compress1KB := connect.WithCompressMinBytes(1024)
 
 	mux := http.NewServeMux()
-	mux.Handle(patchouliconnect.NewSyndicateHandler(s, compress1KB))
+	mux.Handle(patchouliv1connect.NewSyndicateHandler(s, compress1KB))
 
 	slog.Info("listening", "url", "http://localhost"+*bind)
 	log.Fatal(http.ListenAndServe(*bind, mux))
@@ -80,9 +80,9 @@ type Server struct {
 
 func (s *Server) Info(
 	ctx context.Context,
-	req *connect.Request[patchouli.TwitchInfoReq],
+	req *connect.Request[patchouliv1.TwitchInfoReq],
 ) (
-	*connect.Response[patchouli.TwitchInfoResp],
+	*connect.Response[patchouliv1.TwitchInfoResp],
 	error,
 ) {
 	metadata, err := ytdlp.Metadata(ctx, req.Msg.GetUrl())
@@ -91,7 +91,7 @@ func (s *Server) Info(
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
-	result := &patchouli.TwitchInfoResp{
+	result := &patchouliv1.TwitchInfoResp{
 		Id:           metadata.ID,
 		Title:        metadata.Title,
 		ThumbnailUrl: metadata.Thumbnail,
@@ -105,9 +105,9 @@ func (s *Server) Info(
 
 func (s *Server) Download(
 	ctx context.Context,
-	req *connect.Request[patchouli.TwitchDownloadReq],
+	req *connect.Request[patchouliv1.TwitchDownloadReq],
 ) (
-	*connect.Response[patchouli.TwitchDownloadResp],
+	*connect.Response[patchouliv1.TwitchDownloadResp],
 	error,
 ) {
 	dir := filepath.Join(*dataDir, "video")
@@ -116,7 +116,7 @@ func (s *Server) Download(
 		return nil, err
 	}
 
-	result := &patchouli.TwitchDownloadResp{
+	result := &patchouliv1.TwitchDownloadResp{
 		Url:      req.Msg.Url,
 		Location: dir,
 	}

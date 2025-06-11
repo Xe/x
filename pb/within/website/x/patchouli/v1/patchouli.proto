@@ -1,6 +1,5 @@
 syntax = "proto3";
-package within.website.x.patchouli;
-option go_package = "within.website/x/buf/patchouli";
+package within.website.x.patchouli.v1;
 
 import "google/protobuf/timestamp.proto";
 
@@ -9,9 +8,7 @@ service Syndicate {
   rpc Download(TwitchDownloadReq) returns (TwitchDownloadResp) {};
 }
 
-message TwitchInfoReq {
-  string url = 1;
-}
+message TwitchInfoReq { string url = 1; }
 
 message TwitchInfoResp {
   string id = 1;
@@ -22,9 +19,7 @@ message TwitchInfoResp {
   string url = 6;
 }
 
-message TwitchDownloadReq {
-  string url = 1;
-}
+message TwitchDownloadReq { string url = 1; }
 
 message TwitchDownloadResp {
   string url = 1;
