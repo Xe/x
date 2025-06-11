@@ -114,6 +114,7 @@ function __theme_print_git_status
     printf '%s' $git_prompt
     print_colored $__fish_git_prompt_char_branch_end $__fish_git_prompt_color_branch_end
 end
+
 function __theme_print_jobs
     [ "$theme_display_jobs" = 'no' ]; and return
     set -l num_jobs (jobs -c | command wc -l)
@@ -124,12 +125,15 @@ function __theme_print_jobs
         print_colored "$num_jobs" $theme_color_status_jobs
     end
 end
+
 function __theme_print_prompt_char
     print_colored $theme_prompt_char $theme_color_prompt
 end
+
 function __theme_print_pwd
     print_colored (prompt_pwd) $theme_color_path
 end
+
 function __theme_print_pwd_rw
     [ "$theme_display_rw" = 'no' ]; and return;
     set -l rw_chars
@@ -141,6 +145,7 @@ function __theme_print_pwd_rw
     print_colored $theme_prompt_status_separator_char $theme_color_separator
     print_colored $rw_chars $theme_color_status_rw
 end
+
 function __theme_print_superuser
     if [ (command id -u) = "0" ]
         set theme_prompt_char "$theme_prompt_char_superuser"
@@ -149,10 +154,12 @@ function __theme_print_superuser
         set theme_prompt_char "$theme_prompt_char_normal"
     end
 end
+
 function __theme_print_time
     [ "$theme_display_time" = 'yes' ]; or return;
     print_colored (command date $theme_display_time_format) $theme_color_time
 end
+
 function __theme_print_userhost
     echo -ns (__theme_print_superuser) $USER (__theme_reset_color)
 
@@ -164,6 +171,7 @@ function __theme_print_userhost
     print_colored "@" $theme_color_separator
     print_colored (prompt_hostname) $theme_color_host
 end
+
 function __theme_print_virtualenv
     [ "$theme_display_virtualenv" = 'no' -o -z "$VIRTUAL_ENV" ]; and return
 
@@ -178,9 +186,11 @@ function __theme_print_virtualenv
     print_colored $basename $theme_color_virtualenv
     print_colored $theme_prompt_virtualenv_char_end $theme_prompt_virtualenv_color_char_end
 end
+
 function __theme_reset_color
     set_color $theme_color_normal
 end
+
 function print_colored
     set -l bgcolor normal
     set -l fgcolor normal
@@ -197,6 +207,7 @@ function print_colored
 
     printf '%s%s%s' (set_color -b $bgcolor $fgcolor) (string join " " $text) (__theme_reset_color)
 end
+
 function fish_prompt
     set -l sep (set_color $theme_prompt_segment_separator_color)$theme_prompt_segment_separator_char(__theme_reset_color)
     set -l line1 (string join "$sep" \
@@ -207,12 +218,13 @@ function fish_prompt
         (__theme_print_git_status) \
         (__kube_prompt) \
         (__theme_print_jobs) \
+        (__theme_print_prompt_char) \
     )
     set -l line2 (string join " " \
         (__theme_print_virtualenv) \
-        (__theme_print_prompt_char)\
+        (__theme_print_prompt_char) \
     )
 
     echo "$line1"
-    echo "$line2 "
+    echo -n "$line2 "
 end
