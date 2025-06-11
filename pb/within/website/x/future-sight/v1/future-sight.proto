@@ -1,0 +1,6 @@
+syntax = "proto3";
+package within.website.x.future_sight.v1;
+
+import "buf/validate/validate.proto";
+
+message NewVersion { string slug = 1 [ (buf.validate.field).required = true ]; }

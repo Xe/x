@@ -1,0 +1,28 @@
+version: v2
+managed:
+  enabled: true
+  override:
+    - file_option: go_package_prefix
+      value: within.website/x/gen
+  disable:
+    - file_option: go_package
+      module: buf.build/bufbuild/protovalidate
+plugins:
+  - remote: buf.build/protocolbuffers/go
+    out: gen
+    opt:
+      - paths=source_relative
+  - remote: buf.build/grpc/go
+    out: gen
+    opt:
+      - paths=source_relative
+  - remote: buf.build/connectrpc/go:v1.18.1
+    out: gen
+    opt:
+      - paths=source_relative
+  - local: protoc-gen-twirp
+    out: gen
+    opt:
+      - paths=source_relative
+inputs:
+  - directory: pb

@@ -14,6 +14,7 @@ import (
 	"path/filepath"
 	"runtime"
 
+	"buf.build/go/protovalidate"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -21,7 +22,7 @@ import (
 	"github.com/redis/go-redis/v9"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/protobuf/proto"
-	pb "within.website/x/buf/future-sight"
+	pb "within.website/x/gen/within/website/x/future-sight/v1"
 	"within.website/x/internal"
 	"within.website/x/internal/xesite"
 	"within.website/x/web/useragent"
@@ -266,6 +267,11 @@ func (s *Server) HandleFutureSightPushMsg(msg *nats.Msg) {
 	nv := new(pb.NewVersion)
 	if err := proto.Unmarshal(msg.Data, nv); err != nil {
 		slog.Error("failed to unmarshal message", "err", err)
+		return
+	}
+
+	if err := protovalidate.Validate(nv); err != nil {
+		slog.Error("failed to validate message", "err", err)
 		return
 	}
 
