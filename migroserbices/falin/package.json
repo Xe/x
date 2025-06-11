@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "main": "src/index.js",
   "scripts": {
-    "build": "npm run generate && tsc",
+    "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1",
     "generate": "buf generate",
-    "start": "npm run build && node ./src/main.js",
+    "start": "npm run generate && npm run build && node ./src/main.js",
     "sample-inference": "curl http://localhost:8080/within.website.x.falin.v1alpha1.ImageService/GenerateImage --json '{\"prompt\": \"A taco walking on the moon\", \"model\": \"fal-ai/flux-pro/v1.1\"}' -v"
   },
   "keywords": [],
