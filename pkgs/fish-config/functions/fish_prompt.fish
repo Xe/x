@@ -25,7 +25,7 @@ end
 #set -g theme_display_time yes
 #
 ## Display the user's current group
-#set -g theme_display_group no
+set -g theme_display_group no
 #
 ## Display git branch status
 #set -g theme_display_git no
@@ -218,7 +218,6 @@ function fish_prompt
         (__theme_print_git_status) \
         (__kube_prompt) \
         (__theme_print_jobs) \
-        (__theme_print_prompt_char) \
     )
     set -l line2 (string join " " \
         (__theme_print_virtualenv) \
