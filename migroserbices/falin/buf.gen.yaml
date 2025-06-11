@@ -1,14 +1,20 @@
 version: v2
 plugins:
-  - local: protoc-gen-es
+  - remote: buf.build/bufbuild/es:v1.10.0
     out: gen
     opt: target=ts
-  - local: protoc-gen-connect-es
+  - remote: buf.build/connectrpc/es:v1.6.1
     out: gen
     opt: target=ts
-  - local: protoc-gen-go
+  - remote: buf.build/protocolbuffers/go
     out: gen
-    opt: paths=source_relative
-  - local: protoc-gen-connect-go
+    opt:
+      - paths=source_relative
+  - remote: buf.build/grpc/go
     out: gen
-    opt: paths=source_relative
+    opt:
+      - paths=source_relative
+  - remote: buf.build/connectrpc/go:v1.18.1
+    out: gen
+    opt:
+      - paths=source_relative

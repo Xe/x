@@ -1,7 +1,12 @@
 import { ConnectRouter } from "@connectrpc/connect";
 import * as fal from "@fal-ai/serverless-client";
 import { ImageService } from "../gen/falin_connect";
-import { GenerateImageResponse, ImageOutput } from "../gen/falin_pb";
+import {
+  GenerateImageRequest,
+  GenerateImageResponse,
+  ImageOutput,
+} from "../gen/falin_pb";
+import { Message } from "@bufbuild/protobuf";
 
 interface falImageOutput {
   url: string;

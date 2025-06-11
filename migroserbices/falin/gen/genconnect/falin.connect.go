@@ -39,12 +39,6 @@ const (
 	ImageServiceGenerateImageProcedure = "/within.website.x.falin.v1alpha1.ImageService/GenerateImage"
 )
 
-// These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
-var (
-	imageServiceServiceDescriptor             = gen.File_falin_proto.Services().ByName("ImageService")
-	imageServiceGenerateImageMethodDescriptor = imageServiceServiceDescriptor.Methods().ByName("GenerateImage")
-)
-
 // ImageServiceClient is a client for the within.website.x.falin.v1alpha1.ImageService service.
 type ImageServiceClient interface {
 	GenerateImage(context.Context, *connect.Request[gen.GenerateImageRequest]) (*connect.Response[gen.GenerateImageResponse], error)
@@ -59,11 +53,12 @@ type ImageServiceClient interface {
 // http://api.acme.com or https://acme.com/grpc).
 func NewImageServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) ImageServiceClient {
 	baseURL = strings.TrimRight(baseURL, "/")
+	imageServiceMethods := gen.File_falin_proto.Services().ByName("ImageService").Methods()
 	return &imageServiceClient{
 		generateImage: connect.NewClient[gen.GenerateImageRequest, gen.GenerateImageResponse](
 			httpClient,
 			baseURL+ImageServiceGenerateImageProcedure,
-			connect.WithSchema(imageServiceGenerateImageMethodDescriptor),
+			connect.WithSchema(imageServiceMethods.ByName("GenerateImage")),
 			connect.WithClientOptions(opts...),
 		),
 	}
@@ -91,10 +86,11 @@ type ImageServiceHandler interface {
 // By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
 // and JSON codecs. They also support gzip compression.
 func NewImageServiceHandler(svc ImageServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
+	imageServiceMethods := gen.File_falin_proto.Services().ByName("ImageService").Methods()
 	imageServiceGenerateImageHandler := connect.NewUnaryHandler(
 		ImageServiceGenerateImageProcedure,
 		svc.GenerateImage,
-		connect.WithSchema(imageServiceGenerateImageMethodDescriptor),
+		connect.WithSchema(imageServiceMethods.ByName("GenerateImage")),
 		connect.WithHandlerOptions(opts...),
 	)
 	return "/within.website.x.falin.v1alpha1.ImageService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

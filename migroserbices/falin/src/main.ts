@@ -23,4 +23,6 @@ app.get("/healthz", function (_req, res) {
   res.send("OK");
 });
 
+console.log("Listening on port 8080");
+
 http.createServer(app).listen(8080);
