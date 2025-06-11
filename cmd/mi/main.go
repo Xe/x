@@ -8,6 +8,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/robfig/cron/v3"
@@ -37,13 +38,18 @@ var (
 	flyghtTrackerURL = flag.String("flyght-tracker-url", "", "Flyght Tracker URL")
 
 	// POSSE flags
-	blueskyAuthkey   = flag.String("bsky-authkey", "", "Bluesky authkey")
-	blueskyHandle    = flag.String("bsky-handle", "", "Bluesky handle")
-	blueskyPDS       = flag.String("bsky-pds", "https://bsky.social", "Bluesky PDS")
-	mastodonToken    = flag.String("mastodon-token", "", "Mastodon token")
-	mastodonURL      = flag.String("mastodon-url", "", "Mastodon URL")
-	mastodonUsername = flag.String("mastodon-username", "", "Mastodon username")
-	mimiAnnounceURL  = flag.String("mimi-announce-url", "", "Mimi announce URL")
+	blueskyAuthkey      = flag.String("bsky-authkey", "", "Bluesky authkey")
+	blueskyHandle       = flag.String("bsky-handle", "", "Bluesky handle")
+	blueskyPDS          = flag.String("bsky-pds", "https://bsky.social", "Bluesky PDS")
+	mastodonToken       = flag.String("mastodon-token", "", "Mastodon token")
+	mastodonURL         = flag.String("mastodon-url", "", "Mastodon URL")
+	mastodonUsername    = flag.String("mastodon-username", "", "Mastodon username")
+	mimiAnnounceURL     = flag.String("mimi-announce-url", "", "Mimi announce URL")
+	twitchClientID      = flag.String("twitch-client-id", "", "twitch.tv client ID")
+	twitchClientSecret  = flag.String("twitch-client-secret", "", "twitch.tv client secret")
+	twitchUserID        = flag.Int("twitch-user-id", 105794391, "twitch.tv user ID")
+	twitchWebhookSecret = flag.String("twitch-webhook-secret", "", "twitch.tv webhook secret")
+	twitchWebhookURL    = flag.String("twitch-webhook-url", "", "URL for Twitch events to be pushed to")
 )
 
 func main() {
@@ -86,17 +92,21 @@ func main() {
 		os.Exit(1)
 	}
 
-	te, err := twitchevents.New(ctx, dao, twitchevents.Config{
-		BlueskyAuthkey:  *blueskyAuthkey,
-		BlueskyHandle:   *blueskyHandle,
-		BlueskyPDS:      *blueskyPDS,
-		MastodonToken:   *mastodonToken,
-		MastodonURL:     *mastodonURL,
-		MimiAnnounceURL: *mimiAnnounceURL,
-	})
-	if err != nil {
-		slog.Error("failed to create twitch events", "err", err)
-		os.Exit(1)
+	if *twitchClientID != "" {
+		te, err := twitchevents.New(ctx, dao, twitchevents.Config{
+			BlueskyAuthkey:  *blueskyAuthkey,
+			BlueskyHandle:   *blueskyHandle,
+			BlueskyPDS:      *blueskyPDS,
+			MastodonToken:   *mastodonToken,
+			MastodonURL:     *mastodonURL,
+			MimiAnnounceURL: *mimiAnnounceURL,
+		})
+		if err != nil {
+			slog.Error("failed to create twitch events", "err", err)
+			os.Exit(1)
+		}
+
+		mux.Handle("/twitch", te)
 	}
 
 	st := switchtracker.New(dao)
@@ -110,9 +120,26 @@ func main() {
 
 	mux.Handle(announcev1.AnnouncePathPrefix, announcev1.NewAnnounceServer(ann))
 	mux.Handle(pb.SwitchTrackerPathPrefix, pb.NewSwitchTrackerServer(st))
+
+	// XXX(Xe): shim through old paths
+	mux.HandleFunc("/twirp/within.website.x.mi.SwitchTracker/", func(w http.ResponseWriter, r *http.Request) {
+		slog.Info("got here", "path", r.URL.Path)
+		r.URL.Path = strings.Replace(r.URL.Path, "/twirp/within.website.x.mi.SwitchTracker/", "/twirp/within.website.x.mi.v1.SwitchTracker/", -1)
+		slog.Info("got here", "path", r.URL.Path)
+		pb.NewSwitchTrackerServer(st).ServeHTTP(w, r)
+	})
+
 	mux.Handle(pb.EventsPathPrefix, pb.NewEventsServer(es))
+
+	// XXX(Xe): shim through old paths
+	mux.HandleFunc("/twirp/within.website.x.mi.Events/", func(w http.ResponseWriter, r *http.Request) {
+		slog.Info("got here", "path", r.URL.Path)
+		r.URL.Path = strings.Replace(r.URL.Path, "/twirp/within.website.x.mi.Events/", "/twirp/within.website.x.mi.v1.Events/", -1)
+		slog.Info("got here", "path", r.URL.Path)
+		pb.NewEventsServer(es).ServeHTTP(w, r)
+	})
+
 	mux.Handle("/front", homefrontshim.New(dao))
-	mux.Handle("/twitch", te)
 	mux.Handle("/glance", glance.New(dao))
 
 	i := importer.New(dao)

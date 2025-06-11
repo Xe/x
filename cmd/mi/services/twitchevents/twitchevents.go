@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"flag"
 	"fmt"
 	"io"
 	"log/slog"
@@ -33,21 +32,20 @@ var (
 		Name: "mi_twitch_events_count",
 		Help: "Number of twitch events ever processed",
 	}, []string{"messageType"})
-
-	twitchClientID      = flag.String("twitch-client-id", "", "twitch.tv client ID")
-	twitchClientSecret  = flag.String("twitch-client-secret", "", "twitch.tv client secret")
-	twitchUserID        = flag.Int("twitch-user-id", 105794391, "twitch.tv user ID")
-	twitchWebhookSecret = flag.String("twitch-webhook-secret", "", "twitch.tv webhook secret")
-	twitchWebhookURL    = flag.String("twitch-webhook-url", "", "URL for Twitch events to be pushed to")
 )
 
 type Config struct {
-	BlueskyAuthkey  string
-	BlueskyHandle   string
-	BlueskyPDS      string
-	MastodonToken   string
-	MastodonURL     string
-	MimiAnnounceURL string
+	BlueskyAuthkey      string
+	BlueskyHandle       string
+	BlueskyPDS          string
+	MastodonToken       string
+	MastodonURL         string
+	MimiAnnounceURL     string
+	TwitchClientID      string
+	TwitchClientSecret  string
+	TwitchUserID        int
+	TwitchWebhookSecret string
+	TwitchWebhookURL    string
 }
 
 func (c Config) BlueskyAgent(ctx context.Context) (*bsky.BskyAgent, error) {
@@ -75,8 +73,8 @@ type Server struct {
 
 func New(ctx context.Context, dao *models.DAO, cfg Config) (*Server, error) {
 	twitch, err := helix.NewClient(&helix.Options{
-		ClientID:     *twitchClientID,
-		ClientSecret: *twitchClientSecret,
+		ClientID:     cfg.TwitchClientID,
+		ClientSecret: cfg.TwitchClientSecret,
 	})
 
 	if err != nil {
@@ -125,7 +123,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if !helix.VerifyEventSubNotification(*twitchWebhookSecret, r.Header, string(data)) {
+	if !helix.VerifyEventSubNotification(s.cfg.TwitchWebhookSecret, r.Header, string(data)) {
 		slog.Error("can't verify event", "err", "invalid secret")
 		http.Error(w, "no auth", http.StatusUnauthorized)
 		return
@@ -174,7 +172,7 @@ func (s *Server) maybeCreateWebhookSubscription() error {
 
 	found := false
 	for _, sub := range subs.Data.EventSubSubscriptions {
-		if sub.Transport.Callback == *twitchWebhookURL {
+		if sub.Transport.Callback == s.cfg.TwitchWebhookURL {
 			slog.Info("no need to resubscribe, webhook URL was found")
 			found = true
 			break
@@ -189,12 +187,12 @@ func (s *Server) maybeCreateWebhookSubscription() error {
 		Type:    "stream.online",
 		Version: "1",
 		Condition: helix.EventSubCondition{
-			BroadcasterUserID: strconv.Itoa(*twitchUserID),
+			BroadcasterUserID: strconv.Itoa(s.cfg.TwitchUserID),
 		},
 		Transport: helix.EventSubTransport{
 			Method:   "webhook",
-			Callback: *twitchWebhookURL,
-			Secret:   *twitchWebhookSecret,
+			Callback: s.cfg.TwitchWebhookURL,
+			Secret:   s.cfg.TwitchWebhookSecret,
 		},
 	}); err != nil {
 		return fmt.Errorf("can't create subscription: %w", err)
