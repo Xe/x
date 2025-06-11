@@ -5,6 +5,7 @@ go 1.24.2
 require (
 	al.essio.dev/pkg/shellescape v1.6.0
 	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.6-20250603165357-b52ab10f4468.1
+	buf.build/go/protovalidate v0.12.0
 	cirello.io/goherokuname v0.0.0-20190914093443-b436bae8c2c5
 	connectrpc.com/connect v1.18.1
 	github.com/Marcel-ICMC/graw v0.0.0-20230411090719-e24cd8592d25
@@ -45,8 +46,8 @@ require (
 	github.com/multiformats/go-multibase v0.2.0
 	github.com/mymmrac/telego v0.31.5
 	github.com/nats-io/nats.go v1.42.0
-	github.com/ncruces/go-sqlite3 v0.16.0
-	github.com/ncruces/go-sqlite3/gormlite v0.16.0
+	github.com/ncruces/go-sqlite3 v0.24.0
+	github.com/ncruces/go-sqlite3/gormlite v0.24.0
 	github.com/nicklaw5/helix/v2 v2.31.0
 	github.com/orandin/slog-gorm v1.4.0
 	github.com/otiai10/copy v1.14.1
@@ -80,7 +81,6 @@ require (
 )
 
 require (
-	buf.build/go/protovalidate v0.12.0 // indirect
 	cel.dev/expr v0.23.1 // indirect
 	dario.cat/mergo v1.0.1 // indirect
 	github.com/AlekSi/pointer v1.2.0 // indirect
