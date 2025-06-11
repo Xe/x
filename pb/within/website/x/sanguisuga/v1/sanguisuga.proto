@@ -1,0 +1,47 @@
+syntax = "proto3";
+package within.website.x.sanguisuga.v1;
+
+import "google/protobuf/empty.proto";
+
+message Show {
+  string title = 1;
+  string disk_path = 2;
+  string quality = 3;
+}
+
+message Shows { repeated Show shows = 1; }
+
+message TVSnatch {
+  string category = 1;
+  string name = 2;
+  bool freeleech = 3;
+  string torrent_id = 4;
+}
+
+message TVSnatches { repeated TVSnatch snatches = 1; }
+
+message AnimeSnatch {
+  string fname = 1;
+  string show_name = 2;
+  string episode = 3;
+  string resolution = 4;
+  string crc32 = 5;
+  string bot_name = 6;
+  string pack_id = 7;
+}
+
+message AnimeSnatches { repeated AnimeSnatch snatches = 1; }
+
+service TV {
+  rpc List(google.protobuf.Empty) returns (Shows) {};
+  rpc Track(Show) returns (google.protobuf.Empty) {};
+  rpc Untrack(Show) returns (google.protobuf.Empty) {};
+  rpc Snatches(google.protobuf.Empty) returns (TVSnatches) {};
+}
+
+service Anime {
+  rpc List(google.protobuf.Empty) returns (Shows) {};
+  rpc Track(Show) returns (google.protobuf.Empty) {};
+  rpc Untrack(Show) returns (google.protobuf.Empty) {};
+  rpc Snatches(google.protobuf.Empty) returns (AnimeSnatches) {};
+}

@@ -1,4 +1,4 @@
-package sanguisuga
+package sanguisugav1
 
 import (
 	"errors"
