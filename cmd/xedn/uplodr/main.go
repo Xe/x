@@ -25,7 +25,7 @@ import (
 	"github.com/gen2brain/jpegxl"
 	"github.com/gen2brain/webp"
 	"google.golang.org/grpc"
-	"within.website/x/cmd/xedn/uplodr/pb"
+	pb "within.website/x/gen/within/website/x/xedn/uplodr/v1"
 	"within.website/x/internal"
 	"within.website/x/tigris"
 )

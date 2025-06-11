@@ -15,7 +15,7 @@ import (
 	"github.com/google/uuid"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-	"within.website/x/cmd/xedn/uplodr/pb"
+	pb "within.website/x/gen/within/website/x/xedn/uplodr/v1"
 	"within.website/x/web/fly/flymachines"
 )
 
