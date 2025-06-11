@@ -5,26 +5,27 @@ import (
 	"errors"
 	"log/slog"
 
+	"buf.build/go/protovalidate"
 	"github.com/twitchtv/twirp"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"gorm.io/gorm"
 	"within.website/x/cmd/mi/models"
-	pb "within.website/x/proto/mi"
+	pb "within.website/x/gen/within/website/x/mi/v1"
 )
 
-type SwitchTracker struct {
+type Server struct {
 	dao *models.DAO
 
 	pb.UnimplementedSwitchTrackerServer
 }
 
-func New(dao *models.DAO) *SwitchTracker {
-	return &SwitchTracker{
+func New(dao *models.DAO) *Server {
+	return &Server{
 		dao: dao,
 	}
 }
 
-func (s *SwitchTracker) Members(ctx context.Context, _ *emptypb.Empty) (*pb.MembersResp, error) {
+func (s *Server) Members(ctx context.Context, _ *emptypb.Empty) (*pb.MembersResp, error) {
 	members, err := s.dao.Members(ctx)
 	if err != nil {
 		return nil, twirp.InternalErrorWith(err)
@@ -38,7 +39,7 @@ func (s *SwitchTracker) Members(ctx context.Context, _ *emptypb.Empty) (*pb.Memb
 	return &resp, nil
 }
 
-func (s *SwitchTracker) WhoIsFront(ctx context.Context, _ *emptypb.Empty) (*pb.FrontChange, error) {
+func (s *Server) WhoIsFront(ctx context.Context, _ *emptypb.Empty) (*pb.FrontChange, error) {
 	sw, err := s.dao.WhoIsFront(ctx)
 	if err != nil {
 		slog.Error("can't find who is front", "err", err)
@@ -55,8 +56,8 @@ func (s *SwitchTracker) WhoIsFront(ctx context.Context, _ *emptypb.Empty) (*pb.F
 	return sw.AsFrontChange(), nil
 }
 
-func (s *SwitchTracker) Switch(ctx context.Context, req *pb.SwitchReq) (*pb.SwitchResp, error) {
-	if err := req.Valid(); err != nil {
+func (s *Server) Switch(ctx context.Context, req *pb.SwitchReq) (*pb.SwitchResp, error) {
+	if err := protovalidate.Validate(req); err != nil {
 		slog.Error("can't switch without a member", "req", req, "err", err)
 		return nil, twirp.InvalidArgumentError("member_name", err.Error())
 	}
@@ -81,8 +82,8 @@ func (s *SwitchTracker) Switch(ctx context.Context, req *pb.SwitchReq) (*pb.Swit
 	}, nil
 }
 
-func (s *SwitchTracker) GetSwitch(ctx context.Context, req *pb.GetSwitchReq) (*pb.FrontChange, error) {
-	if err := req.Valid(); err != nil {
+func (s *Server) GetSwitch(ctx context.Context, req *pb.GetSwitchReq) (*pb.FrontChange, error) {
+	if err := protovalidate.Validate(req); err != nil {
 		slog.Error("can't get switch by ID", "req", req, "err", err)
 		return nil, twirp.InvalidArgumentError("id", err.Error())
 	}
@@ -102,7 +103,7 @@ func (s *SwitchTracker) GetSwitch(ctx context.Context, req *pb.GetSwitchReq) (*p
 	return sw.AsFrontChange(), nil
 }
 
-func (s *SwitchTracker) ListSwitches(ctx context.Context, req *pb.ListSwitchesReq) (*pb.ListSwitchesResp, error) {
+func (s *Server) ListSwitches(ctx context.Context, req *pb.ListSwitchesReq) (*pb.ListSwitchesResp, error) {
 	var switches []models.Switch
 
 	if req.GetCount() == 0 {

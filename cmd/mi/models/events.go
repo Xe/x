@@ -6,7 +6,7 @@ import (
 
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"gorm.io/gorm"
-	pb "within.website/x/proto/mi"
+	pb "within.website/x/gen/within/website/x/mi/v1"
 )
 
 // Event represents an event that members of DevRel will be attending.
@@ -19,7 +19,6 @@ type Event struct {
 	EndDate     time.Time
 	Location    string `gorm:"index"`
 	Description string
-	Syndicate   bool
 }
 
 func (e *Event) AsProto() *pb.Event {
@@ -31,7 +30,6 @@ func (e *Event) AsProto() *pb.Event {
 		EndDate:     timestamppb.New(e.EndDate),
 		Location:    e.Location,
 		Description: e.Description,
-		Syndicate:   e.Syndicate,
 	}
 }
 

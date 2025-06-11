@@ -1,1 +1,0 @@
-yeet.run("go", "generate", "./...");

@@ -21,9 +21,9 @@ import (
 	"within.website/x/cmd/mi/services/posse"
 	"within.website/x/cmd/mi/services/switchtracker"
 	"within.website/x/cmd/mi/services/twitchevents"
+	pb "within.website/x/gen/within/website/x/mi/v1"
+	announcev1 "within.website/x/gen/within/website/x/mimi/announce/v1"
 	"within.website/x/internal"
-	pb "within.website/x/proto/mi"
-	"within.website/x/proto/mimi/announce"
 )
 
 var (
@@ -104,11 +104,11 @@ func main() {
 
 	gs := grpc.NewServer()
 
-	announce.RegisterAnnounceServer(gs, ann)
+	announcev1.RegisterAnnounceServer(gs, ann)
 	pb.RegisterSwitchTrackerServer(gs, st)
 	pb.RegisterEventsServer(gs, es)
 
-	mux.Handle(announce.AnnouncePathPrefix, announce.NewAnnounceServer(ann))
+	mux.Handle(announcev1.AnnouncePathPrefix, announcev1.NewAnnounceServer(ann))
 	mux.Handle(pb.SwitchTrackerPathPrefix, pb.NewSwitchTrackerServer(st))
 	mux.Handle(pb.EventsPathPrefix, pb.NewEventsServer(es))
 	mux.Handle("/front", homefrontshim.New(dao))

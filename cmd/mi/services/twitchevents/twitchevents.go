@@ -20,7 +20,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"golang.org/x/sync/errgroup"
 	"within.website/x/cmd/mi/models"
-	"within.website/x/proto/mimi/announce"
+	announcev1 "within.website/x/gen/within/website/x/mimi/announce/v1"
 	"within.website/x/web/mastodon"
 )
 
@@ -67,7 +67,7 @@ func (c Config) BlueskyAgent(ctx context.Context) (*bsky.BskyAgent, error) {
 
 type Server struct {
 	dao      *models.DAO
-	mimi     announce.Post
+	mimi     announcev1.Post
 	mastodon *mastodon.Client
 	cfg      Config
 	twitch   *helix.Client
@@ -99,7 +99,7 @@ func New(ctx context.Context, dao *models.DAO, cfg Config) (*Server, error) {
 
 	s := &Server{
 		dao:      dao,
-		mimi:     announce.NewPostProtobufClient(cfg.MimiAnnounceURL, &http.Client{}),
+		mimi:     announcev1.NewPostProtobufClient(cfg.MimiAnnounceURL, &http.Client{}),
 		mastodon: mas,
 		cfg:      cfg,
 		twitch:   twitch,
@@ -307,7 +307,7 @@ func (s *Server) handleStreamUp(ctx context.Context, lg *slog.Logger, ev *helix.
 	})
 
 	g.Go(func() error {
-		if _, err := s.mimi.Post(gCtx, &announce.StatusUpdate{
+		if _, err := s.mimi.Post(gCtx, &announcev1.StatusUpdate{
 			Body: streamAnnouncement,
 		}); err != nil {
 			slog.Error("can't announce to Mimi", "err", err)

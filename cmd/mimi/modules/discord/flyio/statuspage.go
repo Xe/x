@@ -10,7 +10,7 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 	"google.golang.org/protobuf/types/known/emptypb"
-	"within.website/x/proto/mimi/statuspage"
+	statuspage "within.website/x/gen/within/website/x/mimi/statuspage/v1"
 )
 
 var (

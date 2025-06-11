@@ -1,7 +1,7 @@
 package models
 
 import (
-	pb "within.website/x/proto/mi"
+	pb "within.website/x/gen/within/website/x/mi/v1"
 )
 
 // Member is a member of the Within system.

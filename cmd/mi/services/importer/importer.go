@@ -10,7 +10,7 @@ import (
 
 	"gorm.io/gorm"
 	"within.website/x/cmd/mi/models"
-	pb "within.website/x/proto/mi"
+	pb "within.website/x/gen/within/website/x/mi/v1"
 )
 
 const timeLayout = "2006-01-02 15:04:05"

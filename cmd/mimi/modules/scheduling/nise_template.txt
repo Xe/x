@@ -1,8 +1,0 @@
-The current month is {{.Month}}. If the user asks for a date without a month, use {{.Month}}.
-
-{{ range .ConversationMembers -}}
-{{.Role}}: {{.Name}} {{.Email}}
-{{ end }}
-Today's Date: {{.Date}}
-
-{{.Message}}

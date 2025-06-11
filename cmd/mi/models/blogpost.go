@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"gorm.io/gorm"
-	"within.website/x/proto/external/jsonfeed"
+	jsonfeedv1 "within.website/x/gen/within/website/x/external/jsonfeed/v1"
 )
 
 // Blogpost is a single blogpost from a JSON Feed.
@@ -30,7 +30,7 @@ func (d *DAO) HasBlogpost(ctx context.Context, postURL string) (bool, error) {
 	return count > 0, nil
 }
 
-func (d *DAO) InsertBlogpost(ctx context.Context, post *jsonfeed.Item) (*Blogpost, error) {
+func (d *DAO) InsertBlogpost(ctx context.Context, post *jsonfeedv1.Item) (*Blogpost, error) {
 	bp := &Blogpost{
 		ID:          post.GetId(),
 		URL:         post.GetUrl(),

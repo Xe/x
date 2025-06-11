@@ -15,8 +15,8 @@ import (
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"within.website/x/cmd/mi/models"
-	"within.website/x/proto/external/jsonfeed"
-	"within.website/x/proto/mimi/announce"
+	jsonfeedv1 "within.website/x/gen/within/website/x/external/jsonfeed/v1"
+	announcev1 "within.website/x/gen/within/website/x/mimi/announce/v1"
 	"within.website/x/web/mastodon"
 )
 
@@ -35,10 +35,10 @@ var (
 type Announcer struct {
 	dao      *models.DAO
 	mastodon *mastodon.Client
-	mimi     announce.Announce
+	mimi     announcev1.Announce
 	cfg      Config
 
-	announce.UnimplementedAnnounceServer
+	announcev1.UnimplementedAnnounceServer
 }
 
 type Config struct {
@@ -59,12 +59,12 @@ func New(ctx context.Context, dao *models.DAO, cfg Config) (*Announcer, error) {
 	return &Announcer{
 		dao:      dao,
 		mastodon: mas,
-		mimi:     announce.NewAnnounceProtobufClient(cfg.MimiAnnounceURL, &http.Client{}),
+		mimi:     announcev1.NewAnnounceProtobufClient(cfg.MimiAnnounceURL, &http.Client{}),
 		cfg:      cfg,
 	}, nil
 }
 
-func (a *Announcer) Announce(ctx context.Context, it *jsonfeed.Item) (*emptypb.Empty, error) {
+func (a *Announcer) Announce(ctx context.Context, it *jsonfeedv1.Item) (*emptypb.Empty, error) {
 	u, err := url.Parse(it.GetUrl())
 	if err != nil {
 		slog.Error("[unexpected] can't parse URL", "err", err, "url", it.GetUrl())

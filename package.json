@@ -7,7 +7,11 @@
     "doc": "docs"
   },
   "scripts": {
-    "generate": "go generate ./... && go tool goimports -w .",
+    "generate": "npm run generate:buf && npm run generate:go && npm run generate:gofmt",
+    "generate:buf": "buf generate && npm run generate:buf:falin",
+    "generate:buf:falin": "cd migroserbices/falin && npm ci && npm run generate",
+    "generate:go": "go generate ./...",
+    "generate:gofmt": "go tool goimports -w .",
     "test": "npm run generate && go test ./...",
     "prepare": "husky"
   },

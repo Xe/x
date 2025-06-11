@@ -1,3 +1,0 @@
-package proto
-
-//go:generate protoc --proto_path=. --go_out=./mi --go_opt=paths=source_relative --go-grpc_out=./mi --go-grpc_opt=paths=source_relative --twirp_out=./mi --twirp_opt=paths=source_relative ./mi.proto

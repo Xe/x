@@ -9,12 +9,13 @@ import (
 	"strconv"
 	"time"
 
+	"buf.build/go/protovalidate"
 	"github.com/c-bata/go-prompt"
 	"github.com/google/subcommands"
 	"github.com/rodaine/table"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/timestamppb"
-	"within.website/x/proto/mi"
+	mi "within.website/x/gen/within/website/x/mi/v1"
 )
 
 var (
@@ -87,7 +88,7 @@ func (s *miSwitch) Execute(ctx context.Context, f *flag.FlagSet, _ ...interface{
 
 	sr := &mi.SwitchReq{MemberName: s.member}
 
-	if err := sr.Valid(); err != nil {
+	if err := protovalidate.Validate(sr); err != nil {
 		fmt.Printf("error: %v\n", err)
 		return subcommands.ExitFailure
 	}
@@ -195,7 +196,7 @@ type miAddEvent struct {
 func (*miAddEvent) Name() string     { return "add-event" }
 func (*miAddEvent) Synopsis() string { return "Add an event to be attended." }
 func (*miAddEvent) Usage() string {
-	return `add-event [--name] [--url] [--start-date] [--end-date] [--location] [--description] [--syndicate]:
+	return `add-event [--name] [--url] [--start-date] [--end-date] [--location] [--description]:
 Add an event to be attended.
 `
 }
@@ -206,7 +207,6 @@ func (ae *miAddEvent) SetFlags(f *flag.FlagSet) {
 	f.StringVar(&ae.endDate, "end-date", "", "End date of the event.")
 	f.StringVar(&ae.location, "location", "", "Location of the event.")
 	f.StringVar(&ae.description, "description", "", "Description of the event.")
-	f.BoolVar(&ae.syndicate, "syndicate", false, "Syndicate this event to other services.")
 }
 
 func (ae *miAddEvent) Execute(ctx context.Context, f *flag.FlagSet, _ ...interface{}) subcommands.ExitStatus {
@@ -299,7 +299,6 @@ func (ae *miAddEvent) Execute(ctx context.Context, f *flag.FlagSet, _ ...interfa
 		EndDate:     timestamppb.New(endDate),
 		Location:    ae.location,
 		Description: ae.description,
-		Syndicate:   ae.syndicate,
 	}
 
 	slog.Info("adding event", "event", ev)

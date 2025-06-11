@@ -12,7 +12,7 @@ import (
 	"github.com/oklog/ulid/v2"
 	"within.website/x/cmd/mi/models"
 	"within.website/x/cmd/mi/services/switchtracker"
-	pb "within.website/x/proto/mi"
+	pb "within.website/x/gen/within/website/x/mi/v1"
 )
 
 var (

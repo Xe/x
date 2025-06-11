@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"gorm.io/gorm"
-	pb "within.website/x/proto/mi"
+	pb "within.website/x/gen/within/website/x/mi/v1"
 )
 
 // Switch is a record of the system switching front to a different member.
