@@ -14,6 +14,7 @@ import (
 	"github.com/robfig/cron/v3"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 	"within.website/x/cmd/mi/models"
 	"within.website/x/cmd/mi/services/events"
 	"within.website/x/cmd/mi/services/glance"
@@ -113,6 +114,8 @@ func main() {
 	es := events.New(dao, *flyghtTrackerURL)
 
 	gs := grpc.NewServer()
+
+	reflection.Register(gs)
 
 	announcev1.RegisterAnnounceServer(gs, ann)
 	pb.RegisterSwitchTrackerServer(gs, st)
