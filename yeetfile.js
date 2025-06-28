@@ -9,6 +9,8 @@ programs = [
   "httpdebug",
   "quickserv",
   "relayd",
+  "mi",
+  //"mimi",
   "reverseproxyd",
   "sapientwindex",
   "stickers",
@@ -175,6 +177,10 @@ const pkgs = [];
     );
   });
 });
+
+$`cd ./pkgs/fish-config && go tool yeet --package-dest-dir ../../var`;
+$`cd ./pkgs/home-automount-nas && go tool yeet --package-dest-dir ../../var`;
+$`cd ./pkgs/techaro-repo-unstable && go tool yeet --package-dest-dir ../../var`;
 
 pkgs
   .filter((pkg) => pkg.endsWith("rpm"))

@@ -24,6 +24,12 @@ builds:
     id: aerial
     main: ./cmd/aerial
   - <<: *base
+    id: mi
+    main: ./cmd/mi
+  - <<: *base
+    id: mimi
+    main: ./cmd/mimi
+  - <<: *base
     id: aura
     main: ./cmd/aura
   - <<: *base
