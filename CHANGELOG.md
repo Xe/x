@@ -1,3 +1,15 @@
+# [1.23.0](https://github.com/Xe/x/compare/v1.22.0...v1.23.0) (2025-06-28)
+
+### Bug Fixes
+
+- **fish-config:** make fish prompt compatible with vs code ([484b614](https://github.com/Xe/x/commit/484b614b607f0a5b610dd6186a07aaa547873ea1))
+- **fish-prompt:** clean up theme ([d00dabd](https://github.com/Xe/x/commit/d00dabd9e9962a0950837a9a0eb2d419471ad00c))
+- **mi:** enable reflection ([b264671](https://github.com/Xe/x/commit/b264671471cc62a4696442de204085808e628130))
+
+### Features
+
+- **pkgs/fish-config:** add autols, autopair, fisher, and nvm ([2a8ccb5](https://github.com/Xe/x/commit/2a8ccb5e9235262aa0db262caa46061b174472c9))
+
 # [1.22.0](https://github.com/Xe/x/compare/v1.21.0...v1.22.0) (2025-06-11)
 
 ### Bug Fixes
