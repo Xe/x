@@ -29,6 +29,7 @@ func main() {
 		}
 
 		contains := strings.Contains(r.Header.Get("Accept"), "text/html")
+		slog.Info("got request", "method", r.Method, "path", r.RequestURI)
 
 		if contains {
 			w.Header().Add("Content-Type", "text/html")
