@@ -25,10 +25,10 @@ func RequestLogFromRequest(r *http.Request, ipAddress, requestID, ja4 string) *R
 	}
 
 	for k, v := range r.Header {
-		if k == "Cookie" {
-			result.Headers[k] = "Omitted cookie values"
+		switch {
+		case k == "Cookie", k == "Authorization":
+			continue
 		}
-
 		result.Headers[k] = strings.Join(v, ",")
 	}
 
