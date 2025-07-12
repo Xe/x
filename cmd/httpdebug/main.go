@@ -35,12 +35,17 @@ func main() {
 			fmt.Fprint(w, "<pre id=\"main\"><code>")
 		}
 
-		if !*silent {
-			fmt.Println("---")
-			r.Header.Write(io.MultiWriter(w, os.Stdout))
-		} else {
-			r.Header.Write(w)
+		var out io.Writer
+
+		switch *silent {
+		case true:
+			out = w
+		case false:
+			out = io.MultiWriter(w, os.Stdout)
 		}
+
+		fmt.Fprintln(out, r.Method, r.RequestURI)
+		r.Header.Write(out)
 
 		if contains {
 			fmt.Fprintln(w, "</pre></code>")
