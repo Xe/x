@@ -3,8 +3,7 @@ kind: ConfigMap
 metadata:
   name: pocket-id
 data:
-  PUBLIC_APP_URL: https://idp.xeserv.us
+  APP_URL: https://idp.xeserv.us
   TRUST_PROXY: "true"
   PUID: "1000"
   PGID: "1000"
-  CADDY_PORT: "80"

@@ -155,7 +155,7 @@ spec:
               mountPath: "/xe/pki"
               readOnly: true
         - name: anubis
-          image: registry.int.xeserv.us/techaro/botstopper/anubis:latest
+          image: ghcr.io/techarohq/anubis:latest
           imagePullPolicy: Always
           env:
             - name: "BIND"
@@ -177,8 +177,10 @@ spec:
                 secretKeyRef:
                   name: anubis-key
                   key: ED25519_PRIVATE_KEY_HEX
-          # - name: "SLOG_LEVEL"
-          #   value: "debug"
+            - name: "SLOG_LEVEL"
+              value: "debug"
+            - name: "POLICY_FNAME"
+              value: "/xe/cfg/anubis/botPolicies.yaml"
           volumeMounts:
             - name: anubis
               mountPath: /xe/cfg/anubis
@@ -201,3 +203,6 @@ spec:
                 - ALL
             seccompProfile:
               type: RuntimeDefault
+          envFrom:
+            - secretRef:
+                name: anubis-thoth

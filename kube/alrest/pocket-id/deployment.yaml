@@ -22,7 +22,7 @@ spec:
             claimName: pocket-id
       containers:
         - name: main
-          image: ghcr.io/pocket-id/pocket-id:v0.53.0
+          image: ghcr.io/pocket-id/pocket-id:v1.6.2
           imagePullPolicy: IfNotPresent
           securityContext:
             runAsUser: 1000
@@ -46,11 +46,11 @@ spec:
               name: backend
             - containerPort: 3000
               name: frontend
-            - containerPort: 80
+            - containerPort: 1411
               name: http
           livenessProbe:
             httpGet:
-              path: /health
+              path: /healthz
               port: http
             initialDelaySeconds: 200
             timeoutSeconds: 5
@@ -59,5 +59,5 @@ spec:
             failureThreshold: 10
           volumeMounts:
             - name: data
-              mountPath: /app/backend/data
+              mountPath: /app/data
               subPath: data

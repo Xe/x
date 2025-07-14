@@ -1,24 +1,9 @@
-## Anubis has the ability to let you import snippets of configuration into the main
-## configuration file. This allows you to break up your config into smaller parts
-## that get logically assembled into one big file.
-##
-## Of note, a bot rule can either have inline bot configuration or import a
-## bot config snippet. You cannot do both in a single bot rule.
-##
-## Import paths can either be prefixed with (data) to import from the common/shared
-## rules in the data folder in the Anubis source tree or will point to absolute/relative
-## paths in your filesystem. If you don't have access to the Anubis source tree, check
-## /usr/share/docs/anubis/data or in the tarball you extracted Anubis from.
-
 bots:
-  # Pathological bots to deny
-  - # This correlates to data/bots/ai-robots-txt.yaml in the source tree
-    import: (data)/bots/ai-robots-txt.yaml
+  - import: (data)/bots/ai-robots-txt.yaml
   - import: (data)/bots/cloudflare-workers.yaml
   - import: (data)/bots/headless-browsers.yaml
   - import: (data)/bots/us-ai-scraper.yaml
 
-  # Search engines to allow
   - import: (data)/crawlers/googlebot.yaml
   - import: (data)/crawlers/bingbot.yaml
   - import: (data)/crawlers/duckduckbot.yaml
@@ -28,23 +13,51 @@ bots:
   - import: (data)/crawlers/marginalia.yaml
   - import: (data)/crawlers/mojeekbot.yaml
 
-  # Allow common "keeping the internet working" routes (well-known, favicon, robots.txt)
+  - import: (data)/clients/git.yaml
+
   - import: (data)/common/keep-internet-working.yaml
 
-  # # Punish any bot with "bot" in the user-agent string
-  # # This is known to have a high false-positive rate, use at your own risk
-  # - name: generic-bot-catchall
-  #   user_agent_regex: (?i:bot|crawler)
-  #   action: CHALLENGE
-  #   challenge:
-  #     difficulty: 16  # impossible
-  #     report_as: 4    # lie to the operator
-  #     algorithm: slow # intentionally waste CPU cycles and time
-
-  # Generic catchall rule
   - name: generic-browser
     user_agent_regex: >-
       Mozilla|Opera
     action: CHALLENGE
 
 dnsbl: false
+
+thresholds:
+  - name: minimal-suspicion
+    expression:
+      any:
+        - weight == 0
+        - weight <= 0
+    action: ALLOW
+
+  - name: mild-suspicion
+    expression:
+      all:
+        - weight > 0
+        - weight < 10
+    action: CHALLENGE
+    challenge:
+      algorithm: metarefresh
+      difficulty: 1
+      report_as: 1
+
+  - name: moderate-suspicion
+    expression:
+      all:
+        - weight >= 10
+        - weight < 20
+    action: CHALLENGE
+    challenge:
+      algorithm: fast
+      difficulty: 2
+      report_as: 2
+
+  - name: extreme-suspicion
+    expression: weight >= 20
+    action: CHALLENGE
+    challenge:
+      algorithm: fast
+      difficulty: 4
+      report_as: 4
