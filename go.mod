@@ -47,8 +47,8 @@ require (
 	github.com/multiformats/go-multibase v0.2.0
 	github.com/mymmrac/telego v0.31.5
 	github.com/nats-io/nats.go v1.42.0
-	github.com/ncruces/go-sqlite3 v0.16.0
-	github.com/ncruces/go-sqlite3/gormlite v0.16.0
+	github.com/ncruces/go-sqlite3 v0.24.0
+	github.com/ncruces/go-sqlite3/gormlite v0.24.0
 	github.com/nicklaw5/helix/v2 v2.31.0
 	github.com/orandin/slog-gorm v1.4.0
 	github.com/otiai10/copy v1.14.1
