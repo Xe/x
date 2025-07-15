@@ -169,6 +169,10 @@ func main() {
 		t0 := time.Now()
 
 		var foundJa3N, foundJa4 string
+		foundJa4H := ja4h.JA4H(r)
+		fingerprints := map[string]string{
+			"ja4h": foundJa4H,
+		}
 
 		host, _, _ := net.SplitHostPort(r.RemoteAddr)
 		if host != "" {
@@ -187,10 +191,10 @@ func main() {
 
 		if tcpFP := GetTCPFingerprint(r); tcpFP != nil {
 			r.Header.Set("X-JA4T-Fingerprint", tcpFP.String())
+			fingerprints["ja4t"] = tcpFP.String()
 		}
 
 		reqID := uuid.Must(uuid.NewV7()).String()
-		rl := relayd.RequestLogFromRequest(r, host, reqID, foundJa4)
 
 		r.Header.Set("X-Forwarded-Host", r.Host)
 		r.Header.Set("X-Forwarded-Proto", "https")
@@ -198,15 +202,19 @@ func main() {
 		r.Header.Set("X-Request-Id", reqID)
 		r.Header.Set("X-Scheme", "https")
 		r.Header.Set("X-HTTP-Protocol", r.Proto)
-		r.Header.Set("X-JA4H-Fingerprint", ja4h.JA4H(r))
+		r.Header.Set("X-JA4H-Fingerprint", foundJa4H)
 
 		if foundJa3N != "" {
 			r.Header.Set("X-JA3N-Fingerprint", foundJa3N)
+			fingerprints["ja3n"] = foundJa3N
 		}
 
 		if foundJa4 != "" {
 			r.Header.Set("X-JA4-Fingerprint", foundJa4)
+			fingerprints["ja4"] = foundJa4
 		}
+
+		rl := relayd.RequestLogFromRequest(r, host, reqID, fingerprints)
 
 		headers, _ := json.Marshal(r.Header)
 

@@ -14,7 +14,8 @@ message RequestLog {
   map<string, string> headers = 7;
   string remote_ip = 8;
   string ja3n = 9 [ deprecated = true ];
-  string ja4 = 10;
+  string ja4 = 10 [ deprecated = true ];
   string request_id = 11;
   int32 status_code = 12;
+  map<string, string> fingerprints = 13;
 }

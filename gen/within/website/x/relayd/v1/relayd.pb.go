@@ -35,10 +35,12 @@ type RequestLog struct {
 	Headers      map[string]string      `protobuf:"bytes,7,rep,name=headers,proto3" json:"headers,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	RemoteIp     string                 `protobuf:"bytes,8,opt,name=remote_ip,json=remoteIp,proto3" json:"remote_ip,omitempty"`
 	// Deprecated: Marked as deprecated in within/website/x/relayd/v1/relayd.proto.
-	Ja3N          string `protobuf:"bytes,9,opt,name=ja3n,proto3" json:"ja3n,omitempty"`
-	Ja4           string `protobuf:"bytes,10,opt,name=ja4,proto3" json:"ja4,omitempty"`
-	RequestId     string `protobuf:"bytes,11,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
-	StatusCode    int32  `protobuf:"varint,12,opt,name=status_code,json=statusCode,proto3" json:"status_code,omitempty"`
+	Ja3N string `protobuf:"bytes,9,opt,name=ja3n,proto3" json:"ja3n,omitempty"`
+	// Deprecated: Marked as deprecated in within/website/x/relayd/v1/relayd.proto.
+	Ja4           string            `protobuf:"bytes,10,opt,name=ja4,proto3" json:"ja4,omitempty"`
+	RequestId     string            `protobuf:"bytes,11,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
+	StatusCode    int32             `protobuf:"varint,12,opt,name=status_code,json=statusCode,proto3" json:"status_code,omitempty"`
+	Fingerprints  map[string]string `protobuf:"bytes,13,rep,name=fingerprints,proto3" json:"fingerprints,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -137,6 +139,7 @@ func (x *RequestLog) GetJa3N() string {
 	return ""
 }
 
+// Deprecated: Marked as deprecated in within/website/x/relayd/v1/relayd.proto.
 func (x *RequestLog) GetJa4() string {
 	if x != nil {
 		return x.Ja4
@@ -158,11 +161,18 @@ func (x *RequestLog) GetStatusCode() int32 {
 	return 0
 }
 
+func (x *RequestLog) GetFingerprints() map[string]string {
+	if x != nil {
+		return x.Fingerprints
+	}
+	return nil
+}
+
 var File_within_website_x_relayd_v1_relayd_proto protoreflect.FileDescriptor
 
 const file_within_website_x_relayd_v1_relayd_proto_rawDesc = "" +
 	"\n" +
-	"'within/website/x/relayd/v1/relayd.proto\x12\x1awithin.website.x.relayd.v1\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xe0\x04\n" +
+	"'within/website/x/relayd/v1/relayd.proto\x12\x1awithin.website.x.relayd.v1\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\x83\x06\n" +
 	"\n" +
 	"RequestLog\x12=\n" +
 	"\frequest_date\x18\x01 \x01(\v2\x1a.google.protobuf.TimestampR\vrequestDate\x12>\n" +
@@ -173,18 +183,22 @@ const file_within_website_x_relayd_v1_relayd_proto_rawDesc = "" +
 	"\x05query\x18\x06 \x03(\v21.within.website.x.relayd.v1.RequestLog.QueryEntryR\x05query\x12M\n" +
 	"\aheaders\x18\a \x03(\v23.within.website.x.relayd.v1.RequestLog.HeadersEntryR\aheaders\x12\x1b\n" +
 	"\tremote_ip\x18\b \x01(\tR\bremoteIp\x12\x16\n" +
-	"\x04ja3n\x18\t \x01(\tB\x02\x18\x01R\x04ja3n\x12\x10\n" +
+	"\x04ja3n\x18\t \x01(\tB\x02\x18\x01R\x04ja3n\x12\x14\n" +
 	"\x03ja4\x18\n" +
-	" \x01(\tR\x03ja4\x12\x1d\n" +
+	" \x01(\tB\x02\x18\x01R\x03ja4\x12\x1d\n" +
 	"\n" +
 	"request_id\x18\v \x01(\tR\trequestId\x12\x1f\n" +
 	"\vstatus_code\x18\f \x01(\x05R\n" +
-	"statusCode\x1a8\n" +
+	"statusCode\x12\\\n" +
+	"\ffingerprints\x18\r \x03(\v28.within.website.x.relayd.v1.RequestLog.FingerprintsEntryR\ffingerprints\x1a8\n" +
 	"\n" +
 	"QueryEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\x1a:\n" +
 	"\fHeadersEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\x1a?\n" +
+	"\x11FingerprintsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01B\xf4\x01\n" +
 	"\x1ecom.within.website.x.relayd.v1B\vRelaydProtoP\x01Z8within.website/x/gen/within/website/x/relayd/v1;relaydv1\xa2\x02\x04WWXR\xaa\x02\x1aWithin.Website.X.Relayd.V1\xca\x02\x1aWithin\\Website\\X\\Relayd\\V1\xe2\x02&Within\\Website\\X\\Relayd\\V1\\GPBMetadata\xea\x02\x1eWithin::Website::X::Relayd::V1b\x06proto3"
@@ -201,24 +215,26 @@ func file_within_website_x_relayd_v1_relayd_proto_rawDescGZIP() []byte {
 	return file_within_website_x_relayd_v1_relayd_proto_rawDescData
 }
 
-var file_within_website_x_relayd_v1_relayd_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_within_website_x_relayd_v1_relayd_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_within_website_x_relayd_v1_relayd_proto_goTypes = []any{
 	(*RequestLog)(nil),            // 0: within.website.x.relayd.v1.RequestLog
 	nil,                           // 1: within.website.x.relayd.v1.RequestLog.QueryEntry
 	nil,                           // 2: within.website.x.relayd.v1.RequestLog.HeadersEntry
-	(*timestamppb.Timestamp)(nil), // 3: google.protobuf.Timestamp
-	(*durationpb.Duration)(nil),   // 4: google.protobuf.Duration
+	nil,                           // 3: within.website.x.relayd.v1.RequestLog.FingerprintsEntry
+	(*timestamppb.Timestamp)(nil), // 4: google.protobuf.Timestamp
+	(*durationpb.Duration)(nil),   // 5: google.protobuf.Duration
 }
 var file_within_website_x_relayd_v1_relayd_proto_depIdxs = []int32{
-	3, // 0: within.website.x.relayd.v1.RequestLog.request_date:type_name -> google.protobuf.Timestamp
-	4, // 1: within.website.x.relayd.v1.RequestLog.response_time:type_name -> google.protobuf.Duration
+	4, // 0: within.website.x.relayd.v1.RequestLog.request_date:type_name -> google.protobuf.Timestamp
+	5, // 1: within.website.x.relayd.v1.RequestLog.response_time:type_name -> google.protobuf.Duration
 	1, // 2: within.website.x.relayd.v1.RequestLog.query:type_name -> within.website.x.relayd.v1.RequestLog.QueryEntry
 	2, // 3: within.website.x.relayd.v1.RequestLog.headers:type_name -> within.website.x.relayd.v1.RequestLog.HeadersEntry
-	4, // [4:4] is the sub-list for method output_type
-	4, // [4:4] is the sub-list for method input_type
-	4, // [4:4] is the sub-list for extension type_name
-	4, // [4:4] is the sub-list for extension extendee
-	0, // [0:4] is the sub-list for field type_name
+	3, // 4: within.website.x.relayd.v1.RequestLog.fingerprints:type_name -> within.website.x.relayd.v1.RequestLog.FingerprintsEntry
+	5, // [5:5] is the sub-list for method output_type
+	5, // [5:5] is the sub-list for method input_type
+	5, // [5:5] is the sub-list for extension type_name
+	5, // [5:5] is the sub-list for extension extendee
+	0, // [0:5] is the sub-list for field type_name
 }
 
 func init() { file_within_website_x_relayd_v1_relayd_proto_init() }
@@ -232,7 +248,7 @@ func file_within_website_x_relayd_v1_relayd_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_within_website_x_relayd_v1_relayd_proto_rawDesc), len(file_within_website_x_relayd_v1_relayd_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   3,
+			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
