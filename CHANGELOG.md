@@ -1,3 +1,13 @@
+# [1.24.0](https://github.com/Xe/x/compare/v1.23.0...v1.24.0) (2025-07-15)
+
+### Features
+
+- **cmd/httpdebug:** add HTTP method and URI to output ([158fb5b](https://github.com/Xe/x/commit/158fb5b9c4883aed25bf38d1893cf1a84d0db76c))
+- **cmd/relayd:** ja4t / ja4h fingerprinting ([e810bdb](https://github.com/Xe/x/commit/e810bdb0c432df273e7cc6f0885273daae5faea6))
+- **fish-config:** build a deb too I guess ([063d5c0](https://github.com/Xe/x/commit/063d5c0dd6cefbf24aab2bcebd02003f65994c5d))
+- **fish-config:** dotenv.fish ([7c8b929](https://github.com/Xe/x/commit/7c8b92988925a9db748a653ef62fde5fb16f36d3))
+- **pb/relayd:** add fingerprints object ([2fc470c](https://github.com/Xe/x/commit/2fc470cb7ed3c887f5feaf3d10a88265dda1d685))
+
 # [1.23.0](https://github.com/Xe/x/compare/v1.22.0...v1.23.0) (2025-06-28)
 
 ### Bug Fixes
