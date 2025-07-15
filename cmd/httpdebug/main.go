@@ -21,13 +21,13 @@ var (
 func main() {
 	internal.HandleStartup()
 
-	mux := http.NewServeMux()
+	slog.Info("listening", "url", "http://localhost"+*bind)
+	log.Fatal(http.ListenAndServe(*bind, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/.within/health" {
+			fmt.Fprintln(w, "OK")
+			return
+		}
 
-	mux.HandleFunc("/.within/health", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, "OK")
-	})
-
-	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		contains := strings.Contains(r.Header.Get("Accept"), "text/html")
 
 		if contains {
@@ -50,8 +50,5 @@ func main() {
 		if contains {
 			fmt.Fprintln(w, "</pre></code>")
 		}
-	})
-
-	slog.Info("listening", "url", "http://localhost"+*bind)
-	log.Fatal(http.ListenAndServe(*bind, mux))
+	})))
 }

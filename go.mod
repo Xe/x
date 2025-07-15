@@ -5,6 +5,7 @@ go 1.24.2
 require (
 	al.essio.dev/pkg/shellescape v1.6.0
 	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.6-20250603165357-b52ab10f4468.1
+	buf.build/go/protovalidate v0.12.0
 	cirello.io/goherokuname v0.0.0-20190914093443-b436bae8c2c5
 	connectrpc.com/connect v1.18.1
 	github.com/Marcel-ICMC/graw v0.0.0-20230411090719-e24cd8592d25
@@ -41,6 +42,7 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/kr/pretty v0.3.1
 	github.com/lib/pq v1.10.9
+	github.com/lum8rjack/go-ja4h v0.0.0-20250606032308-3a989c6635be
 	github.com/mattn/go-sqlite3 v1.14.24
 	github.com/multiformats/go-multibase v0.2.0
 	github.com/mymmrac/telego v0.31.5
@@ -80,7 +82,6 @@ require (
 )
 
 require (
-	buf.build/go/protovalidate v0.12.0 // indirect
 	cel.dev/expr v0.23.1 // indirect
 	dario.cat/mergo v1.0.1 // indirect
 	github.com/AlekSi/pointer v1.2.0 // indirect

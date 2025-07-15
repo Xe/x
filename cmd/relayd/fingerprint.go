@@ -7,6 +7,7 @@ import (
 	"crypto/tls"
 	"encoding/hex"
 	"fmt"
+	"log/slog"
 	"net"
 	"net/http"
 	"slices"
@@ -30,9 +31,10 @@ func applyTLSFingerprinter(server *http.Server) {
 	}
 
 	server.TLSConfig.GetConfigForClient = func(clientHello *tls.ClientHelloInfo) (*tls.Config, error) {
-		ja4 := buildTLSFingerprint(clientHello)
+		ja3n, ja4 := buildTLSFingerprint(clientHello)
 		ptr := clientHello.Context().Value(tlsFingerprintKey{})
 		if fpPtr, ok := ptr.(*TLSFingerprint); ok && ptr != nil && fpPtr != nil {
+			fpPtr.ja3n.Store(&ja3n)
 			fpPtr.ja4.Store(&ja4)
 		}
 		return getConfigForClient(clientHello)
@@ -40,22 +42,32 @@ func applyTLSFingerprinter(server *http.Server) {
 	server.ConnContext = func(ctx context.Context, c net.Conn) context.Context {
 		ctx = context.WithValue(ctx, tlsFingerprintKey{}, &TLSFingerprint{})
 
-		// if tc, ok := c.(*tls.Conn); ok {
-		// 	tcpFP, err := assignTCPFingerprint(tc.NetConn())
-		// 	if err == nil {
-		// 		ctx = context.WithValue(ctx, tcpFingerprintKey{}, tcpFP)
-		// 	} else {
-		// 		slog.Debug("ja4t error", "err", err)
-		// 	}
-		// }
+		if tc, ok := c.(*tls.Conn); ok {
+			tcpFP, err := assignTCPFingerprint(tc.NetConn())
+			if err == nil {
+				ctx = context.WithValue(ctx, tcpFingerprintKey{}, tcpFP)
+			} else {
+				slog.Debug("ja4t error", "err", err)
+			}
+		}
 
 		return ctx
 	}
 }
 
+type tcpFingerprintKey struct{}
 type tlsFingerprintKey struct{}
 type TLSFingerprint struct {
-	ja4 atomic.Pointer[TLSFingerprintJA4]
+	ja3n atomic.Pointer[TLSFingerprintJA3N]
+	ja4  atomic.Pointer[TLSFingerprintJA4]
+}
+
+type TLSFingerprintJA3N [md5.Size]byte
+
+func (f TLSFingerprintJA3N) String() string {
+
+	return hex.EncodeToString(f[:])
+
 }
 
 type TLSFingerprintJA4 struct {
@@ -74,6 +86,10 @@ func (f *TLSFingerprintJA4) String() string {
 		hex.EncodeToString(f.B[:]),
 		hex.EncodeToString(f.C[:]),
 	}, "_")
+}
+
+func (f *TLSFingerprint) JA3N() *TLSFingerprintJA3N {
+	return f.ja3n.Load()
 }
 
 func (f *TLSFingerprint) JA4() *TLSFingerprintJA4 {
@@ -325,8 +341,8 @@ func ja4SHA256(buf []byte) [6]byte {
 	return [6]byte(sum[:6])
 }
 
-func buildTLSFingerprint(hello *tls.ClientHelloInfo) TLSFingerprintJA4 {
-	return tlsFingerprintJA4(hello)
+func buildTLSFingerprint(hello *tls.ClientHelloInfo) (TLSFingerprintJA3N, TLSFingerprintJA4) {
+	return TLSFingerprintJA3N(tlsFingerprintJA3(hello, true)), tlsFingerprintJA4(hello)
 }
 
 func GetTLSFingerprint(r *http.Request) *TLSFingerprint {

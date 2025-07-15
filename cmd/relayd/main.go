@@ -23,6 +23,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/lum8rjack/go-ja4h"
 	"golang.org/x/crypto/acme/autocert"
 	"google.golang.org/protobuf/types/known/durationpb"
 	_ "modernc.org/sqlite"
@@ -167,7 +168,7 @@ func main() {
 	h := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		t0 := time.Now()
 
-		var foundJa4 string
+		var foundJa3N, foundJa4 string
 
 		host, _, _ := net.SplitHostPort(r.RemoteAddr)
 		if host != "" {
@@ -176,9 +177,16 @@ func main() {
 
 		fp := GetTLSFingerprint(r)
 		if fp != nil {
+			if fp.JA3N() != nil {
+				foundJa3N = fp.JA3N().String()
+			}
 			if fp.JA4() != nil {
 				foundJa4 = fp.JA4().String()
 			}
+		}
+
+		if tcpFP := GetTCPFingerprint(r); tcpFP != nil {
+			r.Header.Set("X-JA4T-Fingerprint", tcpFP.String())
 		}
 
 		reqID := uuid.Must(uuid.NewV7()).String()
@@ -190,7 +198,15 @@ func main() {
 		r.Header.Set("X-Request-Id", reqID)
 		r.Header.Set("X-Scheme", "https")
 		r.Header.Set("X-HTTP-Protocol", r.Proto)
-		r.Header.Set("X-TLS-Fingerprint-JA4", foundJa4)
+		r.Header.Set("X-JA4H-Fingerprint", ja4h.JA4H(r))
+
+		if foundJa3N != "" {
+			r.Header.Set("X-JA3N-Fingerprint", foundJa3N)
+		}
+
+		if foundJa4 != "" {
+			r.Header.Set("X-JA4-Fingerprint", foundJa4)
+		}
 
 		headers, _ := json.Marshal(r.Header)
 
