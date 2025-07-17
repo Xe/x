@@ -33,6 +33,6 @@
     "dotenv": "^16.4.5",
     "express": "^4.21.2",
     "http": "^0.0.1-security",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.1"
   }
 }
