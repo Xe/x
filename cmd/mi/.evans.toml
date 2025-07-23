@@ -1,0 +1,37 @@
+[default]
+package = ''
+protofile = ['']
+protopath = ['']
+service = ''
+
+[log]
+prefix = 'evans: '
+
+[meta]
+autoupdate = false
+configversion = '0.10.11'
+updatelevel = 'patch'
+
+[repl]
+coloredoutput = true
+historysize = 100
+inputpromptformat = '{ancestor}{name} ({type}) => '
+promptformat = '{package}.{service}@{addr}:{port}'
+silent = false
+splashtextpath = ''
+
+[request]
+cacertfile = ''
+certfile = ''
+certkeyfile = ''
+web = false
+
+[request.header]
+grpc-client = ['evans']
+
+[server]
+host = 'mi.mi.svc.alrest.xeserv.us'
+name = ''
+port = '8081'
+reflection = true
+tls = false

@@ -1,3 +1,5 @@
+//go:build ignore
+
 package main
 
 import (
@@ -16,10 +18,6 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	mi "within.website/x/gen/within/website/x/mi/v1"
-)
-
-var (
-	miURL = flag.String("mi-url", "http://mi.mi.svc.alrest.xeserv.us", "Base mi URL")
 )
 
 type miWhoIsFront struct {

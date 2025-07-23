@@ -6,6 +6,7 @@ import (
 
 	"github.com/google/subcommands"
 	"within.website/x/cmd/x/cmd/grpchc"
+	"within.website/x/cmd/x/cmd/mi"
 	"within.website/x/internal"
 )
 
@@ -17,14 +18,14 @@ func main() {
 	subcommands.Register(&grpchc.GRPCHealth{}, "grpc")
 
 	// Switch tracker
-	subcommands.Register(&miListSwitches{}, "switch-tracker")
-	subcommands.Register(&miSwitch{}, "switch-tracker")
-	subcommands.Register(&miWhoIsFront{}, "switch-tracker")
+	// subcommands.Register(&miListSwitches{}, "switch-tracker")
+	// subcommands.Register(&miSwitch{}, "switch-tracker")
+	subcommands.Register(&mi.WhoIsFront{}, "switch-tracker")
 
-	// Events
-	subcommands.Register(&miListEvents{}, "events")
-	subcommands.Register(&miAddEvent{}, "events")
-	subcommands.Register(&miRemoveEvent{}, "events")
+	// // Events
+	// subcommands.Register(&miListEvents{}, "events")
+	// subcommands.Register(&miAddEvent{}, "events")
+	// subcommands.Register(&miRemoveEvent{}, "events")
 
 	internal.HandleStartup()
 	ctx := context.Background()
