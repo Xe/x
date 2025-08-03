@@ -3,7 +3,6 @@ package logging
 import (
 	"context"
 	"log/slog"
-	"slices"
 	"strings"
 )
 
@@ -59,126 +58,6 @@ func (h *FilteringHandler) WithGroup(name string) slog.Handler {
 // AddFilter adds a new filter to the handler
 func (h *FilteringHandler) AddFilter(filter LogFilter) {
 	h.filters = append(h.filters, filter)
-}
-
-// Common filter functions
-
-// FilterByMessage filters logs that contain any of the specified message substrings
-func FilterByMessage(contains ...string) LogFilter {
-	return func(ctx context.Context, r slog.Record) bool {
-		msg := r.Message
-		for _, substr := range contains {
-			if strings.Contains(msg, substr) {
-				return false // Filter out (skip) this log
-			}
-		}
-		return true // Allow this log
-	}
-}
-
-// FilterByMessageAllow only allows logs that contain any of the specified message substrings
-func FilterByMessageAllow(contains ...string) LogFilter {
-	return func(ctx context.Context, r slog.Record) bool {
-		msg := r.Message
-		for _, substr := range contains {
-			if strings.Contains(msg, substr) {
-				return true // Allow this log
-			}
-		}
-		return false // Filter out (skip) this log
-	}
-}
-
-// FilterByLevel filters out logs below the specified level
-func FilterByLevel(minLevel slog.Level) LogFilter {
-	return func(ctx context.Context, r slog.Record) bool {
-		return r.Level >= minLevel
-	}
-}
-
-// FilterByAttribute filters logs based on the presence and value of attributes
-func FilterByAttribute(key string, values ...any) LogFilter {
-	return func(ctx context.Context, r slog.Record) bool {
-		var found bool
-		var attrValue any
-
-		r.Attrs(func(a slog.Attr) bool {
-			if a.Key == key {
-				found = true
-				attrValue = a.Value.Any()
-				return false // Stop iteration
-			}
-			return true // Continue iteration
-		})
-
-		if !found {
-			return true // Allow if attribute not present
-		}
-
-		// If no specific values specified, filter out any logs with this attribute
-		if len(values) == 0 {
-			return false
-		}
-
-		// Check if the attribute value matches any of the allowed values
-		for _, value := range values {
-			if attrValue == value {
-				return false // Filter out this log
-			}
-		}
-
-		return true // Allow this log
-	}
-}
-
-// FilterByAttributeAllow only allows logs with specific attribute values
-func FilterByAttributeAllow(key string, values ...any) LogFilter {
-	return func(ctx context.Context, r slog.Record) bool {
-		var found bool
-		var attrValue any
-
-		r.Attrs(func(a slog.Attr) bool {
-			if a.Key == key {
-				found = true
-				attrValue = a.Value.Any()
-				return false // Stop iteration
-			}
-			return true // Continue iteration
-		})
-
-		if !found {
-			return false // Filter out if attribute not present
-		}
-
-		// Check if the attribute value matches any of the allowed values
-		for _, value := range values {
-			if attrValue == value {
-				return true // Allow this log
-			}
-		}
-
-		return false // Filter out this log
-	}
-}
-
-// FilterByComponent filters logs based on a "component" attribute
-func FilterByComponent(allowedComponents ...string) LogFilter {
-	return func(ctx context.Context, r slog.Record) bool {
-		var component string
-		r.Attrs(func(a slog.Attr) bool {
-			if a.Key == "component" {
-				component = a.Value.String()
-				return false
-			}
-			return true
-		})
-
-		if component == "" {
-			return true // Allow logs without component
-		}
-
-		return slices.Contains(allowedComponents, component)
-	}
 }
 
 // FilterNoiseHTTP filters out common HTTP noise logs

@@ -96,6 +96,33 @@ func TestLoggingValid(t *testing.T) {
 			},
 			err: ErrWrongValue,
 		},
+		{
+			name: "filter with only expression",
+			input: Logging{
+				AccessLog:  "/var/log/access.log",
+				MaxSizeMB:  100,
+				MaxAgeDays: 30,
+				MaxBackups: 5,
+				Compress:   true,
+				Filters: []Filter{
+					{Expression: "true"},
+				},
+			},
+		},
+		{
+			name: "uncompilable filter",
+			input: Logging{
+				AccessLog:  "/var/log/access.log",
+				MaxSizeMB:  100,
+				MaxAgeDays: 30,
+				MaxBackups: 5,
+				Compress:   true,
+				Filters: []Filter{
+					{Expression: "taco"},
+				},
+			},
+			err: ErrFilterDoesntCompile,
+		},
 	} {
 		t.Run(tt.name, func(t *testing.T) {
 			if err := tt.input.Valid(); !errors.Is(err, tt.err) {

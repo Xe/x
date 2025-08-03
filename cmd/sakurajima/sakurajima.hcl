@@ -7,6 +7,18 @@ bind {
 logging {
   access_log = "./var/access.log"
   compress   = true
+
+  filter "no-listening" {
+    expression = <<EOF
+      msg == "listening"
+    EOF
+  }
+
+  # filter "no-http" {
+  #   expression = <<EOF
+  #     "for" in attrs && attrs["for"] == "http"
+  #   EOF
+  # }
 }
 
 domain "sakurajima.local.cetacean.club" {

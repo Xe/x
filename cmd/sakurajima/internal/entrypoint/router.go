@@ -25,6 +25,7 @@ import (
 	"gopkg.in/natefinch/lumberjack.v2"
 	"within.website/x/cmd/sakurajima/internal/config"
 	"within.website/x/cmd/sakurajima/internal/logging"
+	"within.website/x/cmd/sakurajima/internal/logging/expressions"
 	"within.website/x/fingerprint"
 )
 
@@ -145,11 +146,30 @@ func (rtr *Router) setConfig(c config.Toplevel) error {
 		Compress:   c.Logging.Compress,
 	}
 
+	var filters []logging.LogFilter
+
+	h := rtr.baseSlog.Handler()
+
+	for _, f := range c.Logging.Filters {
+		filter, err := expressions.NewFilter(rtr.baseSlog, f.Name, f.Expression)
+		if err != nil {
+			return fmt.Errorf("can't compile filter expression: %w", err)
+		}
+
+		filters = append(filters, filter.Filter)
+	}
+
+	if len(filters) != 0 {
+		h = logging.NewFilteringHandler(h, filters...)
+	}
+
+	log := slog.New(h)
+
 	rtr.lock.Lock()
 	rtr.routes = newMap
 	rtr.tlsCerts = newCerts
 	rtr.accessLog = lum
-	rtr.log = rtr.baseSlog
+	rtr.log = log
 	rtr.lock.Unlock()
 
 	return nil
@@ -294,7 +314,7 @@ func (rtr *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	ja4hFP := ja4h.JA4H(r)
 
-	slog.Debug("got request", "method", r.Method, "host", host, "path", r.URL.Path)
+	rtr.log.Debug("got request", "method", r.Method, "host", host, "path", r.URL.Path)
 
 	rtr.lock.RLock()
 	h, ok = rtr.routes[host]
@@ -326,7 +346,7 @@ func (rtr *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	requestsPerDomain.WithLabelValues(host, r.Method, fmt.Sprint(m.Code)).Inc()
 	responseTime.WithLabelValues(host).Observe(float64(m.Duration.Milliseconds()))
 
-	slog.Debug("request completed", "host", host, "method", r.Method, "response_code", m.Code, "duration_ms", m.Duration.Milliseconds())
+	rtr.log.Debug("request completed", "host", host, "method", r.Method, "response_code", m.Code, "duration_ms", m.Duration.Milliseconds())
 
 	logging.LogHTTPRequest(rtr.accessLog, r, m.Code, m.Written, m.Duration)
 }
