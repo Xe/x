@@ -1,4 +1,4 @@
-package main
+package entrypoint
 
 import (
 	"crypto/tls"
@@ -11,6 +11,8 @@ import (
 )
 
 func newH2CReverseProxy(target *url.URL) *httputil.ReverseProxy {
+	target.Scheme = "http"
+
 	director := func(req *http.Request) {
 		req.URL.Scheme = target.Scheme
 		req.URL.Host = target.Host
