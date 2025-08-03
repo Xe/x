@@ -3,7 +3,6 @@ package entrypoint
 import (
 	"context"
 	"fmt"
-	"log/slog"
 	"net"
 
 	"github.com/hashicorp/hcl/v2/hclsimple"
@@ -15,6 +14,7 @@ import (
 
 type Options struct {
 	ConfigFname string
+	LogLevel    string
 }
 
 func Main(ctx context.Context, opts Options) error {
@@ -29,7 +29,7 @@ func Main(ctx context.Context, opts Options) error {
 		return fmt.Errorf("configuration file %s is invalid:\n\n%w", opts.ConfigFname, err)
 	}
 
-	rtr, err := NewRouter(cfg)
+	rtr, err := NewRouter(cfg, opts.LogLevel)
 	if err != nil {
 		return err
 	}
@@ -51,7 +51,7 @@ func Main(ctx context.Context, opts Options) error {
 			ln.Close()
 		}(ctx)
 
-		slog.Info("listening", "for", "http", "bind", cfg.Bind.HTTP)
+		rtr.log.Info("listening", "for", "http", "bind", cfg.Bind.HTTP)
 
 		return rtr.HandleHTTP(gCtx, ln)
 	})
@@ -69,7 +69,7 @@ func Main(ctx context.Context, opts Options) error {
 			ln.Close()
 		}(ctx)
 
-		slog.Info("listening", "for", "https", "bind", cfg.Bind.HTTPS)
+		rtr.log.Info("listening", "for", "https", "bind", cfg.Bind.HTTPS)
 
 		return rtr.HandleHTTPS(gCtx, ln)
 	})

@@ -4,6 +4,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"log/slog"
 	"os"
 	"os/signal"
 	"syscall"
@@ -29,13 +30,14 @@ func main() {
 		return
 	}
 
-	logging.InitSlog(*slogLevel)
+	slog.SetDefault(logging.InitSlog(*slogLevel))
 
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer cancel()
 
 	if err := entrypoint.Main(ctx, entrypoint.Options{
 		ConfigFname: *configFname,
+		LogLevel:    *slogLevel,
 	}); err != nil {
 		fmt.Fprintf(os.Stderr, "%v\n", err)
 		os.Exit(1)

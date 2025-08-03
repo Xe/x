@@ -59,6 +59,8 @@ type Router struct {
 	tlsCerts  map[string]*tls.Certificate
 	opts      Options
 	accessLog *lumberjack.Logger
+	baseSlog  *slog.Logger
+	log       *slog.Logger
 }
 
 func (rtr *Router) setConfig(c config.Toplevel) error {
@@ -147,6 +149,7 @@ func (rtr *Router) setConfig(c config.Toplevel) error {
 	rtr.routes = newMap
 	rtr.tlsCerts = newCerts
 	rtr.accessLog = lum
+	rtr.log = rtr.baseSlog
 	rtr.lock.Unlock()
 
 	return nil
@@ -165,7 +168,7 @@ func (rtr *Router) GetCertificate(hello *tls.ClientHelloInfo) (*tls.Certificate,
 }
 
 func (rtr *Router) loadConfig() error {
-	slog.Info("reloading config", "fname", rtr.opts.ConfigFname)
+	rtr.log.Info("reloading config", "fname", rtr.opts.ConfigFname)
 	var cfg config.Toplevel
 	if err := hclsimple.DecodeFile(rtr.opts.ConfigFname, nil, &cfg); err != nil {
 		return err
@@ -179,7 +182,7 @@ func (rtr *Router) loadConfig() error {
 		return err
 	}
 
-	slog.Info("done!")
+	rtr.log.Info("done reloading config", "domains", len(cfg.Domains))
 
 	return nil
 }
@@ -200,9 +203,10 @@ func (rtr *Router) backgroundReloadConfig(ctx context.Context) {
 	}
 }
 
-func NewRouter(c config.Toplevel) (*Router, error) {
+func NewRouter(c config.Toplevel, logLevel string) (*Router, error) {
 	result := &Router{
-		routes: map[string]http.Handler{},
+		routes:   map[string]http.Handler{},
+		baseSlog: logging.InitSlog(logLevel),
 	}
 
 	if err := result.setConfig(c); err != nil {
@@ -263,7 +267,7 @@ func (rtr *Router) ListenAndServeMetrics(ctx context.Context, addr string) error
 	mux.HandleFunc("/readyz", readyz)
 	mux.HandleFunc("/healthz", healthz)
 
-	slog.Info("listening", "for", "metrics", "bind", addr)
+	rtr.log.Info("listening", "for", "metrics", "bind", addr)
 
 	srv := http.Server{
 		Addr:    addr,

@@ -35,7 +35,7 @@ func loadConfig(t *testing.T, fname string) config.Toplevel {
 func newRouter(t *testing.T, cfg config.Toplevel) *Router {
 	t.Helper()
 
-	rtr, err := NewRouter(cfg)
+	rtr, err := NewRouter(cfg, "INFO")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -64,7 +64,7 @@ func TestNewRouterFails(t *testing.T) {
 		HealthTarget: cfg.Domains[0].HealthTarget,
 	})
 
-	rtr, err := NewRouter(cfg)
+	rtr, err := NewRouter(cfg, "INFO")
 	if err == nil {
 		t.Fatal("wanted an error but got none")
 	}
