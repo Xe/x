@@ -1,15 +1,20 @@
 bind {
-  http    = ":3004"
-  https   = ":3005"
-  metrics = ":9091"
+  http    = ":3034"
+  https   = ":3035"
+  metrics = ":3036"
+}
+
+logging {
+  access_log = "./var/access.log"
+  compress   = true
 }
 
 domain "sakurajima.local.cetacean.club" {
   tls {
-    cert = "./internal/config/testdata/tls/selfsigned.crt"
-    key  = "./internal/config/testdata/tls/selfsigned.key"
+    cert = "./var/sakurajima.local.cetacean.club.pem"
+    key  = "./var/sakurajima.local.cetacean.club-key.pem"
   }
 
   target        = "http://localhost:3000"
-  health_target = "http://localhost:9091/healthz"
+  health_target = "http://localhost:3036/healthz"
 }

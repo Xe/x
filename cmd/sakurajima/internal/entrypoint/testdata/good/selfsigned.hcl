@@ -4,6 +4,10 @@ bind {
   metrics = ":65532"
 }
 
+logging {
+  access_log = "/var/log/access.log"
+}
+
 domain "osiris.local.cetacean.club" {
   tls {
     cert = "./testdata/selfsigned.crt"

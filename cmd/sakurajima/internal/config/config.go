@@ -8,6 +8,7 @@ import (
 type Toplevel struct {
 	Bind    Bind     `hcl:"bind,block"`
 	Domains []Domain `hcl:"domain,block"`
+	Logging Logging  `hcl:"logging,block"`
 }
 
 func (t *Toplevel) Valid() error {
@@ -21,6 +22,10 @@ func (t *Toplevel) Valid() error {
 		if err := d.Valid(); err != nil {
 			errs = append(errs, fmt.Errorf("when parsing domain %s: %w", d.Name, err))
 		}
+	}
+
+	if err := t.Logging.Valid(); err != nil {
+		errs = append(errs, fmt.Errorf("invalid logging block:\n%w", err))
 	}
 
 	if len(errs) != 0 {

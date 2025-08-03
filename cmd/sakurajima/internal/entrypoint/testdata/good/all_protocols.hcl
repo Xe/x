@@ -4,6 +4,10 @@ bind {
   metrics = ":65522"
 }
 
+logging {
+  access_log = "/var/log/access.log"
+}
+
 domain "http.internal" {
   tls {
     cert = "./testdata/selfsigned.crt"

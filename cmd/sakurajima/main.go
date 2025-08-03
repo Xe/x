@@ -15,7 +15,7 @@ import (
 )
 
 var (
-	configFname = flag.String("config", "./osiris.hcl", "Configuration file (HCL), see docs")
+	configFname = flag.String("config", "./sakurajima.hcl", "Configuration file (HCL), see docs")
 	slogLevel   = flag.String("slog-level", "INFO", "logging level (see https://pkg.go.dev/log/slog#hdr-Levels)")
 	versionFlag = flag.Bool("version", false, "if true, show version information then quit")
 )

@@ -15,7 +15,6 @@ import (
 	"strings"
 	"sync"
 	"syscall"
-	"time"
 
 	"github.com/felixge/httpsnoop"
 	"github.com/hashicorp/hcl/v2/hclsimple"
@@ -23,7 +22,9 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"gopkg.in/natefinch/lumberjack.v2"
 	"within.website/x/cmd/sakurajima/internal/config"
+	"within.website/x/cmd/sakurajima/internal/logging"
 	"within.website/x/fingerprint"
 )
 
@@ -53,10 +54,11 @@ var (
 )
 
 type Router struct {
-	lock     sync.RWMutex
-	routes   map[string]http.Handler
-	tlsCerts map[string]*tls.Certificate
-	opts     Options
+	lock      sync.RWMutex
+	routes    map[string]http.Handler
+	tlsCerts  map[string]*tls.Certificate
+	opts      Options
+	accessLog *lumberjack.Logger
 }
 
 func (rtr *Router) setConfig(c config.Toplevel) error {
@@ -128,9 +130,23 @@ func (rtr *Router) setConfig(c config.Toplevel) error {
 		return fmt.Errorf("can't compile config to routing map: %w", errors.Join(errs...))
 	}
 
+	if rtr.accessLog != nil {
+		rtr.accessLog.Rotate()
+		rtr.accessLog.Close()
+	}
+
+	lum := &lumberjack.Logger{
+		Filename:   c.Logging.AccessLog,
+		MaxSize:    c.Logging.MaxSizeMB,
+		MaxAge:     c.Logging.MaxAgeDays,
+		MaxBackups: c.Logging.MaxBackups,
+		Compress:   c.Logging.Compress,
+	}
+
 	rtr.lock.Lock()
 	rtr.routes = newMap
 	rtr.tlsCerts = newCerts
+	rtr.accessLog = lum
 	rtr.lock.Unlock()
 
 	return nil
@@ -169,8 +185,6 @@ func (rtr *Router) loadConfig() error {
 }
 
 func (rtr *Router) backgroundReloadConfig(ctx context.Context) {
-	t := time.NewTicker(time.Hour)
-	defer t.Stop()
 	ch := make(chan os.Signal, 1)
 	signal.Notify(ch, syscall.SIGHUP)
 
@@ -178,10 +192,6 @@ func (rtr *Router) backgroundReloadConfig(ctx context.Context) {
 		select {
 		case <-ctx.Done():
 			return
-		case <-t.C:
-			if err := rtr.loadConfig(); err != nil {
-				slog.Error("can't reload config", "fname", rtr.opts.ConfigFname, "err", err)
-			}
 		case <-ch:
 			if err := rtr.loadConfig(); err != nil {
 				slog.Error("can't reload config", "fname", rtr.opts.ConfigFname, "err", err)
@@ -280,7 +290,7 @@ func (rtr *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	ja4hFP := ja4h.JA4H(r)
 
-	slog.Info("got request", "method", r.Method, "host", host, "path", r.URL.Path)
+	slog.Debug("got request", "method", r.Method, "host", host, "path", r.URL.Path)
 
 	rtr.lock.RLock()
 	h, ok = rtr.routes[host]
@@ -312,5 +322,7 @@ func (rtr *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	requestsPerDomain.WithLabelValues(host, r.Method, fmt.Sprint(m.Code)).Inc()
 	responseTime.WithLabelValues(host).Observe(float64(m.Duration.Milliseconds()))
 
-	slog.Info("request completed", "host", host, "method", r.Method, "response_code", m.Code, "duration_ms", m.Duration.Milliseconds())
+	slog.Debug("request completed", "host", host, "method", r.Method, "response_code", m.Code, "duration_ms", m.Duration.Milliseconds())
+
+	logging.LogHTTPRequest(rtr.accessLog, r, m.Code, m.Written, m.Duration)
 }
