@@ -27,6 +27,7 @@ import (
 	"golang.org/x/crypto/acme/autocert"
 	"google.golang.org/protobuf/types/known/durationpb"
 	_ "modernc.org/sqlite"
+	"within.website/x/fingerprint"
 	relayd "within.website/x/gen/within/website/x/relayd/v1"
 	"within.website/x/internal"
 	"within.website/x/xess"
@@ -179,7 +180,7 @@ func main() {
 			r.Header.Set("X-Real-Ip", host)
 		}
 
-		fp := GetTLSFingerprint(r)
+		fp := fingerprint.GetTLSFingerprint(r)
 		if fp != nil {
 			if fp.JA3N() != nil {
 				foundJa3N = fp.JA3N().String()
@@ -189,7 +190,7 @@ func main() {
 			}
 		}
 
-		if tcpFP := GetTCPFingerprint(r); tcpFP != nil {
+		if tcpFP := fingerprint.GetTCPFingerprint(r); tcpFP != nil {
 			r.Header.Set("X-JA4T-Fingerprint", tcpFP.String())
 			fingerprints["ja4t"] = tcpFP.String()
 		}
@@ -261,7 +262,7 @@ func main() {
 		TLSConfig: tc,
 	}
 
-	applyTLSFingerprinter(srv)
+	fingerprint.ApplyTLSFingerprinter(srv)
 
 	log.Fatal(srv.ListenAndServeTLS("", ""))
 }

@@ -1,11 +1,10 @@
 //go:build linux
 
-package main
+package fingerprint
 
 import (
 	"fmt"
 	"net"
-	"net/http"
 	"syscall"
 	"unsafe"
 )
@@ -70,7 +69,8 @@ type tcpInfo struct {
 	Snd_wnd         uint32
 }
 
-func assignTCPFingerprint(conn net.Conn) (*JA4T, error) {
+// AssignTCPFingerprint extracts TCP fingerprint information from a connection
+func AssignTCPFingerprint(conn net.Conn) (*JA4T, error) {
 	tcpConn, ok := conn.(*net.TCPConn)
 	if !ok {
 		return nil, fmt.Errorf("not a TCPConn")
@@ -129,12 +129,4 @@ func assignTCPFingerprint(conn net.Conn) (*JA4T, error) {
 	}
 
 	return fp, nil
-}
-
-func GetTCPFingerprint(r *http.Request) *JA4T {
-	ptr := r.Context().Value(tcpFingerprintKey{})
-	if fpPtr, ok := ptr.(*JA4T); ok && ptr != nil && fpPtr != nil {
-		return fpPtr
-	}
-	return nil
 }

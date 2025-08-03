@@ -1,10 +1,12 @@
-package main
+package fingerprint
 
 import (
 	"fmt"
+	"net/http"
 	"strings"
 )
 
+// JA4T represents a TCP fingerprint
 type JA4T struct {
 	Window      uint32
 	Options     []uint8
@@ -32,4 +34,13 @@ func (j JA4T) String() string {
 	fmt.Fprintf(&sb, "_%d_%d", j.MSS, j.WindowScale)
 
 	return sb.String()
+}
+
+// GetTCPFingerprint extracts TCP fingerprint from HTTP request context
+func GetTCPFingerprint(r *http.Request) *JA4T {
+	ptr := r.Context().Value(tcpFingerprintKey{})
+	if fpPtr, ok := ptr.(*JA4T); ok && ptr != nil && fpPtr != nil {
+		return fpPtr
+	}
+	return nil
 }

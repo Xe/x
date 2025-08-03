@@ -1,6 +1,6 @@
 //go:build freebsd
 
-package main
+package fingerprint
 
 import (
 	"fmt"
@@ -43,7 +43,8 @@ type tcpInfo struct {
 	// Truncated for brevity — add more fields if needed
 }
 
-func assignTCPFingerprint(conn net.Conn) (*JA4T, error) {
+// AssignTCPFingerprint extracts TCP fingerprint information from a connection
+func AssignTCPFingerprint(conn net.Conn) (*JA4T, error) {
 	tcpConn, ok := conn.(*net.TCPConn)
 	if !ok {
 		return nil, fmt.Errorf("not a TCPConn")
