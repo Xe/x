@@ -24,6 +24,11 @@ bots:
 
 dnsbl: false
 
+store:
+  backend: valkey
+  parameters:
+    url: redis://anubis-valkey:6379/0
+
 thresholds:
   - name: minimal-suspicion
     expression:

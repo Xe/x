@@ -155,13 +155,16 @@ spec:
               mountPath: "/xe/pki"
               readOnly: true
         - name: anubis
-          image: ghcr.io/techarohq/anubis:latest
+          #image: ghcr.io/techarohq/anubis:latest
+          image: registry.int.xeserv.us/techaro/botstopper/anubis:latest
           imagePullPolicy: Always
           env:
             - name: "BIND"
               value: ":8080"
             - name: "DIFFICULTY"
               value: "4"
+            - name: "CHALLENGE_TITLE"
+              value: "Making sure your connection is secure!"
             - name: "ERROR_TITLE"
               value: "Error detected"
             - name: "METRICS_BIND"
@@ -172,11 +175,11 @@ spec:
               value: "true"
             - name: "TARGET"
               value: "http://localhost:3000"
-            - name: ED25519_PRIVATE_KEY_HEX
-              valueFrom:
-                secretKeyRef:
-                  name: anubis-key
-                  key: ED25519_PRIVATE_KEY_HEX
+            # - name: ED25519_PRIVATE_KEY_HEX
+            #   valueFrom:
+            #     secretKeyRef:
+            #       name: anubis-key
+            #       key: ED25519_PRIVATE_KEY_HEX
             - name: "SLOG_LEVEL"
               value: "debug"
             - name: "POLICY_FNAME"

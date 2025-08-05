@@ -10,26 +10,38 @@ import (
 var (
 	ErrCantReadTLS       = errors.New("tls: can't read TLS")
 	ErrInvalidTLSKeypair = errors.New("tls: can't parse TLS keypair")
+	ErrCertAndAutocert   = errors.New("tls: both certificate path and autocert cannot be set")
 )
 
 type TLS struct {
-	Cert string `hcl:"cert"`
-	Key  string `hcl:"key"`
+	Cert     string `hcl:"cert,optional"`
+	Key      string `hcl:"key,optional"`
+	Autocert bool   `hcl:"autocert,optional"`
 }
 
 func (t TLS) Valid() error {
 	var errs []error
 
-	if _, err := os.Stat(t.Cert); err != nil {
-		errs = append(errs, fmt.Errorf("%w certificate %s: %w", ErrCantReadTLS, t.Cert, err))
+	if t.Cert != "" && t.Autocert {
+		errs = append(errs, ErrCertAndAutocert)
 	}
 
-	if _, err := os.Stat(t.Key); err != nil {
-		errs = append(errs, fmt.Errorf("%w key %s: %w", ErrCantReadTLS, t.Key, err))
+	if t.Cert != "" {
+		if _, err := os.Stat(t.Cert); err != nil {
+			errs = append(errs, fmt.Errorf("%w certificate %s: %w", ErrCantReadTLS, t.Cert, err))
+		}
 	}
 
-	if _, err := tls.LoadX509KeyPair(t.Cert, t.Key); err != nil {
-		errs = append(errs, fmt.Errorf("%w (%s, %s): %w", ErrInvalidTLSKeypair, t.Cert, t.Key, err))
+	if t.Key != "" {
+		if _, err := os.Stat(t.Key); err != nil {
+			errs = append(errs, fmt.Errorf("%w key %s: %w", ErrCantReadTLS, t.Key, err))
+		}
+	}
+
+	if t.Cert != "" && t.Key != "" {
+		if _, err := tls.LoadX509KeyPair(t.Cert, t.Key); err != nil {
+			errs = append(errs, fmt.Errorf("%w (%s, %s): %w", ErrInvalidTLSKeypair, t.Cert, t.Key, err))
+		}
 	}
 
 	if len(errs) != 0 {

@@ -34,6 +34,20 @@ func TestTLSValid(t *testing.T) {
 			},
 			err: ErrInvalidTLSKeypair,
 		},
+		{
+			name: "cert and autocert both set",
+			input: TLS{
+				Cert:     "./testdata/tls/selfsigned.crt",
+				Autocert: true,
+			},
+			err: ErrCertAndAutocert,
+		},
+		{
+			name: "autocert set",
+			input: TLS{
+				Autocert: true,
+			},
+		},
 	} {
 		t.Run(tt.name, func(t *testing.T) {
 			if err := tt.input.Valid(); !errors.Is(err, tt.err) {

@@ -8,13 +8,13 @@ resources:
   - runner.yaml
   #- external-dns.yaml
   - ingress.yaml
+  - valkey.yaml
 namespace: gitea
 
 configMapGenerator:
   - name: anubis-cfg
     behavior: create
     files:
-      - ./cfg/anubis/botPolicies.json
       - ./cfg/anubis/botPolicies.yaml
 
   - name: botstopper-custom-css
