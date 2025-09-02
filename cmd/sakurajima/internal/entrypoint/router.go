@@ -22,7 +22,10 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"golang.org/x/crypto/acme"
+	"golang.org/x/crypto/acme/autocert"
 	"gopkg.in/natefinch/lumberjack.v2"
+	"within.website/x/autocert/s3cache"
 	"within.website/x/cmd/sakurajima/internal/config"
 	"within.website/x/cmd/sakurajima/internal/logging"
 	"within.website/x/cmd/sakurajima/internal/logging/expressions"
@@ -55,19 +58,24 @@ var (
 )
 
 type Router struct {
-	lock      sync.RWMutex
-	routes    map[string]http.Handler
-	tlsCerts  map[string]*tls.Certificate
-	opts      Options
-	accessLog *lumberjack.Logger
-	baseSlog  *slog.Logger
-	log       *slog.Logger
+	lock                 sync.RWMutex
+	routes               map[string]http.Handler
+	tlsCerts             map[string]*tls.Certificate
+	opts                 Options
+	accessLog            *lumberjack.Logger
+	baseSlog             *slog.Logger
+	log                  *slog.Logger
+	autoMgr              *autocert.Manager
+	autocertRedirectCode int
 }
 
 func (rtr *Router) setConfig(c config.Toplevel) error {
 	var errs []error
 	newMap := map[string]http.Handler{}
 	newCerts := map[string]*tls.Certificate{}
+
+	// Build host policy list for autocert based on domains with tls.autocert=true
+	var autocertHosts []string
 
 	for _, d := range c.Domains {
 		var domainErrs []error
@@ -117,12 +125,15 @@ func (rtr *Router) setConfig(c config.Toplevel) error {
 
 		newMap[d.Name] = h
 
-		cert, err := tls.LoadX509KeyPair(d.TLS.Cert, d.TLS.Key)
-		if err != nil {
-			domainErrs = append(domainErrs, fmt.Errorf("%w: %w", ErrInvalidTLSKeypair, err))
+		if d.TLS.Autocert {
+			autocertHosts = append(autocertHosts, d.Name)
+		} else {
+			cert, err := tls.LoadX509KeyPair(d.TLS.Cert, d.TLS.Key)
+			if err != nil {
+				domainErrs = append(domainErrs, fmt.Errorf("%w: %w", ErrInvalidTLSKeypair, err))
+			}
+			newCerts[d.Name] = &cert
 		}
-
-		newCerts[d.Name] = &cert
 
 		if len(domainErrs) != 0 {
 			errs = append(errs, fmt.Errorf("invalid domain %s: %w", d.Name, errors.Join(domainErrs...)))
@@ -131,6 +142,25 @@ func (rtr *Router) setConfig(c config.Toplevel) error {
 
 	if len(errs) != 0 {
 		return fmt.Errorf("can't compile config to routing map: %w", errors.Join(errs...))
+	}
+
+	// Initialize autocert manager if needed
+	var autoMgr *autocert.Manager
+	if len(autocertHosts) > 0 {
+		cache, err := s3cache.New(context.Background(), s3cache.Options{Bucket: c.Autocert.S3Bucket, Prefix: c.Autocert.S3Prefix})
+		if err != nil {
+			return fmt.Errorf("failed to init s3 autocert cache: %w", err)
+		}
+		autoMgr = &autocert.Manager{
+			Prompt:     autocert.AcceptTOS,
+			HostPolicy: autocert.HostWhitelist(autocertHosts...),
+			Cache:      cache,
+			Email:      c.Autocert.Email,
+		}
+
+		if c.Autocert.DirectoryURL != "" {
+			autoMgr.Client = &acme.Client{DirectoryURL: c.Autocert.DirectoryURL}
+		}
 	}
 
 	if rtr.accessLog != nil {
@@ -170,6 +200,12 @@ func (rtr *Router) setConfig(c config.Toplevel) error {
 	rtr.tlsCerts = newCerts
 	rtr.accessLog = lum
 	rtr.log = log
+	rtr.autoMgr = autoMgr
+	if c.Autocert.HTTPRedirectCode != 0 {
+		rtr.autocertRedirectCode = c.Autocert.HTTPRedirectCode
+	} else {
+		rtr.autocertRedirectCode = http.StatusMovedPermanently
+	}
 	rtr.lock.Unlock()
 
 	return nil
@@ -178,13 +214,19 @@ func (rtr *Router) setConfig(c config.Toplevel) error {
 func (rtr *Router) GetCertificate(hello *tls.ClientHelloInfo) (*tls.Certificate, error) {
 	rtr.lock.RLock()
 	cert, ok := rtr.tlsCerts[hello.ServerName]
+	auto := rtr.autoMgr
 	rtr.lock.RUnlock()
 
-	if !ok {
-		return nil, ErrNoCert
+	if ok {
+		return cert, nil
 	}
 
-	return cert, nil
+	if auto != nil {
+		// Delegate to autocert manager for configured hosts
+		return auto.GetCertificate(hello)
+	}
+
+	return nil, ErrNoCert
 }
 
 func (rtr *Router) loadConfig() error {
@@ -238,7 +280,7 @@ func NewRouter(c config.Toplevel, logLevel string) (*Router, error) {
 
 func (rtr *Router) HandleHTTP(ctx context.Context, ln net.Listener) error {
 	srv := http.Server{
-		Handler: rtr,
+		Handler: rtr.httpHandler(),
 	}
 
 	go func(ctx context.Context) {
@@ -247,6 +289,29 @@ func (rtr *Router) HandleHTTP(ctx context.Context, ln net.Listener) error {
 	}(ctx)
 
 	return srv.Serve(ln)
+}
+
+func (rtr *Router) httpHandler() http.Handler {
+	rtr.lock.RLock()
+	auto := rtr.autoMgr
+	redirectCode := rtr.autocertRedirectCode
+	rtr.lock.RUnlock()
+
+	if auto == nil {
+		return rtr
+	}
+
+	mux := http.NewServeMux()
+	// Serve ACME HTTP-01 challenges
+	mux.Handle("/.well-known/acme-challenge/", auto.HTTPHandler(nil))
+	// Redirect everything else to HTTPS preserving host and path
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		u := *r.URL
+		u.Scheme = "https"
+		u.Host = r.Host
+		http.Redirect(w, r, u.String(), redirectCode)
+	})
+	return mux
 }
 
 func (rtr *Router) HandleHTTPS(ctx context.Context, ln net.Listener) error {

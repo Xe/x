@@ -152,7 +152,9 @@ func main() {
 		w.Header().Add("Cache-Control", "max-age=3599")
 		w.Header().Add("Expires", time.Now().Add(time.Hour-time.Second).Format(http.TimeFormat))
 
-		http.Redirect(w, r, req.URL, http.StatusTemporaryRedirect)
+		brandedURL := strings.ReplaceAll(req.URL, "xedn.fly.storage.tigris.dev", "files.xeiaso.net")
+
+		http.Redirect(w, r, brandedURL, http.StatusTemporaryRedirect)
 	})
 
 	slog.Info("listening", "bind", *bind)

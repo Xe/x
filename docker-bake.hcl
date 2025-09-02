@@ -46,3 +46,19 @@ target "mimi" {
     "ghcr.io/xe/x/mimi:latest",
   ]
 }
+
+target "sakurajima" {
+  context = "."
+  dockerfile = "./docker/sakurajima.Dockerfile"
+  platforms = [
+    "linux/amd64",
+    "linux/arm64",
+    "linux/ppc64le",
+    "linux/riscv64"
+  ]
+  pull = true
+  tags = [
+    "ghcr.io/xe/x/sakurajima:${VERSION}",
+    "ghcr.io/xe/x/sakurajima:latest",
+  ]
+}
