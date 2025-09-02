@@ -201,7 +201,7 @@ func (rtr *Router) setConfig(c config.Toplevel) error {
 	rtr.accessLog = lum
 	rtr.log = log
 	rtr.autoMgr = autoMgr
-	if c.Autocert.HTTPRedirectCode != 0 {
+	if c.Autocert != nil && c.Autocert.HTTPRedirectCode != 0 {
 		rtr.autocertRedirectCode = c.Autocert.HTTPRedirectCode
 	} else {
 		rtr.autocertRedirectCode = http.StatusMovedPermanently

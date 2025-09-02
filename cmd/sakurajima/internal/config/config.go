@@ -7,10 +7,10 @@ import (
 )
 
 type Toplevel struct {
-	Bind     Bind     `hcl:"bind,block"`
-	Domains  []Domain `hcl:"domain,block"`
-	Logging  Logging  `hcl:"logging,block"`
-	Autocert Autocert `hcl:"autocert,block"`
+	Bind     Bind      `hcl:"bind,block"`
+	Domains  []Domain  `hcl:"domain,block"`
+	Logging  Logging   `hcl:"logging,block"`
+	Autocert *Autocert `hcl:"autocert,block"`
 }
 
 type Autocert struct {
