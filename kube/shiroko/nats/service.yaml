@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: nats
+  labels:
+    xeiaso.net/role: nats
+spec:
+  selector:
+    xeiaso.net/role: nats
+  ports:
+    - port: 4222
+      name: nats
+    - port: 1833
+      name: mqtt
+    - port: 8222
+      name: http

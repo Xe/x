@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nats-config
+data:
+  nats.conf: |
+    pid_file: "/var/run/nats/nats.pid"
+    http: 8222
+    server_name: "shiroko"
+
+    jetstream {
+      store_dir: /data/jetstream
+      max_mem: 512M
+      max_file: 9G
+    }
+
+    mqtt {
+      port: 1833
+
+      authorization {
+        username: "xe"
+        password: "hunter2"
+      }
+    }

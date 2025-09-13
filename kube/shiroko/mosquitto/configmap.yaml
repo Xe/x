@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mosquitto-config
+data:
+  mosquitto.conf: |
+    persistence true
+    persistence_location /mosquitto/data/
+    log_dest stdout
+    log_type all
+
+    password_file /mosquitto/config/password.txt
+
+    # MQTTS listener
+    listener 1883
+    protocol mqtt
+
+    # WS Listener
+    listener 9001
+    protocol websockets
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mosquitto-password
+data:
+  password.txt: |
+    admin:$7$101$tz6arXoVTIHSiOis$msNpyhYVntBTDtPjHeUhr8YAckwsKfQRivH9hm+It7Bn3/1OB2aBHQq+S0n5AZMokqRtv79Rzh5oZMwnnhtXZw==

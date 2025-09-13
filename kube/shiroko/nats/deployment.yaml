@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nats
+  labels:
+    xeiaso.net/role: nats
+spec:
+  replicas: 1
+  strategy: {}
+  selector:
+    matchLabels:
+      xeiaso.net/role: nats
+  template:
+    metadata:
+      labels:
+        xeiaso.net/role: nats
+    spec:
+      containers:
+        - name: nats
+          image: nats:2-alpine
+          args:
+            - "-c"
+            - "/etc/nats/nats.conf"
+          resources:
+            requests:
+              cpu: "10m"
+              memory: "16Mi"
+            limits:
+              cpu: "100m"
+              memory: "128Mi"
+          ports:
+            - containerPort: 4222
+            - containerPort: 8222
+          volumeMounts:
+            - name: nats-config
+              mountPath: /etc/nats
+              readOnly: true
+            - name: data
+              mountPath: /data/jetstream
+            - name: tmp
+              mountPath: /var/run/nats
+
+      volumes:
+        - name: nats-config
+          configMap:
+            name: nats-config
+        - name: data
+          persistentVolumeClaim:
+            claimName: nats
+        - name: tmp
+          emptyDir: {}

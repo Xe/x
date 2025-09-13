@@ -4,8 +4,8 @@ metadata:
   name: pkgs-techaro-lol-cname
 spec:
   endpoints:
-  - dnsName: "pkgs.techaro.lol"
-    recordTTL: 3600
-    recordType: CNAME
-    targets:
-    - pkgs.techaro.lol.fly.storage.tigris.dev
+    - dnsName: "pkgs.techaro.lol"
+      recordTTL: 3600
+      recordType: CNAME
+      targets:
+        - pkgs.techaro.lol.fly.storage.tigris.dev
