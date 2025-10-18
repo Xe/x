@@ -37,7 +37,7 @@ message SwitchReq {
       id : "member_name.is_in_system",
       message : "member_name must be in Within",
       expression : "this in [\"Cadey\", \"Nicole\", \"Jessie\", \"Sephie\", "
-                   "\"Ashe\", \"Mai\"]"
+                   "\"Ashe\", \"Mai\", \"W'zamqo\"]"
     }
   ]; // required
 }

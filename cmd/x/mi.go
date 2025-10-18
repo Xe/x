@@ -79,6 +79,7 @@ func (s *miSwitch) Execute(ctx context.Context, f *flag.FlagSet, _ ...interface{
 				{Text: "Ashe"},
 				{Text: "Sephie"},
 				{Text: "Mai"},
+				{Text: "W'zamqo"},
 			}
 			return prompt.FilterHasPrefix(s, d.GetWordBeforeCursor(), true)
 		})

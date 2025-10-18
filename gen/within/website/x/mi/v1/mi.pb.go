@@ -648,10 +648,10 @@ const file_within_website_x_mi_v1_mi_proto_rawDesc = "" +
 	"\tmember_id\x18\x02 \x01(\x05R\bmemberId\x12\x1d\n" +
 	"\n" +
 	"started_at\x18\x03 \x01(\tR\tstartedAt\x12\x19\n" +
-	"\bended_at\x18\x04 \x01(\tR\aendedAt\"\xb2\x01\n" +
-	"\tSwitchReq\x12\xa4\x01\n" +
-	"\vmember_name\x18\x01 \x01(\tB\x82\x01\xbaH\x7f\xba\x01y\n" +
-	"\x18member_name.is_in_system\x12\x1dmember_name must be in Within\x1a>this in [\"Cadey\", \"Nicole\", \"Jessie\", \"Sephie\", \"Ashe\", \"Mai\"]\xc8\x01\x01R\n" +
+	"\bended_at\x18\x04 \x01(\tR\aendedAt\"\xbf\x01\n" +
+	"\tSwitchReq\x12\xb1\x01\n" +
+	"\vmember_name\x18\x01 \x01(\tB\x8f\x01\xbaH\x8b\x01\xba\x01\x84\x01\n" +
+	"\x18member_name.is_in_system\x12\x1dmember_name must be in Within\x1aIthis in [\"Cadey\", \"Nicole\", \"Jessie\", \"Sephie\", \"Ashe\", \"Mai\", \"W'zamqo\"]\xc8\x01\x01R\n" +
 	"memberName\"x\n" +
 	"\n" +
 	"SwitchResp\x120\n" +
