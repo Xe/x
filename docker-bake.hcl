@@ -5,6 +5,7 @@ group "default" {
     "aura",
     "falin",
     "mimi",
+    "mi",
   ]
 }
 
@@ -44,6 +45,19 @@ target "mimi" {
   tags = [
     "ghcr.io/xe/x/mimi:${VERSION}",
     "ghcr.io/xe/x/mimi:latest",
+  ]
+}
+
+target "mi" {
+  context = "."
+  dockerfile = "./docker/mi.Dockerfile"
+  platforms = [
+    "linux/amd64",
+  ]
+  pull = true
+  tags = [
+    "ghcr.io/xe/x/mi:${VERSION}",
+    "ghcr.io/xe/x/mi:latest",
   ]
 }
 

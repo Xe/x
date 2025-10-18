@@ -22,9 +22,9 @@ func main() {
 	subcommands.Register(&chatgpt.ImportCmd{}, "ai")
 	subcommands.Register(&deepseek.ImportCmd{}, "ai")
 
-	// Switch tracker
+	// Switch tracker commands
 	// subcommands.Register(&miListSwitches{}, "switch-tracker")
-	// subcommands.Register(&miSwitch{}, "switch-tracker")
+	subcommands.Register(&mi.Switch{}, "switch-tracker")
 	subcommands.Register(&mi.WhoIsFront{}, "switch-tracker")
 
 	// // Events

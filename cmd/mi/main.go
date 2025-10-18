@@ -95,12 +95,17 @@ func main() {
 
 	if *twitchClientID != "" {
 		te, err := twitchevents.New(ctx, dao, twitchevents.Config{
-			BlueskyAuthkey:  *blueskyAuthkey,
-			BlueskyHandle:   *blueskyHandle,
-			BlueskyPDS:      *blueskyPDS,
-			MastodonToken:   *mastodonToken,
-			MastodonURL:     *mastodonURL,
-			MimiAnnounceURL: *mimiAnnounceURL,
+			BlueskyAuthkey:      *blueskyAuthkey,
+			BlueskyHandle:       *blueskyHandle,
+			BlueskyPDS:          *blueskyPDS,
+			MastodonToken:       *mastodonToken,
+			MastodonURL:         *mastodonURL,
+			MimiAnnounceURL:     *mimiAnnounceURL,
+			TwitchClientID:      *twitchClientID,
+			TwitchClientSecret:  *twitchClientSecret,
+			TwitchUserID:        *twitchUserID,
+			TwitchWebhookSecret: *twitchWebhookSecret,
+			TwitchWebhookURL:    *twitchWebhookURL,
 		})
 		if err != nil {
 			slog.Error("failed to create twitch events", "err", err)

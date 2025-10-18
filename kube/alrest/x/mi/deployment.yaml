@@ -31,6 +31,7 @@ spec:
         fsGroup: 1000
       containers:
         - name: main
+          # image: ghcr.io/xe/x/mi@sha256:7a32e4839db511d0c951ce1bc8a8613071d6fa08b0642d0889b9b1c1f2589061
           image: ghcr.io/xe/x/mi:latest
           imagePullPolicy: "Always"
           resources:

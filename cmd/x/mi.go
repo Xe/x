@@ -11,7 +11,6 @@ import (
 	"strconv"
 	"time"
 
-	"buf.build/go/protovalidate"
 	"github.com/c-bata/go-prompt"
 	"github.com/google/subcommands"
 	"github.com/rodaine/table"
@@ -53,69 +52,7 @@ func (wif *miWhoIsFront) Execute(ctx context.Context, f *flag.FlagSet, _ ...inte
 	return subcommands.ExitSuccess
 }
 
-type miSwitch struct {
-	member string
-}
-
-func (*miSwitch) Name() string     { return "switch" }
-func (*miSwitch) Synopsis() string { return "Switch front to a different member." }
-func (*miSwitch) Usage() string {
-	return `switch [--member]:
-Switch front to a different member.
-`
-}
-func (s *miSwitch) SetFlags(f *flag.FlagSet) {
-	f.StringVar(&s.member, "member", "", "Member to switch to.")
-}
-func (s *miSwitch) Execute(ctx context.Context, f *flag.FlagSet, _ ...interface{}) subcommands.ExitStatus {
-	cli := mi.NewSwitchTrackerProtobufClient(*miURL, http.DefaultClient)
-
-	if s.member == "" {
-		s.member = prompt.Input("Member to switch to: ", func(d prompt.Document) []prompt.Suggest {
-			s := []prompt.Suggest{
-				{Text: "Cadey"},
-				{Text: "Nicole"},
-				{Text: "Jessie"},
-				{Text: "Ashe"},
-				{Text: "Sephie"},
-				{Text: "Mai"},
-				{Text: "W'zamqo"},
-			}
-			return prompt.FilterHasPrefix(s, d.GetWordBeforeCursor(), true)
-		})
-	}
-
-	sr := &mi.SwitchReq{MemberName: s.member}
-
-	if err := protovalidate.Validate(sr); err != nil {
-		fmt.Printf("error: %v\n", err)
-		return subcommands.ExitFailure
-	}
-
-	members, err := cli.Members(ctx, &emptypb.Empty{})
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-		return subcommands.ExitFailure
-	}
-
-	sw, err := cli.Switch(ctx, sr)
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-		return subcommands.ExitFailure
-	}
-
-	var oldMember string
-	for _, m := range members.Members {
-		if m.Id == sw.Old.MemberId {
-			oldMember = m.Name
-			break
-		}
-	}
-
-	fmt.Printf("switched from %s to %s\n", oldMember, s.member)
-
-	return subcommands.ExitSuccess
-}
+// Switch command moved to cmd/x/cmd/mi/switch.go.
 
 type miListSwitches struct {
 	count int

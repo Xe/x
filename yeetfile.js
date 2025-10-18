@@ -10,7 +10,7 @@ programs = [
   "httpproxy",
   "quickserv",
   "relayd",
-  "mi",
+  // "mi",
   //"mimi",
   "reverseproxyd",
   "sapientwindex",
