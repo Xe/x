@@ -1,0 +1,19 @@
+apiVersion: x.within.website/v1
+kind: App
+metadata:
+  name: zohar
+
+spec:
+  image: ghcr.io/xe/x/reverseproxyd:latest
+  autoUpdate: true
+  replicas: 3
+
+  env:
+    - name: HTTP_BIND
+      value: ":3000"
+    - name: PROXY_TO
+      value: "http://192.168.2.12:8080"
+
+  ingress:
+    enabled: true
+    host: zohar.automuse.art
