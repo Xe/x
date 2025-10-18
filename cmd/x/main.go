@@ -23,7 +23,7 @@ func main() {
 	subcommands.Register(&deepseek.ImportCmd{}, "ai")
 
 	// Switch tracker commands
-	// subcommands.Register(&miListSwitches{}, "switch-tracker")
+	subcommands.Register(&mi.ListSwitches{}, "switch-tracker")
 	subcommands.Register(&mi.Switch{}, "switch-tracker")
 	subcommands.Register(&mi.WhoIsFront{}, "switch-tracker")
 
