@@ -7,7 +7,6 @@ programs = [
   "amano",
   "future-sight",
   "httpdebug",
-  "httpproxy",
   "quickserv",
   "relayd",
   // "mi",

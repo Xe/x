@@ -34,3 +34,7 @@ bin
 
 node_modules
 .VERSION
+# Local configuration and Go build caches
+.config
+.gocache
+.modcache
