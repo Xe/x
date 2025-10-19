@@ -2,15 +2,45 @@ package mi
 
 import (
 	"context"
+	"encoding/json"
 	"flag"
 	"fmt"
+	"os"
 
 	"buf.build/go/protovalidate"
+	"github.com/c-bata/go-prompt"
 	"github.com/google/subcommands"
 	"google.golang.org/protobuf/types/known/emptypb"
 
 	mi "within.website/x/gen/within/website/x/mi/v1"
 )
+
+// memberSuggestions provides autocomplete for member names using the testdata JSON.
+var cachedMemberSuggestions []prompt.Suggest
+
+func init() {
+	// Load suggestions once at program start. Errors are ignored – an empty list
+	// simply falls back to free‑form input.
+	f, err := os.Open("cmd/mi/testdata/members.json")
+	if err != nil {
+		return
+	}
+	defer f.Close()
+	var members []struct {
+		Name string `json:"name"`
+	}
+	if err := json.NewDecoder(f).Decode(&members); err != nil {
+		return
+	}
+	for _, m := range members {
+		cachedMemberSuggestions = append(cachedMemberSuggestions, prompt.Suggest{Text: m.Name})
+	}
+}
+
+func memberSuggestions(d prompt.Document) []prompt.Suggest {
+	// Simple prefix filtering – go-prompt will handle the rest.
+	return cachedMemberSuggestions
+}
 
 // Switch implements the "switch" subcommand which changes the front member.
 type Switch struct {
@@ -40,8 +70,8 @@ func (s *Switch) Execute(ctx context.Context, f *flag.FlagSet, _ ...interface{})
 
 	// Prompt for member if not supplied.
 	if s.member == "" {
-		fmt.Print("Member to switch to: ")
-		fmt.Scanln(&s.member)
+		// Load member suggestions from the testdata JSON.
+		s.member = prompt.Input("Member to switch to: ", memberSuggestions)
 	}
 
 	// Validate request.

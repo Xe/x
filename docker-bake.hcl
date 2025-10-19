@@ -6,6 +6,8 @@ group "default" {
     "falin",
     "mimi",
     "mi",
+    "python-wasm-mcp",
+    "httpdebug",
   ]
 }
 
@@ -58,6 +60,33 @@ target "mi" {
   tags = [
     "ghcr.io/xe/x/mi:${VERSION}",
     "ghcr.io/xe/x/mi:latest",
+  ]
+}
+
+target "httpdebug" {
+  context = "."
+  dockerfile = "./docker/httpdebug.Dockerfile"
+  platforms = [
+    "linux/amd64",
+    "linux/arm64",
+  ]
+  pull = true
+  tags = [
+    "ghcr.io/xe/x/httpdebug:${VERSION}",
+    "ghcr.io/xe/x/httpdebug:latest",
+  ]
+}
+
+target "python-wasm-mcp" {
+  context = "."
+  dockerfile = "./docker/python-wasm-mcp.Dockerfile"
+  platforms = [
+    "linux/amd64",
+  ]
+  pull = true
+  tags = [
+    "ghcr.io/xe/x/python-wasm-mcp:${VERSION}",
+    "ghcr.io/xe/x/python-wasm-mcp:latest",
   ]
 }
 
