@@ -2,7 +2,7 @@
 
 ## Project Structure & Module Organization
 
-```
+```text
 ├─ cmd/            # Main applications (each sub‑directory is a binary)
 ├─ internal/       # Private packages used by the repo
 ├─ web/            # Web‑related services and helpers
@@ -70,7 +70,7 @@ When undertaking a task, pause and ask the user for intent before writing code.
 
 Use Conventional Commits:
 
-```
+```text
 <type>[optional scope]: <description>
 
 [optional body]
@@ -83,7 +83,7 @@ Add `!` after type/scope for breaking changes or include `BREAKING CHANGE:` in t
 
 When committing, wrap the message in double quotes, sign‑off as:
 
-```
+```text
 Signed-off-by: Mimi Yasomi <mimi@xeserv.us>
 ```
 
