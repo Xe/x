@@ -96,4 +96,11 @@ Write the commit to a temporary file first, using `printf` (fish shell).
 
 ---
 
+## Flag Parsing Convention
+
+All command‑line tools invoke `internal.HandleStartup()` at the start of `main()`.
+`internal.HandleStartup()` already calls `flag.Parse()`, so individual binaries
+must **not** call `flag.Parse()` themselves. Doing so can cause flags to be
+parsed twice and lead to unexpected behavior.
+
 _This file is consulted by the repository’s tooling. Keep it up‑to‑date as the project evolves._
