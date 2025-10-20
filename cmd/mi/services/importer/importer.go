@@ -104,6 +104,10 @@ func (i *Importer) importSwitches(w http.ResponseWriter, r *http.Request) {
 }
 
 func (i *Importer) importMembers(w http.ResponseWriter, r *http.Request) {
+	// Decode the incoming JSON payload into a slice of protobuf Member structs.
+	// The generated protobuf type contains an internal mutex, so iterating over the
+	// slice by value would copy that mutex and trigger a vet warning. Instead we
+	// iterate by index and work with pointers to avoid copying the lock.
 	var members []pb.Member
 	if err := json.NewDecoder(r.Body).Decode(&members); err != nil {
 		slog.Error("failed to decode members", "err", err)
@@ -114,14 +118,18 @@ func (i *Importer) importMembers(w http.ResponseWriter, r *http.Request) {
 
 	tx := i.db.Begin()
 
-	for _, m := range members {
+	for idx := range members {
+		m := &members[idx]
 		member := models.Member{
 			ID:        int(m.Id),
 			Name:      m.Name,
 			AvatarURL: m.AvatarUrl,
 		}
 
-		if err := tx.Exec("INSERT INTO members (id, name, avatar_url) VALUES (?, ?, ?) ON CONFLICT (id) DO UPDATE SET name = ?, avatar_url = ?", member.ID, member.Name, member.AvatarURL, member.Name, member.AvatarURL).Error; err != nil {
+		if err := tx.Exec(
+			"INSERT INTO members (id, name, avatar_url) VALUES (?, ?, ?) ON CONFLICT (id) DO UPDATE SET name = ?, avatar_url = ?",
+			member.ID, member.Name, member.AvatarURL, member.Name, member.AvatarURL,
+		).Error; err != nil {
 			slog.Error("failed to save member", "err", err)
 			http.Error(w, "failed to save member", http.StatusInternalServerError)
 			return

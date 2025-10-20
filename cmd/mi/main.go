@@ -20,6 +20,7 @@ import (
 	"within.website/x/cmd/mi/services/glance"
 	"within.website/x/cmd/mi/services/homefrontshim"
 	"within.website/x/cmd/mi/services/importer"
+	"within.website/x/cmd/mi/services/mcp"
 	"within.website/x/cmd/mi/services/posse"
 	"within.website/x/cmd/mi/services/switchtracker"
 	"within.website/x/cmd/mi/services/twitchevents"
@@ -149,6 +150,7 @@ func main() {
 
 	mux.Handle("/front", homefrontshim.New(dao))
 	mux.Handle("/glance", glance.New(dao))
+	mux.Handle("/mcp", mcp.New(st))
 
 	i := importer.New(dao)
 	i.Mount(http.DefaultServeMux)
