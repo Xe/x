@@ -68,7 +68,6 @@ target "httpdebug" {
   dockerfile = "./docker/httpdebug.Dockerfile"
   platforms = [
     "linux/amd64",
-    "linux/arm64",
   ]
   pull = true
   tags = [
