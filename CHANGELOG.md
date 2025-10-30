@@ -1,3 +1,30 @@
+# [1.25.0](https://github.com/Xe/x/compare/v1.24.0...v1.25.0) (2025-10-30)
+
+### Bug Fixes
+
+- a bunch of things ([113cde3](https://github.com/Xe/x/commit/113cde35bba091dada6c83f7e40c74dcd0d181a0))
+- bump versions of things in kube ([94ef124](https://github.com/Xe/x/commit/94ef124e9eae053d1b9874208eed99854a613196))
+- **httpdebug:** log request info ([b7c3bcb](https://github.com/Xe/x/commit/b7c3bcb18d682e30935b6c803b480b2b8fb9c7e6))
+- oops ([1796967](https://github.com/Xe/x/commit/17969677917010bdfe3d7aa99cfd8ead189a00fc))
+- **sakurajima:** fix tests ([5549686](https://github.com/Xe/x/commit/55496863add61e24c7e6edc1d05288babd52cfc9))
+
+### Features
+
+- add httpdebug Docker target and Dockerfile ([b428337](https://github.com/Xe/x/commit/b428337f8e177ba51110c9895d141542c66c62b2))
+- add shiroko k8s ([0172f70](https://github.com/Xe/x/commit/0172f7082b11b4b177ba634461d590296d2a5d53))
+- add W'zamqo as valid member name and update suggestions ([d0fff60](https://github.com/Xe/x/commit/d0fff604962700ba5ed185c4828f81db3443b07d))
+- **cmd/httpdebug:** enhance security and functionality ([0c0f8ea](https://github.com/Xe/x/commit/0c0f8ea72feab23cbe5ed667e0dd283b1fa77914))
+- **cmd/mi:** add MCP server for completely bad ideas ([673dbbd](https://github.com/Xe/x/commit/673dbbde5dd0f61ad7d06239186d49aef732227c))
+- cmd/sakurajima ([86de439](https://github.com/Xe/x/commit/86de439c6da51f1751a2c72b79a584ceba72d3ef))
+- **cmd/sakurajima:** add autocert config settings ([0017dc0](https://github.com/Xe/x/commit/0017dc0eeab6e42dbc1735ea6a18bf509d36a28f))
+- **cmd/x:** fix switch command ([616d8b4](https://github.com/Xe/x/commit/616d8b452be147e9994f292f446ddf49d7f6773d))
+- **cmd/x:** port list-switches command over ([edd2e48](https://github.com/Xe/x/commit/edd2e48be7437fe43ea053d11372840199b0caab))
+- **cmd:** add x-browser-validation test program ([8c0154e](https://github.com/Xe/x/commit/8c0154e9fd798cdeec0e3f6ad66f287bdae9e7b7))
+- **sakurajima:** add the rigging for log filtering logic ([0274cf3](https://github.com/Xe/x/commit/0274cf3e4cdfbe908fb8602d980b5b1636f5e6fb))
+- **sakurajima:** implement access logs / logrotate logic ([8b68476](https://github.com/Xe/x/commit/8b68476147a011a8deebf6aa0b8f82770397ae67))
+- **sakurajima:** log filters ([b4a5f77](https://github.com/Xe/x/commit/b4a5f77dc13da12437865bf8b5dbed60e0611685))
+- **stickers:** use branded presigned URLs ([5223d77](https://github.com/Xe/x/commit/5223d77df6b10ff75d6a0dce4b674a989562b833))
+
 # [1.24.0](https://github.com/Xe/x/compare/v1.23.0...v1.24.0) (2025-07-15)
 
 ### Features
