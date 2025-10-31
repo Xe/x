@@ -132,9 +132,7 @@ func main() {
 
 	// XXX(Xe): shim through old paths
 	mux.HandleFunc("/twirp/within.website.x.mi.SwitchTracker/", func(w http.ResponseWriter, r *http.Request) {
-		slog.Info("got here", "path", r.URL.Path)
 		r.URL.Path = strings.Replace(r.URL.Path, "/twirp/within.website.x.mi.SwitchTracker/", "/twirp/within.website.x.mi.v1.SwitchTracker/", -1)
-		slog.Info("got here", "path", r.URL.Path)
 		pb.NewSwitchTrackerServer(st).ServeHTTP(w, r)
 	})
 
@@ -142,9 +140,7 @@ func main() {
 
 	// XXX(Xe): shim through old paths
 	mux.HandleFunc("/twirp/within.website.x.mi.Events/", func(w http.ResponseWriter, r *http.Request) {
-		slog.Info("got here", "path", r.URL.Path)
 		r.URL.Path = strings.Replace(r.URL.Path, "/twirp/within.website.x.mi.Events/", "/twirp/within.website.x.mi.v1.Events/", -1)
-		slog.Info("got here", "path", r.URL.Path)
 		pb.NewEventsServer(es).ServeHTTP(w, r)
 	})
 
