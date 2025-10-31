@@ -54,6 +54,7 @@ require (
 	github.com/ncruces/go-sqlite3 v0.16.0
 	github.com/ncruces/go-sqlite3/gormlite v0.16.0
 	github.com/nicklaw5/helix/v2 v2.31.0
+	github.com/openai/openai-go/v2 v2.7.1
 	github.com/orandin/slog-gorm v1.4.0
 	github.com/otiai10/copy v1.14.1
 	github.com/pires/go-proxyproto v0.7.0
@@ -216,6 +217,10 @@ require (
 	github.com/skeema/knownhosts v1.3.1 // indirect
 	github.com/spaolacci/murmur3 v1.1.0 // indirect
 	github.com/spf13/cast v1.7.1 // indirect
+	github.com/tidwall/gjson v1.14.4 // indirect
+	github.com/tidwall/match v1.1.1 // indirect
+	github.com/tidwall/pretty v1.2.1 // indirect
+	github.com/tidwall/sjson v1.2.5 // indirect
 	github.com/turnage/redditproto v0.0.0-20151223012412-afedf1b6eddb // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ulikunitz/xz v0.5.14 // indirect
