@@ -87,8 +87,6 @@ When committing, wrap the message in double quotes, sign‑off as:
 Signed-off-by: Mimi Yasomi <mimi@xeserv.us>
 ```
 
-Write the commit to a temporary file first, using `printf` (fish shell).
-
 ### Additional Guidelines
 
 - Keep descriptions concise, imperative, lowercase, and without a trailing period.
