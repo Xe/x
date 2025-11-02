@@ -74,7 +74,7 @@ func New(st miv1.SwitchTracker) http.Handler {
 	}, nil)
 
 	mcp.AddTool(srv, &mcp.Tool{
-		Name:        "switch",
+		Name:        "switch-front",
 		Description: "Record a switch in the database",
 	}, s.switchFront)
 
