@@ -6,12 +6,11 @@ import "google/protobuf/empty.proto";
 import "within/website/x/external/jsonfeed/v1/jsonfeed.proto";
 
 message StatusUpdate {
-  string body = 1 [ (buf.validate.field).required = true ];
+  string body = 1 [(buf.validate.field).required = true];
 }
 
 service Announce {
-  rpc Announce(within.website.x.external.jsonfeed.v1.Item)
-      returns (google.protobuf.Empty) {}
+  rpc Announce(within.website.x.external.jsonfeed.v1.Item) returns (google.protobuf.Empty) {}
 }
 
 service Post {

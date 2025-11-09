@@ -1,10 +1,13 @@
 syntax = "proto3";
 package within.website.x.mimi.statuspage;
-option go_package = "within.website/x/proto/mimi/statuspage";
 
 import "google/protobuf/empty.proto";
 
-service Update { rpc Poke(StatusUpdate) returns (google.protobuf.Empty); }
+option go_package = "within.website/x/proto/mimi/statuspage";
+
+service Update {
+  rpc Poke(StatusUpdate) returns (google.protobuf.Empty);
+}
 
 message Meta {
   string unsubscribe = 1;

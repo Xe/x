@@ -25,4 +25,6 @@ message Variant {
   string mime_type = 2;
 }
 
-message Echo { string nonce = 1; }
+message Echo {
+  string nonce = 1;
+}

@@ -9,7 +9,9 @@ message Show {
   string quality = 3;
 }
 
-message Shows { repeated Show shows = 1; }
+message Shows {
+  repeated Show shows = 1;
+}
 
 message TVSnatch {
   string category = 1;
@@ -18,7 +20,9 @@ message TVSnatch {
   string torrent_id = 4;
 }
 
-message TVSnatches { repeated TVSnatch snatches = 1; }
+message TVSnatches {
+  repeated TVSnatch snatches = 1;
+}
 
 message AnimeSnatch {
   string fname = 1;
@@ -30,18 +34,20 @@ message AnimeSnatch {
   string pack_id = 7;
 }
 
-message AnimeSnatches { repeated AnimeSnatch snatches = 1; }
+message AnimeSnatches {
+  repeated AnimeSnatch snatches = 1;
+}
 
 service TV {
-  rpc List(google.protobuf.Empty) returns (Shows) {};
-  rpc Track(Show) returns (google.protobuf.Empty) {};
-  rpc Untrack(Show) returns (google.protobuf.Empty) {};
-  rpc Snatches(google.protobuf.Empty) returns (TVSnatches) {};
+  rpc List(google.protobuf.Empty) returns (Shows) {}
+  rpc Track(Show) returns (google.protobuf.Empty) {}
+  rpc Untrack(Show) returns (google.protobuf.Empty) {}
+  rpc Snatches(google.protobuf.Empty) returns (TVSnatches) {}
 }
 
 service Anime {
-  rpc List(google.protobuf.Empty) returns (Shows) {};
-  rpc Track(Show) returns (google.protobuf.Empty) {};
-  rpc Untrack(Show) returns (google.protobuf.Empty) {};
-  rpc Snatches(google.protobuf.Empty) returns (AnimeSnatches) {};
+  rpc List(google.protobuf.Empty) returns (Shows) {}
+  rpc Track(Show) returns (google.protobuf.Empty) {}
+  rpc Untrack(Show) returns (google.protobuf.Empty) {}
+  rpc Snatches(google.protobuf.Empty) returns (AnimeSnatches) {}
 }
