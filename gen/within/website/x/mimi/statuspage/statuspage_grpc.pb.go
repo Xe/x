@@ -2,9 +2,9 @@
 // versions:
 // - protoc-gen-go-grpc v1.5.1
 // - protoc             (unknown)
-// source: within/website/x/mimi/statuspage/v1/statuspage.proto
+// source: within/website/x/mimi/statuspage/statuspage.proto
 
-package v1
+package statuspage
 
 import (
 	context "context"
@@ -119,5 +119,5 @@ var Update_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "within/website/x/mimi/statuspage/v1/statuspage.proto",
+	Metadata: "within/website/x/mimi/statuspage/statuspage.proto",
 }

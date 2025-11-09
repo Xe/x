@@ -13,8 +13,6 @@ import (
 
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	_ "google.golang.org/protobuf/types/known/durationpb"
-	_ "google.golang.org/protobuf/types/known/timestamppb"
 )
 
 const (
@@ -232,7 +230,7 @@ var File_within_website_x_mimi_scheduling_v1_scheduling_proto protoreflect.FileD
 
 const file_within_website_x_mimi_scheduling_v1_scheduling_proto_rawDesc = "" +
 	"\n" +
-	"4within/website/x/mimi/scheduling/v1/scheduling.proto\x12#within.website.x.mimi.scheduling.v1\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"R\n" +
+	"4within/website/x/mimi/scheduling/v1/scheduling.proto\x12#within.website.x.mimi.scheduling.v1\"R\n" +
 	"\x12ConversationMember\x12\x12\n" +
 	"\x04role\x18\x01 \x01(\tR\x04role\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x14\n" +

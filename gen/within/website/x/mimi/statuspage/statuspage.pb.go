@@ -2,9 +2,9 @@
 // versions:
 // 	protoc-gen-go v1.36.10
 // 	protoc        (unknown)
-// source: within/website/x/mimi/statuspage/v1/statuspage.proto
+// source: within/website/x/mimi/statuspage/statuspage.proto
 
-package v1
+package statuspage
 
 import (
 	reflect "reflect"
@@ -33,7 +33,7 @@ type Meta struct {
 
 func (x *Meta) Reset() {
 	*x = Meta{}
-	mi := &file_within_website_x_mimi_statuspage_v1_statuspage_proto_msgTypes[0]
+	mi := &file_within_website_x_mimi_statuspage_statuspage_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -45,7 +45,7 @@ func (x *Meta) String() string {
 func (*Meta) ProtoMessage() {}
 
 func (x *Meta) ProtoReflect() protoreflect.Message {
-	mi := &file_within_website_x_mimi_statuspage_v1_statuspage_proto_msgTypes[0]
+	mi := &file_within_website_x_mimi_statuspage_statuspage_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -58,7 +58,7 @@ func (x *Meta) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Meta.ProtoReflect.Descriptor instead.
 func (*Meta) Descriptor() ([]byte, []int) {
-	return file_within_website_x_mimi_statuspage_v1_statuspage_proto_rawDescGZIP(), []int{0}
+	return file_within_website_x_mimi_statuspage_statuspage_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *Meta) GetUnsubscribe() string {
@@ -86,7 +86,7 @@ type Page struct {
 
 func (x *Page) Reset() {
 	*x = Page{}
-	mi := &file_within_website_x_mimi_statuspage_v1_statuspage_proto_msgTypes[1]
+	mi := &file_within_website_x_mimi_statuspage_statuspage_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -98,7 +98,7 @@ func (x *Page) String() string {
 func (*Page) ProtoMessage() {}
 
 func (x *Page) ProtoReflect() protoreflect.Message {
-	mi := &file_within_website_x_mimi_statuspage_v1_statuspage_proto_msgTypes[1]
+	mi := &file_within_website_x_mimi_statuspage_statuspage_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -111,7 +111,7 @@ func (x *Page) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Page.ProtoReflect.Descriptor instead.
 func (*Page) Descriptor() ([]byte, []int) {
-	return file_within_website_x_mimi_statuspage_v1_statuspage_proto_rawDescGZIP(), []int{1}
+	return file_within_website_x_mimi_statuspage_statuspage_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *Page) GetId() string {
@@ -148,7 +148,7 @@ type ComponentUpdate struct {
 
 func (x *ComponentUpdate) Reset() {
 	*x = ComponentUpdate{}
-	mi := &file_within_website_x_mimi_statuspage_v1_statuspage_proto_msgTypes[2]
+	mi := &file_within_website_x_mimi_statuspage_statuspage_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -160,7 +160,7 @@ func (x *ComponentUpdate) String() string {
 func (*ComponentUpdate) ProtoMessage() {}
 
 func (x *ComponentUpdate) ProtoReflect() protoreflect.Message {
-	mi := &file_within_website_x_mimi_statuspage_v1_statuspage_proto_msgTypes[2]
+	mi := &file_within_website_x_mimi_statuspage_statuspage_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -173,7 +173,7 @@ func (x *ComponentUpdate) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ComponentUpdate.ProtoReflect.Descriptor instead.
 func (*ComponentUpdate) Descriptor() ([]byte, []int) {
-	return file_within_website_x_mimi_statuspage_v1_statuspage_proto_rawDescGZIP(), []int{2}
+	return file_within_website_x_mimi_statuspage_statuspage_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *ComponentUpdate) GetCreatedAt() string {
@@ -223,7 +223,7 @@ type Component struct {
 
 func (x *Component) Reset() {
 	*x = Component{}
-	mi := &file_within_website_x_mimi_statuspage_v1_statuspage_proto_msgTypes[3]
+	mi := &file_within_website_x_mimi_statuspage_statuspage_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -235,7 +235,7 @@ func (x *Component) String() string {
 func (*Component) ProtoMessage() {}
 
 func (x *Component) ProtoReflect() protoreflect.Message {
-	mi := &file_within_website_x_mimi_statuspage_v1_statuspage_proto_msgTypes[3]
+	mi := &file_within_website_x_mimi_statuspage_statuspage_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -248,7 +248,7 @@ func (x *Component) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Component.ProtoReflect.Descriptor instead.
 func (*Component) Descriptor() ([]byte, []int) {
-	return file_within_website_x_mimi_statuspage_v1_statuspage_proto_rawDescGZIP(), []int{3}
+	return file_within_website_x_mimi_statuspage_statuspage_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *Component) GetCreatedAt() string {
@@ -296,7 +296,7 @@ type IncidentUpdate struct {
 
 func (x *IncidentUpdate) Reset() {
 	*x = IncidentUpdate{}
-	mi := &file_within_website_x_mimi_statuspage_v1_statuspage_proto_msgTypes[4]
+	mi := &file_within_website_x_mimi_statuspage_statuspage_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -308,7 +308,7 @@ func (x *IncidentUpdate) String() string {
 func (*IncidentUpdate) ProtoMessage() {}
 
 func (x *IncidentUpdate) ProtoReflect() protoreflect.Message {
-	mi := &file_within_website_x_mimi_statuspage_v1_statuspage_proto_msgTypes[4]
+	mi := &file_within_website_x_mimi_statuspage_statuspage_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -321,7 +321,7 @@ func (x *IncidentUpdate) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use IncidentUpdate.ProtoReflect.Descriptor instead.
 func (*IncidentUpdate) Descriptor() ([]byte, []int) {
-	return file_within_website_x_mimi_statuspage_v1_statuspage_proto_rawDescGZIP(), []int{4}
+	return file_within_website_x_mimi_statuspage_statuspage_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *IncidentUpdate) GetBody() string {
@@ -419,7 +419,7 @@ type Incident struct {
 
 func (x *Incident) Reset() {
 	*x = Incident{}
-	mi := &file_within_website_x_mimi_statuspage_v1_statuspage_proto_msgTypes[5]
+	mi := &file_within_website_x_mimi_statuspage_statuspage_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -431,7 +431,7 @@ func (x *Incident) String() string {
 func (*Incident) ProtoMessage() {}
 
 func (x *Incident) ProtoReflect() protoreflect.Message {
-	mi := &file_within_website_x_mimi_statuspage_v1_statuspage_proto_msgTypes[5]
+	mi := &file_within_website_x_mimi_statuspage_statuspage_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -444,7 +444,7 @@ func (x *Incident) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Incident.ProtoReflect.Descriptor instead.
 func (*Incident) Descriptor() ([]byte, []int) {
-	return file_within_website_x_mimi_statuspage_v1_statuspage_proto_rawDescGZIP(), []int{5}
+	return file_within_website_x_mimi_statuspage_statuspage_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *Incident) GetBackfilled() bool {
@@ -628,7 +628,7 @@ type StatusUpdate struct {
 
 func (x *StatusUpdate) Reset() {
 	*x = StatusUpdate{}
-	mi := &file_within_website_x_mimi_statuspage_v1_statuspage_proto_msgTypes[6]
+	mi := &file_within_website_x_mimi_statuspage_statuspage_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -640,7 +640,7 @@ func (x *StatusUpdate) String() string {
 func (*StatusUpdate) ProtoMessage() {}
 
 func (x *StatusUpdate) ProtoReflect() protoreflect.Message {
-	mi := &file_within_website_x_mimi_statuspage_v1_statuspage_proto_msgTypes[6]
+	mi := &file_within_website_x_mimi_statuspage_statuspage_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -653,7 +653,7 @@ func (x *StatusUpdate) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StatusUpdate.ProtoReflect.Descriptor instead.
 func (*StatusUpdate) Descriptor() ([]byte, []int) {
-	return file_within_website_x_mimi_statuspage_v1_statuspage_proto_rawDescGZIP(), []int{6}
+	return file_within_website_x_mimi_statuspage_statuspage_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *StatusUpdate) GetMeta() *Meta {
@@ -691,11 +691,11 @@ func (x *StatusUpdate) GetComponentUpdate() *ComponentUpdate {
 	return nil
 }
 
-var File_within_website_x_mimi_statuspage_v1_statuspage_proto protoreflect.FileDescriptor
+var File_within_website_x_mimi_statuspage_statuspage_proto protoreflect.FileDescriptor
 
-const file_within_website_x_mimi_statuspage_v1_statuspage_proto_rawDesc = "" +
+const file_within_website_x_mimi_statuspage_statuspage_proto_rawDesc = "" +
 	"\n" +
-	"4within/website/x/mimi/statuspage/v1/statuspage.proto\x12 within.website.x.mimi.statuspage\x1a\x1bgoogle/protobuf/empty.proto\"N\n" +
+	"1within/website/x/mimi/statuspage/statuspage.proto\x12 within.website.x.mimi.statuspage\x1a\x1bgoogle/protobuf/empty.proto\"N\n" +
 	"\x04Meta\x12 \n" +
 	"\vunsubscribe\x18\x01 \x01(\tR\vunsubscribe\x12$\n" +
 	"\rdocumentation\x18\x02 \x01(\tR\rdocumentation\"p\n" +
@@ -770,23 +770,23 @@ const file_within_website_x_mimi_statuspage_v1_statuspage_proto_rawDesc = "" +
 	"\tcomponent\x18\x04 \x01(\v2+.within.website.x.mimi.statuspage.ComponentR\tcomponent\x12\\\n" +
 	"\x10component_update\x18\x05 \x01(\v21.within.website.x.mimi.statuspage.ComponentUpdateR\x0fcomponentUpdate2X\n" +
 	"\x06Update\x12N\n" +
-	"\x04Poke\x12..within.website.x.mimi.statuspage.StatusUpdate\x1a\x16.google.protobuf.EmptyB\x97\x02\n" +
-	"$com.within.website.x.mimi.statuspageB\x0fStatuspageProtoP\x01Z8within.website/x/gen/within/website/x/mimi/statuspage/v1\xa2\x02\x05WWXMS\xaa\x02 Within.Website.X.Mimi.Statuspage\xca\x02 Within\\Website\\X\\Mimi\\Statuspage\xe2\x02,Within\\Website\\X\\Mimi\\Statuspage\\GPBMetadata\xea\x02$Within::Website::X::Mimi::Statuspageb\x06proto3"
+	"\x04Poke\x12..within.website.x.mimi.statuspage.StatusUpdate\x1a\x16.google.protobuf.EmptyB\x94\x02\n" +
+	"$com.within.website.x.mimi.statuspageB\x0fStatuspageProtoP\x01Z5within.website/x/gen/within/website/x/mimi/statuspage\xa2\x02\x05WWXMS\xaa\x02 Within.Website.X.Mimi.Statuspage\xca\x02 Within\\Website\\X\\Mimi\\Statuspage\xe2\x02,Within\\Website\\X\\Mimi\\Statuspage\\GPBMetadata\xea\x02$Within::Website::X::Mimi::Statuspageb\x06proto3"
 
 var (
-	file_within_website_x_mimi_statuspage_v1_statuspage_proto_rawDescOnce sync.Once
-	file_within_website_x_mimi_statuspage_v1_statuspage_proto_rawDescData []byte
+	file_within_website_x_mimi_statuspage_statuspage_proto_rawDescOnce sync.Once
+	file_within_website_x_mimi_statuspage_statuspage_proto_rawDescData []byte
 )
 
-func file_within_website_x_mimi_statuspage_v1_statuspage_proto_rawDescGZIP() []byte {
-	file_within_website_x_mimi_statuspage_v1_statuspage_proto_rawDescOnce.Do(func() {
-		file_within_website_x_mimi_statuspage_v1_statuspage_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_within_website_x_mimi_statuspage_v1_statuspage_proto_rawDesc), len(file_within_website_x_mimi_statuspage_v1_statuspage_proto_rawDesc)))
+func file_within_website_x_mimi_statuspage_statuspage_proto_rawDescGZIP() []byte {
+	file_within_website_x_mimi_statuspage_statuspage_proto_rawDescOnce.Do(func() {
+		file_within_website_x_mimi_statuspage_statuspage_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_within_website_x_mimi_statuspage_statuspage_proto_rawDesc), len(file_within_website_x_mimi_statuspage_statuspage_proto_rawDesc)))
 	})
-	return file_within_website_x_mimi_statuspage_v1_statuspage_proto_rawDescData
+	return file_within_website_x_mimi_statuspage_statuspage_proto_rawDescData
 }
 
-var file_within_website_x_mimi_statuspage_v1_statuspage_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
-var file_within_website_x_mimi_statuspage_v1_statuspage_proto_goTypes = []any{
+var file_within_website_x_mimi_statuspage_statuspage_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_within_website_x_mimi_statuspage_statuspage_proto_goTypes = []any{
 	(*Meta)(nil),            // 0: within.website.x.mimi.statuspage.Meta
 	(*Page)(nil),            // 1: within.website.x.mimi.statuspage.Page
 	(*ComponentUpdate)(nil), // 2: within.website.x.mimi.statuspage.ComponentUpdate
@@ -796,7 +796,7 @@ var file_within_website_x_mimi_statuspage_v1_statuspage_proto_goTypes = []any{
 	(*StatusUpdate)(nil),    // 6: within.website.x.mimi.statuspage.StatusUpdate
 	(*emptypb.Empty)(nil),   // 7: google.protobuf.Empty
 }
-var file_within_website_x_mimi_statuspage_v1_statuspage_proto_depIdxs = []int32{
+var file_within_website_x_mimi_statuspage_statuspage_proto_depIdxs = []int32{
 	4, // 0: within.website.x.mimi.statuspage.Incident.incident_updates:type_name -> within.website.x.mimi.statuspage.IncidentUpdate
 	0, // 1: within.website.x.mimi.statuspage.StatusUpdate.meta:type_name -> within.website.x.mimi.statuspage.Meta
 	1, // 2: within.website.x.mimi.statuspage.StatusUpdate.page:type_name -> within.website.x.mimi.statuspage.Page
@@ -812,26 +812,26 @@ var file_within_website_x_mimi_statuspage_v1_statuspage_proto_depIdxs = []int32{
 	0, // [0:6] is the sub-list for field type_name
 }
 
-func init() { file_within_website_x_mimi_statuspage_v1_statuspage_proto_init() }
-func file_within_website_x_mimi_statuspage_v1_statuspage_proto_init() {
-	if File_within_website_x_mimi_statuspage_v1_statuspage_proto != nil {
+func init() { file_within_website_x_mimi_statuspage_statuspage_proto_init() }
+func file_within_website_x_mimi_statuspage_statuspage_proto_init() {
+	if File_within_website_x_mimi_statuspage_statuspage_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_within_website_x_mimi_statuspage_v1_statuspage_proto_rawDesc), len(file_within_website_x_mimi_statuspage_v1_statuspage_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_within_website_x_mimi_statuspage_statuspage_proto_rawDesc), len(file_within_website_x_mimi_statuspage_statuspage_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   7,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_within_website_x_mimi_statuspage_v1_statuspage_proto_goTypes,
-		DependencyIndexes: file_within_website_x_mimi_statuspage_v1_statuspage_proto_depIdxs,
-		MessageInfos:      file_within_website_x_mimi_statuspage_v1_statuspage_proto_msgTypes,
+		GoTypes:           file_within_website_x_mimi_statuspage_statuspage_proto_goTypes,
+		DependencyIndexes: file_within_website_x_mimi_statuspage_statuspage_proto_depIdxs,
+		MessageInfos:      file_within_website_x_mimi_statuspage_statuspage_proto_msgTypes,
 	}.Build()
-	File_within_website_x_mimi_statuspage_v1_statuspage_proto = out.File
-	file_within_website_x_mimi_statuspage_v1_statuspage_proto_goTypes = nil
-	file_within_website_x_mimi_statuspage_v1_statuspage_proto_depIdxs = nil
+	File_within_website_x_mimi_statuspage_statuspage_proto = out.File
+	file_within_website_x_mimi_statuspage_statuspage_proto_goTypes = nil
+	file_within_website_x_mimi_statuspage_statuspage_proto_depIdxs = nil
 }
