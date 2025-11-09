@@ -7,7 +7,7 @@
     "doc": "docs"
   },
   "scripts": {
-    "format": "go tool goimports -w . && npx prettier -w . && buf format -w",
+    "format": "go tool goimports -w . && npx prettier -w . 2>&1 >/dev/null && buf format -w",
     "generate": "npm run generate:buf && npm run generate:go && npm run format",
     "generate:buf": "buf generate && npm run generate:buf:falin",
     "generate:buf:falin": "cd migroserbices/falin && npm ci && npm run generate",
@@ -75,7 +75,8 @@
     "tabWidth": 2,
     "semi": true,
     "trailingComma": "all",
-    "printWidth": 80
+    "printWidth": 80,
+    "ignorePath": ".prettierignore"
   },
   "release": {
     "branches": [

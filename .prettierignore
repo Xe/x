@@ -4,3 +4,6 @@
 cmd/hdrwtch/static/css/styles.css
 
 cmd/_old/**.*.json
+
+# terraform files
+.terraform/
