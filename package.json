@@ -7,7 +7,7 @@
     "doc": "docs"
   },
   "scripts": {
-    "format": "go tool goimports -w . && npx prettier -w .",
+    "format": "go tool goimports -w . && npx prettier -w . && buf format -w",
     "generate": "npm run generate:buf && npm run generate:go && npm run format",
     "generate:buf": "buf generate && npm run generate:buf:falin",
     "generate:buf:falin": "cd migroserbices/falin && npm ci && npm run generate",

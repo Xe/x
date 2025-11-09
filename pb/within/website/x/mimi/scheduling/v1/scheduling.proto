@@ -4,7 +4,9 @@ package within.website.x.mimi.scheduling.v1;
 import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
 
-service Scheduling { rpc ParseEmail(ParseReq) returns (ParseResp); }
+service Scheduling {
+  rpc ParseEmail(ParseReq) returns (ParseResp);
+}
 
 message ConversationMember {
   string role = 1;

@@ -4,11 +4,13 @@ package within.website.x.patchouli.v1;
 import "google/protobuf/timestamp.proto";
 
 service Syndicate {
-  rpc Info(TwitchInfoReq) returns (TwitchInfoResp) {};
-  rpc Download(TwitchDownloadReq) returns (TwitchDownloadResp) {};
+  rpc Info(TwitchInfoReq) returns (TwitchInfoResp) {}
+  rpc Download(TwitchDownloadReq) returns (TwitchDownloadResp) {}
 }
 
-message TwitchInfoReq { string url = 1; }
+message TwitchInfoReq {
+  string url = 1;
+}
 
 message TwitchInfoResp {
   string id = 1;
@@ -19,7 +21,9 @@ message TwitchInfoResp {
   string url = 6;
 }
 
-message TwitchDownloadReq { string url = 1; }
+message TwitchDownloadReq {
+  string url = 1;
+}
 
 message TwitchDownloadResp {
   string url = 1;
