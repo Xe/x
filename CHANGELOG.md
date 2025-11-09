@@ -1,3 +1,9 @@
+# [1.26.0](https://github.com/Xe/x/compare/v1.25.0...v1.26.0) (2025-11-09)
+
+### Features
+
+- add list-system-members MCP tool ([#781](https://github.com/Xe/x/issues/781)) ([3d14b73](https://github.com/Xe/x/commit/3d14b73136855e4444549f6cce866547625fd62e))
+
 # [1.25.0](https://github.com/Xe/x/compare/v1.24.0...v1.25.0) (2025-10-30)
 
 ### Bug Fixes
