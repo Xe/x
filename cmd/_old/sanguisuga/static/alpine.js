@@ -7,7 +7,7 @@
     bn(e);
   }
   function bn(e) {
-    V.includes(e) || V.push(e), wn();
+    (V.includes(e) || V.push(e), wn());
   }
   function we(e) {
     let t = V.indexOf(e);
@@ -17,9 +17,9 @@
     !Qe && !Ze && ((Ze = !0), queueMicrotask(En));
   }
   function En() {
-    (Ze = !1), (Qe = !0);
-    for (let e = 0; e < V.length; e++) V[e](), (et = e);
-    (V.length = 0), (et = -1), (Qe = !1);
+    ((Ze = !1), (Qe = !0));
+    for (let e = 0; e < V.length; e++) (V[e](), (et = e));
+    ((V.length = 0), (et = -1), (Qe = !1));
   }
   var T,
     D,
@@ -27,10 +27,10 @@
     rt,
     tt = !0;
   function zt(e) {
-    (tt = !1), e(), (tt = !0);
+    ((tt = !1), e(), (tt = !0));
   }
   function Ht(e) {
-    (T = e.reactive),
+    ((T = e.reactive),
       (L = e.release),
       (D = (t) =>
         e.effect(t, {
@@ -38,7 +38,7 @@
             tt ? Kt(r) : r();
           },
         })),
-      (rt = e.raw);
+      (rt = e.raw));
   }
   function nt(e) {
     D = e;
@@ -84,14 +84,14 @@
     let r = !1;
     if ((t(e, () => (r = !0)), r)) return;
     let n = e.firstElementChild;
-    for (; n; ) O(n, t, !1), (n = n.nextElementSibling);
+    for (; n; ) (O(n, t, !1), (n = n.nextElementSibling));
   }
   function S(e, ...t) {
     console.warn(`Alpine Warning: ${e}`, ...t);
   }
   var qt = !1;
   function Ut() {
-    qt &&
+    (qt &&
       S(
         "Alpine has already been initialized on this page. Calling Alpine.start() more than once can cause problems.",
       ),
@@ -107,14 +107,14 @@
       Q((t) => ae(t)),
       Se((t, r) => {
         le(t, r).forEach((n) => n());
-      });
+      }));
     let e = (t) => !U(t.parentElement, !0);
-    Array.from(document.querySelectorAll(Jt()))
+    (Array.from(document.querySelectorAll(Jt()))
       .filter(e)
       .forEach((t) => {
         v(t);
       }),
-      q(document, "alpine:initialized");
+      q(document, "alpine:initialized"));
   }
   var it = [],
     Wt = [];
@@ -152,16 +152,16 @@
   function v(e, t = O, r = () => {}) {
     tr(() => {
       t(e, (n, i) => {
-        r(n, i),
+        (r(n, i),
           Xt.forEach((o) => o(n, i)),
           le(n, n.attributes).forEach((o) => o()),
-          n._x_ignore && i();
+          n._x_ignore && i());
       });
     });
   }
   function ae(e) {
     O(e, (t) => {
-      ot(t), er(t);
+      (ot(t), er(t));
     });
   }
   var rr = [],
@@ -179,9 +179,9 @@
     rr.push(e);
   }
   function Oe(e, t, r) {
-    e._x_attributeCleanups || (e._x_attributeCleanups = {}),
+    (e._x_attributeCleanups || (e._x_attributeCleanups = {}),
       e._x_attributeCleanups[t] || (e._x_attributeCleanups[t] = []),
-      e._x_attributeCleanups[t].push(r);
+      e._x_attributeCleanups[t].push(r));
   }
   function ot(e, t) {
     e._x_attributeCleanups &&
@@ -196,36 +196,36 @@
   var at = new MutationObserver(ft),
     ct = !1;
   function ce() {
-    at.observe(document, {
+    (at.observe(document, {
       subtree: !0,
       childList: !0,
       attributes: !0,
       attributeOldValue: !0,
     }),
-      (ct = !0);
+      (ct = !0));
   }
   function lt() {
-    vn(), at.disconnect(), (ct = !1);
+    (vn(), at.disconnect(), (ct = !1));
   }
   var ue = [],
     st = !1;
   function vn() {
-    (ue = ue.concat(at.takeRecords())),
+    ((ue = ue.concat(at.takeRecords())),
       ue.length &&
         !st &&
         ((st = !0),
         queueMicrotask(() => {
-          Sn(), (st = !1);
-        }));
+          (Sn(), (st = !1));
+        })));
   }
   function Sn() {
-    ft(ue), (ue.length = 0);
+    (ft(ue), (ue.length = 0));
   }
   function h(e) {
     if (!ct) return e();
     lt();
     let t = e();
-    return ce(), t;
+    return (ce(), t);
   }
   var ut = !1,
     Ae = [];
@@ -233,7 +233,7 @@
     ut = !0;
   }
   function sr() {
-    (ut = !1), ft(Ae), (Ae = []);
+    ((ut = !1), ft(Ae), (Ae = []));
   }
   function ft(e) {
     if (ut) {
@@ -256,11 +256,11 @@
           a = e[o].attributeName,
           c = e[o].oldValue,
           l = () => {
-            n.has(s) || n.set(s, []),
-              n.get(s).push({ name: a, value: s.getAttribute(a) });
+            (n.has(s) || n.set(s, []),
+              n.get(s).push({ name: a, value: s.getAttribute(a) }));
           },
           u = () => {
-            i.has(s) || i.set(s, []), i.get(s).push(a);
+            (i.has(s) || i.set(s, []), i.get(s).push(a));
           };
         s.hasAttribute(a) && c === null
           ? l()
@@ -268,15 +268,15 @@
             ? (u(), l())
             : u();
       }
-    i.forEach((o, s) => {
+    (i.forEach((o, s) => {
       ot(s, o);
     }),
       n.forEach((o, s) => {
         rr.forEach((a) => a(s, o));
-      });
+      }));
     for (let o of r) t.includes(o) || (nr.forEach((s) => s(o)), ae(o));
     t.forEach((o) => {
-      (o._x_ignoreSelf = !0), (o._x_ignore = !0);
+      ((o._x_ignoreSelf = !0), (o._x_ignore = !0));
     });
     for (let o of t)
       r.includes(o) ||
@@ -286,13 +286,13 @@
           ir.forEach((s) => s(o)),
           (o._x_ignore = !0),
           (o._x_ignoreSelf = !0)));
-    t.forEach((o) => {
-      delete o._x_ignoreSelf, delete o._x_ignore;
+    (t.forEach((o) => {
+      (delete o._x_ignoreSelf, delete o._x_ignore);
     }),
       (t = null),
       (r = null),
       (n = null),
-      (i = null);
+      (i = null));
   }
   function Ce(e) {
     return F($(e));
@@ -333,11 +333,11 @@
                 let s = o.get,
                   a = o.set,
                   c = o;
-                (s = s && s.bind(t)),
+                ((s = s && s.bind(t)),
                   (a = a && a.bind(t)),
                   s && (s._x_alreadyBound = !0),
                   a && (a._x_alreadyBound = !0),
-                  Object.defineProperty(i, n, { ...c, get: s, set: a });
+                  Object.defineProperty(i, n, { ...c, get: s, set: a }));
               }
               return !0;
             }
@@ -345,7 +345,7 @@
           }) || {})[n],
         set: (r, n, i) => {
           let o = e.find((s) => s.hasOwnProperty(n));
-          return o ? (o[n] = i) : (e[e.length - 1][n] = i), !0;
+          return (o ? (o[n] = i) : (e[e.length - 1][n] = i), !0);
         },
       },
     );
@@ -387,7 +387,7 @@
           let i = r.initialize.bind(r);
           r.initialize = (o, s, a) => {
             let c = n.initialize(o, s, a);
-            return (r.initialValue = c), i(o, s, a);
+            return ((r.initialValue = c), i(o, s, a));
           };
         } else r.initialValue = n;
         return r;
@@ -402,7 +402,7 @@
       e[t[0]] = r;
     else {
       if (t.length === 0) throw error;
-      return e[t[0]] || (e[t[0]] = {}), dt(e[t[0]], t.slice(1), r);
+      return (e[t[0]] || (e[t[0]] = {}), dt(e[t[0]], t.slice(1), r));
     }
   }
   var ar = {};
@@ -417,7 +417,7 @@
           if (i) return i;
           {
             let [s, a] = pt(t);
-            return (i = { interceptor: Re, ...s }), Q(t, a), i;
+            return ((i = { interceptor: Re, ...s }), Q(t, a), i);
           }
         }
         Object.defineProperty(e, `$${r}`, {
@@ -438,7 +438,7 @@
     }
   }
   function ee(e, t, r = void 0) {
-    Object.assign(e, { el: t, expression: r }),
+    (Object.assign(e, { el: t, expression: r }),
       console.warn(
         `Alpine Expression Error: ${e.message}
 
@@ -455,18 +455,18 @@ ${
       ),
       setTimeout(() => {
         throw e;
-      }, 0);
+      }, 0));
   }
   var Me = !0;
   function Pe(e) {
     let t = Me;
     Me = !1;
     let r = e();
-    return (Me = t), r;
+    return ((Me = t), r);
   }
   function R(e, t, r = {}) {
     let n;
-    return x(e, t)((i) => (n = i), r), n;
+    return (x(e, t)((i) => (n = i), r), n);
   }
   function x(...e) {
     return lr(...e);
@@ -503,15 +503,15 @@ ${
             `with (scope) { __self.result = ${n} }; __self.finished = true; return __self.result;`,
           );
         } catch (s) {
-          return ee(s, t, e), Promise.resolve();
+          return (ee(s, t, e), Promise.resolve());
         }
       })();
-    return (mt[e] = o), o;
+    return ((mt[e] = o), o);
   }
   function Tn(e, t, r) {
     let n = Cn(t, r);
     return (i = () => {}, { scope: o = {}, params: s = [] } = {}) => {
-      (n.result = void 0), (n.finished = !1);
+      ((n.result = void 0), (n.finished = !1));
       let a = F([o, ...e]);
       if (typeof n == "function") {
         let c = n(n, a).catch((l) => ee(l, r, t));
@@ -567,12 +567,12 @@ ${
           value: c,
         })),
         s = bt(o);
-      (o = o.map((a) =>
+      ((o = o.map((a) =>
         s.find((c) => c.name === a.name)
           ? { name: `x-bind:${a.name}`, value: `"${a.value}"` }
           : a,
       )),
-        (t = t.concat(o));
+        (t = t.concat(o)));
     }
     let n = {};
     return t
@@ -593,15 +593,15 @@ ${
   function tr(e) {
     gt = !0;
     let t = Symbol();
-    (dr = t), de.set(t, []);
+    ((dr = t), de.set(t, []));
     let r = () => {
         for (; de.get(t).length; ) de.get(t).shift()();
         de.delete(t);
       },
       n = () => {
-        (gt = !1), r();
+        ((gt = !1), r());
       };
-    e(r), n();
+    (e(r), n());
   }
   function pt(e) {
     let t = [],
@@ -633,12 +633,13 @@ ${
         (n = n.bind(n, e, t, i)),
         gt ? de.get(dr).push(n) : n());
     };
-    return (s.runCleanups = o), s;
+    return ((s.runCleanups = o), s);
   }
   var De =
       (e, t) =>
       ({ name: r, value: n }) => (
-        r.startsWith(e) && (r = r.replace(e, t)), { name: r, value: n }
+        r.startsWith(e) && (r = r.replace(e, t)),
+        { name: r, value: n }
       ),
     Ie = (e) => e;
   function pr(e = () => {}) {
@@ -647,7 +648,7 @@ ${
         name: t,
         value: r,
       });
-      return n !== t && e(n, t), { name: n, value: i };
+      return (n !== t && e(n, t), { name: n, value: i });
     };
   }
   var mr = [];
@@ -707,7 +708,7 @@ ${
       }),
       new Promise((t) => {
         wt.push(() => {
-          e(), t();
+          (e(), t());
         });
       })
     );
@@ -740,7 +741,7 @@ ${
           e.classList.remove(...o);
         }
       );
-    return (t = t === !0 ? (t = "") : t || ""), i(n(t));
+    return ((t = t === !0 ? (t = "") : t || ""), i(n(t)));
   }
   function Pn(e, t) {
     let r = (a) => a.split(" ").filter(Boolean),
@@ -760,8 +761,8 @@ ${
         e.classList.contains(a) || (e.classList.add(a), o.push(a));
       }),
       () => {
-        s.forEach((a) => e.classList.add(a)),
-          o.forEach((a) => e.classList.remove(a));
+        (s.forEach((a) => e.classList.add(a)),
+          o.forEach((a) => e.classList.remove(a)));
       }
     );
   }
@@ -772,9 +773,9 @@ ${
     let r = {};
     return (
       Object.entries(t).forEach(([n, i]) => {
-        (r[n] = e.style[n]),
+        ((r[n] = e.style[n]),
           n.startsWith("--") || (n = kn(n)),
-          e.style.setProperty(n, i);
+          e.style.setProperty(n, i));
       }),
       setTimeout(() => {
         e.style.length === 0 && e.removeAttribute("style");
@@ -805,12 +806,12 @@ ${
   p(
     "transition",
     (e, { value: t, modifiers: r, expression: n }, { evaluate: i }) => {
-      typeof n == "function" && (n = i(n)),
-        n !== !1 && (!n || typeof n == "boolean" ? $n(e, r, t) : Ln(e, n, t));
+      (typeof n == "function" && (n = i(n)),
+        n !== !1 && (!n || typeof n == "boolean" ? $n(e, r, t) : Ln(e, n, t)));
     },
   );
   function Ln(e, t, r) {
-    yr(e, pe, ""),
+    (yr(e, pe, ""),
       {
         enter: (i) => {
           e._x_transition.enter.during = i;
@@ -830,15 +831,17 @@ ${
         "leave-end": (i) => {
           e._x_transition.leave.end = i;
         },
-      }[r](t);
+      }[r](t));
   }
   function $n(e, t, r) {
     yr(e, G);
     let n = !t.includes("in") && !t.includes("out") && !r,
       i = n || t.includes("in") || ["enter"].includes(r),
       o = n || t.includes("out") || ["leave"].includes(r);
-    t.includes("in") && !n && (t = t.filter((g, b) => b < t.indexOf("out"))),
-      t.includes("out") && !n && (t = t.filter((g, b) => b > t.indexOf("out")));
+    (t.includes("in") && !n && (t = t.filter((g, b) => b < t.indexOf("out"))),
+      t.includes("out") &&
+        !n &&
+        (t = t.filter((g, b) => b > t.indexOf("out"))));
     let s = !t.includes("opacity") && !t.includes("scale"),
       a = s || t.includes("opacity"),
       c = s || t.includes("scale"),
@@ -850,7 +853,7 @@ ${
       k = he(t, "duration", 150) / 1e3,
       be = he(t, "duration", 75) / 1e3,
       f = "cubic-bezier(0.4, 0.0, 0.2, 1)";
-    i &&
+    (i &&
       ((e._x_transition.enter.during = {
         transformOrigin: m,
         transitionDelay: `${d}s`,
@@ -869,7 +872,10 @@ ${
           transitionTimingFunction: f,
         }),
         (e._x_transition.leave.start = { opacity: 1, transform: "scale(1)" }),
-        (e._x_transition.leave.end = { opacity: l, transform: `scale(${u})` }));
+        (e._x_transition.leave.end = {
+          opacity: l,
+          transform: `scale(${u})`,
+        })));
   }
   function yr(e, t, r = {}) {
     e._x_transition ||
@@ -928,15 +934,15 @@ ${
           : o();
       return;
     }
-    (e._x_hidePromise = e._x_transition
+    ((e._x_hidePromise = e._x_transition
       ? new Promise((s, a) => {
-          e._x_transition.out(
+          (e._x_transition.out(
             () => {},
             () => s(n),
           ),
             e._x_transitioning.beforeCancel(() =>
               a({ isFromCancelledTransition: !0 }),
-            );
+            ));
         })
       : Promise.resolve(n)),
       queueMicrotask(() => {
@@ -950,13 +956,13 @@ ${
                   c._x_hidePromise,
                   ...(c._x_hideChildren || []).map(a),
                 ]).then(([u]) => u());
-                return delete c._x_hidePromise, delete c._x_hideChildren, l;
+                return (delete c._x_hidePromise, delete c._x_hideChildren, l);
               };
               a(e).catch((c) => {
                 if (!c.isFromCancelledTransition) throw c;
               });
             });
-      });
+      }));
   };
   function br(e) {
     let t = e.parentNode;
@@ -975,7 +981,7 @@ ${
         Object.keys(n).length === 0 &&
         Object.keys(i).length === 0)
     ) {
-      o(), s();
+      (o(), s());
       return;
     }
     let a, c, l;
@@ -988,11 +994,11 @@ ${
       },
       before: o,
       end() {
-        a(), (l = t(e, i));
+        (a(), (l = t(e, i)));
       },
       after: s,
       cleanup() {
-        c(), l();
+        (c(), l());
       },
     });
   }
@@ -1002,15 +1008,15 @@ ${
       i,
       o = me(() => {
         h(() => {
-          (r = !0),
+          ((r = !0),
             n || t.before(),
             i || (t.end(), ke()),
             t.after(),
             e.isConnected && t.cleanup(),
-            delete e._x_transitioning;
+            delete e._x_transitioning);
         });
       });
-    (e._x_transitioning = {
+    ((e._x_transitioning = {
       beforeCancels: [],
       beforeCancel(s) {
         this.beforeCancels.push(s);
@@ -1022,7 +1028,7 @@ ${
       finish: o,
     }),
       h(() => {
-        t.start(), t.during();
+        (t.start(), t.during());
       }),
       gr(),
       requestAnimationFrame(() => {
@@ -1039,7 +1045,7 @@ ${
                 .transitionDelay.replace(/,.*/, "")
                 .replace("s", ""),
             ) * 1e3;
-        s === 0 &&
+        (s === 0 &&
           (s =
             Number(getComputedStyle(e).animationDuration.replace("s", "")) *
             1e3),
@@ -1055,8 +1061,8 @@ ${
               ke(),
               setTimeout(e._x_transitioning.finish, s + a),
               (i = !0));
-          });
-      });
+          }));
+      }));
   }
   function he(e, t, r) {
     if (e.indexOf(t) === -1) return r;
@@ -1079,7 +1085,7 @@ ${
     return (...t) => I && e(...t);
   }
   function Er(e, t) {
-    e._x_dataStack &&
+    (e._x_dataStack &&
       ((t._x_dataStack = e._x_dataStack),
       t.setAttribute("data-has-alpine-state", !0)),
       (I = !0),
@@ -1088,36 +1094,36 @@ ${
           n(r, () => {});
         });
       }),
-      (I = !1);
+      (I = !1));
   }
   var vt = !1;
   function vr(e, t) {
-    t._x_dataStack || (t._x_dataStack = e._x_dataStack),
+    (t._x_dataStack || (t._x_dataStack = e._x_dataStack),
       (I = !0),
       (vt = !0),
       Sr(() => {
         jn(t);
       }),
       (I = !1),
-      (vt = !1);
+      (vt = !1));
   }
   function jn(e) {
     let t = !1;
     v(e, (n, i) => {
       O(n, (o, s) => {
         if (t && Yt(o)) return s();
-        (t = !0), i(o, s);
+        ((t = !0), i(o, s));
       });
     });
   }
   function Sr(e) {
     let t = D;
-    nt((r, n) => {
+    (nt((r, n) => {
       let i = t(r);
-      return L(i), () => {};
+      return (L(i), () => {});
     }),
       e(),
-      nt(t);
+      nt(t));
   }
   function Ar(e) {
     return I ? (vt ? !0 : e.hasAttribute("data-has-alpine-state")) : !1;
@@ -1149,8 +1155,8 @@ ${
   }
   function Bn(e, t) {
     if (e.type === "radio")
-      e.attributes.value === void 0 && (e.value = t),
-        window.fromModel && (e.checked = Or(e.value, t));
+      (e.attributes.value === void 0 && (e.value = t),
+        window.fromModel && (e.checked = Or(e.value, t)));
     else if (e.type === "checkbox")
       Number.isInteger(t)
         ? (e.value = t)
@@ -1168,15 +1174,15 @@ ${
     }
   }
   function Kn(e, t) {
-    e._x_undoAddedClasses && e._x_undoAddedClasses(),
-      (e._x_undoAddedClasses = pe(e, t));
+    (e._x_undoAddedClasses && e._x_undoAddedClasses(),
+      (e._x_undoAddedClasses = pe(e, t)));
   }
   function zn(e, t) {
-    e._x_undoAddedStyles && e._x_undoAddedStyles(),
-      (e._x_undoAddedStyles = G(e, t));
+    (e._x_undoAddedStyles && e._x_undoAddedStyles(),
+      (e._x_undoAddedStyles = G(e, t)));
   }
   function Hn(e, t, r) {
-    Cr(e, t, r), qn(e, t, r);
+    (Cr(e, t, r), qn(e, t, r));
   }
   function Cr(e, t, r) {
     [null, void 0, !1].includes(r) && Gn(t)
@@ -1247,7 +1253,7 @@ ${
     if (e._x_bindings && e._x_bindings[t] !== void 0) return e._x_bindings[t];
     if (e._x_inlineBindings && e._x_inlineBindings[t] !== void 0) {
       let i = e._x_inlineBindings[t];
-      return (i.extract = n), Pe(() => R(e, i.expression));
+      return ((i.extract = n), Pe(() => R(e, i.expression)));
     }
     return Nr(e, t, r);
   }
@@ -1269,9 +1275,9 @@ ${
       var n = this,
         i = arguments,
         o = function () {
-          (r = null), e.apply(n, i);
+          ((r = null), e.apply(n, i));
         };
-      clearTimeout(r), (r = setTimeout(o, t));
+      (clearTimeout(r), (r = setTimeout(o, t)));
     };
   }
   function Fe(e, t) {
@@ -1290,7 +1296,7 @@ ${
       c,
       l = D(() => {
         let u, d;
-        i
+        (i
           ? ((u = e()), n(JSON.parse(JSON.stringify(u))), (d = r()), (i = !1))
           : ((u = e()),
             (d = r()),
@@ -1300,7 +1306,7 @@ ${
               ? ((d = r()), n(u), (d = u))
               : (t(JSON.parse(c ?? null)), (u = d))),
           (o = JSON.stringify(u)),
-          (s = JSON.stringify(d));
+          (s = JSON.stringify(d)));
       });
     return () => {
       L(l);
@@ -1313,13 +1319,13 @@ ${
     Dr = !1;
   function Ir(e, t) {
     if ((Dr || ((J = T(J)), (Dr = !0)), t === void 0)) return J[e];
-    (J[e] = t),
+    ((J[e] = t),
       typeof t == "object" &&
         t !== null &&
         t.hasOwnProperty("init") &&
         typeof t.init == "function" &&
         J[e].init(),
-      Te(J[e]);
+      Te(J[e]));
   }
   function kr() {
     return J;
@@ -1353,7 +1359,7 @@ ${
           : s,
       )),
       le(e, i, r).map((s) => {
-        n.push(s.runCleanups), s();
+        (n.push(s.runCleanups), s());
       }),
       () => {
         for (; n.length; ) n.pop()();
@@ -1490,7 +1496,7 @@ ${
   function Jr(e, t = zr) {
     ri(e) && (e = e.raw);
     let r = ii(e, t);
-    return t.lazy || r(), r;
+    return (t.lazy || r(), r);
   }
   function Yr(e) {
     e.active &&
@@ -1503,9 +1509,9 @@ ${
       if (!ye.includes(r)) {
         Xr(r);
         try {
-          return si(), ye.push(r), (P = r), e();
+          return (si(), ye.push(r), (P = r), e());
         } finally {
-          ye.pop(), Zr(), (P = ye[ye.length - 1]);
+          (ye.pop(), Zr(), (P = ye[ye.length - 1]));
         }
       }
     };
@@ -1530,10 +1536,10 @@ ${
   var ie = !0,
     Pt = [];
   function oi() {
-    Pt.push(ie), (ie = !1);
+    (Pt.push(ie), (ie = !1));
   }
   function si() {
-    Pt.push(ie), (ie = !0);
+    (Pt.push(ie), (ie = !0));
   }
   function Zr() {
     let e = Pt.pop();
@@ -1544,12 +1550,12 @@ ${
     let n = Rt.get(e);
     n || Rt.set(e, (n = new Map()));
     let i = n.get(r);
-    i || n.set(r, (i = new Set())),
+    (i || n.set(r, (i = new Set())),
       i.has(P) ||
         (i.add(P),
         P.deps.push(i),
         P.options.onTrack &&
-          P.options.onTrack({ effect: P, target: e, type: t, key: r }));
+          P.options.onTrack({ effect: P, target: e, type: t, key: r })));
   }
   function H(e, t, r, n, i, o) {
     let s = Rt.get(e);
@@ -1581,7 +1587,7 @@ ${
           break;
       }
     let l = (u) => {
-      u.options.onTrigger &&
+      (u.options.onTrigger &&
         u.options.onTrigger({
           effect: u,
           target: e,
@@ -1591,7 +1597,7 @@ ${
           oldValue: i,
           oldTarget: o,
         }),
-        u.options.scheduler ? u.options.scheduler(u) : u();
+        u.options.scheduler ? u.options.scheduler(u) : u());
     };
     a.forEach(l);
   }
@@ -1619,7 +1625,7 @@ ${
         e[t] = function (...r) {
           oi();
           let n = _(this)[t].apply(this, r);
-          return Zr(), n;
+          return (Zr(), n);
         };
       }),
       e
@@ -1652,7 +1658,7 @@ ${
     return function (r, n, i, o) {
       let s = r[n];
       if (!e && ((i = _(i)), (s = _(s)), !K(r) && Nt(s) && !Nt(i)))
-        return (s.value = i), !0;
+        return ((s.value = i), !0);
       let a = K(r) && Ke(n) ? Number(n) < r.length : ge(r, n),
         c = Reflect.set(r, n, i, o);
       return (
@@ -1666,14 +1672,14 @@ ${
     let r = ge(e, t),
       n = e[t],
       i = Reflect.deleteProperty(e, t);
-    return i && r && H(e, "delete", t, void 0, n), i;
+    return (i && r && H(e, "delete", t, void 0, n), i);
   }
   function mi(e, t) {
     let r = Reflect.has(e, t);
-    return (!Be(t) || !Qr.has(t)) && M(e, "has", t), r;
+    return ((!Be(t) || !Qr.has(t)) && M(e, "has", t), r);
   }
   function hi(e) {
-    return M(e, "iterate", K(e) ? "length" : Y), Reflect.ownKeys(e);
+    return (M(e, "iterate", K(e) ? "length" : Y), Reflect.ownKeys(e));
   }
   var _i = { get: ci, set: fi, deleteProperty: pi, has: mi, ownKeys: hi },
     gi = {
@@ -1705,7 +1711,7 @@ ${
     e = e.__v_raw;
     let i = _(e),
       o = _(t);
-    t !== o && !r && M(i, "get", t), !r && M(i, "get", o);
+    (t !== o && !r && M(i, "get", t), !r && M(i, "get", o));
     let { has: s } = Ge(i),
       a = n ? kt : r ? It : Dt;
     if (s.call(i, t)) return a(e.get(t));
@@ -1724,13 +1730,15 @@ ${
   }
   function qe(e, t = !1) {
     return (
-      (e = e.__v_raw), !t && M(_(e), "iterate", Y), Reflect.get(e, "size", e)
+      (e = e.__v_raw),
+      !t && M(_(e), "iterate", Y),
+      Reflect.get(e, "size", e)
     );
   }
   function qr(e) {
     e = _(e);
     let t = _(this);
-    return Ge(t).has.call(t, e) || (t.add(e), H(t, "add", e, e)), this;
+    return (Ge(t).has.call(t, e) || (t.add(e), H(t, "add", e, e)), this);
   }
   function Ur(e, t) {
     t = _(t);
@@ -1752,14 +1760,14 @@ ${
     i ? rn(t, r, e) : ((e = _(e)), (i = r.call(t, e)));
     let o = n ? n.call(t, e) : void 0,
       s = t.delete(e);
-    return i && H(t, "delete", e, void 0, o), s;
+    return (i && H(t, "delete", e, void 0, o), s);
   }
   function Gr() {
     let e = _(this),
       t = e.size !== 0,
       r = ne(e) ? new Map(e) : new Set(e),
       n = e.clear();
-    return t && H(e, "clear", void 0, void 0, r), n;
+    return (t && H(e, "clear", void 0, void 0, r), n);
   }
   function Ue(e, t) {
     return function (n, i) {
@@ -1768,7 +1776,8 @@ ${
         a = _(s),
         c = t ? kt : e ? It : Dt;
       return (
-        !e && M(a, "iterate", Y), s.forEach((l, u) => n.call(i, c(l), c(u), o))
+        !e && M(a, "iterate", Y),
+        s.forEach((l, u) => n.call(i, c(l), c(u), o))
       );
     };
   }
@@ -1872,10 +1881,10 @@ ${
       };
     return (
       ["keys", "values", "entries", Symbol.iterator].forEach((o) => {
-        (e[o] = We(o, !1, !1)),
+        ((e[o] = We(o, !1, !1)),
           (r[o] = We(o, !0, !1)),
           (t[o] = We(o, !1, !0)),
-          (n[o] = We(o, !0, !0));
+          (n[o] = We(o, !0, !0)));
       }),
       [e, r, t, n]
     );
@@ -1932,14 +1941,14 @@ ${
   }
   function an(e, t, r, n, i) {
     if (!xe(e))
-      return console.warn(`value cannot be made reactive: ${String(e)}`), e;
+      return (console.warn(`value cannot be made reactive: ${String(e)}`), e);
     if (e.__v_raw && !(t && e.__v_isReactive)) return e;
     let o = i.get(e);
     if (o) return o;
     let s = Ti(e);
     if (s === 0) return e;
     let a = new Proxy(e, s === 2 ? n : r);
-    return i.set(e, a), a;
+    return (i.set(e, a), a);
   }
   function _(e) {
     return (e && _(e.__v_raw)) || e;
@@ -1955,13 +1964,13 @@ ${
       a,
       c = r(() =>
         o((l) => {
-          JSON.stringify(l),
+          (JSON.stringify(l),
             s
               ? (a = l)
               : queueMicrotask(() => {
-                  i(l, a), (a = l);
+                  (i(l, a), (a = l));
                 }),
-            (s = !1);
+            (s = !1));
         }),
       );
     e._x_effects.delete(c);
@@ -1976,12 +1985,12 @@ ${
   function Ri(e) {
     let t = [],
       r = e;
-    for (; r; ) r._x_refs && t.push(r._x_refs), (r = r.parentNode);
+    for (; r; ) (r._x_refs && t.push(r._x_refs), (r = r.parentNode));
     return t;
   }
   var Lt = {};
   function $t(e) {
-    return Lt[e] || (Lt[e] = 0), ++Lt[e];
+    return (Lt[e] || (Lt[e] = 0), ++Lt[e]);
   }
   function cn(e, t) {
     return Z(e, (r) => {
@@ -1989,7 +1998,7 @@ ${
     });
   }
   function ln(e, t) {
-    e._x_ids || (e._x_ids = {}), e._x_ids[t] || (e._x_ids[t] = $t(t));
+    (e._x_ids || (e._x_ids = {}), e._x_ids[t] || (e._x_ids[t] = $t(t)));
   }
   y("id", (e) => (t, r = null) => {
     let n = cn(e, t),
@@ -2013,12 +2022,12 @@ ${
       let o = n(t),
         s = () => {
           let u;
-          return o((d) => (u = d)), u;
+          return (o((d) => (u = d)), u);
         },
         a = n(`${t} = __placeholder`),
         c = (u) => a(() => {}, { scope: { __placeholder: u } }),
         l = s();
-      c(l),
+      (c(l),
         queueMicrotask(() => {
           if (!e._x_model) return;
           e._x_removeModelListeners.default();
@@ -2043,7 +2052,7 @@ ${
               },
             );
           i(m);
-        });
+        }));
     },
   );
   var Mi = document.createElement("div");
@@ -2056,32 +2065,33 @@ ${
     )();
     i || S(`Cannot find x-teleport element for selector: "${r}"`);
     let o = e.content.cloneNode(!0).firstElementChild;
-    (e._x_teleport = o),
+    ((e._x_teleport = o),
       (o._x_teleportBack = e),
       e._x_forwardEvents &&
         e._x_forwardEvents.forEach((s) => {
           o.addEventListener(s, (a) => {
-            a.stopPropagation(), e.dispatchEvent(new a.constructor(a.type, a));
+            (a.stopPropagation(),
+              e.dispatchEvent(new a.constructor(a.type, a)));
           });
         }),
       N(o, {}, e),
       h(() => {
-        t.includes("prepend")
+        (t.includes("prepend")
           ? i.parentNode.insertBefore(o, i)
           : t.includes("append")
             ? i.parentNode.insertBefore(o, i.nextSibling)
             : i.appendChild(o),
           v(o),
-          (o._x_ignore = !0);
+          (o._x_ignore = !0));
       }),
-      n(() => o.remove());
+      n(() => o.remove()));
   });
   var fn = () => {};
   fn.inline = (e, { modifiers: t }, { cleanup: r }) => {
-    t.includes("self") ? (e._x_ignoreSelf = !0) : (e._x_ignore = !0),
+    (t.includes("self") ? (e._x_ignoreSelf = !0) : (e._x_ignore = !0),
       r(() => {
         t.includes("self") ? delete e._x_ignoreSelf : delete e._x_ignore;
-      });
+      }));
   };
   p("ignore", fn);
   p("effect", (e, { expression: t }, { effect: r }) => r(x(e, t)));
@@ -2111,11 +2121,11 @@ ${
     return (
       r.includes("prevent") &&
         (o = a(o, (c, l) => {
-          l.preventDefault(), c(l);
+          (l.preventDefault(), c(l));
         })),
       r.includes("stop") &&
         (o = a(o, (c, l) => {
-          l.stopPropagation(), c(l);
+          (l.stopPropagation(), c(l));
         })),
       r.includes("self") &&
         (o = a(o, (c, l) => {
@@ -2131,7 +2141,7 @@ ${
         }))),
       r.includes("once") &&
         (o = a(o, (c, l) => {
-          c(l), i.removeEventListener(t, o, s);
+          (c(l), i.removeEventListener(t, o, s));
         })),
       (o = a(o, (c, l) => {
         (Ii(t) && ki(l, r)) || c(l);
@@ -2235,12 +2245,12 @@ ${
           : (a = () => {});
       let c = () => {
           let m;
-          return s((w) => (m = w)), pn(m) ? m.get() : m;
+          return (s((w) => (m = w)), pn(m) ? m.get() : m);
         },
         l = (m) => {
           let w;
-          s((k) => (w = k)),
-            pn(w) ? w.set(m) : a(() => {}, { scope: { __placeholder: m } });
+          (s((k) => (w = k)),
+            pn(w) ? w.set(m) : a(() => {}, { scope: { __placeholder: m } }));
         };
       typeof r == "string" &&
         e.type === "radio" &&
@@ -2273,7 +2283,7 @@ ${
         });
         i(() => m());
       }
-      (e._x_model = {
+      ((e._x_model = {
         get() {
           return c();
         },
@@ -2282,16 +2292,16 @@ ${
         },
       }),
         (e._x_forceModelUpdate = (m) => {
-          m === void 0 && typeof r == "string" && r.match(/\./) && (m = ""),
+          (m === void 0 && typeof r == "string" && r.match(/\./) && (m = ""),
             (window.fromModel = !0),
             h(() => _e(e, "value", m)),
-            delete window.fromModel;
+            delete window.fromModel);
         }),
         n(() => {
           let m = c();
           (t.includes("unintrusive") && document.activeElement.isSameNode(e)) ||
             e._x_forceModelUpdate(m);
-        });
+        }));
     },
   );
   function Li(e, t, r, n) {
@@ -2367,10 +2377,10 @@ ${
     r(() => {
       i((o) => {
         h(() => {
-          (e.innerHTML = o),
+          ((e.innerHTML = o),
             (e._x_ignoreSelf = !0),
             v(e),
-            delete e._x_ignoreSelf;
+            delete e._x_ignoreSelf);
         });
       });
     });
@@ -2383,13 +2393,13 @@ ${
   ) => {
     if (!t) {
       let a = {};
-      Fr(a),
+      (Fr(a),
         x(e, n)(
           (l) => {
             St(e, l, i);
           },
           { scope: a },
-        );
+        ));
       return;
     }
     if (t === "key") return ji(e, n);
@@ -2402,8 +2412,8 @@ ${
     let s = x(e, n);
     o(() =>
       s((a) => {
-        a === void 0 && typeof n == "string" && n.match(/\./) && (a = ""),
-          h(() => _e(e, t, a, r));
+        (a === void 0 && typeof n == "string" && n.match(/\./) && (a = ""),
+          h(() => _e(e, t, a, r)));
       }),
     );
   };
@@ -2425,18 +2435,18 @@ ${
     let i = {};
     Kr(i, n);
     let o = R(e, t, { scope: i });
-    (o === void 0 || o === !0) && (o = {}), fe(o, e);
+    ((o === void 0 || o === !0) && (o = {}), fe(o, e));
     let s = T(o);
     Te(s);
     let a = N(e, s);
-    s.init && R(e, s.init),
+    (s.init && R(e, s.init),
       r(() => {
-        s.destroy && R(e, s.destroy), a();
-      });
+        (s.destroy && R(e, s.destroy), a());
+      }));
   });
   p("show", (e, { modifiers: t, expression: r }, { effect: n }) => {
     let i = x(e, r);
-    e._x_doHide ||
+    (e._x_doHide ||
       (e._x_doHide = () => {
         h(() => {
           e.style.setProperty(
@@ -2453,12 +2463,12 @@ ${
               ? e.removeAttribute("style")
               : e.style.removeProperty("display");
           });
-        });
+        }));
     let o = () => {
-        e._x_doHide(), (e._x_isShown = !1);
+        (e._x_doHide(), (e._x_isShown = !1));
       },
       s = () => {
-        e._x_doShow(), (e._x_isShown = !0);
+        (e._x_doShow(), (e._x_isShown = !0));
       },
       a = () => setTimeout(s),
       c = me(
@@ -2484,21 +2494,21 @@ ${
     let i = Ki(t),
       o = x(e, i.items),
       s = x(e, e._x_keyExpression || "index");
-    (e._x_prevKeys = []),
+    ((e._x_prevKeys = []),
       (e._x_lookup = {}),
       r(() => Bi(e, i, o, s)),
       n(() => {
-        Object.values(e._x_lookup).forEach((a) => a.remove()),
+        (Object.values(e._x_lookup).forEach((a) => a.remove()),
           delete e._x_prevKeys,
-          delete e._x_lookup;
-      });
+          delete e._x_lookup);
+      }));
   });
   function Bi(e, t, r, n) {
     let i = (s) => typeof s == "object" && !Array.isArray(s),
       o = e;
     r((s) => {
-      zi(s) && s >= 0 && (s = Array.from(Array(s).keys(), (f) => f + 1)),
-        s === void 0 && (s = []);
+      (zi(s) && s >= 0 && (s = Array.from(Array(s).keys(), (f) => f + 1)),
+        s === void 0 && (s = []));
       let a = e._x_lookup,
         c = e._x_prevKeys,
         l = [],
@@ -2506,12 +2516,12 @@ ${
       if (i(s))
         s = Object.entries(s).map(([f, g]) => {
           let b = hn(t, g, f, s);
-          n((E) => u.push(E), { scope: { index: f, ...b } }), l.push(b);
+          (n((E) => u.push(E), { scope: { index: f, ...b } }), l.push(b));
         });
       else
         for (let f = 0; f < s.length; f++) {
           let g = hn(t, s[f], f, s);
-          n((b) => u.push(b), { scope: { index: f, ...g } }), l.push(g);
+          (n((b) => u.push(b), { scope: { index: f, ...g } }), l.push(g));
         }
       let d = [],
         m = [],
@@ -2526,36 +2536,36 @@ ${
       for (let f = 0; f < u.length; f++) {
         let g = u[f],
           b = c.indexOf(g);
-        if (b === -1) c.splice(f, 0, g), d.push([be, f]);
+        if (b === -1) (c.splice(f, 0, g), d.push([be, f]));
         else if (b !== f) {
           let E = c.splice(f, 1)[0],
             A = c.splice(b - 1, 1)[0];
-          c.splice(f, 0, A), c.splice(b, 0, E), m.push([E, A]);
+          (c.splice(f, 0, A), c.splice(b, 0, E), m.push([E, A]));
         } else k.push(g);
         be = g;
       }
       for (let f = 0; f < w.length; f++) {
         let g = w[f];
-        a[g]._x_effects && a[g]._x_effects.forEach(we),
+        (a[g]._x_effects && a[g]._x_effects.forEach(we),
           a[g].remove(),
           (a[g] = null),
-          delete a[g];
+          delete a[g]);
       }
       for (let f = 0; f < m.length; f++) {
         let [g, b] = m[f],
           E = a[g],
           A = a[b],
           X = document.createElement("div");
-        h(() => {
-          A || S('x-for ":key" is undefined or invalid', o),
+        (h(() => {
+          (A || S('x-for ":key" is undefined or invalid', o),
             A.after(X),
             E.after(A),
             A._x_currentIfEl && A.after(A._x_currentIfEl),
             X.before(E),
             E._x_currentIfEl && E.after(E._x_currentIfEl),
-            X.remove();
+            X.remove());
         }),
-          A._x_refreshXForScope(l[u.indexOf(b)]);
+          A._x_refreshXForScope(l[u.indexOf(b)]));
       }
       for (let f = 0; f < d.length; f++) {
         let [g, b] = d[f],
@@ -2565,21 +2575,21 @@ ${
           X = u[b],
           se = document.importNode(o.content, !0).firstElementChild,
           Bt = T(A);
-        N(se, Bt, o),
+        (N(se, Bt, o),
           (se._x_refreshXForScope = (gn) => {
             Object.entries(gn).forEach(([xn, yn]) => {
               Bt[xn] = yn;
             });
           }),
           h(() => {
-            E.after(se), v(se);
+            (E.after(se), v(se));
           }),
           typeof X == "object" &&
             S(
               "x-for key cannot be an object, it must be a string or an integer",
               o,
             ),
-          (a[X] = se);
+          (a[X] = se));
       }
       for (let f = 0; f < k.length; f++)
         a[k[f]]._x_refreshXForScope(l[u.indexOf(k[f])]);
@@ -2638,9 +2648,9 @@ ${
   function _n() {}
   _n.inline = (e, { expression: t }, { cleanup: r }) => {
     let n = U(e);
-    n._x_refs || (n._x_refs = {}),
+    (n._x_refs || (n._x_refs = {}),
       (n._x_refs[t] = e),
-      r(() => delete n._x_refs[t]);
+      r(() => delete n._x_refs[t]));
   };
   p("ref", _n);
   p("if", (e, { expression: t }, { effect: r, cleanup: n }) => {
@@ -2651,15 +2661,15 @@ ${
         return (
           N(a, {}, e),
           h(() => {
-            e.after(a), v(a);
+            (e.after(a), v(a));
           }),
           (e._x_currentIfEl = a),
           (e._x_undoIf = () => {
-            O(a, (c) => {
+            (O(a, (c) => {
               c._x_effects && c._x_effects.forEach(we);
             }),
               a.remove(),
-              delete e._x_currentIfEl;
+              delete e._x_currentIfEl);
           }),
           a
         );
@@ -2667,12 +2677,12 @@ ${
       s = () => {
         e._x_undoIf && (e._x_undoIf(), delete e._x_undoIf);
       };
-    r(() =>
+    (r(() =>
       i((a) => {
         a ? o() : s();
       }),
     ),
-      n(() => e._x_undoIf && e._x_undoIf());
+      n(() => e._x_undoIf && e._x_undoIf()));
   });
   p("id", (e, { expression: t }, { evaluate: r }) => {
     r(t).forEach((i) => ln(e, i));

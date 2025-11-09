@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+
+set -euo pipefail
+set -x
+
 version=$(curl -sX GET "https://api.github.com/repos/actions/runner/releases/latest" | jq --raw-output '.tag_name')
 version="${version#*v}"
 version="${version#*release-}"
