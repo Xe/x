@@ -60,8 +60,8 @@ jobs:
         if: github.event_name != 'pull_request'
         run: go tool yeet
 
-      - name: "Cut release if 'Release-Status: cut' in commit message"
-        if: "${{ github.ref == 'refs/heads/master' && contains(github.event.head_commit.message, 'Release-Status: cut') }}"
+      - name: "Cut release if 'Release-status: cut' in commit message"
+        if: "${{ github.ref == 'refs/heads/master' && contains(github.event.head_commit.message, 'Release-status: cut') }}"
         uses: benc-uk/workflow-dispatch@e2e5e9a103e331dad343f381a29e654aea3cf8fc # v1.2.4
         with:
           workflow: "release.yaml"
