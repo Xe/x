@@ -106,8 +106,7 @@ spec:
                 bus: sata
                 readonly: true
               name: cloudinitdisk
-          filesystems:
-            []
+          filesystems: []
             # - name: storage
             #   virtiofs: {}
         machine:
