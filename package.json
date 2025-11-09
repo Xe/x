@@ -34,10 +34,12 @@
     "@semantic-release/git": "^10.0.1",
     "@semantic-release/github": "^12.0.1",
     "@semantic-release/release-notes-generator": "^14.1.0",
+    "@tailwindcss/cli": "^4.1.17",
     "husky": "^9.1.7",
     "lint-staged": "^16.2.6",
     "prettier": "^3.6.2",
-    "semantic-release": "^25.0.1"
+    "semantic-release": "^25.0.1",
+    "tailwindcss": "^4.1.17"
   },
   "commitlint": {
     "extends": [
@@ -196,6 +198,5 @@
         }
       ]
     ]
-  },
-  "dependencies": {}
+  }
 }
