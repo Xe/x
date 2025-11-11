@@ -2,9 +2,7 @@ package mcp
 
 import (
 	"context"
-	"fmt"
 	"net/http"
-	"strings"
 
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -66,7 +64,12 @@ func (s *Server) whoIsFront(ctx context.Context, req *mcp.CallToolRequest, wif w
 
 type listSystemMembersReq struct{}
 
-func (s *Server) listSystemMembers(ctx context.Context, req *mcp.CallToolRequest, lsm listSystemMembersReq) (*mcp.CallToolResult, *string, error) {
+type listSystemMembersResp struct {
+	Message string   `json:"message,omitempty"`
+	Members []string `json:"members,omitempty"`
+}
+
+func (s *Server) listSystemMembers(ctx context.Context, req *mcp.CallToolRequest, lsm listSystemMembersReq) (*mcp.CallToolResult, *listSystemMembersResp, error) {
 	resp, err := s.st.Members(ctx, &emptypb.Empty{})
 	if err != nil {
 		return nil, nil, err
@@ -74,22 +77,16 @@ func (s *Server) listSystemMembers(ctx context.Context, req *mcp.CallToolRequest
 
 	if len(resp.Members) == 0 {
 		emptyResult := "# System Members\n\nNo members found in the system."
-		return nil, &emptyResult, nil
+		return nil, &listSystemMembersResp{Message: emptyResult}, nil
 	}
 
-	// Generate Markdown output
-	var sb strings.Builder
-
-	sb.WriteString("# System Members\n\n")
-	sb.WriteString("Below is a list of all members in the system:\n\n")
+	result := &listSystemMembersResp{}
 
 	for _, member := range resp.Members {
-		sb.WriteString(fmt.Sprintf("- %s", member.GetName()))
-		sb.WriteString("\n")
+		result.Members = append(result.Members, member.GetName())
 	}
 
-	result := sb.String()
-	return nil, &result, nil
+	return nil, result, nil
 }
 
 func New(st miv1.SwitchTracker) http.Handler {
