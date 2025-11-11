@@ -1,3 +1,9 @@
+## [1.26.1](https://github.com/Xe/x/compare/v1.26.0...v1.26.1) (2025-11-11)
+
+### Bug Fixes
+
+- **mcp:** fix list-system-members output schema ([2a24290](https://github.com/Xe/x/commit/2a2429068fcdbd7dd5f22e0a47caa7037fdec4fb))
+
 # [1.26.0](https://github.com/Xe/x/compare/v1.25.0...v1.26.0) (2025-11-09)
 
 ### Features
