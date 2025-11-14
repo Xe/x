@@ -21,6 +21,7 @@ message Member {
   int32 id = 1; // required
   string name = 2; // required
   string avatar_url = 3; // required
+  google.protobuf.Timestamp birthday = 4; // optional, RFC 3339 timestamp
 }
 
 message Switch {

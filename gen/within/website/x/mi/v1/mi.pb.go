@@ -74,6 +74,7 @@ type Member struct {
 	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                               // required
 	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`                            // required
 	AvatarUrl     string                 `protobuf:"bytes,3,opt,name=avatar_url,json=avatarUrl,proto3" json:"avatar_url,omitempty"` // required
+	Birthday      *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=birthday,proto3" json:"birthday,omitempty"`                    // optional, RFC 3339 timestamp
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -127,6 +128,13 @@ func (x *Member) GetAvatarUrl() string {
 		return x.AvatarUrl
 	}
 	return ""
+}
+
+func (x *Member) GetBirthday() *timestamppb.Timestamp {
+	if x != nil {
+		return x.Birthday
+	}
+	return nil
 }
 
 type Switch struct {
@@ -637,12 +645,13 @@ const file_within_website_x_mi_v1_mi_proto_rawDesc = "" +
 	"\n" +
 	"\x1fwithin/website/x/mi/v1/mi.proto\x12\x16within.website.x.mi.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"G\n" +
 	"\vMembersResp\x128\n" +
-	"\amembers\x18\x01 \x03(\v2\x1e.within.website.x.mi.v1.MemberR\amembers\"K\n" +
+	"\amembers\x18\x01 \x03(\v2\x1e.within.website.x.mi.v1.MemberR\amembers\"\x83\x01\n" +
 	"\x06Member\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1d\n" +
 	"\n" +
-	"avatar_url\x18\x03 \x01(\tR\tavatarUrl\"o\n" +
+	"avatar_url\x18\x03 \x01(\tR\tavatarUrl\x126\n" +
+	"\bbirthday\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\bbirthday\"o\n" +
 	"\x06Switch\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1b\n" +
 	"\tmember_id\x18\x02 \x01(\x05R\bmemberId\x12\x1d\n" +
@@ -725,37 +734,38 @@ var file_within_website_x_mi_v1_mi_proto_goTypes = []any{
 }
 var file_within_website_x_mi_v1_mi_proto_depIdxs = []int32{
 	1,  // 0: within.website.x.mi.v1.MembersResp.members:type_name -> within.website.x.mi.v1.Member
-	2,  // 1: within.website.x.mi.v1.SwitchResp.old:type_name -> within.website.x.mi.v1.Switch
-	2,  // 2: within.website.x.mi.v1.SwitchResp.current:type_name -> within.website.x.mi.v1.Switch
-	2,  // 3: within.website.x.mi.v1.FrontChange.switch:type_name -> within.website.x.mi.v1.Switch
-	1,  // 4: within.website.x.mi.v1.FrontChange.member:type_name -> within.website.x.mi.v1.Member
-	6,  // 5: within.website.x.mi.v1.ListSwitchesResp.switches:type_name -> within.website.x.mi.v1.FrontChange
-	11, // 6: within.website.x.mi.v1.Event.start_date:type_name -> google.protobuf.Timestamp
-	11, // 7: within.website.x.mi.v1.Event.end_date:type_name -> google.protobuf.Timestamp
-	9,  // 8: within.website.x.mi.v1.EventFeed.events:type_name -> within.website.x.mi.v1.Event
-	12, // 9: within.website.x.mi.v1.SwitchTracker.Members:input_type -> google.protobuf.Empty
-	12, // 10: within.website.x.mi.v1.SwitchTracker.WhoIsFront:input_type -> google.protobuf.Empty
-	3,  // 11: within.website.x.mi.v1.SwitchTracker.Switch:input_type -> within.website.x.mi.v1.SwitchReq
-	5,  // 12: within.website.x.mi.v1.SwitchTracker.GetSwitch:input_type -> within.website.x.mi.v1.GetSwitchReq
-	7,  // 13: within.website.x.mi.v1.SwitchTracker.ListSwitches:input_type -> within.website.x.mi.v1.ListSwitchesReq
-	12, // 14: within.website.x.mi.v1.POSSE.RefreshBlog:input_type -> google.protobuf.Empty
-	12, // 15: within.website.x.mi.v1.Events.Get:input_type -> google.protobuf.Empty
-	9,  // 16: within.website.x.mi.v1.Events.Add:input_type -> within.website.x.mi.v1.Event
-	9,  // 17: within.website.x.mi.v1.Events.Remove:input_type -> within.website.x.mi.v1.Event
-	0,  // 18: within.website.x.mi.v1.SwitchTracker.Members:output_type -> within.website.x.mi.v1.MembersResp
-	6,  // 19: within.website.x.mi.v1.SwitchTracker.WhoIsFront:output_type -> within.website.x.mi.v1.FrontChange
-	4,  // 20: within.website.x.mi.v1.SwitchTracker.Switch:output_type -> within.website.x.mi.v1.SwitchResp
-	6,  // 21: within.website.x.mi.v1.SwitchTracker.GetSwitch:output_type -> within.website.x.mi.v1.FrontChange
-	8,  // 22: within.website.x.mi.v1.SwitchTracker.ListSwitches:output_type -> within.website.x.mi.v1.ListSwitchesResp
-	12, // 23: within.website.x.mi.v1.POSSE.RefreshBlog:output_type -> google.protobuf.Empty
-	10, // 24: within.website.x.mi.v1.Events.Get:output_type -> within.website.x.mi.v1.EventFeed
-	12, // 25: within.website.x.mi.v1.Events.Add:output_type -> google.protobuf.Empty
-	12, // 26: within.website.x.mi.v1.Events.Remove:output_type -> google.protobuf.Empty
-	18, // [18:27] is the sub-list for method output_type
-	9,  // [9:18] is the sub-list for method input_type
-	9,  // [9:9] is the sub-list for extension type_name
-	9,  // [9:9] is the sub-list for extension extendee
-	0,  // [0:9] is the sub-list for field type_name
+	11, // 1: within.website.x.mi.v1.Member.birthday:type_name -> google.protobuf.Timestamp
+	2,  // 2: within.website.x.mi.v1.SwitchResp.old:type_name -> within.website.x.mi.v1.Switch
+	2,  // 3: within.website.x.mi.v1.SwitchResp.current:type_name -> within.website.x.mi.v1.Switch
+	2,  // 4: within.website.x.mi.v1.FrontChange.switch:type_name -> within.website.x.mi.v1.Switch
+	1,  // 5: within.website.x.mi.v1.FrontChange.member:type_name -> within.website.x.mi.v1.Member
+	6,  // 6: within.website.x.mi.v1.ListSwitchesResp.switches:type_name -> within.website.x.mi.v1.FrontChange
+	11, // 7: within.website.x.mi.v1.Event.start_date:type_name -> google.protobuf.Timestamp
+	11, // 8: within.website.x.mi.v1.Event.end_date:type_name -> google.protobuf.Timestamp
+	9,  // 9: within.website.x.mi.v1.EventFeed.events:type_name -> within.website.x.mi.v1.Event
+	12, // 10: within.website.x.mi.v1.SwitchTracker.Members:input_type -> google.protobuf.Empty
+	12, // 11: within.website.x.mi.v1.SwitchTracker.WhoIsFront:input_type -> google.protobuf.Empty
+	3,  // 12: within.website.x.mi.v1.SwitchTracker.Switch:input_type -> within.website.x.mi.v1.SwitchReq
+	5,  // 13: within.website.x.mi.v1.SwitchTracker.GetSwitch:input_type -> within.website.x.mi.v1.GetSwitchReq
+	7,  // 14: within.website.x.mi.v1.SwitchTracker.ListSwitches:input_type -> within.website.x.mi.v1.ListSwitchesReq
+	12, // 15: within.website.x.mi.v1.POSSE.RefreshBlog:input_type -> google.protobuf.Empty
+	12, // 16: within.website.x.mi.v1.Events.Get:input_type -> google.protobuf.Empty
+	9,  // 17: within.website.x.mi.v1.Events.Add:input_type -> within.website.x.mi.v1.Event
+	9,  // 18: within.website.x.mi.v1.Events.Remove:input_type -> within.website.x.mi.v1.Event
+	0,  // 19: within.website.x.mi.v1.SwitchTracker.Members:output_type -> within.website.x.mi.v1.MembersResp
+	6,  // 20: within.website.x.mi.v1.SwitchTracker.WhoIsFront:output_type -> within.website.x.mi.v1.FrontChange
+	4,  // 21: within.website.x.mi.v1.SwitchTracker.Switch:output_type -> within.website.x.mi.v1.SwitchResp
+	6,  // 22: within.website.x.mi.v1.SwitchTracker.GetSwitch:output_type -> within.website.x.mi.v1.FrontChange
+	8,  // 23: within.website.x.mi.v1.SwitchTracker.ListSwitches:output_type -> within.website.x.mi.v1.ListSwitchesResp
+	12, // 24: within.website.x.mi.v1.POSSE.RefreshBlog:output_type -> google.protobuf.Empty
+	10, // 25: within.website.x.mi.v1.Events.Get:output_type -> within.website.x.mi.v1.EventFeed
+	12, // 26: within.website.x.mi.v1.Events.Add:output_type -> google.protobuf.Empty
+	12, // 27: within.website.x.mi.v1.Events.Remove:output_type -> google.protobuf.Empty
+	19, // [19:28] is the sub-list for method output_type
+	10, // [10:19] is the sub-list for method input_type
+	10, // [10:10] is the sub-list for extension type_name
+	10, // [10:10] is the sub-list for extension extendee
+	0,  // [0:10] is the sub-list for field type_name
 }
 
 func init() { file_within_website_x_mi_v1_mi_proto_init() }
