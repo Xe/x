@@ -1,5 +1,12 @@
 npx --no-install commitlint --edit "$1"
 
+# Check if commit message contains Signed-off-by line
+if ! grep -q "^Signed-off-by:" "$1"; then
+  echo "Commit message must contain a 'Signed-off-by:' line."
+  echo "Please use 'git commit --signoff' or add a Signed-off-by line to your commit message."
+  exit 1
+fi
+
 case "$(cat $1)" in
   *"[skip ci]"*)
     exit 0
