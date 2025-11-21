@@ -716,10 +716,10 @@ github.com/nats-io/nkeys v0.4.11/go.mod h1:szDimtgmfOi9n25JpfIdGw12tZFYXqhGxjhVx
 github.com/nats-io/nuid v1.0.1 h1:5iA8DT8V7q8WK2EScv2padNa/rTESc1KdnPw4TC2paw=
 github.com/nats-io/nuid v1.0.1/go.mod h1:19wcPz3Ph3q0Jbyiqsd0kePYG7A95tJPxeL+1OSON2c=
 github.com/nbio/st v0.0.0-20140626010706-e9e8d9816f32/go.mod h1:9wM+0iRr9ahx58uYLpLIr5fm8diHn0JbqRycJi6w0Ms=
-github.com/ncruces/go-sqlite3 v0.16.0 h1:O7eULuEjvSBnS1QCN+dDL/ixLQZoUGWr466A02Gx1xc=
-github.com/ncruces/go-sqlite3 v0.16.0/go.mod h1:2TmAeD93ImsKXJRsUIKohfMvt17dZSbS6pzJ3k6YYFg=
-github.com/ncruces/go-sqlite3/gormlite v0.16.0 h1:pBN2h323adfTF3NThIuHa3e7GCesgqrDZFEdAmdFNQE=
-github.com/ncruces/go-sqlite3/gormlite v0.16.0/go.mod h1:TyfqjFmR31x1iOth4t6hPgtUf2UvM8zupKSj6TZkP4c=
+github.com/ncruces/go-sqlite3 v0.30.1 h1:pHC3YsyRdJv4pCMB4MO1Q2BXw/CAa+Hoj7GSaKtVk+g=
+github.com/ncruces/go-sqlite3 v0.30.1/go.mod h1:UVsWrQaq1qkcal5/vT5lOJnZCVlR5rsThKdwidjFsKc=
+github.com/ncruces/go-sqlite3/gormlite v0.30.1 h1:kApjSKrepgmhtx63KMeD8aUoz1l4aJT4fkoBmHSsRns=
+github.com/ncruces/go-sqlite3/gormlite v0.30.1/go.mod h1:zgFibXnnKek3qMHd/2A1OtfDqbN7ae+H80aMX+487As=
 github.com/ncruces/go-strftime v0.1.9 h1:bY0MQC28UADQmHmaF5dgpLmImcShSi2kHU9XLdhx/f4=
 github.com/ncruces/go-strftime v0.1.9/go.mod h1:Fwc5htZGVVkseilnfgOVb9mKy6w1naJmn9CehxcKcls=
 github.com/ncruces/julianday v1.0.0 h1:fH0OKwa7NWvniGQtxdJRxAgkBMolni2BjDHaWTxqt7M=
@@ -878,8 +878,8 @@ github.com/stretchr/testify v1.8.4/go.mod h1:sz/lmYIOXD/1dqDmKjjqLyZ2RngseejIcXl
 github.com/stretchr/testify v1.9.0/go.mod h1:r2ic/lqez/lEtzL7wO/rwa5dbSLXVDPFyf8C91i36aY=
 github.com/stretchr/testify v1.10.0 h1:Xv5erBjTwe/5IxqUQTdXv5kgmIvbHo3QQyRwhJsOfJA=
 github.com/stretchr/testify v1.10.0/go.mod h1:r2ic/lqez/lEtzL7wO/rwa5dbSLXVDPFyf8C91i36aY=
-github.com/tetratelabs/wazero v1.9.0 h1:IcZ56OuxrtaEz8UYNRHBrUa9bYeX9oVY93KspZZBf/I=
-github.com/tetratelabs/wazero v1.9.0/go.mod h1:TSbcXCfFP0L2FGkRPxHphadXPjo1T6W+CseNNY7EkjM=
+github.com/tetratelabs/wazero v1.10.0 h1:CXP3zneLDl6J4Zy8N/J+d5JsWKfrjE6GtvVK1fpnDlk=
+github.com/tetratelabs/wazero v1.10.0/go.mod h1:DRm5twOQ5Gr1AoEdSi0CLjDQF1J9ZAuyqFIjl1KKfQU=
 github.com/thlib/go-timezone-local v0.0.0-20210907160436-ef149e42d28e/go.mod h1:/Tnicc6m/lsJE0irFMA0LfIwTBo4QP7A8IfyIv4zZKI=
 github.com/thoj/go-ircevent v0.0.0-20210723090443-73e444401d64 h1:l/T7dYuJEQZOwVOpjIXr1180aM9PZL/d1MnMVIxefX4=
 github.com/thoj/go-ircevent v0.0.0-20210723090443-73e444401d64/go.mod h1:Q1NAJOuRdQCqN/VIWdnaaEhV8LpeO2rtlBP7/iDJNII=
@@ -1543,8 +1543,8 @@ gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b/go.mod h1:K4uyk7z7BCEPqu6E+C
 gopkg.in/yaml.v3 v3.0.1 h1:fxVm/GzAzEWqLHuvctI91KS9hhNmmWOoWu0XTYJS7CA=
 gopkg.in/yaml.v3 v3.0.1/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=
 gorm.io/gorm v1.25.0/go.mod h1:L4uxeKpfBml98NYqVqwAdmV1a2nBtAec/cf3fpucW/k=
-gorm.io/gorm v1.30.0 h1:qbT5aPv1UH8gI99OsRlvDToLxW5zR7FzS9acZDOZcgs=
-gorm.io/gorm v1.30.0/go.mod h1:8Z33v652h4//uMA76KjeDH8mJXPm1QNCYrMeatR0DOE=
+gorm.io/gorm v1.31.1 h1:7CA8FTFz/gRfgqgpeKIBcervUn3xSyPUmr6B2WXJ7kg=
+gorm.io/gorm v1.31.1/go.mod h1:XyQVbO2k6YkOis7C2437jSit3SsDK72s7n7rsSHd+Gs=
 gorm.io/plugin/prometheus v0.1.0 h1:kDQwAfCUsT9D6jDUpIp7pnc7bCJu/6voM8I/BmFjxUQ=
 gorm.io/plugin/prometheus v0.1.0/go.mod h1:5nrc/JrWCUNoDXCY4eOae/FK/J5WjQ0axXuFusCzdTc=
 honnef.co/go/tools v0.0.0-20190102054323-c2f93a96b099/go.mod h1:rf3lG4BRIbNafJWhAfAdb/ePZxsR/4RtNHQocxwk9r4=
