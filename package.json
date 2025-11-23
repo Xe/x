@@ -75,8 +75,7 @@
     "tabWidth": 2,
     "semi": true,
     "trailingComma": "all",
-    "printWidth": 80,
-    "ignorePath": ".prettierignore"
+    "printWidth": 80
   },
   "release": {
     "branches": [

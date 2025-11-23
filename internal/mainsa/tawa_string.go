@@ -19,9 +19,9 @@ const _Tawa_name = "KasiSeliSinLete"
 var _Tawa_index = [...]uint8{0, 4, 8, 11, 15}
 
 func (i Tawa) String() string {
-	i -= 1
-	if i < 0 || i >= Tawa(len(_Tawa_index)-1) {
-		return "Tawa(" + strconv.FormatInt(int64(i+1), 10) + ")"
+	idx := int(i) - 1
+	if i < 1 || idx >= len(_Tawa_index)-1 {
+		return "Tawa(" + strconv.FormatInt(int64(i), 10) + ")"
 	}
-	return _Tawa_name[_Tawa_index[i]:_Tawa_index[i+1]]
+	return _Tawa_name[_Tawa_index[idx]:_Tawa_index[idx+1]]
 }

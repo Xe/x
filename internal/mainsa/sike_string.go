@@ -18,9 +18,9 @@ const _Sike_name = "KamaPokaMonsi"
 var _Sike_index = [...]uint8{0, 4, 8, 13}
 
 func (i Sike) String() string {
-	i -= 1
-	if i < 0 || i >= Sike(len(_Sike_index)-1) {
-		return "Sike(" + strconv.FormatInt(int64(i+1), 10) + ")"
+	idx := int(i) - 1
+	if i < 1 || idx >= len(_Sike_index)-1 {
+		return "Sike(" + strconv.FormatInt(int64(i), 10) + ")"
 	}
-	return _Sike_name[_Sike_index[i]:_Sike_index[i+1]]
+	return _Sike_name[_Sike_index[idx]:_Sike_index[idx+1]]
 }
