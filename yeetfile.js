@@ -27,7 +27,7 @@ yeet.setenv("CGO_ENABLED", "0");
 const pkgs = [];
 
 ["amd64", "arm64", "ppc64le", "riscv64"].forEach((goarch) => {
-  [deb, rpm].forEach((method) => {
+  [deb, rpm, portable].forEach((method) => {
     pkgs.push(
       method.build({
         name: "httpdebug",
