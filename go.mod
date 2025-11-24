@@ -51,8 +51,8 @@ require (
 	github.com/multiformats/go-multibase v0.2.0
 	github.com/mymmrac/telego v0.31.5
 	github.com/nats-io/nats.go v1.42.0
-	github.com/ncruces/go-sqlite3 v0.16.0
-	github.com/ncruces/go-sqlite3/gormlite v0.16.0
+	github.com/ncruces/go-sqlite3 v0.30.1
+	github.com/ncruces/go-sqlite3/gormlite v0.30.1
 	github.com/nicklaw5/helix/v2 v2.31.0
 	github.com/openai/openai-go/v2 v2.7.1
 	github.com/orandin/slog-gorm v1.4.0
@@ -68,7 +68,7 @@ require (
 	github.com/sebest/xff v0.0.0-20210106013422-671bd2870b3a
 	github.com/speps/go-hashids v2.0.0+incompatible
 	github.com/stoewer/go-strcase v1.3.0
-	github.com/tetratelabs/wazero v1.9.0
+	github.com/tetratelabs/wazero v1.10.0
 	github.com/thoj/go-ircevent v0.0.0-20210723090443-73e444401d64
 	github.com/tmc/scp v0.0.0-20170824174625-f7b48647feef
 	github.com/twitchtv/twirp v8.1.3+incompatible
@@ -81,7 +81,7 @@ require (
 	golang.org/x/sync v0.18.0
 	google.golang.org/grpc v1.74.2
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
-	gorm.io/gorm v1.30.0
+	gorm.io/gorm v1.31.1
 	gorm.io/plugin/prometheus v0.1.0
 	modernc.org/sqlite v1.37.0
 	nhooyr.io/websocket v1.8.17
@@ -115,7 +115,8 @@ require (
 	github.com/carlmjohnson/versioninfo v0.22.5 // indirect
 	github.com/cavaliergopher/cpio v1.0.1 // indirect
 	github.com/cli/browser v1.3.0 // indirect
-	github.com/cli/go-gh v0.1.0 // indirect
+	github.com/cli/go-gh/v2 v2.12.1 // indirect
+	github.com/cli/safeexec v1.0.1 // indirect
 	github.com/cloudflare/circl v1.6.1 // indirect
 	github.com/cloudwego/base64x v0.1.4 // indirect
 	github.com/cloudwego/iasm v0.2.0 // indirect
@@ -136,7 +137,6 @@ require (
 	github.com/go-jose/go-jose/v4 v4.0.5 // indirect
 	github.com/go-logr/logr v1.4.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
-	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-sourcemap/sourcemap v2.1.3+incompatible // indirect
 	github.com/gobwas/glob v0.2.3 // indirect
 	github.com/goccy/go-yaml v1.18.0 // indirect
@@ -175,7 +175,6 @@ require (
 	github.com/kevinburke/ssh_config v1.2.0 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.7 // indirect
 	github.com/klauspost/pgzip v1.2.6 // indirect
-	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/lestrrat-go/blackmagic v1.0.1 // indirect
 	github.com/lestrrat-go/httpcc v1.0.1 // indirect
 	github.com/lestrrat-go/httprc v1.0.4 // indirect
@@ -245,6 +244,7 @@ require (
 	go.uber.org/zap v1.27.0 // indirect
 	golang.org/x/arch v0.6.0 // indirect
 	golang.org/x/telemetry v0.0.0-20251008203120-078029d740a8 // indirect
+	golang.org/x/term v0.37.0 // indirect
 	golang.org/x/xerrors v0.0.0-20240716161551-93cc26a95ae9 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20250603155806-513f23925822 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250528174236-200df99c418a // indirect
@@ -255,6 +255,7 @@ require (
 	modernc.org/libc v1.62.1 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.9.1 // indirect
+	mvdan.cc/sh/v3 v3.12.0 // indirect
 )
 
 require (
