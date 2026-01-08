@@ -1,0 +1,21 @@
+apiVersion: x.within.website/v1
+kind: App
+metadata:
+  name: mcp-auth
+
+spec:
+  image: ghcr.io/tigrisdata-community/mcp-oauth-adjunct:latest
+  autoUpdate: true
+
+  healthcheck:
+    enabled: true
+    path: /health
+
+  ingress:
+    enabled: true
+    host: auth.mcp.xeserv.us
+
+  secrets:
+    - name: env
+      itemPath: "vaults/lc5zo4zjz3if3mkeuhufjmgmui/items/r45je5csxcem3wsccju2t32pju"
+      environment: true
