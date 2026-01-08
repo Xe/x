@@ -1,3 +1,19 @@
+# [1.27.0](https://github.com/Xe/x/compare/v1.26.1...v1.27.0) (2026-01-08)
+
+### Bug Fixes
+
+- **package.json:** use Signed-off-by instead of Signed-Off-By ([c2406e3](https://github.com/Xe/x/commit/c2406e3de87ab486e37b68e33b044288a704e5bd))
+- **yeetfile:** build sysexts ([c9b3ab7](https://github.com/Xe/x/commit/c9b3ab7f70954de56174ed1b634c0d224a8bdbee))
+
+### Features
+
+- add 7-day cooldown to dependabot updates ([#791](https://github.com/Xe/x/issues/791)) ([1a5d9d3](https://github.com/Xe/x/commit/1a5d9d3fa49558fd483c1d2b29c40f842f1f3186))
+- add attention attenuator package ([6ca9c01](https://github.com/Xe/x/commit/6ca9c014acb21fa808f20222f9383be8a90c44cb))
+- add claude-code-cfg package ([73798a3](https://github.com/Xe/x/commit/73798a312ee21cda529f527370d7c1ca60a8bc64))
+- **kube/alrest:** add mcp-auth sidecar ([e56238b](https://github.com/Xe/x/commit/e56238bb3bcc0870b84e4bfbc10e04c99715ccdc))
+- **mi:** add birthday field to Member model ([#784](https://github.com/Xe/x/issues/784)) ([69bff8e](https://github.com/Xe/x/commit/69bff8e99e082cfc3e859cfc03bfc597cc36c16a))
+- require Signed-off-by in commit messages ([#785](https://github.com/Xe/x/issues/785)) ([7e1c910](https://github.com/Xe/x/commit/7e1c910b5d458f5b7a9e21ebe7272ddb1aae68d1))
+
 ## [1.26.1](https://github.com/Xe/x/compare/v1.26.0...v1.26.1) (2025-11-11)
 
 ### Bug Fixes
