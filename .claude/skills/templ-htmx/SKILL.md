@@ -10,6 +10,7 @@ description: Build interactive hypermedia-driven applications with templ and HTM
 HTMX enables modern, interactive web applications with minimal JavaScript. Combined with templ's type-safe components, you get fast, reliable hypermedia-driven UIs.
 
 **Key Benefits:**
+
 - No JavaScript framework needed
 - Server-side rendering
 - Minimal client-side code
@@ -19,6 +20,7 @@ HTMX enables modern, interactive web applications with minimal JavaScript. Combi
 ## When to Use This Skill
 
 Use when:
+
 - Building interactive UIs
 - Creating dynamic content
 - User mentions "HTMX", "dynamic updates", "real-time"
@@ -142,6 +144,7 @@ templ SearchBox() {
 ```
 
 Handler:
+
 ```go
 func searchHandler(w http.ResponseWriter, r *http.Request) {
     query := r.URL.Query().Get("q")
@@ -211,6 +214,7 @@ Control when requests fire:
 ### Pattern 1: Live Search
 
 Component:
+
 ```templ
 templ SearchBox() {
     <div>
@@ -240,6 +244,7 @@ templ SearchResults(results []string) {
 ```
 
 Handler:
+
 ```go
 func searchHandler(w http.ResponseWriter, r *http.Request) {
     query := r.URL.Query().Get("q")
@@ -287,6 +292,7 @@ templ DeleteButton(itemID string) {
 ```
 
 Handler:
+
 ```go
 func deleteHandler(w http.ResponseWriter, r *http.Request) {
     itemID := strings.TrimPrefix(r.URL.Path, "/items/")
@@ -441,17 +447,18 @@ templ DataTable() {
 ```
 
 CSS:
+
 ```css
 .htmx-indicator {
-    display: none;
+  display: none;
 }
 
 .htmx-request .htmx-indicator {
-    display: inline;
+  display: inline;
 }
 
 .htmx-request.htmx-indicator {
-    display: inline;
+  display: inline;
 }
 ```
 
@@ -473,9 +480,10 @@ func handler(w http.ResponseWriter, r *http.Request) {
 ```
 
 Client side:
+
 ```javascript
-document.body.addEventListener("itemCreated", function(evt) {
-    console.log("Item created!");
+document.body.addEventListener("itemCreated", function (evt) {
+  console.log("Item created!");
 });
 ```
 
@@ -610,6 +618,7 @@ templ TodoItem(todo Todo) {
 ```
 
 Handlers:
+
 ```go
 func todosHandler(w http.ResponseWriter, r *http.Request) {
     switch r.Method {
