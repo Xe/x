@@ -40,10 +40,9 @@ func Python(ctx context.Context, req *mcp.CallToolRequest, input Input) (*mcp.Ca
 
 func main() {
 	internal.HandleStartup()
-	// Flags are parsed by internal.HandleStartup().
 
 	srv := mcp.NewServer(&mcp.Implementation{Name: "python-wasm-mcp", Version: x.Version}, nil)
-	mcp.AddTool(srv, &mcp.Tool{Name: "python", Description: "Run Python code"}, Python)
+	mcp.AddTool(srv, &mcp.Tool{Name: "run", Description: "Run Python code"}, Python)
 
 	switch *bind {
 	case "":
