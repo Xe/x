@@ -52,8 +52,8 @@ require (
 	github.com/multiformats/go-multibase v0.2.0
 	github.com/mymmrac/telego v0.31.5
 	github.com/nats-io/nats.go v1.42.0
-	github.com/ncruces/go-sqlite3 v0.16.0
-	github.com/ncruces/go-sqlite3/gormlite v0.16.0
+	github.com/ncruces/go-sqlite3 v0.30.1
+	github.com/ncruces/go-sqlite3/gormlite v0.30.2
 	github.com/nicklaw5/helix/v2 v2.31.0
 	github.com/openai/openai-go/v2 v2.7.1
 	github.com/openai/openai-go/v3 v3.15.0
@@ -70,7 +70,7 @@ require (
 	github.com/sebest/xff v0.0.0-20210106013422-671bd2870b3a
 	github.com/speps/go-hashids v2.0.0+incompatible
 	github.com/stoewer/go-strcase v1.3.0
-	github.com/tetratelabs/wazero v1.9.0
+	github.com/tetratelabs/wazero v1.10.1
 	github.com/thoj/go-ircevent v0.0.0-20210723090443-73e444401d64
 	github.com/tmc/scp v0.0.0-20170824174625-f7b48647feef
 	github.com/twitchtv/twirp v8.1.3+incompatible
@@ -83,7 +83,7 @@ require (
 	golang.org/x/sync v0.18.0
 	google.golang.org/grpc v1.74.2
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
-	gorm.io/gorm v1.30.0
+	gorm.io/gorm v1.31.1
 	gorm.io/plugin/prometheus v0.1.0
 	modernc.org/sqlite v1.37.0
 	nhooyr.io/websocket v1.8.17
