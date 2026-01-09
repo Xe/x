@@ -12,7 +12,8 @@ jobs:
       contains(github.event.comment.body, ' /reviewbot') ||
       startsWith(github.event.comment.body, '/reviewbot') ||
       contains(github.event.comment.body, ' /review') ||
-      startsWith(github.event.comment.body, '/review')
+      startsWith(github.event.comment.body, '/review') ||
+      contains(github.event.comment.body, 'Reviewbot-request: yes')
     runs-on: ubuntu-latest
     permissions:
       id-token: write
