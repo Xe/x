@@ -1,0 +1,46 @@
+Pull request info:
+
+<pr>
+<title>{{ .Title }}</title>
+<author>{{ .Author }}</author>
+<authorRole>{{ .AuthorRole }}</authorRole>
+<body>
+{{ .PRBody }}
+</body>
+</pr>
+
+Commits:
+
+<commits>
+{{- range .Commits }}
+<commit>
+<author>{{ .Author.Login }}</author>
+<message>
+{{ .Commit.Message }}
+</message>
+</commit>
+{{ end -}}
+</commits>
+
+Files changed:
+
+<files>
+{{- range .Files }}
+<file>
+<name>{{ .Filename }}</name>
+<status>{{ .Status }}</status>
+<patch>
+{{ .Patch }}
+</patch>
+</file>
+{{- end }}
+</files>
+
+{{- if ne .AgentsMD "" }}
+
+Agent information:
+
+<agentInfo>
+{{ .AgentsMD }}
+</agentInfo>
+{{ end -}}

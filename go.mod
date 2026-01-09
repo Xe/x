@@ -36,6 +36,7 @@ require (
 	github.com/gomarkdown/markdown v0.0.0-20240328165702-4d01890c35c0
 	github.com/google/cel-go v0.25.0
 	github.com/google/go-github v17.0.0+incompatible
+	github.com/google/go-github/v81 v81.0.0
 	github.com/google/subcommands v1.2.0
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/securecookie v1.1.2
@@ -55,6 +56,7 @@ require (
 	github.com/ncruces/go-sqlite3/gormlite v0.16.0
 	github.com/nicklaw5/helix/v2 v2.31.0
 	github.com/openai/openai-go/v2 v2.7.1
+	github.com/openai/openai-go/v3 v3.15.0
 	github.com/orandin/slog-gorm v1.4.0
 	github.com/otiai10/copy v1.14.1
 	github.com/pires/go-proxyproto v0.7.0
@@ -85,6 +87,7 @@ require (
 	gorm.io/plugin/prometheus v0.1.0
 	modernc.org/sqlite v1.37.0
 	nhooyr.io/websocket v1.8.17
+	rsc.io/gitfs v1.0.0
 )
 
 require (
@@ -216,7 +219,7 @@ require (
 	github.com/skeema/knownhosts v1.3.1 // indirect
 	github.com/spaolacci/murmur3 v1.1.0 // indirect
 	github.com/spf13/cast v1.7.1 // indirect
-	github.com/tidwall/gjson v1.14.4 // indirect
+	github.com/tidwall/gjson v1.18.0 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.1 // indirect
 	github.com/tidwall/sjson v1.2.5 // indirect
