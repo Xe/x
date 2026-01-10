@@ -3,10 +3,7 @@
     "python": {
       "type": "stdio",
       "command": "go",
-      "args": [
-        "run",
-        "./cmd/python-wasm-mcp"
-      ],
+      "args": ["run", "./cmd/python-wasm-mcp"],
       "env": {}
     }
   }
