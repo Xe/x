@@ -38,41 +38,18 @@ var (
 	systemPrompt string
 )
 
-func main() {
-	internal.HandleStartup()
-
-	slog.Info(
-		"Starting up",
-		"github-repo", *githubRepo,
-		"github-sha", *githubSha,
-		"has-github-token", *githubToken != "",
-		"openai-api-base", *openAIAPIBase,
-		"has-openai-api-key", *openAIAPIKey != "",
-		"openai-model", *openAIModel,
-		"pr-number", *prNumber,
-	)
-
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-
-	ai := openai.NewClient(
-		option.WithAPIKey(*openAIAPIKey),
-		option.WithBaseURL(*openAIAPIBase),
-	)
-	_ = ai
-
+func run(ctx context.Context) error {
 	gh := github.NewClient(http.DefaultClient).WithAuthToken(*githubToken)
 
 	repo, err := gitfs.NewRepo("https://github.com/" + *githubRepo + ".git")
 	if err != nil {
-		log.Fatalf("can't initialize repo: %v", err)
+		return fmt.Errorf("initializing repo: %w", err)
 	}
 
 	hash, fs, err := repo.Clone(*githubSha)
 	if err != nil {
-		log.Fatalf("can't clone %s commit %s: %v", *githubRepo, *githubSha, err)
+		return fmt.Errorf("cloning repo %s at commit %s: %w", *githubRepo, *githubSha, err)
 	}
-	_ = fs
 
 	slog.Info("cloned repo filesystem", "commit-hash", hash.String())
 
@@ -81,30 +58,30 @@ func main() {
 
 	pr, resp, err := gh.PullRequests.Get(ctx, owner, repoName, *prNumber)
 	if err != nil {
-		log.Fatalf("can't get PR information: status %d: %v", resp.StatusCode, err)
+		return fmt.Errorf("getting PR information: status %d: %w", resp.StatusCode, err)
 	}
 	slog.Info("got PR info", "title", pr.Title, "node-id", pr.NodeID)
 
 	files, resp, err := gh.PullRequests.ListFiles(ctx, owner, repoName, *prNumber, nil)
 	if err != nil {
-		log.Fatalf("can't list files for PR: status %d: %v", resp.StatusCode, err)
+		return fmt.Errorf("listing files for PR: status %d: %w", resp.StatusCode, err)
 	}
 
 	commits, resp, err := gh.PullRequests.ListCommits(ctx, owner, repoName, *prNumber, nil)
 	if err != nil {
-		log.Fatalf("can't list files for PR: status %d: %v", resp.StatusCode, err)
+		return fmt.Errorf("listing commits for PR: status %d: %w", resp.StatusCode, err)
 	}
 
 	tmpl, err := template.New("ai-prompt").Parse(promptTemplate)
 	if err != nil {
-		log.Fatalf("can't parse prompt: %v", err)
+		return fmt.Errorf("parsing prompt template: %w", err)
 	}
 
 	var agentsMD string
 	if fin, err := fs.Open("AGENTS.md"); err == nil {
 		data, err := io.ReadAll(fin)
 		if err != nil {
-			log.Fatalf("can't read AGENTS.md: %v", err)
+			return fmt.Errorf("reading AGENTS.md: %w", err)
 		}
 
 		agentsMD = string(data)
@@ -129,8 +106,13 @@ func main() {
 		AgentsMD:   agentsMD,
 		PRBody:     *pr.Body,
 	}); err != nil {
-		log.Fatal(err)
+		return fmt.Errorf("executing prompt template: %w", err)
 	}
+
+	ai := openai.NewClient(
+		option.WithAPIKey(*openAIAPIKey),
+		option.WithBaseURL(*openAIAPIBase),
+	)
 
 	params := openai.ChatCompletionNewParams{
 		Messages: []openai.ChatCompletionMessageParamUnion{
@@ -182,7 +164,7 @@ func main() {
 	for !finalize {
 		completion, err := ai.Chat.Completions.New(ctx, params)
 		if err != nil {
-			log.Fatalf("can't get chat completion: %v", err)
+			return fmt.Errorf("getting chat completion: %w", err)
 		}
 
 		msg := completion.Choices[0].Message
@@ -199,11 +181,11 @@ func main() {
 			case "submit_review":
 				var args SubmitReviewParams
 				if err := json.Unmarshal([]byte(toolCall.Function.Arguments), &args); err != nil {
-					log.Fatalf("can't unmarshal tool call args: %s yielded %v", toolCall.Function.Arguments, err)
+					return fmt.Errorf("unmarshaling tool call args %s: %w", toolCall.Function.Arguments, err)
 				}
 
 				if err := args.Valid(); err != nil {
-					log.Fatalf("can't validate tool call args: %s yielded %v", toolCall.Function.Arguments, err)
+					return fmt.Errorf("validating tool call args %s: %w", toolCall.Function.Arguments, err)
 				}
 
 				slog.Info("got tool call", "name", toolCall.Function.Name, "args", args)
@@ -219,13 +201,37 @@ func main() {
 					CommitID: githubSha,
 				})
 				if err != nil {
-					log.Fatalf("can't create PR comment: status %d: %v", resp.StatusCode, err)
+					return fmt.Errorf("creating PR review: status %d: %w", resp.StatusCode, err)
 				}
 				fmt.Println("Created review:", comment.HTMLURL)
 				finalize = true
 			default:
-				log.Fatalf("model invoked unknown tool %s with args %s", toolCall.Function.Name, toolCall.Function.Arguments)
+				return fmt.Errorf("model invoked unknown tool %s with args %s", toolCall.Function.Name, toolCall.Function.Arguments)
 			}
 		}
+	}
+
+	return nil
+}
+
+func main() {
+	internal.HandleStartup()
+
+	slog.Info(
+		"Starting up",
+		"github-repo", *githubRepo,
+		"github-sha", *githubSha,
+		"has-github-token", *githubToken != "",
+		"openai-api-base", *openAIAPIBase,
+		"has-openai-api-key", *openAIAPIKey != "",
+		"openai-model", *openAIModel,
+		"pr-number", *prNumber,
+	)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	if err := run(ctx); err != nil {
+		log.Fatalf("reviewbot run failed: %v", err)
 	}
 }
