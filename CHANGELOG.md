@@ -1,3 +1,16 @@
+# [1.28.0](https://github.com/Xe/x/compare/v1.27.0...v1.28.0) (2026-01-10)
+
+### Bug Fixes
+
+- **reviewbot:** add desired output format to the system prompt ([7cb3f98](https://github.com/Xe/x/commit/7cb3f98b2e68f975a4902902c0f5c2987bcbecc1))
+
+### Features
+
+- add reviewbot prototype ([1ea29dd](https://github.com/Xe/x/commit/1ea29dde9e7f984e745d07b4343b6b8366c4b9ae))
+- **reviewbot:** add auto-trigger via commit footer ([91726b2](https://github.com/Xe/x/commit/91726b2e5827b2dfe8ae11cedee59bf4a4e96d0b))
+- **reviewbot:** if no tool call, default to leaving a PR comment ([#809](https://github.com/Xe/x/issues/809)) ([c530dd7](https://github.com/Xe/x/commit/c530dd777dde5fdc4efdd79a4cf0ac509d9128ab))
+- **skills:** add templ-htmx skill using local htmx package ([ad16a19](https://github.com/Xe/x/commit/ad16a19c9810cfb0ae52d122158738cea7eec154))
+
 # [1.27.0](https://github.com/Xe/x/compare/v1.26.1...v1.27.0) (2026-01-08)
 
 ### Bug Fixes
