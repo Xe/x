@@ -3,6 +3,8 @@ name: Reviewbot
 on:
   pull_request_review_comment:
     types: [created]
+  issue_comment:
+    types: [created]
 
 jobs:
   manual_invocation:
@@ -30,6 +32,10 @@ jobs:
         run: |
           go run ./cmd/reviewbot
         env:
+          GITHUB_REPO: ${{ github.repository }}
+          GITHUB_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OPENAI_API_BASE: https://zohar.automuse.art/v1
           OPENAI_API_KEY: ${{ secrets.ZOHAR_API_KEY }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
+          OPENAI_MODEL: gpt-oss-120b
+          PR_NUMBER: ${{ github.event.issue.number || github.event.pull_request.number }}
