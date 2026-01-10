@@ -171,6 +171,16 @@ func run(ctx context.Context) error {
 		toolCalls := msg.ToolCalls
 		if len(toolCalls) == 0 {
 			fmt.Println(msg.Content)
+			event := "COMMENT"
+			comment, resp, err := gh.PullRequests.CreateReview(ctx, owner, repoName, *prNumber, &github.PullRequestReviewRequest{
+				Body:     &msg.Content,
+				Event:    &event,
+				CommitID: githubSha,
+			})
+			if err != nil {
+				return fmt.Errorf("creating PR review: status %d: %w", resp.StatusCode, err)
+			}
+			fmt.Println("Created review:", comment.HTMLURL)
 			break
 		}
 
