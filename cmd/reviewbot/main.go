@@ -11,7 +11,6 @@ import (
 	"log"
 	"log/slog"
 	"net/http"
-	"os"
 	"strings"
 	"text/template"
 
@@ -96,7 +95,7 @@ func run(ctx context.Context) error {
 		authorLogin = *pr.User.Login
 	}
 
-	if err := tmpl.Execute(io.MultiWriter(&buf, os.Stdout), struct {
+	if err := tmpl.Execute(&buf, struct {
 		Files    []*github.CommitFile
 		Commits  []*github.RepositoryCommit
 		Title    string
