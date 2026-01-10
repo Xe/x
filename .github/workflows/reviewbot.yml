@@ -3,17 +3,12 @@ name: Reviewbot
 on:
   pull_request_review_comment:
     types: [created]
-  pull_request:
-    types: [opened]
 
 jobs:
   manual_invocation:
     if: |
-      contains(github.event.comment.body, ' /reviewbot') ||
-      startsWith(github.event.comment.body, '/reviewbot') ||
-      contains(github.event.comment.body, ' /review') ||
-      startsWith(github.event.comment.body, '/review') ||
-      contains(github.event.comment.body, 'Reviewbot-request: yes')
+      startsWith(github.event.comment.body, '/reviewbot')
+
     runs-on: ubuntu-latest
     permissions:
       id-token: write
