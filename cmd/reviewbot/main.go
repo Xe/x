@@ -8,6 +8,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"io/fs"
 	"log"
 	"log/slog"
 	"net/http"
@@ -37,6 +38,59 @@ var (
 	//go:embed systemprompt.txt
 	systemPrompt string
 )
+
+func readFileFromRepo(fs fs.FS, params ReadFileParams) (string, error) {
+	fin, err := fs.Open(params.Path)
+	if err != nil {
+		return "", fmt.Errorf("opening file: %w", err)
+	}
+	defer fin.Close()
+
+	data, err := io.ReadAll(fin)
+	if err != nil {
+		return "", fmt.Errorf("reading file: %w", err)
+	}
+
+	lines := strings.Split(string(data), "\n")
+
+	// Handle line range
+	startLine := 1
+	endLine := len(lines)
+
+	if params.StartLine != nil {
+		startLine = *params.StartLine
+	}
+	if params.EndLine != nil {
+		endLine = *params.EndLine
+	}
+
+	// Clamp to file bounds
+	if startLine > len(lines) {
+		return "", fmt.Errorf("start_line %d exceeds file length %d", startLine, len(lines))
+	}
+	if endLine > len(lines) {
+		endLine = len(lines)
+	}
+
+	// Convert to 0-indexed and extract slice
+	startIdx := startLine - 1
+	endIdx := endLine
+
+	selectedLines := lines[startIdx:endIdx]
+
+	result, err := json.Marshal(map[string]any{
+		"content":    strings.Join(selectedLines, "\n"),
+		"line_count": len(selectedLines),
+		"path":       params.Path,
+		"start_line": startLine,
+		"end_line":   endLine,
+	})
+	if err != nil {
+		return "", fmt.Errorf("marshaling result: %w", err)
+	}
+
+	return string(result), nil
+}
 
 func run(ctx context.Context) error {
 	gh := github.NewClient(http.DefaultClient).WithAuthToken(*githubToken)
@@ -162,6 +216,32 @@ func run(ctx context.Context) error {
 					},
 				},
 			},
+			{
+				OfFunction: &openai.ChatCompletionFunctionToolParam{
+					Function: openai.FunctionDefinitionParam{
+						Name:        "read_file",
+						Description: openai.String("Read file contents from the pull request's repository"),
+						Parameters: openai.FunctionParameters{
+							"type": "object",
+							"properties": map[string]any{
+								"path": map[string]any{
+									"type":        "string",
+									"description": "File path relative to repository root",
+								},
+								"start_line": map[string]any{
+									"type":        "integer",
+									"description": "1-indexed start line (default: 1)",
+								},
+								"end_line": map[string]any{
+									"type":        "integer",
+									"description": "1-indexed end line (default: end of file)",
+								},
+							},
+							"required": []string{"path"},
+						},
+					},
+				},
+			},
 		},
 	}
 
@@ -192,6 +272,7 @@ func run(ctx context.Context) error {
 		params.Messages = append(params.Messages, msg.ToParam())
 
 		for _, toolCall := range toolCalls {
+			var resultMsg string
 			switch toolCall.Function.Name {
 			case "submit_review":
 				var args SubmitReviewParams
@@ -220,9 +301,29 @@ func run(ctx context.Context) error {
 				}
 				fmt.Println("Created review:", comment.HTMLURL)
 				finalize = true
+			case "read_file":
+				var args ReadFileParams
+				if err := json.Unmarshal([]byte(toolCall.Function.Arguments), &args); err != nil {
+					return fmt.Errorf("unmarshaling tool call args %s: %w", toolCall.Function.Arguments, err)
+				}
+
+				if err := args.Valid(); err != nil {
+					return fmt.Errorf("validating tool call args %s: %w", toolCall.Function.Arguments, err)
+				}
+
+				slog.Info("got tool call", "name", toolCall.Function.Name, "args", args)
+
+				result, err := readFileFromRepo(fs, args)
+				if err != nil {
+					resultMsg = fmt.Sprintf(`{"error": "%s"}`, err)
+				} else {
+					resultMsg = result
+				}
 			default:
 				return fmt.Errorf("model invoked unknown tool %s with args %s", toolCall.Function.Name, toolCall.Function.Arguments)
 			}
+
+			params.Messages = append(params.Messages, openai.ToolMessage(resultMsg, toolCall.ID))
 		}
 	}
 
