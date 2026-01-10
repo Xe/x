@@ -12,6 +12,7 @@ programs = [
   // "mi",
   //"mimi",
   "reverseproxyd",
+  "reviewbot",
   "sapientwindex",
   "stickers",
   "todayinmarch2020",
