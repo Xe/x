@@ -89,22 +89,27 @@ func run(ctx context.Context) error {
 
 	var buf bytes.Buffer
 
+	prTitle := github.Stringify(pr.Title)
+	prBody := github.Stringify(pr.Body)
+	var authorLogin string
+	if pr.User != nil && pr.User.Login != nil {
+		authorLogin = *pr.User.Login
+	}
+
 	if err := tmpl.Execute(io.MultiWriter(&buf, os.Stdout), struct {
-		Files      []*github.CommitFile
-		Commits    []*github.RepositoryCommit
-		Title      string
-		Author     string
-		AuthorRole string
-		AgentsMD   string
-		PRBody     string
+		Files    []*github.CommitFile
+		Commits  []*github.RepositoryCommit
+		Title    string
+		Author   string
+		AgentsMD string
+		PRBody   string
 	}{
-		Files:      files,
-		Commits:    commits,
-		Title:      *pr.Title,
-		Author:     *pr.User.Login,
-		AuthorRole: *pr.AuthorAssociation,
-		AgentsMD:   agentsMD,
-		PRBody:     *pr.Body,
+		Files:    files,
+		Commits:  commits,
+		Title:    prTitle,
+		Author:   authorLogin,
+		AgentsMD: agentsMD,
+		PRBody:   prBody,
 	}); err != nil {
 		return fmt.Errorf("executing prompt template: %w", err)
 	}
