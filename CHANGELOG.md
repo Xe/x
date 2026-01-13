@@ -1,3 +1,9 @@
+# [1.29.0](https://github.com/Xe/x/compare/v1.28.0...v1.29.0) (2026-01-13)
+
+### Features
+
+- add cmd/readability ([8043d20](https://github.com/Xe/x/commit/8043d209826d0e038ebd991b32806de9424a4cae))
+
 # [1.28.0](https://github.com/Xe/x/compare/v1.27.0...v1.28.0) (2026-01-10)
 
 ### Bug Fixes
