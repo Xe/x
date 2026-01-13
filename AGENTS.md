@@ -60,7 +60,7 @@ Commit messages follow **Conventional Commits** format:
 - Add `!` after type/scope for breaking changes or include `BREAKING CHANGE:` in the footer.
 - Keep descriptions concise, imperative, lowercase, and without a trailing period.
 - Reference issues/PRs in the footer when applicable.
-- Make sure to use `--signoff` when making git commits.
+- **ALL git commits MUST be made with `--signoff`.** This is mandatory.
 
 ### Attribution Requirements
 
