@@ -19,6 +19,7 @@ import (
 	"github.com/openai/openai-go/v3/option"
 	"rsc.io/gitfs"
 	"within.website/x/internal"
+	"within.website/x/llm/codeinterpreter/python"
 )
 
 var (
@@ -124,23 +125,23 @@ func run(ctx context.Context) error {
 			openai.UserMessage(buf.String()),
 		},
 		Tools: []openai.ChatCompletionToolUnionParam{
-			// {
-			// 	OfFunction: &openai.ChatCompletionFunctionToolParam{
-			// 		Function: openai.FunctionDefinitionParam{
-			// 			Name:        "python",
-			// 			Description: openai.String("Execute python code"),
-			// 			Parameters: openai.FunctionParameters{
-			// 				"type": "object",
-			// 				"properties": map[string]any{
-			// 					"code": map[string]any{
-			// 						"type": "string",
-			// 					},
-			// 				},
-			// 				"required": []string{"code"},
-			// 			},
-			// 		},
-			// 	},
-			// },
+			{
+				OfFunction: &openai.ChatCompletionFunctionToolParam{
+					Function: openai.FunctionDefinitionParam{
+						Name:        "python",
+						Description: openai.String("Execute python code"),
+						Parameters: openai.FunctionParameters{
+							"type": "object",
+							"properties": map[string]any{
+								"code": map[string]any{
+									"type": "string",
+								},
+							},
+							"required": []string{"code"},
+						},
+					},
+				},
+			},
 			{
 				OfFunction: &openai.ChatCompletionFunctionToolParam{
 					Function: openai.FunctionDefinitionParam{
@@ -192,6 +193,35 @@ func run(ctx context.Context) error {
 
 		for _, toolCall := range toolCalls {
 			switch toolCall.Function.Name {
+			case "python":
+				var args PythonParams
+				if err := json.Unmarshal([]byte(toolCall.Function.Arguments), &args); err != nil {
+					return fmt.Errorf("unmarshaling tool call args %s: %w", toolCall.Function.Arguments, err)
+				}
+
+				if err := args.Valid(); err != nil {
+					return fmt.Errorf("validating tool call args %s: %w", toolCall.Function.Arguments, err)
+				}
+
+				slog.Info("got tool call", "name", toolCall.Function.Name, "args", args)
+
+				result, err := python.Run(ctx, fs, args.Code)
+				if err != nil {
+					result = &python.Result{
+						PlatformError: err.Error(),
+					}
+				}
+
+				// Send the result back to the LLM
+				resultMsg := fmt.Sprintf("stdout:\n%s\n\nstderr:\n%s\n", result.Stdout, result.Stderr)
+				if result.PlatformError != "" {
+					resultMsg += fmt.Sprintf("error:\n%s\n", result.PlatformError)
+				}
+
+				params.Messages = append(params.Messages, openai.ToolMessage(
+					resultMsg,
+					toolCall.ID,
+				))
 			case "submit_review":
 				var args SubmitReviewParams
 				if err := json.Unmarshal([]byte(toolCall.Function.Arguments), &args); err != nil {
