@@ -78,7 +78,11 @@ Assisted-by: GLM 4.6 via Claude Code
 
 Additionally, commits created by AI agents should include the footer `Reviewbot-request: yes` to trigger automated code review.
 
-### Additional Guidelines
+## Helpful Documentation
+
+When asked about various services or tools, use these resources to help you:
+
+- **Tigris** or **Tigris Data**: https://www.tigrisdata.com/docs/llms.txt
 
 ## Pull Request Requirements
 
