@@ -24,3 +24,21 @@ func (srp SubmitReviewParams) Valid() error {
 
 	return nil
 }
+
+type PythonParams struct {
+	Code string `json:"code"`
+}
+
+func (pp PythonParams) LogValue() slog.Value {
+	return slog.GroupValue(
+		slog.String("code", pp.Code),
+	)
+}
+
+func (pp PythonParams) Valid() error {
+	if pp.Code == "" {
+		return errors.New("code is required")
+	}
+
+	return nil
+}
