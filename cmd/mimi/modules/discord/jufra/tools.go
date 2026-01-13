@@ -81,17 +81,10 @@ func (m *Module) runPythonCode(ctx context.Context, tc ollama.ToolCall) (*ollama
 		return nil, err
 	}
 
-	tmpdir, err := os.MkdirTemp("", "mimi-python-*")
-	if err != nil {
-		return nil, err
-	}
-
-	defer os.RemoveAll(tmpdir)
-
 	ctx, cancel := context.WithTimeout(ctx, 30*time.Second)
 	defer cancel()
 
-	res, err := python.Run(ctx, tmpdir, args.Code)
+	res, err := python.Run(ctx, nil, args.Code)
 	if err != nil {
 		return &ollama.Message{
 			Role:    "tool",

@@ -5,7 +5,6 @@ import (
 	"flag"
 	"log"
 	"net/http"
-	"os"
 
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 	"within.website/x"
@@ -23,14 +22,7 @@ type Input struct {
 }
 
 func Python(ctx context.Context, req *mcp.CallToolRequest, input Input) (*mcp.CallToolResult, *python.Result, error) {
-	dir, err := os.MkdirTemp("", "python-wasm-mcp-*")
-	if err != nil {
-		return nil, nil, err
-	}
-
-	defer os.RemoveAll(dir)
-
-	result, err := python.Run(ctx, dir, input.Code)
+	result, err := python.Run(ctx, nil, input.Code)
 	if err != nil {
 		return nil, nil, err
 	}

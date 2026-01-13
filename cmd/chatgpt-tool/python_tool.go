@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"os"
 
 	"within.website/x/llm/codeinterpreter/python"
 )
@@ -12,14 +11,7 @@ type PythonInput struct {
 }
 
 func Python(ctx context.Context, input PythonInput) (*python.Result, error) {
-	dir, err := os.MkdirTemp("", "python-wasm-mcp-*")
-	if err != nil {
-		return nil, err
-	}
-
-	defer os.RemoveAll(dir)
-
-	result, err := python.Run(ctx, dir, input.Code)
+	result, err := python.Run(ctx, nil, input.Code)
 	if err != nil {
 		return nil, err
 	}
