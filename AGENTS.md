@@ -90,6 +90,7 @@ When asked about various services or tools, use these resources to help you:
 - Reference any related issues
 - Pass CI (`npm test`)
 - Optionally add screenshots for UI changes
+- Add a comment `/reviewbot` to trigger automated code review
 
 ### Security Best Practices
 
