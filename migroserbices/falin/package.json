@@ -26,7 +26,7 @@
   "dependencies": {
     "@bufbuild/protobuf": "^1.10.0",
     "@connectrpc/connect": "^1.5.0",
-    "@connectrpc/connect-express": "^1.5.0",
+    "@connectrpc/connect-express": "^2.1.1",
     "@fal-ai/serverless-client": "^0.14.3",
     "@fal-ai/serverless-proxy": "^0.9.0",
     "cors": "^2.8.5",
