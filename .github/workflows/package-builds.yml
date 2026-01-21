@@ -13,7 +13,7 @@ jobs:
   package_builds:
     runs-on: alrest-x
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
           persist-credentials: false
           fetch-tags: true
@@ -25,10 +25,10 @@ jobs:
           sudo apt-get install -y build-essential
 
       - name: Set up Homebrew
-        uses: Homebrew/actions/setup-homebrew@master
+        uses: Homebrew/actions/setup-homebrew@5d6d1da704bb2434e19e77cd91a876f2b333a06b # master
 
       - name: Setup Homebrew cellar cache
-        uses: actions/cache@v4
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
           path: |
             /home/linuxbrew/.linuxbrew/Cellar
@@ -49,7 +49,7 @@ jobs:
           brew bundle
 
       - name: Setup Golang caches
-        uses: actions/cache@v4
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
           path: |
             ~/.cache/go-build
