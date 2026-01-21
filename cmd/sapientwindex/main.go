@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"log"
@@ -14,6 +15,7 @@ import (
 	"github.com/Marcel-ICMC/graw/reddit"
 	"within.website/x/internal"
 	"within.website/x/internal/yeet"
+	"within.website/x/store"
 	"within.website/x/web/discordwebhook"
 )
 
@@ -22,6 +24,7 @@ var (
 	redditUsername    = flag.String("reddit-username", "", "Your reddit username")
 	subreddits        = flag.String("subreddits", "", "subreddits to scan (separate multiple by commas)")
 	scanDuration      = flag.Duration("scan-duration", 30*time.Second, "scan frequency")
+	stateDir          = flag.String("state-dir", "", "state directory")
 )
 
 func main() {
@@ -42,6 +45,13 @@ func main() {
 		os.Exit(2)
 	}
 
+	st, err := store.NewCAS(*stateDir)
+	if err != nil {
+		slog.Error("can't open state directory", "dir", *stateDir, "err", err)
+		os.Exit(2)
+	}
+	defer store.Close(st)
+
 	redditUserAgent := fmt.Sprintf("graw:within.website/x/cmd/sapientwindex:%s by /u/%s", yeet.DateTag, *redditUsername)
 
 	slog.Info("starting up", "subreddits", *subreddits, "scan_duration", (*scanDuration).String())
@@ -50,7 +60,12 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	announce := &announcer{}
+	announce := &announcer{
+		seenPosts: &store.JSON[void]{
+			Underlying: st,
+			Prefix:     "posts",
+		},
+	}
 
 	scriptCfg := graw.Config{
 		Subreddits: strings.Split(*subreddits, ","),
@@ -71,7 +86,10 @@ func main() {
 	}
 }
 
-type announcer struct{}
+type void struct{}
+type announcer struct {
+	seenPosts *store.JSON[void]
+}
 
 func addMemeArrow(str string) string {
 	var result strings.Builder
@@ -86,8 +104,13 @@ func addMemeArrow(str string) string {
 }
 
 func (a announcer) Post(post *reddit.Post) error {
+	if a.seenPosts.Exists(context.Background(), post.ID) == nil {
+		slog.Debug("already seen post, ignoring", "id", post.ID)
+		return nil
+	}
+
 	if len(post.SelfText) > 1000 {
-		post.SelfText = post.SelfText[:1000] + " [truncated]"
+		post.SelfText = post.SelfText[:1000] + "... [truncated]"
 	}
 
 	wh := discordwebhook.Webhook{
@@ -114,6 +137,11 @@ func (a announcer) Post(post *reddit.Post) error {
 
 	if err := discordwebhook.Validate(resp); err != nil {
 		slog.Error("discord webhook error", "err", err)
+		return nil
+	}
+
+	if err := a.seenPosts.Set(context.Background(), post.ID, void{}); err != nil {
+		slog.Error("seen post error", "err", err)
 		return nil
 	}
 

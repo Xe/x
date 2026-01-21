@@ -20,6 +20,9 @@ spec:
         - name: sapientwindex
           secret:
             secretName: sapientwindex
+        - name: vol
+          persistentVolumeClaim:
+            claimName: sapientwindex
       containers:
         - name: bot
           image: ghcr.io/xe/x/sapientwindex:latest
@@ -41,7 +44,12 @@ spec:
                 - ALL
             seccompProfile:
               type: RuntimeDefault
+          env:
+            - name: STATE_DIR
+              value: "/data/state"
           volumeMounts:
             - name: sapientwindex
               readOnly: true
               mountPath: "/run/secrets/sapientwindex"
+            - name: vol
+              mountPath: "/data"
