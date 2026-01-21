@@ -1,3 +1,4 @@
 resources:
   - deployment.yaml
+  - pvc.yaml
   - xe-op-secret.yaml
