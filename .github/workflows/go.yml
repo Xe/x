@@ -38,8 +38,6 @@ jobs:
         with:
           go-version: stable
 
-      - uses: ko-build/setup-ko@d982fec422852203cfb2053a8ec6ad302280d04d # v0.8
-
       - uses: bufbuild/buf-action@8f4a1456a0ab6a1eb80ba68e53832e6fcfacc16c # v1.3.0
         with:
           token: ${{ secrets.BUF_TOKEN }}
