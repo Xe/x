@@ -51,18 +51,3 @@ type Interface interface {
 	// List lists the keys in this keyspace optionally matching by a prefix.
 	List(ctx context.Context, prefix string) ([]string, error)
 }
-
-// Closer is an optional interface for stores that need explicit cleanup.
-// Use Close() to safely close a store, which will call Close() on the underlying
-// store if it implements Closer, otherwise it does nothing.
-type Closer interface {
-	Close() error
-}
-
-// Close closes the store if it implements Closer, otherwise returns nil.
-func Close(s Interface) error {
-	if c, ok := s.(Closer); ok {
-		return c.Close()
-	}
-	return nil
-}
