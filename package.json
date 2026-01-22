@@ -37,7 +37,7 @@
     "@tailwindcss/cli": "^4.1.18",
     "husky": "^9.1.7",
     "lint-staged": "^16.2.7",
-    "prettier": "^3.7.4",
+    "prettier": "^3.8.0",
     "semantic-release": "^25.0.2",
     "tailwindcss": "^4.1.18"
   },
