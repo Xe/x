@@ -4,7 +4,7 @@ package web
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log/slog"
 	"net/http"
 	"net/url"
@@ -15,7 +15,7 @@ import (
 //
 // This consumes the body of the HTTP response.
 func NewError(wantStatusCode int, resp *http.Response) error {
-	data, err := ioutil.ReadAll(resp.Body)
+	data, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return err
 	}
