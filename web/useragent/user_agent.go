@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"path/filepath"
 	"runtime"
 )
 
@@ -23,7 +24,7 @@ func GenUserAgent(prefix, infoURL string) string {
 	return fmt.Sprintf(
 		"%s (%s/%s/%s; %s; +%s) Hostname/%s",
 		prefix, runtime.Version(), runtime.GOOS, runtime.GOARCH, infoURL,
-		os.Args[0], hostname,
+		filepath.Base(os.Args[0]), hostname,
 	)
 }
 
