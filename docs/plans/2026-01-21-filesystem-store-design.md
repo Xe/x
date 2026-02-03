@@ -11,11 +11,13 @@ Add three filesystem-based implementations of `store.Interface` to enable local 
 Simple key→file mapping. A key `foo/bar/baz` creates directories `foo/bar/` and a file `baz` in the base directory.
 
 **Constructor:**
+
 ```go
 func NewDirectFile(baseDir string) (Interface, error)
 ```
 
 **Key details:**
+
 - Creates base directory if missing
 - Uses `os.MkdirAll` for nested paths automatically
 - `List` uses `filepath.WalkDir` to find files under prefix
@@ -24,11 +26,13 @@ func NewDirectFile(baseDir string) (Interface, error)
 - Files stored as raw bytes
 
 **Path validation:**
+
 - Keys containing `..` segments are rejected (return `ErrBadConfig`)
 - Empty keys are rejected
 - Leading `/` is stripped
 
 **Error handling:**
+
 - `Exists` returns `ErrNotFound` if file doesn't exist
 - `Get` returns `ErrNotFound` wrapped around `os.ErrNotExist`
 - `Delete` succeeds silently if file already gone
@@ -42,11 +46,13 @@ func NewDirectFile(baseDir string) (Interface, error)
 In-memory JSON index with mutex-protected concurrent access.
 
 **Constructor:**
+
 ```go
 func NewJSONMutexDB(baseDir string) (Interface, error)
 ```
 
 **Directory structure:**
+
 ```
 baseDir/
 ├── index.json    # key→filename index
@@ -55,6 +61,7 @@ baseDir/
 ```
 
 **Data structure:**
+
 ```go
 type jsonMutexDB struct {
     mu    sync.RWMutex
@@ -64,6 +71,7 @@ type jsonMutexDB struct {
 ```
 
 **Key details:**
+
 - Creates both directories if missing
 - On `Set`: write lock, update in-memory map, write index JSON, write data to `data/<filename>`
 - On `Get/Delete/Exists`: read lock, lookup key in index, operate on `data/<filename>`
@@ -71,6 +79,7 @@ type jsonMutexDB struct {
 - Saves entire JSON file on each write
 
 **Error handling:**
+
 - Returns `ErrBadConfig` if `index.json` is corrupted on load
 - Creates empty index if file doesn't exist
 - `Get` returns `ErrNotFound` if key not in index
@@ -84,11 +93,13 @@ type jsonMutexDB struct {
 Content-addressable storage with deduplication. Identical data shares storage; index maps keys to hash-based filenames.
 
 **Constructor:**
+
 ```go
 func NewCAS(baseDir string) (Interface, error)
 ```
 
 **Directory structure:**
+
 ```
 baseDir/
 ├── index.bolt    # BoltDB key→hash index
@@ -97,21 +108,25 @@ baseDir/
 ```
 
 **BoltDB schema:**
+
 - Bucket: `keys`
 - Key: the store key (e.g., "foo/bar/baz")
 - Value: SHA-256 hash (hex encoded, 64 chars)
 
 **Storage format:**
+
 - Objects stored as `objects/aa/bb/filename` using first 4 chars for sharding
 - Full hash as filename
 
 **Key details:**
+
 - On `Set`: compute SHA-256, write object if missing, update BoltDB
 - On `Get`: lookup hash in BoltDB, read from `objects/`
 - On `Delete`: remove BoltDB entry (orphaned objects OK, GC not required initially)
 - `List`: iterates BoltDB keys, filters by prefix
 
 **Error handling:**
+
 - Returns `ErrBadConfig` if BoltDB open fails
 - Returns `ErrNotFound` if key missing or object file gone
 
@@ -132,6 +147,7 @@ Each implementation has its own test file using `t.TempDir()`:
 ## Error Consistency
 
 All implementations follow the S3API pattern:
+
 - Missing keys → `ErrNotFound` (wrapped)
 - Invalid configuration → `ErrBadConfig`
 - IO failures → underlying error wrapped with context
@@ -141,4 +157,5 @@ All implementations follow the S3API pattern:
 ## Dependencies
 
 New dependency required for CAS:
+
 - `go.etcd.io/bbolt` - BoltDB for the CAS index

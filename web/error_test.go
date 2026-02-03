@@ -10,11 +10,11 @@ import (
 
 func TestNewError(t *testing.T) {
 	tests := []struct {
-		name         string
-		wantStatus   int
-		response     *http.Response
-		wantErr      bool
-		checkError   func(*testing.T, error)
+		name       string
+		wantStatus int
+		response   *http.Response
+		wantErr    bool
+		checkError func(*testing.T, error)
 	}{
 		{
 			name:       "successful error creation",
@@ -161,8 +161,8 @@ func TestError_Error(t *testing.T) {
 
 func TestError_LogValue(t *testing.T) {
 	tests := []struct {
-		name string
-		err  *Error
+		name  string
+		err   *Error
 		check func(*testing.T, slog.Value)
 	}{
 		{
