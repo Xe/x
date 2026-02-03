@@ -7,6 +7,7 @@ require (
 	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.6-20250603165357-b52ab10f4468.1
 	buf.build/go/protovalidate v0.12.0
 	cirello.io/goherokuname v0.0.0-20190914093443-b436bae8c2c5
+	codeberg.org/readeck/go-readability/v2 v2.1.0
 	connectrpc.com/connect v1.18.1
 	github.com/Marcel-ICMC/graw v0.0.0-20230411090719-e24cd8592d25
 	github.com/McKael/madon/v2 v2.4.0
@@ -20,6 +21,7 @@ require (
 	github.com/c-bata/go-prompt v0.2.6
 	github.com/cenkalti/backoff/v4 v4.3.0
 	github.com/coreos/go-oidc/v3 v3.14.1
+	github.com/creachadair/otp v0.5.3
 	github.com/danrusei/gobot-bsky v0.1.0
 	github.com/disintegration/imaging v1.6.2
 	github.com/eaburns/peggy v1.0.2
@@ -93,7 +95,6 @@ require (
 require (
 	cel.dev/expr v0.24.0 // indirect
 	charm.land/lipgloss/v2 v2.0.0-beta.3.0.20251120230642-dcccabe2cd63 // indirect
-	codeberg.org/readeck/go-readability/v2 v2.1.0 // indirect
 	dario.cat/mergo v1.0.2 // indirect
 	github.com/AlekSi/pointer v1.2.0 // indirect
 	github.com/BurntSushi/toml v1.4.1-0.20240526193622-a339e1f7089c // indirect
@@ -269,6 +270,7 @@ require (
 	golang.org/x/exp/typeparams v0.0.0-20231108232855-2478ac86f678 // indirect
 	golang.org/x/telemetry v0.0.0-20251008203120-078029d740a8 // indirect
 	golang.org/x/term v0.37.0 // indirect
+	golang.org/x/tools/go/expect v0.1.1-deprecated // indirect
 	golang.org/x/xerrors v0.0.0-20240716161551-93cc26a95ae9 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20250603155806-513f23925822 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250528174236-200df99c418a // indirect

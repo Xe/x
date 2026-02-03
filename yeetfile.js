@@ -115,6 +115,24 @@ const pkgs = [];
 
     pkgs.push(
       method.build({
+        name: "totpgen",
+        description: "TOTP code generator",
+        homepage: "https://within.website",
+        license: "CC0",
+        goarch,
+
+        documentation: {
+          LICENSE: "LICENSE",
+        },
+
+        build: ({ bin }) => {
+          $`go build -o ${bin}/totpgen -ldflags '-s -w -extldflags "-static" -X "within.website/x.Version=${git.tag()}"' ./cmd/totpgen`;
+        },
+      }),
+    );
+
+    pkgs.push(
+      method.build({
         name: "relayd",
         description: "TLS termination and client fingerprinting",
         homepage: "https://within.website",
