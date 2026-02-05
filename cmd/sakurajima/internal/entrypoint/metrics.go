@@ -56,6 +56,7 @@ func readyz(w http.ResponseWriter, r *http.Request) {
 	if !ok {
 		slog.Error("health service osiris does not exist, file a bug")
 		http.Error(w, "health service osiris does not exist", http.StatusExpectationFailed)
+		return
 	}
 
 	switch st {
