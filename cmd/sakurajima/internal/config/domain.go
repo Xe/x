@@ -17,12 +17,13 @@ var (
 )
 
 type Domain struct {
-	Name               string `hcl:"name,label"`
-	TLS                TLS    `hcl:"tls,block"`
-	Target             string `hcl:"target"`
-	InsecureSkipVerify bool   `hcl:"insecure_skip_verify,optional"`
-	HealthTarget       string `hcl:"health_target"`
-	AllowPrivateTarget bool   `hcl:"allow_private_target,optional"`
+	Name               string  `hcl:"name,label"`
+	TLS                TLS     `hcl:"tls,block"`
+	Target             string  `hcl:"target"`
+	InsecureSkipVerify bool    `hcl:"insecure_skip_verify,optional"`
+	HealthTarget       string  `hcl:"health_target"`
+	AllowPrivateTarget bool    `hcl:"allow_private_target,optional"`
+	Limits             *Limits `hcl:"limits,block"`
 }
 
 func (d Domain) Valid() error {
@@ -59,6 +60,12 @@ func (d Domain) Valid() error {
 		u, err := url.Parse(d.Target)
 		if err == nil && u.Scheme != "https" {
 			errs = append(errs, fmt.Errorf("insecure_skip_verify is only valid for https:// targets, got %s", u.Scheme))
+		}
+	}
+
+	if d.Limits != nil {
+		if err := d.Limits.Valid(); err != nil {
+			errs = append(errs, fmt.Errorf("limits config is invalid: %w", err))
 		}
 	}
 
