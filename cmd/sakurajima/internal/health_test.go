@@ -8,11 +8,11 @@ import (
 
 func TestSetHealthGetHealth(t *testing.T) {
 	cases := []struct {
-		name          string
-		service       string
-		setStatus     healthv1.HealthCheckResponse_ServingStatus
-		wantStatus    healthv1.HealthCheckResponse_ServingStatus
-		wantFound     bool
+		name       string
+		service    string
+		setStatus  healthv1.HealthCheckResponse_ServingStatus
+		wantStatus healthv1.HealthCheckResponse_ServingStatus
+		wantFound  bool
 	}{
 		{
 			name:       "service is serving",
@@ -121,11 +121,11 @@ func TestGetHealthNotFound(t *testing.T) {
 
 func TestSetHealthOverwrite(t *testing.T) {
 	cases := []struct {
-		name       string
-		service    string
+		name         string
+		service      string
 		firstStatus  healthv1.HealthCheckResponse_ServingStatus
 		secondStatus healthv1.HealthCheckResponse_ServingStatus
-		wantStatus healthv1.HealthCheckResponse_ServingStatus
+		wantStatus   healthv1.HealthCheckResponse_ServingStatus
 	}{
 		{
 			name:         "serving to not serving",
