@@ -12,6 +12,7 @@ Table-driven tests are a Go testing idiom that reduces code duplication and make
 ## When to Use Table-Driven Tests
 
 Use table-driven tests when:
+
 - You find yourself copying and pasting test code
 - You're testing the same function/behavior with multiple inputs
 - You want to add more test cases without writing more test functions
@@ -95,15 +96,15 @@ func TestFunctionName(t *testing.T) {
 
 This codebase consistently uses these variable names:
 
-| Purpose | Variable Name | Example |
-|---------|---------------|---------|
-| Test cases slice | `cases`, `tt`, `cs` | `cases := []struct{...}` |
-| Loop variable | `tt`, `cs`, `tc` | `for _, tt := range cases` |
-| Input field | `input`, `in`, `inp` | `input: "test"` |
-| Expected output | `want`, `expected` | `want: "result"` |
-| Actual output | `got`, `output` | `got := Function()` |
-| Error field | `err`, `wantErr` | `err: ErrInvalid` |
-| Name field | `name` | `name: "descriptive name"` |
+| Purpose          | Variable Name        | Example                    |
+| ---------------- | -------------------- | -------------------------- |
+| Test cases slice | `cases`, `tt`, `cs`  | `cases := []struct{...}`   |
+| Loop variable    | `tt`, `cs`, `tc`     | `for _, tt := range cases` |
+| Input field      | `input`, `in`, `inp` | `input: "test"`            |
+| Expected output  | `want`, `expected`   | `want: "result"`           |
+| Actual output    | `got`, `output`      | `got := Function()`        |
+| Error field      | `err`, `wantErr`     | `err: ErrInvalid`          |
+| Name field       | `name`               | `name: "descriptive name"` |
 
 ### Struct Field Guidelines
 
@@ -221,13 +222,13 @@ func TestFunctionName(t *testing.T) {
 
 ## Comparison with Traditional Tests
 
-| Traditional | Table-Driven |
-|-------------|--------------|
+| Traditional                          | Table-Driven                                                 |
+| ------------------------------------ | ------------------------------------------------------------ |
 | `func TestFoo(t *testing.T) { ... }` | `func TestFoo(t *testing.T) { cases := []struct{...}{...} }` |
-| One test function per case | Single function, many cases |
-| Hard to add new cases | Just add a row to the table |
-| Verbose boilerplate | Concise, DRY code |
-| `go test -run TestFoo_SpecificCase` | `go test -run TestFoo/name` |
+| One test function per case           | Single function, many cases                                  |
+| Hard to add new cases                | Just add a row to the table                                  |
+| Verbose boilerplate                  | Concise, DRY code                                            |
+| `go test -run TestFoo_SpecificCase`  | `go test -run TestFoo/name`                                  |
 
 ## Running Specific Tests
 

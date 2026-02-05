@@ -273,7 +273,7 @@ func TestJSONMutexDBConcurrent(t *testing.T) {
 		go func(n int) {
 			defer wg.Done()
 			for j := 0; j < numOps; j++ {
-				key := string(rune('a' + n)) + "/key" + string(rune('0'+j))
+				key := string(rune('a'+n)) + "/key" + string(rune('0'+j))
 				err := store.Set(ctx, key, []byte("data"))
 				if err != nil {
 					t.Errorf("Set(%q) error = %v", key, err)
