@@ -65,7 +65,7 @@ type Router struct {
 	opts                 Options
 	accessLog            atomic.Value // stores *lumberjack.Logger
 	baseSlog             *slog.Logger
-	log                  *slog.Logger
+	log                  atomic.Value // stores *slog.Logger
 	autoMgr              *autocert.Manager
 	autocertRedirectCode int
 }
@@ -202,7 +202,7 @@ func (rtr *Router) setConfig(c config.Toplevel) error {
 	rtr.routes = newMap
 	rtr.tlsCerts = newCerts
 	rtr.accessLog.Store(lum)
-	rtr.log = log
+	rtr.log.Store(log)
 	rtr.autoMgr = autoMgr
 	if c.Autocert != nil && c.Autocert.HTTPRedirectCode != 0 {
 		rtr.autocertRedirectCode = c.Autocert.HTTPRedirectCode
@@ -233,7 +233,9 @@ func (rtr *Router) GetCertificate(hello *tls.ClientHelloInfo) (*tls.Certificate,
 }
 
 func (rtr *Router) loadConfig() error {
-	rtr.log.Info("reloading config", "fname", rtr.opts.ConfigFname)
+	if logger := rtr.log.Load(); logger != nil {
+		logger.(*slog.Logger).Info("reloading config", "fname", rtr.opts.ConfigFname)
+	}
 	var cfg config.Toplevel
 	if err := hclsimple.DecodeFile(rtr.opts.ConfigFname, nil, &cfg); err != nil {
 		return err
@@ -247,7 +249,9 @@ func (rtr *Router) loadConfig() error {
 		return err
 	}
 
-	rtr.log.Info("done reloading config", "domains", len(cfg.Domains))
+	if logger := rtr.log.Load(); logger != nil {
+		logger.(*slog.Logger).Info("done reloading config", "domains", len(cfg.Domains))
+	}
 
 	return nil
 }
@@ -269,11 +273,13 @@ func (rtr *Router) backgroundReloadConfig(ctx context.Context) {
 }
 
 func NewRouter(c config.Toplevel, logLevel string) (*Router, error) {
+	baseLog := logging.InitSlog(logLevel)
 	result := &Router{
 		routes:   map[string]http.Handler{},
-		baseSlog: logging.InitSlog(logLevel),
+		baseSlog: baseLog,
 	}
 	result.accessLog.Store((*lumberjack.Logger)(nil))
+	result.log.Store(baseLog)
 
 	if err := result.setConfig(c); err != nil {
 		return nil, err
@@ -356,7 +362,9 @@ func (rtr *Router) ListenAndServeMetrics(ctx context.Context, addr string) error
 	mux.HandleFunc("/readyz", readyz)
 	mux.HandleFunc("/healthz", healthz)
 
-	rtr.log.Info("listening", "for", "metrics", "bind", addr)
+	if logger := rtr.log.Load(); logger != nil {
+		logger.(*slog.Logger).Info("listening", "for", "metrics", "bind", addr)
+	}
 
 	srv := http.Server{
 		Addr:    addr,
@@ -383,7 +391,9 @@ func (rtr *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	ja4hFP := ja4h.JA4H(r)
 
-	rtr.log.Debug("got request", "method", r.Method, "host", host, "path", r.URL.Path)
+	if logger := rtr.log.Load(); logger != nil {
+		logger.(*slog.Logger).Debug("got request", "method", r.Method, "host", host, "path", r.URL.Path)
+	}
 
 	rtr.lock.RLock()
 	h, ok = rtr.routes[host]
@@ -415,7 +425,9 @@ func (rtr *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	requestsPerDomain.WithLabelValues(host, r.Method, fmt.Sprint(m.Code)).Inc()
 	responseTime.WithLabelValues(host).Observe(float64(m.Duration.Milliseconds()))
 
-	rtr.log.Debug("request completed", "host", host, "method", r.Method, "response_code", m.Code, "duration_ms", m.Duration.Milliseconds())
+	if logger := rtr.log.Load(); logger != nil {
+		logger.(*slog.Logger).Debug("request completed", "host", host, "method", r.Method, "response_code", m.Code, "duration_ms", m.Duration.Milliseconds())
+	}
 
 	if accessLog := rtr.accessLog.Load(); accessLog != nil {
 		if logger, ok := accessLog.(*lumberjack.Logger); ok && logger != nil {
