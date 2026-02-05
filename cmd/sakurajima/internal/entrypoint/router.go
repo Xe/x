@@ -293,10 +293,10 @@ func (rtr *Router) HandleHTTP(ctx context.Context, ln net.Listener) error {
 		Handler: rtr.httpHandler(),
 	}
 
-	go func(ctx context.Context) {
+	go func() {
 		<-ctx.Done()
 		srv.Close()
-	}(ctx)
+	}()
 
 	return srv.Serve(ln)
 }
@@ -334,10 +334,10 @@ func (rtr *Router) HandleHTTPS(ctx context.Context, ln net.Listener) error {
 		TLSConfig: tc,
 	}
 
-	go func(ctx context.Context) {
+	go func() {
 		<-ctx.Done()
 		srv.Close()
-	}(ctx)
+	}()
 
 	fingerprint.ApplyTLSFingerprinter(srv)
 
@@ -351,10 +351,10 @@ func (rtr *Router) ListenAndServeMetrics(ctx context.Context, addr string) error
 	}
 	defer ln.Close()
 
-	go func(ctx context.Context) {
+	go func() {
 		<-ctx.Done()
 		ln.Close()
-	}(ctx)
+	}()
 
 	mux := http.NewServeMux()
 
@@ -371,10 +371,10 @@ func (rtr *Router) ListenAndServeMetrics(ctx context.Context, addr string) error
 		Handler: mux,
 	}
 
-	go func(ctx context.Context) {
+	go func() {
 		<-ctx.Done()
 		srv.Close()
-	}(ctx)
+	}()
 
 	return srv.Serve(ln)
 }

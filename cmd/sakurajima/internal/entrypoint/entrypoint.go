@@ -47,10 +47,10 @@ func Main(ctx context.Context, opts Options) error {
 		}
 		defer ln.Close()
 
-		go func(ctx context.Context) {
+		go func() {
 			<-ctx.Done()
 			ln.Close()
-		}(ctx)
+		}()
 
 		if logger := rtr.log.Load(); logger != nil {
 			logger.(*slog.Logger).Info("listening", "for", "http", "bind", cfg.Bind.HTTP)
@@ -67,10 +67,10 @@ func Main(ctx context.Context, opts Options) error {
 		}
 		defer ln.Close()
 
-		go func(ctx context.Context) {
+		go func() {
 			<-ctx.Done()
 			ln.Close()
-		}(ctx)
+		}()
 
 		if logger := rtr.log.Load(); logger != nil {
 			logger.(*slog.Logger).Info("listening", "for", "https", "bind", cfg.Bind.HTTPS)
