@@ -16,4 +16,6 @@ domain "osiris.local.cetacean.club" {
 
   target        = "http://localhost:3000"
   health_target = "http://localhost:9091/healthz"
+
+  allow_private_target = true
 }

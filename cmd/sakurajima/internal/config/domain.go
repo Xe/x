@@ -21,6 +21,7 @@ type Domain struct {
 	Target             string `hcl:"target"`
 	InsecureSkipVerify bool   `hcl:"insecure_skip_verify,optional"`
 	HealthTarget       string `hcl:"health_target"`
+	AllowPrivateTarget bool   `hcl:"allow_private_target,optional"`
 }
 
 func (d Domain) Valid() error {
@@ -40,6 +41,16 @@ func (d Domain) Valid() error {
 
 	if err := isURLValid(d.HealthTarget); err != nil {
 		errs = append(errs, fmt.Errorf("health_target has %w %q: %w", ErrInvalidURL, d.HealthTarget, err))
+	}
+
+	// SSRF protection: validate targets don't point to private IPs
+	if !d.AllowPrivateTarget {
+		if err := ValidateURLForSSRF(d.Target); err != nil {
+			errs = append(errs, fmt.Errorf("target SSRF validation failed %q: %w", d.Target, err))
+		}
+		if err := ValidateURLForSSRF(d.HealthTarget); err != nil {
+			errs = append(errs, fmt.Errorf("health_target SSRF validation failed %q: %w", d.HealthTarget, err))
+		}
 	}
 
 	if len(errs) != 0 {
