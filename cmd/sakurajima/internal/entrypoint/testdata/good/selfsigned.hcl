@@ -18,4 +18,10 @@ domain "osiris.local.cetacean.club" {
   health_target = "http://localhost:9091/healthz"
 
   allow_private_target = true
+
+  timeouts {
+    dial           = "5s"
+    response_header = "10s"
+    idle           = "90s"
+  }
 }

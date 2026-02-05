@@ -4,6 +4,7 @@ import (
 	"errors"
 	"strings"
 	"testing"
+	"time"
 )
 
 func TestDomainValid(t *testing.T) {
@@ -197,6 +198,121 @@ func TestDomainValid(t *testing.T) {
 					t.Logf("got:  %v", err)
 					t.Error("got unexpected error from validation function")
 				}
+			}
+		})
+	}
+}
+
+func TestTimeoutsParse(t *testing.T) {
+	for _, tt := range []struct {
+		name               string
+		input              Timeouts
+		wantDial           time.Duration
+		wantResponseHeader time.Duration
+		wantIdle           time.Duration
+		wantErr            bool
+	}{
+		{
+			name: "all timeouts specified",
+			input: Timeouts{
+				Dial:           "5s",
+				ResponseHeader: "10s",
+				Idle:           "90s",
+			},
+			wantDial:           5 * time.Second,
+			wantResponseHeader: 10 * time.Second,
+			wantIdle:           90 * time.Second,
+			wantErr:            false,
+		},
+		{
+			name:               "no timeouts specified - uses defaults",
+			input:              Timeouts{},
+			wantDial:           5 * time.Second,
+			wantResponseHeader: 10 * time.Second,
+			wantIdle:           90 * time.Second,
+			wantErr:            false,
+		},
+		{
+			name: "partial timeouts specified",
+			input: Timeouts{
+				Dial: "3s",
+			},
+			wantDial:           3 * time.Second,
+			wantResponseHeader: 0, // not specified
+			wantIdle:           0, // not specified
+			wantErr:            false,
+		},
+		{
+			name: "milliseconds",
+			input: Timeouts{
+				Dial:           "500ms",
+				ResponseHeader: "1000ms",
+				Idle:           "30000ms",
+			},
+			wantDial:           500 * time.Millisecond,
+			wantResponseHeader: 1000 * time.Millisecond,
+			wantIdle:           30000 * time.Millisecond,
+			wantErr:            false,
+		},
+		{
+			name: "mixed duration units",
+			input: Timeouts{
+				Dial:           "100ms",
+				ResponseHeader: "5s",
+				Idle:           "2m",
+			},
+			wantDial:           100 * time.Millisecond,
+			wantResponseHeader: 5 * time.Second,
+			wantIdle:           2 * time.Minute,
+			wantErr:            false,
+		},
+		{
+			name: "invalid dial timeout",
+			input: Timeouts{
+				Dial: "invalid",
+			},
+			wantErr: true,
+		},
+		{
+			name: "invalid response header timeout",
+			input: Timeouts{
+				ResponseHeader: "foo",
+			},
+			wantErr: true,
+		},
+		{
+			name: "invalid idle timeout",
+			input: Timeouts{
+				Idle: "bar",
+			},
+			wantErr: true,
+		},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			dial, responseHeader, idle, err := tt.input.Parse()
+
+			if tt.wantErr {
+				if err == nil {
+					t.Error("expected error but got none")
+				}
+				return
+			}
+
+			if err != nil {
+				t.Errorf("unexpected error: %v", err)
+				return
+			}
+
+			if dial != tt.wantDial {
+				t.Errorf("Dial timeout = %v, want %v", dial, tt.wantDial)
+			}
+
+			if responseHeader != tt.wantResponseHeader {
+				t.Errorf("ResponseHeader timeout = %v, want %v", responseHeader, tt.wantResponseHeader)
+			}
+
+			if idle != tt.wantIdle {
+				t.Errorf("Idle timeout = %v, want %v", idle, tt.wantIdle)
 			}
 		})
 	}

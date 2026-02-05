@@ -9,6 +9,7 @@ import (
 
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
+	"within.website/x/cmd/sakurajima/internal/config"
 )
 
 func newH2cServer(t *testing.T, h http.Handler) *httptest.Server {
@@ -34,7 +35,7 @@ func TestH2CReverseProxy(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	rp, err := newH2CReverseProxy(u)
+	rp, err := newH2CReverseProxy(u, config.Domain{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -162,7 +163,7 @@ func TestNewH2CReverseProxyValidation(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			proxy, err := newH2CReverseProxy(tt.target)
+			proxy, err := newH2CReverseProxy(tt.target, config.Domain{})
 
 			if tt.wantErr {
 				if err == nil {

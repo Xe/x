@@ -47,4 +47,16 @@ domain "sakurajima.local.cetacean.club" {
     max_header_size  = "1MB"     # Maximum size of headers (e.g., "1MB", "512KB")
     max_header_count = 100       # Maximum number of headers allowed
   }
+
+  # HTTP timeout configuration to prevent hanging connections.
+  # All values are human-readable durations (e.g., "5s", "100ms", "1m").
+  # If omitted, sensible defaults are used:
+  # - dial: 5s (time to establish connection)
+  # - response_header: 10s (time to wait for response headers)
+  # - idle: 90s (time to keep idle connections alive)
+  timeouts {
+    dial           = "5s"
+    response_header = "10s"
+    idle           = "90s"
+  }
 }
