@@ -123,6 +123,10 @@ func (rtr *Router) setConfig(c config.Toplevel) error {
 			domainErrs = append(domainErrs, ErrNoHandler)
 		}
 
+		// Wrap handler with request size limits middleware
+		limits := GetDomainLimits(d)
+		h = WithLimits(d.Name, limits, h, rtr.log)
+
 		newMap[d.Name] = h
 
 		if d.TLS.Autocert {
