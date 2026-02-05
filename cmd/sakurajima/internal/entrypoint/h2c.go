@@ -32,6 +32,8 @@ func newH2CReverseProxy(target *url.URL, d config.Domain) (*httputil.ReverseProx
 		req.Host = target.Host
 	}
 
+	// Parse timeout values. The error is ignored because the domain configuration
+	// is validated during config loading, so timeouts are guaranteed to be valid.
 	dialTimeout, _, idleTimeout, _ := d.Timeouts.Parse()
 
 	// Use h2c transport with configured timeouts

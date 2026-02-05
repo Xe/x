@@ -72,6 +72,8 @@ type Router struct {
 }
 
 // newTransport creates an http.Transport with the configured timeout values.
+// The error from Timeouts.Parse() is ignored because the domain configuration
+// is validated during config loading, so timeouts are guaranteed to be valid.
 func newTransport(d config.Domain, dialContext func(context.Context, string, string) (net.Conn, error)) *http.Transport {
 	dialTimeout, responseHeaderTimeout, idleTimeout, _ := d.Timeouts.Parse()
 
