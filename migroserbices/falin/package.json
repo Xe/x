@@ -16,7 +16,7 @@
   "devDependencies": {
     "@bufbuild/buf": "^1.44.0",
     "@bufbuild/protoc-gen-es": "^1.10.0",
-    "@connectrpc/protoc-gen-connect-es": "^1.5.0",
+    "@connectrpc/protoc-gen-connect-es": "^1.7.0",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
     "@types/morgan": "^1.9.9",
@@ -25,8 +25,8 @@
   },
   "dependencies": {
     "@bufbuild/protobuf": "^1.10.0",
-    "@connectrpc/connect": "^1.5.0",
-    "@connectrpc/connect-express": "^2.1.1",
+    "@connectrpc/connect": "^1.7.0",
+    "@connectrpc/connect-express": "^1.7.0",
     "@fal-ai/serverless-client": "^0.14.3",
     "@fal-ai/serverless-proxy": "^0.9.0",
     "cors": "^2.8.5",
