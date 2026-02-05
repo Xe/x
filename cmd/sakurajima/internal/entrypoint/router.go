@@ -14,6 +14,7 @@ import (
 	"os/signal"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"syscall"
 
 	"github.com/felixge/httpsnoop"
@@ -62,7 +63,7 @@ type Router struct {
 	routes               map[string]http.Handler
 	tlsCerts             map[string]*tls.Certificate
 	opts                 Options
-	accessLog            *lumberjack.Logger
+	accessLog            atomic.Value // stores *lumberjack.Logger
 	baseSlog             *slog.Logger
 	log                  *slog.Logger
 	autoMgr              *autocert.Manager
@@ -163,9 +164,11 @@ func (rtr *Router) setConfig(c config.Toplevel) error {
 		}
 	}
 
-	if rtr.accessLog != nil {
-		rtr.accessLog.Rotate()
-		rtr.accessLog.Close()
+	if oldLog := rtr.accessLog.Load(); oldLog != nil {
+		if oldLogger, ok := oldLog.(*lumberjack.Logger); ok && oldLogger != nil {
+			oldLogger.Rotate()
+			oldLogger.Close()
+		}
 	}
 
 	lum := &lumberjack.Logger{
@@ -198,7 +201,7 @@ func (rtr *Router) setConfig(c config.Toplevel) error {
 	rtr.lock.Lock()
 	rtr.routes = newMap
 	rtr.tlsCerts = newCerts
-	rtr.accessLog = lum
+	rtr.accessLog.Store(lum)
 	rtr.log = log
 	rtr.autoMgr = autoMgr
 	if c.Autocert != nil && c.Autocert.HTTPRedirectCode != 0 {
@@ -270,6 +273,7 @@ func NewRouter(c config.Toplevel, logLevel string) (*Router, error) {
 		routes:   map[string]http.Handler{},
 		baseSlog: logging.InitSlog(logLevel),
 	}
+	result.accessLog.Store((*lumberjack.Logger)(nil))
 
 	if err := result.setConfig(c); err != nil {
 		return nil, err
@@ -413,5 +417,9 @@ func (rtr *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	rtr.log.Debug("request completed", "host", host, "method", r.Method, "response_code", m.Code, "duration_ms", m.Duration.Milliseconds())
 
-	logging.LogHTTPRequest(rtr.accessLog, r, m.Code, m.Written, m.Duration)
+	if accessLog := rtr.accessLog.Load(); accessLog != nil {
+		if logger, ok := accessLog.(*lumberjack.Logger); ok && logger != nil {
+			logging.LogHTTPRequest(logger, r, m.Code, m.Written, m.Duration)
+		}
+	}
 }
