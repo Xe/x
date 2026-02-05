@@ -12,6 +12,7 @@ import (
 	"net/url"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -94,6 +95,13 @@ func (rtr *Router) setConfig(c config.Toplevel) error {
 				rp := httputil.NewSingleHostReverseProxy(u)
 
 				if d.InsecureSkipVerify {
+					if u.Scheme != "https" {
+						domainErrs = append(domainErrs, fmt.Errorf("insecure_skip_verify can only be used with https:// targets, got %s", u.Scheme))
+					}
+					slog.Warn("SECURITY WARNING: TLS certificate verification disabled",
+						"domain", d.Name,
+						"target", d.Target,
+						"risk", "Man-in-the-Middle attacks possible")
 					rp.Transport = &http.Transport{
 						TLSClientConfig: &tls.Config{
 							InsecureSkipVerify: true,
@@ -103,8 +111,19 @@ func (rtr *Router) setConfig(c config.Toplevel) error {
 
 				h = rp
 			case "h2c":
-				h = newH2CReverseProxy(u)
+				h2cProxy, err := newH2CReverseProxy(u)
+				if err != nil {
+					domainErrs = append(domainErrs, fmt.Errorf("can't create h2c proxy: %w", err))
+				} else {
+					h = h2cProxy
+				}
 			case "unix":
+				socketPath := strings.TrimPrefix(d.Target, "unix://")
+				socketPath = filepath.Clean(socketPath)
+				if !filepath.IsAbs(socketPath) {
+					domainErrs = append(domainErrs, fmt.Errorf("unix socket path must be absolute: %s", socketPath))
+					break
+				}
 				h = &httputil.ReverseProxy{
 					Director: func(r *http.Request) {
 						r.URL.Scheme = "http"
@@ -113,7 +132,7 @@ func (rtr *Router) setConfig(c config.Toplevel) error {
 					},
 					Transport: &http.Transport{
 						DialContext: func(_ context.Context, _, _ string) (net.Conn, error) {
-							return net.Dial("unix", strings.TrimPrefix(d.Target, "unix://"))
+							return net.Dial("unix", socketPath)
 						},
 					},
 				}

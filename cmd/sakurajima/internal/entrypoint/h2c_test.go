@@ -33,10 +33,15 @@ func TestH2CReverseProxy(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	rp := httptest.NewServer(newH2CReverseProxy(u))
-	defer rp.Close()
+	rp, err := newH2CReverseProxy(u)
+	if err != nil {
+		t.Fatal(err)
+	}
 
-	resp, err := rp.Client().Get(rp.URL)
+	srv2 := httptest.NewServer(rp)
+	defer srv2.Close()
+
+	resp, err := srv2.Client().Get(srv2.URL)
 	if err != nil {
 		t.Fatal(err)
 	}
