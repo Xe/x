@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/url"
 	"strings"
+	"time"
 
 	"golang.org/x/net/idna"
 )
@@ -14,16 +15,65 @@ var (
 	ErrInvalidDomainTLSConfig = errors.New("domain: TLS config is invalid")
 	ErrInvalidURL             = errors.New("invalid URL")
 	ErrInvalidURLScheme       = errors.New("URL has invalid scheme")
+	ErrInvalidTimeout         = errors.New("invalid timeout duration")
 )
 
+// Timeouts defines timeout durations for HTTP connections to a backend.
+type Timeouts struct {
+	Dial           string `hcl:"dial,optional"`
+	ResponseHeader string `hcl:"response_header,optional"`
+	Idle           string `hcl:"idle,optional"`
+}
+
+// DefaultTimeouts returns sensible default timeout values.
+func DefaultTimeouts() Timeouts {
+	return Timeouts{
+		Dial:           "5s",
+		ResponseHeader: "10s",
+		Idle:           "90s",
+	}
+}
+
+// Parse parses the human-readable timeout strings into time.Duration values.
+func (t Timeouts) Parse() (dial, responseHeader, idle time.Duration, err error) {
+	if t.Dial == "" && t.ResponseHeader == "" && t.Idle == "" {
+		// Use defaults if no timeouts are specified
+		t = DefaultTimeouts()
+	}
+
+	if t.Dial != "" {
+		dial, err = time.ParseDuration(t.Dial)
+		if err != nil {
+			return 0, 0, 0, fmt.Errorf("dial timeout: %w", err)
+		}
+	}
+
+	if t.ResponseHeader != "" {
+		responseHeader, err = time.ParseDuration(t.ResponseHeader)
+		if err != nil {
+			return 0, 0, 0, fmt.Errorf("response header timeout: %w", err)
+		}
+	}
+
+	if t.Idle != "" {
+		idle, err = time.ParseDuration(t.Idle)
+		if err != nil {
+			return 0, 0, 0, fmt.Errorf("idle timeout: %w", err)
+		}
+	}
+
+	return dial, responseHeader, idle, nil
+}
+
 type Domain struct {
-	Name               string  `hcl:"name,label"`
-	TLS                TLS     `hcl:"tls,block"`
-	Target             string  `hcl:"target"`
-	InsecureSkipVerify bool    `hcl:"insecure_skip_verify,optional"`
-	HealthTarget       string  `hcl:"health_target"`
-	AllowPrivateTarget bool    `hcl:"allow_private_target,optional"`
-	Limits             *Limits `hcl:"limits,block"`
+	Name               string   `hcl:"name,label"`
+	TLS                TLS      `hcl:"tls,block"`
+	Target             string   `hcl:"target"`
+	InsecureSkipVerify bool     `hcl:"insecure_skip_verify,optional"`
+	HealthTarget       string   `hcl:"health_target"`
+	AllowPrivateTarget bool     `hcl:"allow_private_target,optional"`
+	Timeouts           Timeouts `hcl:"timeouts,block"`
+	Limits             *Limits  `hcl:"limits,block"`
 }
 
 func (d Domain) Valid() error {
@@ -67,6 +117,10 @@ func (d Domain) Valid() error {
 		if err := d.Limits.Valid(); err != nil {
 			errs = append(errs, fmt.Errorf("limits config is invalid: %w", err))
 		}
+	}
+
+	if _, _, _, err := d.Timeouts.Parse(); err != nil {
+		errs = append(errs, fmt.Errorf("%w: %w", ErrInvalidTimeout, err))
 	}
 
 	if len(errs) != 0 {

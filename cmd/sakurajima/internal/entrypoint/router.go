@@ -71,6 +71,28 @@ type Router struct {
 	autocertRedirectCode int
 }
 
+// newTransport creates an http.Transport with the configured timeout values.
+func newTransport(d config.Domain, dialContext func(context.Context, string, string) (net.Conn, error)) *http.Transport {
+	dialTimeout, responseHeaderTimeout, idleTimeout, _ := d.Timeouts.Parse()
+
+	transport := &http.Transport{
+		ResponseHeaderTimeout: responseHeaderTimeout,
+		IdleConnTimeout:       idleTimeout,
+		MaxIdleConnsPerHost:   100,
+	}
+
+	// Set DialContext - use custom dialer if provided, otherwise create one with timeout
+	if dialContext != nil {
+		transport.DialContext = dialContext
+	} else {
+		transport.DialContext = (&net.Dialer{
+			Timeout: dialTimeout,
+		}).DialContext
+	}
+
+	return transport
+}
+
 func (rtr *Router) setConfig(c config.Toplevel) error {
 	var errs []error
 	newMap := map[string]http.Handler{}
@@ -93,6 +115,7 @@ func (rtr *Router) setConfig(c config.Toplevel) error {
 			switch u.Scheme {
 			case "http", "https":
 				rp := httputil.NewSingleHostReverseProxy(u)
+				transport := newTransport(d, nil)
 
 				if d.InsecureSkipVerify {
 					if u.Scheme != "https" {
@@ -102,16 +125,15 @@ func (rtr *Router) setConfig(c config.Toplevel) error {
 						"domain", d.Name,
 						"target", d.Target,
 						"risk", "Man-in-the-Middle attacks possible")
-					rp.Transport = &http.Transport{
-						TLSClientConfig: &tls.Config{
-							InsecureSkipVerify: true,
-						},
+					transport.TLSClientConfig = &tls.Config{
+						InsecureSkipVerify: true,
 					}
 				}
 
+				rp.Transport = transport
 				h = rp
 			case "h2c":
-				h2cProxy, err := newH2CReverseProxy(u)
+				h2cProxy, err := newH2CReverseProxy(u, d)
 				if err != nil {
 					domainErrs = append(domainErrs, fmt.Errorf("can't create h2c proxy: %w", err))
 				} else {
@@ -124,17 +146,16 @@ func (rtr *Router) setConfig(c config.Toplevel) error {
 					domainErrs = append(domainErrs, fmt.Errorf("unix socket path must be absolute: %s", socketPath))
 					break
 				}
+				dialContext := func(_ context.Context, _, _ string) (net.Conn, error) {
+					return net.Dial("unix", socketPath)
+				}
 				h = &httputil.ReverseProxy{
 					Director: func(r *http.Request) {
 						r.URL.Scheme = "http"
 						r.URL.Host = d.Name
 						r.Host = d.Name
 					},
-					Transport: &http.Transport{
-						DialContext: func(_ context.Context, _, _ string) (net.Conn, error) {
-							return net.Dial("unix", socketPath)
-						},
-					},
+					Transport: newTransport(d, dialContext),
 				}
 			}
 		}

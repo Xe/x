@@ -16,6 +16,12 @@ domain "http.internal" {
 
   target        = "http://localhost:65510" # XXX(Xe) this is overwritten
   health_target = "http://localhost:9091/healthz"
+
+  timeouts {
+    dial           = "5s"
+    response_header = "10s"
+    idle           = "90s"
+  }
 }
 
 domain "https.internal" {
@@ -27,6 +33,12 @@ domain "https.internal" {
   target               = "https://localhost:65511" # XXX(Xe) this is overwritten
   insecure_skip_verify = true
   health_target        = "http://localhost:9091/healthz"
+
+  timeouts {
+    dial           = "5s"
+    response_header = "10s"
+    idle           = "90s"
+  }
 }
 
 domain "h2c.internal" {
@@ -37,6 +49,12 @@ domain "h2c.internal" {
 
   target        = "h2c://localhost:65511" # XXX(Xe) this is overwritten
   health_target = "http://localhost:9091/healthz"
+
+  timeouts {
+    dial           = "5s"
+    response_header = "10s"
+    idle           = "90s"
+  }
 }
 
 domain "unix.internal" {
@@ -47,4 +65,10 @@ domain "unix.internal" {
 
   target        = "http://localhost:65511" # XXX(Xe) this is overwritten
   health_target = "http://localhost:9091/healthz"
+
+  timeouts {
+    dial           = "5s"
+    response_header = "10s"
+    idle           = "90s"
+  }
 }
