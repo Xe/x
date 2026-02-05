@@ -12,8 +12,10 @@ import (
 	"net/url"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"syscall"
 
 	"github.com/felixge/httpsnoop"
@@ -62,9 +64,9 @@ type Router struct {
 	routes               map[string]http.Handler
 	tlsCerts             map[string]*tls.Certificate
 	opts                 Options
-	accessLog            *lumberjack.Logger
+	accessLog            atomic.Value // stores *lumberjack.Logger
 	baseSlog             *slog.Logger
-	log                  *slog.Logger
+	log                  atomic.Value // stores *slog.Logger
 	autoMgr              *autocert.Manager
 	autocertRedirectCode int
 }
@@ -93,6 +95,13 @@ func (rtr *Router) setConfig(c config.Toplevel) error {
 				rp := httputil.NewSingleHostReverseProxy(u)
 
 				if d.InsecureSkipVerify {
+					if u.Scheme != "https" {
+						domainErrs = append(domainErrs, fmt.Errorf("insecure_skip_verify can only be used with https:// targets, got %s", u.Scheme))
+					}
+					slog.Warn("SECURITY WARNING: TLS certificate verification disabled",
+						"domain", d.Name,
+						"target", d.Target,
+						"risk", "Man-in-the-Middle attacks possible")
 					rp.Transport = &http.Transport{
 						TLSClientConfig: &tls.Config{
 							InsecureSkipVerify: true,
@@ -102,8 +111,19 @@ func (rtr *Router) setConfig(c config.Toplevel) error {
 
 				h = rp
 			case "h2c":
-				h = newH2CReverseProxy(u)
+				h2cProxy, err := newH2CReverseProxy(u)
+				if err != nil {
+					domainErrs = append(domainErrs, fmt.Errorf("can't create h2c proxy: %w", err))
+				} else {
+					h = h2cProxy
+				}
 			case "unix":
+				socketPath := strings.TrimPrefix(d.Target, "unix://")
+				socketPath = filepath.Clean(socketPath)
+				if !filepath.IsAbs(socketPath) {
+					domainErrs = append(domainErrs, fmt.Errorf("unix socket path must be absolute: %s", socketPath))
+					break
+				}
 				h = &httputil.ReverseProxy{
 					Director: func(r *http.Request) {
 						r.URL.Scheme = "http"
@@ -112,7 +132,7 @@ func (rtr *Router) setConfig(c config.Toplevel) error {
 					},
 					Transport: &http.Transport{
 						DialContext: func(_ context.Context, _, _ string) (net.Conn, error) {
-							return net.Dial("unix", strings.TrimPrefix(d.Target, "unix://"))
+							return net.Dial("unix", socketPath)
 						},
 					},
 				}
@@ -163,9 +183,11 @@ func (rtr *Router) setConfig(c config.Toplevel) error {
 		}
 	}
 
-	if rtr.accessLog != nil {
-		rtr.accessLog.Rotate()
-		rtr.accessLog.Close()
+	if oldLog := rtr.accessLog.Load(); oldLog != nil {
+		if oldLogger, ok := oldLog.(*lumberjack.Logger); ok && oldLogger != nil {
+			oldLogger.Rotate()
+			oldLogger.Close()
+		}
 	}
 
 	lum := &lumberjack.Logger{
@@ -198,8 +220,8 @@ func (rtr *Router) setConfig(c config.Toplevel) error {
 	rtr.lock.Lock()
 	rtr.routes = newMap
 	rtr.tlsCerts = newCerts
-	rtr.accessLog = lum
-	rtr.log = log
+	rtr.accessLog.Store(lum)
+	rtr.log.Store(log)
 	rtr.autoMgr = autoMgr
 	if c.Autocert != nil && c.Autocert.HTTPRedirectCode != 0 {
 		rtr.autocertRedirectCode = c.Autocert.HTTPRedirectCode
@@ -230,7 +252,9 @@ func (rtr *Router) GetCertificate(hello *tls.ClientHelloInfo) (*tls.Certificate,
 }
 
 func (rtr *Router) loadConfig() error {
-	rtr.log.Info("reloading config", "fname", rtr.opts.ConfigFname)
+	if logger := rtr.log.Load(); logger != nil {
+		logger.(*slog.Logger).Info("reloading config", "fname", rtr.opts.ConfigFname)
+	}
 	var cfg config.Toplevel
 	if err := hclsimple.DecodeFile(rtr.opts.ConfigFname, nil, &cfg); err != nil {
 		return err
@@ -244,7 +268,9 @@ func (rtr *Router) loadConfig() error {
 		return err
 	}
 
-	rtr.log.Info("done reloading config", "domains", len(cfg.Domains))
+	if logger := rtr.log.Load(); logger != nil {
+		logger.(*slog.Logger).Info("done reloading config", "domains", len(cfg.Domains))
+	}
 
 	return nil
 }
@@ -266,10 +292,13 @@ func (rtr *Router) backgroundReloadConfig(ctx context.Context) {
 }
 
 func NewRouter(c config.Toplevel, logLevel string) (*Router, error) {
+	baseLog := logging.InitSlog(logLevel)
 	result := &Router{
 		routes:   map[string]http.Handler{},
-		baseSlog: logging.InitSlog(logLevel),
+		baseSlog: baseLog,
 	}
+	result.accessLog.Store((*lumberjack.Logger)(nil))
+	result.log.Store(baseLog)
 
 	if err := result.setConfig(c); err != nil {
 		return nil, err
@@ -283,10 +312,10 @@ func (rtr *Router) HandleHTTP(ctx context.Context, ln net.Listener) error {
 		Handler: rtr.httpHandler(),
 	}
 
-	go func(ctx context.Context) {
+	go func() {
 		<-ctx.Done()
 		srv.Close()
-	}(ctx)
+	}()
 
 	return srv.Serve(ln)
 }
@@ -324,10 +353,10 @@ func (rtr *Router) HandleHTTPS(ctx context.Context, ln net.Listener) error {
 		TLSConfig: tc,
 	}
 
-	go func(ctx context.Context) {
+	go func() {
 		<-ctx.Done()
 		srv.Close()
-	}(ctx)
+	}()
 
 	fingerprint.ApplyTLSFingerprinter(srv)
 
@@ -341,10 +370,10 @@ func (rtr *Router) ListenAndServeMetrics(ctx context.Context, addr string) error
 	}
 	defer ln.Close()
 
-	go func(ctx context.Context) {
+	go func() {
 		<-ctx.Done()
 		ln.Close()
-	}(ctx)
+	}()
 
 	mux := http.NewServeMux()
 
@@ -352,17 +381,19 @@ func (rtr *Router) ListenAndServeMetrics(ctx context.Context, addr string) error
 	mux.HandleFunc("/readyz", readyz)
 	mux.HandleFunc("/healthz", healthz)
 
-	rtr.log.Info("listening", "for", "metrics", "bind", addr)
+	if logger := rtr.log.Load(); logger != nil {
+		logger.(*slog.Logger).Info("listening", "for", "metrics", "bind", addr)
+	}
 
 	srv := http.Server{
 		Addr:    addr,
 		Handler: mux,
 	}
 
-	go func(ctx context.Context) {
+	go func() {
 		<-ctx.Done()
 		srv.Close()
-	}(ctx)
+	}()
 
 	return srv.Serve(ln)
 }
@@ -379,7 +410,9 @@ func (rtr *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	ja4hFP := ja4h.JA4H(r)
 
-	rtr.log.Debug("got request", "method", r.Method, "host", host, "path", r.URL.Path)
+	if logger := rtr.log.Load(); logger != nil {
+		logger.(*slog.Logger).Debug("got request", "method", r.Method, "host", host, "path", r.URL.Path)
+	}
 
 	rtr.lock.RLock()
 	h, ok = rtr.routes[host]
@@ -411,7 +444,13 @@ func (rtr *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	requestsPerDomain.WithLabelValues(host, r.Method, fmt.Sprint(m.Code)).Inc()
 	responseTime.WithLabelValues(host).Observe(float64(m.Duration.Milliseconds()))
 
-	rtr.log.Debug("request completed", "host", host, "method", r.Method, "response_code", m.Code, "duration_ms", m.Duration.Milliseconds())
+	if logger := rtr.log.Load(); logger != nil {
+		logger.(*slog.Logger).Debug("request completed", "host", host, "method", r.Method, "response_code", m.Code, "duration_ms", m.Duration.Milliseconds())
+	}
 
-	logging.LogHTTPRequest(rtr.accessLog, r, m.Code, m.Written, m.Duration)
+	if accessLog := rtr.accessLog.Load(); accessLog != nil {
+		if logger, ok := accessLog.(*lumberjack.Logger); ok && logger != nil {
+			logging.LogHTTPRequest(logger, r, m.Code, m.Written, m.Duration)
+		}
+	}
 }

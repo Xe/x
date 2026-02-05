@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/url"
+	"strings"
 
 	"golang.org/x/net/idna"
 )
@@ -21,6 +22,7 @@ type Domain struct {
 	Target             string `hcl:"target"`
 	InsecureSkipVerify bool   `hcl:"insecure_skip_verify,optional"`
 	HealthTarget       string `hcl:"health_target"`
+	AllowPrivateTarget bool   `hcl:"allow_private_target,optional"`
 }
 
 func (d Domain) Valid() error {
@@ -42,6 +44,24 @@ func (d Domain) Valid() error {
 		errs = append(errs, fmt.Errorf("health_target has %w %q: %w", ErrInvalidURL, d.HealthTarget, err))
 	}
 
+	// SSRF protection: validate targets don't point to private IPs
+	if !d.AllowPrivateTarget {
+		if err := ValidateURLForSSRF(d.Target); err != nil {
+			errs = append(errs, fmt.Errorf("target SSRF validation failed %q: %w", d.Target, err))
+		}
+		if err := ValidateURLForSSRF(d.HealthTarget); err != nil {
+			errs = append(errs, fmt.Errorf("health_target SSRF validation failed %q: %w", d.HealthTarget, err))
+		}
+	}
+
+	// Validate InsecureSkipVerify is only used with HTTPS targets
+	if d.InsecureSkipVerify {
+		u, err := url.Parse(d.Target)
+		if err == nil && u.Scheme != "https" {
+			errs = append(errs, fmt.Errorf("insecure_skip_verify is only valid for https:// targets, got %s", u.Scheme))
+		}
+	}
+
 	if len(errs) != 0 {
 		return errors.Join(errs...)
 	}
@@ -56,8 +76,16 @@ func isURLValid(input string) error {
 	}
 
 	switch u.Scheme {
-	case "http", "https", "h2c", "unix":
+	case "http", "https", "h2c":
 		// do nothing
+	case "unix":
+		socketPath := strings.TrimPrefix(input, "unix://")
+		if strings.Contains(socketPath, "../") {
+			return fmt.Errorf("%w unix socket path contains path traversal: %s", ErrInvalidURLScheme, socketPath)
+		}
+		if socketPath == "" {
+			return fmt.Errorf("%w unix socket path is empty", ErrInvalidURLScheme)
+		}
 	default:
 		return fmt.Errorf("%w %s has scheme %s (want http, https, h2c, unix)", ErrInvalidURLScheme, input, u.Scheme)
 	}

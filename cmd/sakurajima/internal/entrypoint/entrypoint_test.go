@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"sync"
 	"testing"
 	"time"
 )
@@ -22,7 +23,11 @@ func TestMainGoodConfig(t *testing.T) {
 			ctx, cancel := context.WithCancel(t.Context())
 			cfg := loadConfig(t, filepath.Join("testdata", "good", st.Name()))
 
+			var wg sync.WaitGroup
+			wg.Add(1)
+
 			go func(ctx context.Context) {
+				defer wg.Done()
 				if err := Main(ctx, Options{
 					ConfigFname: filepath.Join("testdata", "good", st.Name()),
 				}); err != nil {
@@ -65,9 +70,12 @@ func TestMainGoodConfig(t *testing.T) {
 				}
 
 				cancel()
+				wg.Wait()
 				return
 			}
 
+			cancel()
+			wg.Wait()
 			t.Fatal("router initialization did not work")
 		})
 	}

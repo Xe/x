@@ -112,7 +112,7 @@ func TestRouterSetConfig(t *testing.T) {
 				cfg.Domains = append(cfg.Domains, config.Domain{
 					Name:         "unix.internal",
 					TLS:          cfg.Domains[0].TLS,
-					Target:       "unix://foo.sock",
+					Target:       "unix:///var/run/app.sock",
 					HealthTarget: cfg.Domains[0].HealthTarget,
 				})
 
@@ -160,6 +160,21 @@ func TestRouterSetConfig(t *testing.T) {
 					Name:         "test1.internal",
 					TLS:          cfg.Domains[0].TLS,
 					Target:       "foo://",
+					HealthTarget: cfg.Domains[0].HealthTarget,
+				})
+
+				return cfg
+			},
+			err: ErrNoHandler,
+		},
+		{
+			name:        "unix socket with relative path",
+			configFname: "./testdata/good/selfsigned.hcl",
+			mutation: func(cfg config.Toplevel) config.Toplevel {
+				cfg.Domains = append(cfg.Domains, config.Domain{
+					Name:         "test1.internal",
+					TLS:          cfg.Domains[0].TLS,
+					Target:       "unix://relative/path.sock",
 					HealthTarget: cfg.Domains[0].HealthTarget,
 				})
 

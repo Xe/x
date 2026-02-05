@@ -3,6 +3,7 @@ package entrypoint
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"net"
 
 	"github.com/hashicorp/hcl/v2/hclsimple"
@@ -46,12 +47,14 @@ func Main(ctx context.Context, opts Options) error {
 		}
 		defer ln.Close()
 
-		go func(ctx context.Context) {
+		go func() {
 			<-ctx.Done()
 			ln.Close()
-		}(ctx)
+		}()
 
-		rtr.log.Info("listening", "for", "http", "bind", cfg.Bind.HTTP)
+		if logger := rtr.log.Load(); logger != nil {
+			logger.(*slog.Logger).Info("listening", "for", "http", "bind", cfg.Bind.HTTP)
+		}
 
 		return rtr.HandleHTTP(gCtx, ln)
 	})
@@ -64,12 +67,14 @@ func Main(ctx context.Context, opts Options) error {
 		}
 		defer ln.Close()
 
-		go func(ctx context.Context) {
+		go func() {
 			<-ctx.Done()
 			ln.Close()
-		}(ctx)
+		}()
 
-		rtr.log.Info("listening", "for", "https", "bind", cfg.Bind.HTTPS)
+		if logger := rtr.log.Load(); logger != nil {
+			logger.(*slog.Logger).Info("listening", "for", "https", "bind", cfg.Bind.HTTPS)
+		}
 
 		return rtr.HandleHTTPS(gCtx, ln)
 	})
