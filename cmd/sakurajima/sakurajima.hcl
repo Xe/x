@@ -39,4 +39,12 @@ domain "sakurajima.local.cetacean.club" {
 
   target        = "http://localhost:3000"
   health_target = "http://localhost:3036/healthz"
+
+  # Optional: Request size limits to prevent DoS attacks
+  # If not specified, defaults are: max_request_body=10MB, max_header_size=1MB, max_header_count=100
+  limits {
+    max_request_body = "10MB"    # Maximum request body size (e.g., "10MB", "1GB")
+    max_header_size  = "1MB"     # Maximum size of headers (e.g., "1MB", "512KB")
+    max_header_count = 100       # Maximum number of headers allowed
+  }
 }
