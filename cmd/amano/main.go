@@ -28,7 +28,7 @@ var (
 	s2BasinEndpoint   = flag.String("s2-basin-endpoint", "", "S2 basin endpoint")
 	s2BasinName       = flag.String("s2-basin-name", "bluesky-data", "Basin name for all Bluesky data types")
 
-	bundleCountThreshold = flag.Int("bundle-count-threshold", 100, "Number of items to batch before flushing")
+	bundleCountThreshold = flag.Int("bundle-count-threshold", 512, "Number of items to batch before flushing")
 	bundleDelayThreshold = flag.Duration("bundle-delay-threshold", time.Second, "Maximum time to wait before flushing a bundle")
 	metricsAddr          = flag.String("metrics-addr", ":9090", "Metrics server address")
 )
@@ -111,6 +111,7 @@ func main() {
 	})
 	b.BundleCountThreshold = *bundleCountThreshold
 	b.DelayThreshold = *bundleDelayThreshold
+	b.ContextDeadline = time.Minute
 	b.HandlerLimit = 10
 
 	jsCfg := jetstreamClient.DefaultClientConfig()
