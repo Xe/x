@@ -8,26 +8,27 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: s2-lite
+      app.kubernetes.io/name: s2-lite
   template:
     metadata:
       labels:
-        app: s2-lite
+        app.kubernetes.io/name: s2-lite
     spec:
       containers:
         - name: s2-lite
-          image: ghcr.io/s2-streamstore/s2:lite
+          image: ghcr.io/s2-streamstore/s2
           args:
+            - "lite"
             - "--bucket"
             - "xe-s2"
             - "--path"
-            - "hoshimi-miyabi"
+            - "alrest"
           ports:
             - name: http
               containerPort: 80
           envFrom:
             - secretRef:
-                name: s2-creds
+                name: s2-lite
           # Optional but recommended so `kubectl rollout` can tell when it's up
           readinessProbe:
             httpGet:
