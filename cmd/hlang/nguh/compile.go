@@ -171,7 +171,7 @@ func compileOneNode(out io.Writer, node *peg.Node) error {
 			return err
 		}
 	default:
-		fmt.Errorf("h: le vi lerfu zo %q cu gentoldra", node.Text)
+		return fmt.Errorf("h: le vi lerfu zo %q cu gentoldra", node.Text)
 	}
 
 	return nil
