@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: s2-lite
+  labels:
+    app.kubernetes.io/name: s2-lite
+spec:
+  selector:
+    app.kubernetes.io/name: s2-lite
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+  type: ClusterIP

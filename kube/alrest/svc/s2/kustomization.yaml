@@ -1,0 +1,4 @@
+resources:
+  - 1password.yaml
+  - deployment.yaml
+  - service.yaml

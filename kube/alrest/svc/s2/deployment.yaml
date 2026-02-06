@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: s2-lite
+  labels:
+    app.kubernetes.io/name: s2-lite
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: s2-lite
+  template:
+    metadata:
+      labels:
+        app: s2-lite
+    spec:
+      containers:
+        - name: s2-lite
+          image: ghcr.io/s2-streamstore/s2:lite
+          args:
+            - "--bucket"
+            - "xe-s2"
+            - "--path"
+            - "hoshimi-miyabi"
+          ports:
+            - name: http
+              containerPort: 80
+          envFrom:
+            - secretRef:
+                name: s2-creds
+          # Optional but recommended so `kubectl rollout` can tell when it's up
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 80
+            initialDelaySeconds: 2
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 80
+            initialDelaySeconds: 10
+            periodSeconds: 10
