@@ -33,8 +33,8 @@ var (
 	// Summary enables JSON execution summary output
 	Summary = flag.Bool("summary", false, "Output JSON execution summary with metrics")
 
-	// Agree enables agreement acceptance mode
-	Agree = flag.Bool("agree", false, "Accept the trans rights agreement")
+	// Agree enables agreement acceptance mode (deprecated: use 'markdownlang agree' command instead)
+	Agree = flag.Bool("agree", false, "Accept the trans rights agreement (deprecated: use 'markdownlang agree' command instead)")
 )
 
 // Validate validates the flag configuration.

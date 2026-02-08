@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"strings"
 	"time"
 
 	"within.website/x/cmd/markdownlang/internal/agreement"
@@ -19,9 +20,13 @@ const (
 	usage = `markdownlang - Execute markdownlang programs with LLMs
 
 Usage:
-  markdownlang -program <file.md> -input '{"key":"value"}' [-output result.json]
+  markdownlang <command> [flags]
 
-Flags:
+Commands:
+  run         Execute a markdownlang program (default)
+  agree       Accept the trans rights agreement (first-time setup)
+
+Run Command Flags:
   -program     Path to the markdownlang program (.md file) [required]
   -input       JSON input for the program (default: {})
   -output      Path to write output JSON (default: stdout)
@@ -30,32 +35,45 @@ Flags:
   -base-url    LLM base URL (default: $OPENAI_BASE_URL)
   -debug       Enable verbose debug logging
   -summary     Output JSON execution summary with metrics
-  -agree       Accept the trans rights agreement (first-time setup only)
 
 Examples:
   # Run a program
+  markdownlang run -program fizzbuzz.md -input '{"start":1,"end":15}'
+  # (or without explicit "run":)
   markdownlang -program fizzbuzz.md -input '{"start":1,"end":15}'
 
   # Run with debug output
-  markdownlang -program myagent.md -input '{"url":"https://example.com"}' -debug
+  markdownlang run -program myagent.md -input '{"url":"https://example.com"}' -debug
 
   # Save output to file
-  markdownlang -program agent.md -input '{"data":[1,2,3]}' -output result.json
+  markdownlang run -program agent.md -input '{"data":[1,2,3]}' -output result.json
 
   # Run with execution summary
-  markdownlang -program fizzbuzz.md -input '{"start":1,"end":10}' -summary
+  markdownlang run -program fizzbuzz.md -input '{"start":1,"end":10}' -summary
+
+  # Accept the trans rights agreement
+  markdownlang agree
 
 Agreement:
   Before first use, you must accept the trans rights agreement by running:
-  markdownlang -agree
-  Then type the following phrase exactly:
-  "I hereby agree to not harm transgender people and largely leave them alone so they can live their life in peace."
+  markdownlang agree
+  Then type the required phrase exactly.
 
 Documentation:
   https://github.com/Xe/x/tree/master/cmd/markdownlang`
 )
 
 func main() {
+	// Pre-scan args to detect subcommands before flag parsing
+	var command string
+	args := os.Args[1:]
+
+	// Check if first arg is a subcommand (not a flag)
+	if len(args) > 0 && !strings.HasPrefix(args[0], "-") {
+		command = args[0]
+	}
+
+	// Parse flags (this calls flag.Parse internally)
 	internal.HandleStartup()
 
 	// Show usage if no arguments provided
@@ -64,6 +82,42 @@ func main() {
 		os.Exit(0)
 	}
 
+	// Check for legacy -agree flag for backward compatibility
+	if *config.Agree {
+		fmt.Fprintln(os.Stderr, "Warning: -agree flag is deprecated. Use 'markdownlang agree' command instead.")
+		command = "agree"
+	}
+
+	// If no subcommand was detected before flag parsing, default to "run"
+	if command == "" {
+		command = "run"
+	}
+
+	// Handle subcommand
+	switch command {
+	case "agree":
+		handleAgreeCommand()
+	case "run":
+		handleRunCommand()
+	default:
+		fmt.Fprintf(os.Stderr, "Unknown command: %s\n\n", command)
+		fmt.Fprintln(os.Stderr, usage)
+		os.Exit(1)
+	}
+}
+
+// handleAgreeCommand handles the agreement acceptance command.
+func handleAgreeCommand() {
+	if err := handleAgreement(); err != nil {
+		slog.Error("Agreement failed", "error", err)
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+	fmt.Println("Agreement accepted. You can now use markdownlang.")
+}
+
+// handleRunCommand handles the program execution command.
+func handleRunCommand() {
 	// Validate flags
 	if err := config.Validate(); err != nil {
 		slog.Error("Invalid configuration", "error", err)
@@ -71,21 +125,10 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Handle agreement flag
-	if *config.Agree {
-		if err := handleAgreement(); err != nil {
-			slog.Error("Agreement failed", "error", err)
-			fmt.Fprintln(os.Stderr, err)
-			os.Exit(1)
-		}
-		fmt.Println("Agreement accepted. You can now use markdownlang.")
-		os.Exit(0)
-	}
-
 	// Check for agreement before running any program
 	if err := agreement.Check(); err != nil {
 		fmt.Fprintln(os.Stderr, "\n"+err.Error())
-		fmt.Fprintln(os.Stderr, "\nTo accept the agreement, run: markdownlang -agree")
+		fmt.Fprintln(os.Stderr, "\nTo accept the agreement, run: markdownlang agree")
 		fmt.Fprintln(os.Stderr)
 		os.Exit(1)
 	}

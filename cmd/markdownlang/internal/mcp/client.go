@@ -5,36 +5,95 @@ package mcp
 import (
 	"context"
 	"fmt"
+	"net/url"
 	"os/exec"
+	"strings"
 	"sync"
 
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 )
 
+// TransportType specifies the transport protocol for MCP connections.
+type TransportType string
+
+const (
+	// TransportAuto auto-detects the transport type based on URL scheme.
+	TransportAuto TransportType = "auto"
+	// TransportSSE uses Server-Sent Events (HTTP streaming).
+	TransportSSE TransportType = "sse"
+	// TransportCommand uses stdio-based command transport.
+	TransportCommand TransportType = "command"
+)
+
 // MCPServerConfig defines the configuration for starting an MCP server.
 type MCPServerConfig struct {
-	Name    string            `yaml:"name" json:"name"`
-	Command string            `yaml:"command" json:"command"`
-	Args    []string          `yaml:"args,omitempty" json:"args,omitempty"`
-	Env     map[string]string `yaml:"env,omitempty" json:"env,omitempty"`
+	// Name is the identifier for this server
+	Name string `yaml:"name" json:"name"`
+
+	// Command is the executable to run for command-based servers
+	Command string `yaml:"command,omitempty" json:"command,omitempty"`
+
+	// Args are the command-line arguments
+	Args []string `yaml:"args,omitempty" json:"args,omitempty"`
+
+	// Env contains environment variables for the command
+	Env map[string]string `yaml:"env,omitempty" json:"env,omitempty"`
+
+	// URL is the endpoint for HTTP-based MCP servers (SSE, WebSocket, etc.)
+	URL string `yaml:"url,omitempty" json:"url,omitempty"`
+
+	// Transport specifies the transport type. If "auto", it will be detected
+	// from the URL scheme or default to SSE for HTTP URLs.
+	// Defaults to "auto".
+	Transport TransportType `yaml:"transport,omitempty" json:"transport,omitempty"`
+
 	// Disabled indicates the server should not be started.
 	Disabled bool `yaml:"disabled,omitempty" json:"disabled,omitempty"`
 }
 
 // Client wraps an MCP client connection to a single server.
 type Client struct {
-	config    *MCPServerConfig
-	client    *mcp.Client
-	session   *mcp.ClientSession
-	transport *mcp.CommandTransport
-	cancel    context.CancelFunc
-	mu        sync.RWMutex
+	config  *MCPServerConfig
+	client  *mcp.Client
+	session *mcp.ClientSession
+	cancel  context.CancelFunc
+	mu      sync.RWMutex
 }
 
 // NewClient creates a new MCP client from the given configuration.
 func NewClient(config *MCPServerConfig) *Client {
 	return &Client{
 		config: config,
+	}
+}
+
+// detectTransport determines the appropriate transport type based on URL scheme.
+// Returns SSE for http:// and https:// URLs by default.
+// Can be extended to support ws://, wss:// for WebSocket, etc.
+func detectTransport(endpoint string) TransportType {
+	if endpoint == "" {
+		return TransportCommand
+	}
+
+	u, err := url.Parse(endpoint)
+	if err != nil {
+		// If URL parsing fails, default to SSE
+		return TransportSSE
+	}
+
+	scheme := strings.ToLower(u.Scheme)
+
+	// Auto-detect based on URL scheme
+	switch scheme {
+	case "ws", "wss":
+		// WebSocket transport (not yet implemented, reserved for future)
+		return TransportSSE // Fall back to SSE for now
+	case "http", "https":
+		// Default to SSE for HTTP endpoints
+		return TransportSSE
+	default:
+		// Unknown scheme, try SSE as default
+		return TransportSSE
 	}
 }
 
@@ -47,22 +106,21 @@ func (c *Client) Connect(ctx context.Context) error {
 		return fmt.Errorf("server %s is disabled", c.config.Name)
 	}
 
-	// Create command with environment variables
-	cmd := exec.CommandContext(ctx, c.config.Command, c.config.Args...)
-	if len(c.config.Env) > 0 {
-		env := cmd.Env
-		for k, v := range c.config.Env {
-			env = append(env, fmt.Sprintf("%s=%s", k, v))
+	// Determine the transport type
+	transportType := c.config.Transport
+	if transportType == "" || transportType == TransportAuto {
+		// Auto-detect based on URL
+		if c.config.URL != "" {
+			transportType = detectTransport(c.config.URL)
+		} else if c.config.Command != "" {
+			transportType = TransportCommand
+		} else {
+			return fmt.Errorf("must specify either URL or Command for server %s", c.config.Name)
 		}
-		cmd.Env = env
 	}
 
-	// Create transport
-	c.transport = &mcp.CommandTransport{
-		Command: cmd,
-	}
-
-	// Create client
+	// Create the appropriate transport
+	var transport mcp.Transport
 	impl := &mcp.Implementation{
 		Name:    "markdownlang",
 		Version: "1.0.0",
@@ -73,11 +131,43 @@ func (c *Client) Connect(ctx context.Context) error {
 	clientCtx, cancel := context.WithCancel(ctx)
 	c.cancel = cancel
 
+	switch transportType {
+	case TransportSSE:
+		if c.config.URL == "" {
+			cancel()
+			return fmt.Errorf("SSE transport requires URL for server %s", c.config.Name)
+		}
+		transport = &mcp.SSEClientTransport{
+			Endpoint: c.config.URL,
+		}
+
+	case TransportCommand:
+		if c.config.Command == "" {
+			cancel()
+			return fmt.Errorf("command transport requires Command for server %s", c.config.Name)
+		}
+		cmd := exec.CommandContext(ctx, c.config.Command, c.config.Args...)
+		if len(c.config.Env) > 0 {
+			env := cmd.Env
+			for k, v := range c.config.Env {
+				env = append(env, fmt.Sprintf("%s=%s", k, v))
+			}
+			cmd.Env = env
+		}
+		transport = &mcp.CommandTransport{
+			Command: cmd,
+		}
+
+	default:
+		cancel()
+		return fmt.Errorf("unsupported transport type %q for server %s", transportType, c.config.Name)
+	}
+
 	// Connect to server
-	session, err := c.client.Connect(clientCtx, c.transport, nil)
+	session, err := c.client.Connect(clientCtx, transport, nil)
 	if err != nil {
 		cancel()
-		return fmt.Errorf("failed to connect to MCP server %s: %w", c.config.Name, err)
+		return fmt.Errorf("failed to connect to MCP server %s using %s transport: %w", c.config.Name, transportType, err)
 	}
 
 	c.session = session
@@ -101,7 +191,6 @@ func (c *Client) Close() error {
 	}
 
 	c.client = nil
-	c.transport = nil
 	return nil
 }
 
