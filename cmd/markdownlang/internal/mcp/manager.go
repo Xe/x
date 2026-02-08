@@ -112,6 +112,7 @@ func (m *Manager) GetTools(ctx context.Context) ([]Tool, error) {
 		}
 
 		for _, tool := range serverTools {
+			tool.Name = "mcp__" + name + "__" + tool.Name
 			allTools = append(allTools, Tool{
 				Tool:     tool,
 				Server:   name,

@@ -16,6 +16,7 @@ import (
 	"github.com/openai/openai-go/v2/shared"
 	"within.website/x/cmd/markdownlang/internal/agent"
 	"within.website/x/cmd/markdownlang/internal/config"
+	"within.website/x/cmd/markdownlang/internal/mcp"
 	"within.website/x/cmd/markdownlang/internal/parser"
 	"within.website/x/cmd/markdownlang/internal/template"
 	"within.website/x/llm/codeinterpreter/python"
@@ -37,6 +38,7 @@ type Executor struct {
 	input        map[string]interface{}
 	registry     *agent.Registry
 	callManager  *agent.CallManager
+	mcpManager   *mcp.Manager                 // MCP server manager
 	toolHandlers map[string]agent.ToolHandler // tool name -> handler
 	startTime    time.Time
 	metrics      ExecutionMetrics
@@ -82,12 +84,16 @@ func New() (*Executor, error) {
 		EnableTracing: *config.Debug,
 	})
 
+	// Create MCP manager for MCP servers
+	mcpManager := mcp.NewManager(nil)
+
 	return &Executor{
 		client:      client,
 		program:     program,
 		input:       input,
 		registry:    registry,
 		callManager: callManager,
+		mcpManager:  mcpManager,
 	}, nil
 }
 
@@ -138,6 +144,86 @@ func (e *Executor) Execute(ctx context.Context) (map[string]interface{}, error) 
 		fmt.Fprintf(os.Stderr, "Added default tool: python\n")
 	}
 
+	// Start MCP servers if any
+	if len(e.program.MCPServers) > 0 {
+		if *config.Debug {
+			fmt.Fprintf(os.Stderr, "Starting %d MCP servers...\n", len(e.program.MCPServers))
+		}
+
+		for i := range e.program.MCPServers {
+			serverConfig := &e.program.MCPServers[i]
+			if err := e.mcpManager.Start(ctx, serverConfig); err != nil {
+				slog.Warn("failed to start MCP server", "server", serverConfig.Name, "error", err)
+				continue
+			}
+
+			if *config.Debug {
+				fmt.Fprintf(os.Stderr, "  Started MCP server: %s\n", serverConfig.Name)
+			}
+		}
+
+		// Get tools from all MCP servers
+		mcpTools, err := e.mcpManager.GetTools(ctx)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get MCP tools: %w", err)
+		}
+
+		if *config.Debug {
+			fmt.Fprintf(os.Stderr, "Loaded %d MCP tools\n", len(mcpTools))
+		}
+
+		// Add MCP tools as tool handlers
+		for _, tool := range mcpTools {
+			toolName := tool.Tool.Name
+
+			// Build JSON schema from the tool's input schema
+			var schemaBytes json.RawMessage
+			if tool.Tool.InputSchema != nil {
+				if inputSchema, ok := tool.Tool.InputSchema.(map[string]any); ok {
+					schemaBytes, _ = json.Marshal(inputSchema)
+				}
+			} else {
+				// Default to empty object schema
+				schemaBytes = json.RawMessage(`{"type": "object"}`)
+			}
+
+			// Create tool handler that calls the MCP manager
+			e.toolHandlers[toolName] = agent.NewStaticSchemaTool(schemaBytes, func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
+				// Parse input arguments
+				var args map[string]any
+				if err := json.Unmarshal(input, &args); err != nil {
+					return json.RawMessage(fmt.Sprintf(`{"error": "invalid arguments: %v"}`, err)), nil
+				}
+
+				if *config.Debug {
+					fmt.Fprintf(os.Stderr, "Calling MCP tool: %s\n", toolName)
+				}
+
+				// Call the MCP tool
+				result, err := e.mcpManager.CallTool(ctx, toolName, args)
+				if err != nil {
+					slog.Error("MCP tool call failed", "tool", toolName, "error", err)
+					return json.RawMessage(fmt.Sprintf(`{"error": "tool call failed: %v"}`, err)), nil
+				}
+
+				// Convert MCP result to JSON
+				toolResult := mcp.NewToolCallResult(toolName, tool.Server, result)
+
+				// Marshal the result back to JSON
+				resultBytes, err := json.Marshal(toolResult)
+				if err != nil {
+					return json.RawMessage(fmt.Sprintf(`{"error": "failed to marshal result: %v"}`, err)), nil
+				}
+
+				return json.RawMessage(resultBytes), nil
+			})
+
+			if *config.Debug {
+				fmt.Fprintf(os.Stderr, "  Added MCP tool: %s (from %s)\n", toolName, tool.Server)
+			}
+		}
+	}
+
 	// Load imports if any
 	if len(e.program.Imports) > 0 {
 		if *config.Debug {
@@ -185,6 +271,13 @@ func (e *Executor) Execute(ctx context.Context) (map[string]interface{}, error) 
 	// Validate output against schema
 	if err := e.program.ValidateOutput(result); err != nil {
 		return nil, fmt.Errorf("output validation failed: %w", err)
+	}
+
+	// Stop all MCP servers
+	if e.mcpManager.ServerCount() > 0 {
+		if err := e.mcpManager.StopAll(ctx); err != nil {
+			slog.Warn("failed to stop MCP servers", "error", err)
+		}
 	}
 
 	return result, nil
