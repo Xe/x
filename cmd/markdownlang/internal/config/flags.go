@@ -32,10 +32,18 @@ var (
 
 	// Summary enables JSON execution summary output
 	Summary = flag.Bool("summary", false, "Output JSON execution summary with metrics")
+
+	// Agree enables agreement acceptance mode
+	Agree = flag.Bool("agree", false, "Accept the trans rights agreement")
 )
 
 // Validate validates the flag configuration.
 func Validate() error {
+	// In agreement mode, we don't need a program path
+	if *Agree {
+		return nil
+	}
+
 	// Check if program path is provided
 	if *ProgramPath == "" {
 		return fmt.Errorf("program path is required (use -program flag)")

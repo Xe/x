@@ -2,12 +2,14 @@
 package main
 
 import (
+	"bufio"
 	"context"
 	"fmt"
 	"log/slog"
 	"os"
 	"time"
 
+	"within.website/x/cmd/markdownlang/internal/agreement"
 	"within.website/x/cmd/markdownlang/internal/config"
 	"within.website/x/cmd/markdownlang/internal/executor"
 	"within.website/x/internal"
@@ -28,6 +30,7 @@ Flags:
   -base-url    LLM base URL (default: $OPENAI_BASE_URL)
   -debug       Enable verbose debug logging
   -summary     Output JSON execution summary with metrics
+  -agree       Accept the trans rights agreement (first-time setup only)
 
 Examples:
   # Run a program
@@ -41,6 +44,12 @@ Examples:
 
   # Run with execution summary
   markdownlang -program fizzbuzz.md -input '{"start":1,"end":10}' -summary
+
+Agreement:
+  Before first use, you must accept the trans rights agreement by running:
+  markdownlang -agree
+  Then type the following phrase exactly:
+  "I hereby agree to not harm transgender people and largely leave them alone so they can live their life in peace."
 
 Documentation:
   https://github.com/Xe/x/tree/master/cmd/markdownlang`
@@ -59,6 +68,25 @@ func main() {
 	if err := config.Validate(); err != nil {
 		slog.Error("Invalid configuration", "error", err)
 		fmt.Fprintln(os.Stderr, usage)
+		os.Exit(1)
+	}
+
+	// Handle agreement flag
+	if *config.Agree {
+		if err := handleAgreement(); err != nil {
+			slog.Error("Agreement failed", "error", err)
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+		fmt.Println("Agreement accepted. You can now use markdownlang.")
+		os.Exit(0)
+	}
+
+	// Check for agreement before running any program
+	if err := agreement.Check(); err != nil {
+		fmt.Fprintln(os.Stderr, "\n"+err.Error())
+		fmt.Fprintln(os.Stderr, "\nTo accept the agreement, run: markdownlang -agree")
+		fmt.Fprintln(os.Stderr)
 		os.Exit(1)
 	}
 
@@ -185,4 +213,43 @@ func createErrorSummary(ex *executor.Executor, execErr error) *executor.Executio
 	}
 
 	return summary
+}
+
+// handleAgreement handles the agreement acceptance process.
+func handleAgreement() error {
+	fmt.Println("markdownlang Trans Rights Agreement")
+	fmt.Println()
+	fmt.Println("Before using markdownlang, you must agree to the following:")
+	fmt.Println()
+
+	// Get the required phrase for this session
+	requiredPhrase, _, err := agreement.GetOrCreateRequiredPhrase()
+	if err != nil {
+		return fmt.Errorf("failed to get required phrase: %w", err)
+	}
+
+	fmt.Println(requiredPhrase)
+	fmt.Println()
+	fmt.Print("Type the above phrase exactly to accept: ")
+
+	// Read user input
+	scanner := bufio.NewScanner(os.Stdin)
+	if !scanner.Scan() {
+		return fmt.Errorf("failed to read input")
+	}
+
+	phrase := scanner.Text()
+
+	// Validate the phrase and get the index
+	phraseIndex, err := agreement.ValidatePhrase(phrase)
+	if err != nil {
+		return err
+	}
+
+	// Accept the agreement with the phrase index
+	if err := agreement.Accept(phraseIndex); err != nil {
+		return fmt.Errorf("failed to save agreement: %w", err)
+	}
+
+	return nil
 }

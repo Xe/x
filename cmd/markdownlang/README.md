@@ -102,7 +102,7 @@ Output:
 }
 ```
 
-### With Python
+### With MCP
 
 ```markdown
 ---
@@ -120,9 +120,9 @@ output:
       items: { type: integer }
   required: [primes]
 mcp_servers:
-  - name: python-interpreter
-    command: uvx
-    args: ["mcp-server-python-interpreter"]
+  - name: filesystem
+    command: npx
+    args: ["-y", "@modelcontextprotocol/server-filesystem", "."]
 ---
 
 Use the Python interpreter to calculate all prime numbers up to {{ .limit }}.
