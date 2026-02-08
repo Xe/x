@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"strings"
 	"sync"
 	"testing"
@@ -12,58 +11,15 @@ import (
 )
 
 func TestNew(t *testing.T) {
-	tests := []struct {
-		name        string
-		optOut      string
-		wantEnabled bool
-	}{
-		{
-			name:        "default enabled",
-			optOut:      "",
-			wantEnabled: true,
-		},
-		{
-			name:        "explicitly disabled",
-			optOut:      "off",
-			wantEnabled: false,
-		},
-		{
-			name:        "other value still enabled",
-			optOut:      "something",
-			wantEnabled: true,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			// Save and restore original env var
-			oldVal := os.Getenv(optOutEnvVar)
-			defer func() {
-				if oldVal == "" {
-					os.Unsetenv(optOutEnvVar)
-				} else {
-					os.Setenv(optOutEnvVar, oldVal)
-				}
-			}()
-
-			// Set test value
-			if tt.optOut == "" {
-				os.Unsetenv(optOutEnvVar)
-			} else {
-				os.Setenv(optOutEnvVar, tt.optOut)
-			}
-
-			r := New()
-			if r.enabled != tt.wantEnabled {
-				t.Errorf("New().enabled = %v, want %v", r.enabled, tt.wantEnabled)
-			}
-		})
+	// Telemetry is always enabled now
+	r := New()
+	if r == nil {
+		t.Error("New() returned nil reporter")
 	}
 }
 
 func TestReporter_RecordTool(t *testing.T) {
 	r := New()
-	r.enabled = true // Ensure it's enabled for testing
 
 	// Record some tools
 	r.RecordTool("fetch")
@@ -80,18 +36,6 @@ func TestReporter_RecordTool(t *testing.T) {
 
 	if !r.toolsUsed["python-interpreter"] {
 		t.Error("RecordTool() did not record 'python-interpreter'")
-	}
-}
-
-func TestReporter_RecordToolWhenDisabled(t *testing.T) {
-	r := New()
-	r.enabled = false
-
-	// Recording should be no-op when disabled
-	r.RecordTool("fetch")
-
-	if len(r.toolsUsed) != 0 {
-		t.Errorf("RecordTool() recorded %d tools when disabled, want 0", len(r.toolsUsed))
 	}
 }
 
@@ -130,7 +74,6 @@ func TestReporter_ReportDuration(t *testing.T) {
 
 	// Create reporter and ensure some time passes
 	r := New()
-	r.enabled = true
 	r.RecordTool("test-tool")
 	time.Sleep(10 * time.Millisecond) // Ensure duration > 0
 	r.ReportDuration()
@@ -162,32 +105,6 @@ func TestReporter_ReportDuration(t *testing.T) {
 	}
 }
 
-func TestReporter_ReportDurationWhenDisabled(t *testing.T) {
-	// Create test server that should NOT be called
-	called := false
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		called = true
-		w.WriteHeader(http.StatusOK)
-	}))
-	defer server.Close()
-
-	oldEndpoint := Endpoint
-	defer func() { Endpoint = oldEndpoint }()
-	Endpoint = server.URL
-
-	r := New()
-	r.enabled = false
-	r.RecordTool("test-tool")
-	r.ReportDuration()
-
-	// Wait for potential background goroutine
-	time.Sleep(100 * time.Millisecond)
-
-	if called {
-		t.Error("ReportDuration() sent request when disabled")
-	}
-}
-
 func TestReporter_ReportDurationNilReporter(t *testing.T) {
 	// Calling methods on nil reporter should not panic
 	var r *Reporter
@@ -198,25 +115,16 @@ func TestReporter_ReportDurationNilReporter(t *testing.T) {
 func TestReporter_IsEnabled(t *testing.T) {
 	tests := []struct {
 		name        string
-		enabled     bool
 		nilReporter bool
 		want        bool
 	}{
 		{
-			name:        "enabled reporter",
-			enabled:     true,
+			name:        "reporter",
 			nilReporter: false,
 			want:        true,
 		},
 		{
-			name:        "disabled reporter",
-			enabled:     false,
-			nilReporter: false,
-			want:        false,
-		},
-		{
 			name:        "nil reporter",
-			enabled:     false,
 			nilReporter: true,
 			want:        false,
 		},
@@ -226,7 +134,7 @@ func TestReporter_IsEnabled(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			var r *Reporter
 			if !tt.nilReporter {
-				r = &Reporter{enabled: tt.enabled}
+				r = New()
 			}
 
 			if got := r.IsEnabled(); got != tt.want {
@@ -238,7 +146,6 @@ func TestReporter_IsEnabled(t *testing.T) {
 
 func TestReporter_ConcurrentToolRecording(t *testing.T) {
 	r := New()
-	r.enabled = true
 
 	// Record tools from multiple goroutines
 	var wg sync.WaitGroup
@@ -324,7 +231,6 @@ func TestReporter_SendFailureDoesNotPanic(t *testing.T) {
 	Endpoint = "http://invalid.url-that.does.not.exist:12345"
 
 	r := New()
-	r.enabled = true
 
 	// Should not panic
 	r.ReportDuration()
@@ -339,7 +245,6 @@ func TestReporter_EmptyEndpoint(t *testing.T) {
 	Endpoint = ""
 
 	r := New()
-	r.enabled = true
 
 	// Should not panic
 	r.ReportDuration()
@@ -350,7 +255,6 @@ func TestReporter_EmptyEndpoint(t *testing.T) {
 
 func TestReporter_SetProgramPath(t *testing.T) {
 	r := New()
-	r.enabled = true
 
 	r.SetProgramPath("/test/path/program.md")
 
@@ -363,7 +267,6 @@ func TestReporter_SetProgramPath(t *testing.T) {
 
 func TestReporter_SetModel(t *testing.T) {
 	r := New()
-	r.enabled = true
 
 	r.SetModel("https://api.example.com", "gpt-4")
 
@@ -379,7 +282,6 @@ func TestReporter_SetModel(t *testing.T) {
 
 func TestReporter_RecordMCPServer(t *testing.T) {
 	r := New()
-	r.enabled = true
 
 	r.RecordMCPServer("filesystem")
 	r.RecordMCPServer("fetch")
@@ -397,7 +299,6 @@ func TestReporter_RecordMCPServer(t *testing.T) {
 
 func TestReporter_RecordMCPTool(t *testing.T) {
 	r := New()
-	r.enabled = true
 
 	r.RecordMCPTool("mcp__filesystem__read_file")
 	r.RecordMCPTool("mcp__fetch__fetch")
@@ -411,7 +312,6 @@ func TestReporter_RecordMCPTool(t *testing.T) {
 
 func TestReporter_ToolCallCount(t *testing.T) {
 	r := New()
-	r.enabled = true
 
 	r.RecordTool("tool1")
 	r.RecordTool("tool2")
@@ -431,19 +331,19 @@ func TestSanitizeEmail(t *testing.T) {
 		want  string
 	}{
 		{
-			name:  "valid email",
+			name:  "valid email - returns full email",
 			email: "user@example.com",
-			want:  "example.com",
+			want:  "user@example.com",
 		},
 		{
-			name:  "email with subdomain",
+			name:  "email with subdomain - returns full email",
 			email: "user@mail.example.com",
-			want:  "mail.example.com",
+			want:  "user@mail.example.com",
 		},
 		{
 			name:  "invalid email",
 			email: "not-an-email",
-			want:  "",
+			want:  "not-an-email",
 		},
 		{
 			name:  "empty email",

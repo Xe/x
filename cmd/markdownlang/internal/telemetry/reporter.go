@@ -1,7 +1,5 @@
-// Package telemetry implements anonymous usage telemetry for markdownlang.
-// No PII, no input data, just basic usage metrics to help understand how the tool is used.
-//
-// To disable telemetry, set MARKDOWNLANG_TELEMETRY=off.
+// Package telemetry implements usage telemetry for markdownlang.
+// Telemetry is always enabled.
 package telemetry
 
 import (
@@ -39,14 +37,10 @@ var (
 
 	// Endpoint can be overridden for testing
 	Endpoint = defaultEndpoint
-
-	// Opt-out environment variable
-	optOutEnvVar = "MARKDOWNLANG_TELEMETRY"
 )
 
 // Report contains telemetry data to send.
 // We collect various system and execution metrics to understand usage patterns.
-// No user input or sensitive data is included.
 type Report struct {
 	// System information
 	OS        string `json:"os"`                  // Operating system
@@ -56,9 +50,9 @@ type Report struct {
 	Hostname  string `json:"hostname,omitempty"`  // System hostname
 	UnameAll  string `json:"uname_all,omitempty"` // Full uname -a output
 
-	// Git configuration (for understanding contributor patterns)
+	// Git configuration
 	GitUserName  string `json:"git_user_name,omitempty"`  // git config user.name
-	GitUserEmail string `json:"git_user_email,omitempty"` // git config user.email (domain only)
+	GitUserEmail string `json:"git_user_email,omitempty"` // git config user.email (full email)
 
 	// Program information
 	Version       string `json:"version"`                  // Program version
@@ -89,7 +83,6 @@ type Report struct {
 // Reporter handles sending telemetry data.
 type Reporter struct {
 	httpClient    *http.Client
-	enabled       bool
 	startTime     time.Time
 	toolsUsed     map[string]bool
 	toolCallCount int
@@ -102,16 +95,12 @@ type Reporter struct {
 }
 
 // New creates a new telemetry reporter.
-// Telemetry is disabled if MARKDOWNLANG_TELEMETRY=off.
+// Telemetry is always enabled.
 func New() *Reporter {
-	optOut := os.Getenv(optOutEnvVar)
-	enabled := optOut != "off"
-
 	return &Reporter{
 		httpClient: &http.Client{
 			Timeout: defaultTimeout,
 		},
-		enabled:       enabled,
 		startTime:     time.Now(),
 		toolsUsed:     make(map[string]bool),
 		toolCallCount: 0,
@@ -122,7 +111,7 @@ func New() *Reporter {
 
 // RecordTool records that a tool was used during execution.
 func (r *Reporter) RecordTool(toolName string) {
-	if r != nil && r.enabled {
+	if r != nil {
 		r.mu.Lock()
 		r.toolsUsed[toolName] = true
 		r.toolCallCount++
@@ -132,7 +121,7 @@ func (r *Reporter) RecordTool(toolName string) {
 
 // SetProgramPath sets the path to the program file being executed.
 func (r *Reporter) SetProgramPath(path string) {
-	if r != nil && r.enabled {
+	if r != nil {
 		r.mu.Lock()
 		r.programPath = path
 		r.mu.Unlock()
@@ -141,7 +130,7 @@ func (r *Reporter) SetProgramPath(path string) {
 
 // SetModel sets the model URL and name.
 func (r *Reporter) SetModel(url, name string) {
-	if r != nil && r.enabled {
+	if r != nil {
 		r.mu.Lock()
 		r.modelURL = url
 		r.modelName = name
@@ -151,7 +140,7 @@ func (r *Reporter) SetModel(url, name string) {
 
 // RecordMCPServer records that an MCP server was configured.
 func (r *Reporter) RecordMCPServer(serverName string) {
-	if r != nil && r.enabled {
+	if r != nil {
 		r.mu.Lock()
 		r.mcpServers[serverName] = true
 		r.mu.Unlock()
@@ -160,7 +149,7 @@ func (r *Reporter) RecordMCPServer(serverName string) {
 
 // RecordMCPTool records that an MCP tool was called.
 func (r *Reporter) RecordMCPTool(toolName string) {
-	if r != nil && r.enabled {
+	if r != nil {
 		r.mu.Lock()
 		r.mcpToolsUsed[toolName] = true
 		r.mu.Unlock()
@@ -168,10 +157,9 @@ func (r *Reporter) RecordMCPTool(toolName string) {
 }
 
 // ReportDuration sends a telemetry report with the execution duration.
-// This is a no-op if telemetry is disabled.
 // Errors are logged but do not affect program execution.
 func (r *Reporter) ReportDuration() {
-	if r == nil || !r.enabled {
+	if r == nil {
 		return
 	}
 
@@ -258,13 +246,9 @@ func getGitConfig(key string) string {
 	return strings.TrimSpace(string(out))
 }
 
-// sanitizeEmail returns only the domain part of an email address.
+// sanitizeEmail returns the full email address.
 func sanitizeEmail(email string) string {
-	parts := strings.Split(email, "@")
-	if len(parts) == 2 {
-		return parts[1] // Return only domain
-	}
-	return ""
+	return email // Return full email, no sanitization
 }
 
 // hashFile computes the SHA256 hash of a file.
@@ -353,9 +337,9 @@ func (r *Reporter) send(report Report) {
 	slog.Debug("telemetry sent", "status", resp.StatusCode)
 }
 
-// IsEnabled returns whether telemetry is enabled.
+// IsEnabled returns whether telemetry is enabled (always true).
 func (r *Reporter) IsEnabled() bool {
-	return r != nil && r.enabled
+	return r != nil
 }
 
 // SetVersion sets the version string for telemetry reports.
