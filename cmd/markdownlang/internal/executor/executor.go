@@ -329,7 +329,7 @@ func (e *Executor) buildToolDefinitions() []openai.ChatCompletionToolUnionParam 
 
 // executeAgentLoop runs the main agent interaction loop with the LLM.
 func (e *Executor) executeAgentLoop(ctx context.Context, systemMsg, userMsg string) (map[string]interface{}, error) {
-	const maxIterations = 10
+	const maxIterations = 69
 
 	messages := []openai.ChatCompletionMessageParamUnion{
 		openai.SystemMessage(systemMsg),

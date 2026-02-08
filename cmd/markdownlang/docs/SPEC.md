@@ -30,7 +30,7 @@ markdownlang program (.md)
     Executor (orchestrates execution)
        |
        v
-    Agent Loop (max 10 iterations)
+    Agent Loop (max 69 iterations)
        |
        +-- LLM API Call (OpenAI Responses API v3)
        +-- Tool Execution (MCP servers, Python interpreter, imported agents)
@@ -40,7 +40,7 @@ markdownlang program (.md)
     Result (JSON matching output schema)
 ```
 
-The LLM runs in a loop. If it returns invalid JSON, we tell it what went wrong and try again. Maximum 10 iterations — after that, we bail out because something has gone horribly wrong.
+The LLM runs in a loop. If it returns invalid JSON, we tell it what went wrong and try again. Maximum 69 iterations — after that, we bail out because something has gone horribly wrong.
 
 This is the whole trick, really. The validation feedback loop means we _always_ get output that matches the schema. The LLM learns from its mistakes. It's almost elegant.
 
@@ -176,7 +176,7 @@ Output MUST always be valid JSON matching the output schema. If there's nothing 
 
 ### The Agent Loop
 
-markdownlang runs an iterative loop with a maximum of 10 iterations:
+markdownlang runs an iterative loop with a maximum of 69 iterations:
 
 ```text
 ┌─────────────────────────────────────────────────────┐
@@ -185,7 +185,7 @@ markdownlang runs an iterative loop with a maximum of 10 iterations:
 │  3. Call LLM API (with available tools)             │
 │  4. Extract and validate response against schema    │
 │  5. If valid: return result                         │
-│  6. If invalid: add error feedback, retry (max 10)  │
+│  6. If invalid: add error feedback, retry (max 69)  │
 └─────────────────────────────────────────────────────┘
 ```
 
@@ -196,7 +196,7 @@ Each iteration sends a request to the LLM with the program's description, the re
 1. **Input validation** — Before execution, input is validated against the `input` schema.
 2. **Output validation** — After LLM response, output is validated against the `output` schema.
 3. **Retry with feedback** — If validation fails, the error is included in the next iteration's system message.
-4. **Max iterations** — After 10 failed iterations, execution fails with an error.
+4. **Max iterations** — After 69 failed iterations, execution fails with an error.
 
 This feedback loop is the whole reason markdownlang works reliably. The LLM learns from its mistakes.
 
@@ -833,7 +833,7 @@ This enables asynchronous workflows, fan-out patterns, and long-running agent co
 - Output MUST always be valid JSON (use `{}` when there's nothing to return)
 - Template rendering should prevent injection attacks
 - MCP servers start on agent init, stop on completion
-- Retry on transient errors (default max 10)
+- Retry on transient errors (default max 69)
 - Limit resource usage and execution time
 
 ## References

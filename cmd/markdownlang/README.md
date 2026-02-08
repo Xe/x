@@ -42,6 +42,17 @@ go build
 
 ## Usage
 
+### Commands
+
+```
+markdownlang <command> [flags]
+```
+
+- `run`: Execute a markdownlang program (default)
+- `agree`: Accept the trans rights agreement
+
+### Basic Example
+
 ### Basic Example
 
 Create a file `fizzbuzz.md`:
@@ -49,6 +60,7 @@ Create a file `fizzbuzz.md`:
 ```markdown
 ---
 name: fizzbuzz
+description: Generate FizzBuzz sequence for a range of numbers
 input:
   type: object
   properties:
@@ -104,9 +116,12 @@ Output:
 
 ### With MCP
 
+MCP servers can use stdio (command) or HTTP (SSE) transports:
+
 ```markdown
 ---
 name: calculate-primes
+description: Calculate prime numbers up to a limit
 input:
   type: object
   properties:
@@ -120,9 +135,13 @@ output:
       items: { type: integer }
   required: [primes]
 mcp_servers:
+  # stdio transport (command-based)
   - name: filesystem
     command: npx
     args: ["-y", "@modelcontextprotocol/server-filesystem", "."]
+  # SSE transport (HTTP-based)
+  - name: python-interpreter
+    url: "http://localhost:3000/mcp"
 ---
 
 Use the Python interpreter to calculate all prime numbers up to {{ .limit }}.
@@ -135,11 +154,12 @@ Use the Python interpreter to calculate all prime numbers up to {{ .limit }}.
 - `-program`: Path to the markdownlang program (required)
 - `-input`: JSON input string (default: `{}`)
 - `-output`: Output file path (default: stdout)
-- `-model`: OpenAI model (default: `gpt-4o`)
+- `-model`: OpenAI model (default: `gpt-4o`, can be overridden per-program)
 - `-api-key`: OpenAI API key (default: `$OPENAI_API_KEY`)
 - `-base-url`: LLM base URL (default: `$OPENAI_BASE_URL`)
 - `-debug`: Enable verbose logging
 - `-summary`: Output JSON execution summary with metrics
+- `-agree`: Accept agreement (deprecated, use `markdownlang agree` command)
 
 ### Environment Variables
 
@@ -151,12 +171,15 @@ export OPENAI_BASE_URL="https://api.openai.com/v1"  # or your local LLM
 ### Agent Imports and Calls
 
 Agents can import and call other agents, making them composable building blocks.
+Imports are resolved relative to the importing program, and circular dependencies
+are detected and rejected. Imported agents don't expose their imports (non-recursive).
 
 Create `fizzbuzz.md`:
 
 ```markdown
 ---
 name: fizzbuzz
+description: Generate FizzBuzz sequence for a range of numbers
 input:
   type: object
   properties:
@@ -185,6 +208,7 @@ Create `word-count.md`:
 ```markdown
 ---
 name: word-count
+description: Count words, characters, and find the longest word in text
 input:
   type: object
   properties:
@@ -214,6 +238,7 @@ Create `fizzbuzz-word-count.md` that uses both:
 ---
 name: fizzbuzz-word-count
 description: Runs FizzBuzz on a range and then counts the total words across all results
+model: gpt-4o-mini
 input:
   type: object
   properties:
@@ -243,7 +268,9 @@ Return the totals along with the original fizzbuzz results array.
 
 ### Execution Summary
 
-Use the `-summary` flag to get detailed metrics about your agent execution:
+Use the `-summary` flag to get detailed metrics about your agent execution. The
+summary is written to stderr, while the result goes to stdout or the specified
+output file:
 
 ```bash
 markdownlang -program fizzbuzz.md -input '{"start":1,"end":15}' -summary
@@ -285,6 +312,17 @@ For agents that call other agents, the summary includes:
 }
 ```
 
+### First-Time Setup
+
+Before running any programs, you must accept the trans rights agreement:
+
+```bash
+markdownlang agree
+```
+
+You'll be prompted to type a phrase affirming support for trans rights. This is
+a one-time setup. If this bothers you, markdownlang is not for you.
+
 ## Language Reference
 
 See [SPEC.md](docs/SPEC.md) for the full specification. If you don't read it,
@@ -295,38 +333,64 @@ don't expect me to explain why your programs don't work.
 Every markdownlang program has:
 
 1. **Front matter** (YAML between `---` delimiters)
-   - `name`: Program identifier
-   - `description`: What it does
-   - `input`: JSON Schema for input validation
-   - `output`: JSON Schema for output validation
-   - `imports`: Other programs this can call
-   - `mcp_servers`: MCP servers for tools
+   - `name`: Program identifier (required)
+   - `description`: What it does (required)
+   - `input`: JSON Schema for input validation (required)
+   - `output`: JSON Schema for output validation (required)
+   - `imports`: Other programs this can call (optional)
+   - `mcp_servers`: MCP servers for tools (optional)
+   - `model`: Override default model (optional)
 
 2. **Description** (markdown content)
    - Tells the LLM what to do
    - Supports Go templates: `{{ .variable }}`
    - Template functions: `upper`, `lower`, `title`, `default`, `len`, `slice`, `join`, `split`
 
+### The Agent Loop
+
+markdownlang runs an iterative agent loop (max 69 iterations):
+
+1. Render template with input data
+2. Call LLM with available tools
+3. Validate output against JSON Schema
+4. If valid: return result
+5. If invalid: add error feedback, retry (max 69)
+
+This guarantees output schema compliance through validation feedback.
+
 ### Template Functions
 
+Available template functions:
+
 ```
-{{ .variable }}        - Variable reference
-{{ .nested.field }}    - Nested field access
-{{ upper .name }}      - Convert to uppercase
-{{ .value | default "fallback" }} - Default value
-{{ len .items }}       - Get length
-{{ .items | slice 0 5 }} - Slice array/string
+{{ .variable }}           - Variable reference
+{{ .nested.field }}       - Nested field access
+{{ upper .name }}         - Convert to uppercase
+{{ lower .name }}         - Convert to lowercase
+{{ title .name }}         - Capitalize words
+{{ .value | default "N/A" }}  - Default value for empty/nil
+{{ len .items }}          - Get length
+{{ slice .items 0 5 }}    - Slice array/string
+{{ join .items ", " }}    - Join array with separator
+{{ split .text "," }}     - Split string by separator
+{{ if .cond }}...{{ end }}    - Conditional
+{{ range .items }}...{{ end }} - Loop
 ```
+
+All templates use Go's `text/template` syntax with security sanitization to
+prevent injection attacks.
 
 ## Architecture
 
 The system consists of:
 
-1. **Parser**: Extracts YAML front matter from markdown
-2. **Agent Loop**: Iterates with LLM until output matches schema
-3. **Template Renderer**: Interpolates input into description
-4. **MCP Client**: Manages tool servers
-5. **Python Interpreter**: Wasm-based Python execution
+1. **Parser** (`internal/parser`): Extracts YAML front matter, validates JSON Schema
+2. **Executor** (`internal/executor`): Orchestrates program execution
+3. **Agent Loop** (`internal/agent`): Iterates with LLM (max 69) until output matches schema
+4. **Template Renderer** (`internal/template`): Interpolates input into description
+5. **MCP Manager** (`internal/mcp`): Manages tool servers (stdio and SSE)
+6. **Python Interpreter** (`internal/python`): Wazero-based Python execution
+7. **Registry** (`internal/agent/registry`): Manages imported agents and detects cycles
 
 Because who doesn't want to run Python in a wasm sandbox inside their Go
 program that's calling an LLM? We live in the future, I guess.
