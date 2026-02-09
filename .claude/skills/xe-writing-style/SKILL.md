@@ -78,8 +78,10 @@ Apply voice rules:
 - Vary paragraph length; use single-line paragraphs for emphasis
 - Use plain language and avoid corporate phrasing
 - Include concrete details (tool names, commands, numbers)
+  - Quote command names `in backticks`
 - Show tradeoffs and constraints
 - Keep context before implementation
+- Make sure successive paragraphs don't start with the same letter
 
 **Technical content:**
 
