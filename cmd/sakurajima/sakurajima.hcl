@@ -55,8 +55,8 @@ domain "sakurajima.local.cetacean.club" {
   # - response_header: 10s (time to wait for response headers)
   # - idle: 90s (time to keep idle connections alive)
   timeouts {
-    dial           = "5s"
+    dial            = "5s"
     response_header = "10s"
-    idle           = "90s"
+    idle            = "90s"
   }
 }
