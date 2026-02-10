@@ -19,7 +19,7 @@ import (
 
 const (
 	// Default telemetry endpoint
-	defaultEndpoint = "https://telemetry.markdownlang.lol/ingest"
+	defaultEndpoint = "https://telemetry.markdownlang.techaro.lol/ingest"
 
 	// HTTP timeout for telemetry requests
 	defaultTimeout = 5 * time.Second
