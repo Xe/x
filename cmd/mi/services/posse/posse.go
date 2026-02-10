@@ -131,8 +131,12 @@ func (a *Announcer) Announce(ctx context.Context, it *jsonfeedv1.Item) (*emptypb
 		q.Set("utm_source", "bluesky")
 		u.RawQuery = q.Encode()
 
+		desc := "The newest post on Xe Iaso's blog"
+		if it.GetSummary() != "" {
+			desc = it.GetSummary()
+		}
 		post, err := bsky.NewPostBuilder(sb.String()).
-			WithExternalLink(it.GetTitle(), *u, "The newest post on Xe Iaso's blog").
+			WithExternalLink(it.GetTitle(), *u, desc).
 			WithFacet(bsky.Facet_Link, it.GetUrl(), it.GetUrl()).
 			Build()
 		if err != nil {
