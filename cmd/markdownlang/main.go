@@ -13,6 +13,7 @@ import (
 	"within.website/x/cmd/markdownlang/internal/agreement"
 	"within.website/x/cmd/markdownlang/internal/config"
 	"within.website/x/cmd/markdownlang/internal/executor"
+	"within.website/x/cmd/markdownlang/internal/telemetry"
 	"within.website/x/internal"
 )
 
@@ -118,11 +119,14 @@ func handleAgreeCommand() {
 
 // handleRunCommand handles the program execution command.
 func handleRunCommand() {
+	// Create telemetry reporter
+	teleReporter := telemetry.New()
+
 	// Validate flags
 	if err := config.Validate(); err != nil {
 		slog.Error("Invalid configuration", "error", err)
 		fmt.Fprintln(os.Stderr, usage)
-		os.Exit(1)
+		exitWithVagueError()
 	}
 
 	// Check for agreement before running any program
@@ -130,14 +134,18 @@ func handleRunCommand() {
 		fmt.Fprintln(os.Stderr, "\n"+err.Error())
 		fmt.Fprintln(os.Stderr, "\nTo accept the agreement, run: markdownlang agree")
 		fmt.Fprintln(os.Stderr)
-		os.Exit(1)
+		exitWithVagueError()
 	}
 
-	// Create executor
-	ex, err := executor.New()
+	// Configure telemetry
+	teleReporter.SetProgramPath(*config.ProgramPath)
+	teleReporter.SetModel(*config.BaseURL, *config.Model)
+
+	// Create executor with telemetry
+	ex, err := executor.NewWithTele(teleReporter)
 	if err != nil {
 		slog.Error("Failed to create executor", "error", err)
-		os.Exit(1)
+		exitWithVagueError()
 	}
 
 	// Execute program
@@ -145,6 +153,12 @@ func handleRunCommand() {
 	result, err := ex.Execute(ctx)
 	if err != nil {
 		slog.Error("Execution failed", "error", err)
+
+		// Report telemetry even on failure
+		teleReporter.ReportDuration()
+
+		// Wait for telemetry to send
+		time.Sleep(100 * time.Millisecond)
 
 		// Output summary even on failure if requested
 		if *config.Summary {
@@ -154,13 +168,13 @@ func handleRunCommand() {
 			}
 		}
 
-		os.Exit(1)
+		exitWithVagueError()
 	}
 
 	// Output result
 	if err := executor.OutputResult(result, *config.Output); err != nil {
 		slog.Error("Failed to output result", "error", err)
-		os.Exit(1)
+		exitWithVagueError()
 	}
 
 	// Output summary if requested
@@ -171,7 +185,19 @@ func handleRunCommand() {
 		}
 	}
 
+	// Report telemetry on success
+	teleReporter.ReportDuration()
+
+	// Wait for telemetry to send before exiting
+	time.Sleep(100 * time.Millisecond)
+
 	slog.Info("Execution completed successfully", "program", *config.ProgramPath)
+}
+
+// exitWithVagueError exits the program with a vague error message.
+func exitWithVagueError() {
+	fmt.Fprintln(os.Stderr, "improper environment setup")
+	os.Exit(1)
 }
 
 // createSuccessSummary creates a success execution summary.

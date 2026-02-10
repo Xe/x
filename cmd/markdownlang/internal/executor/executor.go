@@ -19,6 +19,7 @@ import (
 	"within.website/x/cmd/markdownlang/internal/mcp"
 	"within.website/x/cmd/markdownlang/internal/parser"
 	"within.website/x/cmd/markdownlang/internal/template"
+	"within.website/x/cmd/markdownlang/internal/telemetry"
 	"within.website/x/llm/codeinterpreter/python"
 )
 
@@ -40,6 +41,7 @@ type Executor struct {
 	callManager  *agent.CallManager
 	mcpManager   *mcp.Manager                 // MCP server manager
 	toolHandlers map[string]agent.ToolHandler // tool name -> handler
+	tele         *telemetry.Reporter          // Telemetry reporter
 	startTime    time.Time
 	metrics      ExecutionMetrics
 }
@@ -95,6 +97,16 @@ func New() (*Executor, error) {
 		callManager: callManager,
 		mcpManager:  mcpManager,
 	}, nil
+}
+
+// NewWithTele creates a new executor with telemetry reporting.
+func NewWithTele(tele *telemetry.Reporter) (*Executor, error) {
+	ex, err := New()
+	if err != nil {
+		return nil, err
+	}
+	ex.tele = tele
+	return ex, nil
 }
 
 // Execute runs the program and returns the output.
@@ -157,6 +169,11 @@ func (e *Executor) Execute(ctx context.Context) (map[string]interface{}, error) 
 				continue
 			}
 
+			// Record MCP server in telemetry
+			if e.tele != nil {
+				e.tele.RecordMCPServer(serverConfig.Name)
+			}
+
 			if *config.Debug {
 				fmt.Fprintf(os.Stderr, "  Started MCP server: %s\n", serverConfig.Name)
 			}
@@ -175,6 +192,11 @@ func (e *Executor) Execute(ctx context.Context) (map[string]interface{}, error) 
 		// Add MCP tools as tool handlers
 		for _, tool := range mcpTools {
 			toolName := tool.Tool.Name
+
+			// Record MCP tool configuration in telemetry
+			if e.tele != nil {
+				e.tele.RecordMCPTool(toolName)
+			}
 
 			// Build JSON schema from the tool's input schema
 			var schemaBytes json.RawMessage
@@ -466,6 +488,11 @@ func (e *Executor) executeAgentLoop(ctx context.Context, systemMsg, userMsg stri
 					if err != nil {
 						slog.Error("tool execution failed", "tool", toolName, "error", err)
 						result = json.RawMessage(fmt.Sprintf(`{"error": "%s"}`, err.Error()))
+					} else {
+						// Record successful tool call in telemetry
+						if e.tele != nil {
+							e.tele.RecordTool(toolName)
+						}
 					}
 				} else {
 					slog.Error("tool not found", "tool", toolName)
