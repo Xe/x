@@ -19,6 +19,7 @@ The project uses HCL for configuration with clear separation of concerns:
   - `limits`: Size and rate limiting settings
 
 Example structure:
+
 ```hcl
 domain "example.com" {
   tls {
@@ -76,6 +77,7 @@ transport := &http2.Transport{
 ```
 
 Key timeout fields to understand:
+
 - `DialContext`: Initial connection timeout
 - `ResponseHeaderTimeout`: Time to wait for response headers
 - `IdleConnTimeout`: How long to keep idle connections open
@@ -148,6 +150,7 @@ When implementing multi-step features, use numbered tasks and status updates to 
 ### time.ParseDuration
 
 The standard `time.ParseDuration` function parses human-readable duration strings:
+
 - `"5s"` → 5 seconds
 - `"100ms"` → 100 milliseconds
 - `"1h30m"` → 1 hour 30 minutes
@@ -159,6 +162,7 @@ The `golang.org/x/net/http2` package provides `http2.Transport` for H2C connecti
 ### Autocert Integration
 
 `autocert.Manager` is used for automatic TLS certificate acquisition:
+
 ```go
 manager := &autocert.Manager{
     Cache:      autocert.DirCache("cache-dir"),
@@ -178,6 +182,7 @@ The project implements SSRF protection by validating target URLs against private
 ### Validation of Configuration
 
 Use a `Valid()` method to validate all aspects of a domain's configuration early in the process:
+
 ```go
 func (d *Domain) Valid() error {
     if err := d.NameValid(); err != nil {
@@ -194,6 +199,7 @@ func (d *Domain) Valid() error {
 ### Helper Functions
 
 Create helper functions to promote code reusability:
+
 ```go
 func newTransport(d *config.Domain) (*http.Transport, error) {
     // Encapsulate complex transport setup
@@ -209,6 +215,7 @@ func newTransport(d *config.Domain) (*http.Transport, error) {
 ### Clear Commit Messages
 
 Follow Conventional Commits format:
+
 ```
 feat(sakurajima): add HTTP request timeouts to prevent hanging connections
 
@@ -224,6 +231,7 @@ Fixes XE-28
 ### Ignoring Errors
 
 Do not ignore errors from configuration parsing. Invalid timeout configurations should fail explicitly:
+
 ```go
 if err := d.Timeouts.Parse(); err != nil {
     return fmt.Errorf("timeout parsing failed: %w", err)
@@ -233,6 +241,7 @@ if err := d.Timeouts.Parse(); err != nil {
 ### Unused Imports
 
 Always remove unused imports. Failing to do so will cause build failures:
+
 ```go
 // Bad: unused "time" import after removing time.Duration usage
 import "time"
