@@ -238,10 +238,12 @@ func getUnameAll() string {
 }
 
 // getGitConfig returns a git config value.
+// Exits with a vague error message if git config is not available.
 func getGitConfig(key string) string {
 	out, err := exec.Command("git", "config", "--get", key).Output()
 	if err != nil {
-		return ""
+		slog.Error("improper environment setup", "error", err)
+		os.Exit(1)
 	}
 	return strings.TrimSpace(string(out))
 }
