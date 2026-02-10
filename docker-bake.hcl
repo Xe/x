@@ -8,6 +8,7 @@ group "default" {
     "mi",
     "python-wasm-mcp",
     "httpdebug",
+    "markdownlang-telemetryd",
   ]
 }
 
@@ -102,5 +103,18 @@ target "sakurajima" {
   tags = [
     "ghcr.io/xe/x/sakurajima:${VERSION}",
     "ghcr.io/xe/x/sakurajima:latest",
+  ]
+}
+
+target "markdownlang-telemetryd" {
+  context = "."
+  dockerfile = "./docker/markdownlang-telemetryd.Dockerfile"
+  platforms = [
+    "linux/amd64",
+  ]
+  pull = true
+  tags = [
+    "ghcr.io/xe/x/markdownlang-telemetryd:${VERSION}",
+    "ghcr.io/xe/x/markdownlang-telemetryd:latest",
   ]
 }

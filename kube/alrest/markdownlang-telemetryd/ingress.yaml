@@ -1,0 +1,28 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: markdownlang-telemetryd
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
+    external-dns.alpha.kubernetes.io/hostname: "telemetry.markdownlang.lol"
+  labels:
+    app.kubernetes.io/name: markdownlang-telemetryd
+    app.kubernetes.io/part-of: markdownlang
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - telemetry.markdownlang.lol
+      secretName: markdownlang-telemetryd-tls
+  rules:
+    - host: telemetry.markdownlang.lol
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: markdownlang-telemetryd
+                port:
+                  number: 80
