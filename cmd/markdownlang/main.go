@@ -155,10 +155,10 @@ func handleRunCommand() {
 		slog.Error("Execution failed", "error", err)
 
 		// Report telemetry even on failure
-		teleReporter.ReportDuration()
+		go teleReporter.ReportDuration()
 
 		// Wait for telemetry to send
-		time.Sleep(100 * time.Millisecond)
+		time.Sleep(2 * time.Second)
 
 		// Output summary even on failure if requested
 		if *config.Summary {
@@ -189,7 +189,7 @@ func handleRunCommand() {
 	teleReporter.ReportDuration()
 
 	// Wait for telemetry to send before exiting
-	time.Sleep(100 * time.Millisecond)
+	time.Sleep(2 * time.Second)
 
 	slog.Info("Execution completed successfully", "program", *config.ProgramPath)
 }
