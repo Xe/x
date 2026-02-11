@@ -97,6 +97,7 @@ type Reporter struct {
 // New creates a new telemetry reporter.
 // Telemetry is always enabled.
 func New() *Reporter {
+	slog.Debug("telemetry: creating reporter")
 	return &Reporter{
 		httpClient: &http.Client{
 			Timeout: defaultTimeout,
@@ -112,6 +113,7 @@ func New() *Reporter {
 // RecordTool records that a tool was used during execution.
 func (r *Reporter) RecordTool(toolName string) {
 	if r != nil {
+		slog.Debug("telemetry: recording tool call", "tool", toolName)
 		r.mu.Lock()
 		r.toolsUsed[toolName] = true
 		r.toolCallCount++
@@ -122,6 +124,7 @@ func (r *Reporter) RecordTool(toolName string) {
 // SetProgramPath sets the path to the program file being executed.
 func (r *Reporter) SetProgramPath(path string) {
 	if r != nil {
+		slog.Debug("telemetry: setting program path", "path", path)
 		r.mu.Lock()
 		r.programPath = path
 		r.mu.Unlock()
@@ -131,6 +134,7 @@ func (r *Reporter) SetProgramPath(path string) {
 // SetModel sets the model URL and name.
 func (r *Reporter) SetModel(url, name string) {
 	if r != nil {
+		slog.Debug("telemetry: setting model", "url", url, "name", name)
 		r.mu.Lock()
 		r.modelURL = url
 		r.modelName = name
@@ -141,6 +145,7 @@ func (r *Reporter) SetModel(url, name string) {
 // RecordMCPServer records that an MCP server was configured.
 func (r *Reporter) RecordMCPServer(serverName string) {
 	if r != nil {
+		slog.Debug("telemetry: recording MCP server", "server", serverName)
 		r.mu.Lock()
 		r.mcpServers[serverName] = true
 		r.mu.Unlock()
@@ -150,6 +155,7 @@ func (r *Reporter) RecordMCPServer(serverName string) {
 // RecordMCPTool records that an MCP tool was called.
 func (r *Reporter) RecordMCPTool(toolName string) {
 	if r != nil {
+		slog.Debug("telemetry: recording MCP tool", "tool", toolName)
 		r.mu.Lock()
 		r.mcpToolsUsed[toolName] = true
 		r.mu.Unlock()
@@ -160,14 +166,17 @@ func (r *Reporter) RecordMCPTool(toolName string) {
 // Errors are logged but do not affect program execution.
 func (r *Reporter) ReportDuration() {
 	if r == nil {
+		slog.Debug("telemetry: reporter is nil, skipping")
 		return
 	}
 
 	duration := time.Since(r.startTime)
+	slog.Debug("telemetry: collecting report data", "duration_ms", duration.Milliseconds())
 
 	// Collect all the creepy data
 	report := r.collectReportData(duration)
 
+	slog.Debug("telemetry: sending report in background", "endpoint", Endpoint)
 	// Send in background - don't block execution
 	go r.send(report)
 }
@@ -197,6 +206,14 @@ func (r *Reporter) collectReportData(duration time.Duration) Report {
 		mcpTools = append(mcpTools, tool)
 	}
 	r.mu.RUnlock()
+
+	slog.Debug("telemetry: collected metrics",
+		"tool_call_count", toolCallCount,
+		"tools_used", len(tools),
+		"mcp_servers", len(mcpServers),
+		"mcp_tools", len(mcpTools),
+		"duration_ms", duration.Milliseconds(),
+	)
 
 	// Collect system information
 	report := Report{
@@ -305,8 +322,11 @@ func getHostname() string {
 // Errors are logged but do not affect program execution.
 func (r *Reporter) send(report Report) {
 	if Endpoint == "" {
+		slog.Debug("telemetry: endpoint is empty, skipping send")
 		return
 	}
+
+	slog.Debug("telemetry: marshaling report", "size_bytes", len(fmt.Sprintf("%v", report)))
 
 	// Marshal report
 	body, err := json.Marshal(report)
@@ -314,6 +334,8 @@ func (r *Reporter) send(report Report) {
 		slog.Debug("failed to marshal telemetry report", "error", err)
 		return
 	}
+
+	slog.Debug("telemetry: sending report", "endpoint", Endpoint, "body_size", len(body))
 
 	// Create request
 	req, err := http.NewRequest("POST", Endpoint, bytes.NewReader(body))
@@ -329,14 +351,14 @@ func (r *Reporter) send(report Report) {
 	// Send request (with timeout)
 	resp, err := r.httpClient.Do(req)
 	if err != nil {
-		slog.Debug("telemetry request failed", "error", err)
+		slog.Debug("telemetry request failed", "error", err, "endpoint", Endpoint)
 		return
 	}
 	defer resp.Body.Close()
 
 	// We don't care about the response, just that it was sent
 	// Log at debug level only
-	slog.Debug("telemetry sent", "status", resp.StatusCode)
+	slog.Debug("telemetry sent successfully", "status", resp.StatusCode, "endpoint", Endpoint)
 }
 
 // IsEnabled returns whether telemetry is enabled (always true).
