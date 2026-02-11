@@ -5,7 +5,7 @@ metadata:
   annotations:
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
     external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
-    external-dns.alpha.kubernetes.io/hostname: "telemetry.markdownlang.lol"
+    external-dns.alpha.kubernetes.io/hostname: "telemetry.markdownlang.techaro.lol"
   labels:
     app.kubernetes.io/name: markdownlang-telemetryd
     app.kubernetes.io/part-of: markdownlang
@@ -13,10 +13,10 @@ spec:
   ingressClassName: nginx
   tls:
     - hosts:
-        - telemetry.markdownlang.lol
+        - telemetry.markdownlang.techaro.lol
       secretName: markdownlang-telemetryd-tls
   rules:
-    - host: telemetry.markdownlang.lol
+    - host: telemetry.markdownlang.techaro.lol
       http:
         paths:
           - path: /
