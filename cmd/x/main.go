@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/google/subcommands"
+	"within.website/x/cmd/x/cmd/ai"
 	"within.website/x/cmd/x/cmd/grpchc"
 	"within.website/x/cmd/x/cmd/importer/chatgpt"
 	"within.website/x/cmd/x/cmd/importer/deepseek"
@@ -19,6 +20,8 @@ func main() {
 
 	subcommands.Register(&grpchc.GRPCHealth{}, "grpc")
 
+	subcommands.Register(&ai.AddProviderCmd{}, "ai")
+	subcommands.Register(&ai.ListModelsCmd{}, "ai")
 	subcommands.Register(&chatgpt.ImportCmd{}, "ai")
 	subcommands.Register(&deepseek.ImportCmd{}, "ai")
 
