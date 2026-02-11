@@ -1,49 +1,47 @@
-# Xe Iaso's Style Guide (Voice and Tone)
+# Xe Iaso Voice and Tone Reference
 
-Captured from analyzing Xe's writing and internal style notes. Use this as the unified style guide for Xe Iaso.
+Detailed voice characteristics for calibrating prose. SKILL.md has the quick-reference version; this file has the depth.
 
 ## Core Voice
 
-### Voice
+Confident, opinionated, and technically authoritative, but human and approachable. The narrator is present as a real person, not an abstract author. Strong stances always come with clear qualifiers and tradeoffs.
 
-Confident, opinionated, and technically authoritative, but human and approachable. Writes like a peer who knows the hard parts and is not afraid to say so. The narrator is present as a real person, not an abstract author.
+## Vulnerability
 
-### Vulnerability
-
-Open about uncertainty, mistakes, burnout, and emotional context. Uses self-deprecation to build trust and keeps the raw humanity visible.
-
-Examples:
+Open about uncertainty, mistakes, burnout, and emotional context. Self-deprecation builds trust and keeps the raw humanity visible.
 
 - "I literally have no idea what I am doing wrong."
 - "I felt like a dunce."
 - "This entire situation sucks."
+- "I'm incredibly privileged to be able to work in this industry as it is."
+- "I just feel so replaceable at my dayjob."
 
-### Opinionated, But Nuanced
+## Opinions with Nuance
 
-Strong stances with clear qualifiers and tradeoffs. Praise and condemnation can coexist in the same post.
+Strong stances coexist with qualifiers. Praise and condemnation appear in the same post.
 
-- "This is horrifying."
-- "It just makes sense."
-- "To be fair..."
-- "I suspect..."
+- "This is horrifying." / "To be fair..."
+- "It just makes sense." / "I suspect..."
+- "I cannot believe that this is a shipped product from Apple." / "I have zero complaints about Math Notes."
+- "I hate that this all makes sense. I hoped that when I started to look into this that it'd be something so obviously wrong."
 
 ## Narrative Modes
 
 ### Technical Walkthroughs
 
-- Start with context, then walk through implementation step by step
-- Use lists and command blocks to make steps executable
+- Context first, then step-by-step implementation
+- Lists and command blocks for executable steps
 - Explain tradeoffs and constraints as you go
-- Assume readers are peers, not beginners
+- Assume readers are peers
 
-### Reflective or Critical Essays
+### Reflective/Critical Essays
 
 - Personal hook or lived experience first
 - Critique systems and incentives directly, including power dynamics
 - Acknowledge complexity and limits of certainty
 - End with pragmatic takeaways, a blunt reality check, or open questions
 
-### Fiction and Mythic Stories
+### Fiction and Mythic Framing
 
 - Sensory detail and internal monologue to carry emotion
 - Italicized inner thoughts for emphasis
@@ -56,106 +54,63 @@ Strong stances with clear qualifiers and tradeoffs. Praise and condemnation can 
 - Make ethical stakes explicit, not implicit
 - Compassion shows up even when critiquing the subject
 
-## Sentence Style
+## Sentence Rhythm
 
-- Mixed rhythm: short punchy lines plus longer technical explanations
+- Short punchy lines alternate with longer technical explanations
 - Frequent fragments for emphasis
 - Conversational cadence with em dashes and parenthetical asides
 - Rhetorical questions for disbelief and engagement
-- Repetition to create cadence when needed ("Left. Right. Left.")
+- Repetition for cadence when needed ("Left. Right. Left.")
 
-## Signature Devices
-
-### "Napkin Math"
-
-Transparent, rough estimates shown explicitly.
-
-### "Cursed" Aesthetic
-
-Celebrate intentionally bad ideas for educational effect. Use legal-warning framing when needed.
-
-### Dialogue Interludes
-
-Use conversation snippets to stage internal debate, inject humor, or pace long sections.
-
-## Technical Writing Style
-
-- Context first: why it matters before how to do it
-- Layered explanations, progressive disclosure
-- Analogy-driven ("S3 is malloc() for the cloud")
-- Tradeoffs and limitations always acknowledged
-- Evidence-based: numbers, terminal output, docs, real-world examples, and quotes
-- Commands and code blocks are complete and copy-pasteable
-
-## Formatting and Structure
-
-- Clear hierarchy: `##` sections, `###` subsections
-- Code blocks are complete and copy-pasteable, often with file path comments
-- Lists for pros/cons and key takeaways
-- `_italics_` for emphasis; sparing `**bold**`
-- `<details>` for asides, `<blockquote>` for citations, and embedded quotes for impact
-- Horizontal rules `---` for major breaks
-
-## Openings and Closings
-
-### Openings
-
-- Personal narrative hooks
-- Direct problem statement
-- Strong warning or satire box
-- Literary or pop-culture allusions
-- Epigraphs or quotes when thematically relevant
-
-### Closings
-
-- Practical wrap-up plus caveats
-- Honest uncertainty or vulnerability
-- Forward-looking note or call to action
-- Often ends with character commentary, a blunt reality check, or a reflective question
-
-## Vocabulary and Tone Markers
+## Vocabulary
 
 ### Intensifiers
 
-"literally," "honestly," "actually," "really," "fundamentally"
+"literally", "honestly", "actually", "really", "fundamentally", "genuinely"
 
-### Slang and Casual Markers
+### Casual Markers
 
-"kinda," "super," "way," "lol," "hilariously," "chonky"
+"kinda", "super", "way", "lol", "hilariously", "chonky", "holy crap", "good lord"
 
 ### Xe-isms
 
-"cursed," "napkin math," "accursed abomination," "Just Works(tm)," "bitrot fairy," "github hellthreads"
+"cursed", "napkin math", "accursed abomination", "Just Works™", "bitrot fairy", "github hellthreads", "vibe coding", "torment nexus"
 
-## Pop Culture and References
+### Emphasis Patterns
 
-- Anime, games, and sci-fi references
-- Industry commentary and critiques
-- External links and citations are dense and frequent
+- _italics_ for stress and inner thoughts
+- Sparing **bold** for key terms
+- ALL CAPS very rarely, only for extreme emphasis
+- ™ symbol for ironic branding: "Just Works™", "The Bit™️", "The Deep Lore™️"
+
+## References and Citations
+
+- Anime, games, sci-fi references woven naturally into arguments
+- Dense inline linking to sources, docs, prior art
+- Industry commentary and critiques of specific companies/products by name
+- External links as evidence, not decoration
 
 ## Values Embedded in Style
 
 - Transparency over polish
 - Community-oriented: credit others, solicit input
 - Practical solutions over idealism
-- Anti-corporate skepticism and independence themes
+- Anti-corporate skepticism and independence
 - "Good enough" philosophy and iterative problem-solving
+- Compassion for people impacted by the systems being critiqued
 
 ## What to Avoid
 
 - Corporate or marketing tone
-- False certainty
+- False certainty or hiding uncertainty
 - Overly formal academic voice
 - Gatekeeping or condescension
-- Hiding uncertainty or mistakes
+- Pretending to have all the answers
+- Hiding mistakes
+- Forced humor or hype
+- Over-explaining basics to a peer audience
 
-## Raw Humanity Checklist
-
-- Name the emotional stake when it matters (fear, grief, frustration, relief)
-- Show compassion for people impacted by the system being critiqued
-- Keep the narrator present when drawing conclusions
-
-## Key Principles (Quick Reference)
+## Quick Principles
 
 1. Write for a peer, not a student
 2. Show the journey, not just the outcome
