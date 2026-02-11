@@ -18,8 +18,8 @@ import (
 	"within.website/x/cmd/markdownlang/internal/config"
 	"within.website/x/cmd/markdownlang/internal/mcp"
 	"within.website/x/cmd/markdownlang/internal/parser"
-	"within.website/x/cmd/markdownlang/internal/template"
 	"within.website/x/cmd/markdownlang/internal/telemetry"
+	"within.website/x/cmd/markdownlang/internal/template"
 	"within.website/x/llm/codeinterpreter/python"
 )
 
