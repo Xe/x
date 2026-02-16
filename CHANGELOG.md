@@ -1,3 +1,39 @@
+# [1.30.0](https://github.com/Xe/x/compare/v1.29.0...v1.30.0) (2026-02-16)
+
+### Bug Fixes
+
+- **falin:** resolve npm ci dependency conflict ([#835](https://github.com/Xe/x/issues/835)) ([683bff8](https://github.com/Xe/x/commit/683bff8e5a484f7b4f2a4b506380501fda204720))
+- **mi:** use blog post summary in Bluesky embed description ([#848](https://github.com/Xe/x/issues/848)) ([7491810](https://github.com/Xe/x/commit/7491810e2481fd6be8f4baec97a08e4fd758b2f8))
+- **nguh:** return error for unsupported tokens ([d1a50e7](https://github.com/Xe/x/commit/d1a50e7a1604c1ecb831be9199365f39c22218a2))
+- **skills/xe-writing-style:** update details about successive paragraph starting letter rule ([5808b2b](https://github.com/Xe/x/commit/5808b2b2100dbcac2f1ec63800909d9cc6588ef2))
+- **skills/xe-writing-style:** wumbofy this with Opus ([cea6609](https://github.com/Xe/x/commit/cea6609b7f020b682136817604b40ebd8bf1ce61))
+- **useragent:** use filepath.Base for os.Args[0] in GenUserAgent ([#830](https://github.com/Xe/x/issues/830)) ([3ef21d9](https://github.com/Xe/x/commit/3ef21d9a605ac0f1607a71677d233d11f1b64187))
+- **web:** replace deprecated io/ioutil with io ([#829](https://github.com/Xe/x/issues/829)) ([fee5e4f](https://github.com/Xe/x/commit/fee5e4f1ce31e9bd5b6e2331eddebfd7fa015a3e))
+
+### Features
+
+- **cmd/x:** add ai-add-provider and ai-list-models subcommands ([#850](https://github.com/Xe/x/issues/850)) ([bba7f41](https://github.com/Xe/x/commit/bba7f419c26bc3a099f306cd4006f9e5a86dd8e6))
+- **python:** accept io/fs.FS as root filesystem parameter ([#813](https://github.com/Xe/x/issues/813)) ([87b97e8](https://github.com/Xe/x/commit/87b97e8fadaecb2efcbd1e87d6990440b61ddd8a))
+- **reviewbot:** add Python interpreter with repo filesystem ([#814](https://github.com/Xe/x/issues/814)) ([b40ff1c](https://github.com/Xe/x/commit/b40ff1cadba0c5aeec5936ef5134ec900d80f310))
+- **sakurajima:** add HTTP request timeouts to prevent hanging connections ([#837](https://github.com/Xe/x/issues/837)) ([d50a792](https://github.com/Xe/x/commit/d50a7922e614feaa51d8d593f17d7cc03ffbcc1e))
+- **sakurajima:** add request size limits to prevent DoS attacks ([#838](https://github.com/Xe/x/issues/838)) ([f207855](https://github.com/Xe/x/commit/f2078551e8f2cf28d7450e396715873f5acb1607))
+- **sakurajima:** add request size limits to prevent DoS attacks ([#839](https://github.com/Xe/x/issues/839)) ([80dd84a](https://github.com/Xe/x/commit/80dd84ad36e8acd028812ae9bd032b901b2524a1))
+- **sakurajima:** production readiness fixes and enhancements ([#834](https://github.com/Xe/x/issues/834)) ([4368e6f](https://github.com/Xe/x/commit/4368e6fd401f7d883a26e3eadec1eb685e5aa4fd))
+- **sapientwindex:** add state to prevent double-posts ([#825](https://github.com/Xe/x/issues/825)) ([6ba9223](https://github.com/Xe/x/commit/6ba922341741c20bac2beb48e4103bc06a3c2036))
+- **skills:** add experimental Xe writing style skill ([baed3bd](https://github.com/Xe/x/commit/baed3bd228a40d5be584dbdff4d8b300be85e10e))
+- **skills:** add Go table-driven tests skill ([#817](https://github.com/Xe/x/issues/817)) ([a2e35ea](https://github.com/Xe/x/commit/a2e35ead52b7d3b0849129a9b399b0f2f7e4e283))
+- **store:** add filesystem backends (DirectFile, JSONMutexDB, CAS) ([#824](https://github.com/Xe/x/issues/824)) ([4f694cf](https://github.com/Xe/x/commit/4f694cfaa9efe8754f68e2871aeb5d27576c5433))
+- **totpgen:** add TOTP code generator command ([#833](https://github.com/Xe/x/issues/833)) ([d0a556d](https://github.com/Xe/x/commit/d0a556d6aa204eec74ffe5cb4b8fbe5496452d89))
+
+### BREAKING CHANGES
+
+- **python:** llm/codeinterpreter/python.Run() now takes fs.FS as first parameter
+
+Assisted-by: GLM 4.6 via Claude Code
+Reviewbot-request: yes
+
+Signed-off-by: Xe Iaso <me@xeiaso.net>
+
 # [1.29.0](https://github.com/Xe/x/compare/v1.28.0...v1.29.0) (2026-01-13)
 
 ### Features
