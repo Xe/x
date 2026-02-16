@@ -5,37 +5,25 @@ package announcev1
 
 import (
 	context "context"
-	fmt "fmt"
-
-	http "net/http"
-
-	io "io"
-
 	json "encoding/json"
-
+	fmt "fmt"
+	io "io"
+	http "net/http"
 	strconv "strconv"
-
 	strings "strings"
 
+	twirp "github.com/twitchtv/twirp"
+	ctxsetters "github.com/twitchtv/twirp/ctxsetters"
 	protojson "google.golang.org/protobuf/encoding/protojson"
-
 	proto "google.golang.org/protobuf/proto"
 
-	twirp "github.com/twitchtv/twirp"
-
-	ctxsetters "github.com/twitchtv/twirp/ctxsetters"
-
 	google_protobuf3 "google.golang.org/protobuf/types/known/emptypb"
-
 	within_website_x_external_jsonfeed_v1 "within.website/x/gen/within/website/x/external/jsonfeed/v1"
 
 	bytes "bytes"
-
 	errors "errors"
-
-	path "path"
-
 	url "net/url"
+	path "path"
 )
 
 // Version compatibility assertion.

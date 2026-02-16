@@ -5,35 +5,24 @@ package statuspage
 
 import (
 	context "context"
-	fmt "fmt"
-
-	http "net/http"
-
-	io "io"
-
 	json "encoding/json"
-
+	fmt "fmt"
+	io "io"
+	http "net/http"
 	strconv "strconv"
-
 	strings "strings"
 
-	protojson "google.golang.org/protobuf/encoding/protojson"
-
-	proto "google.golang.org/protobuf/proto"
-
 	twirp "github.com/twitchtv/twirp"
-
 	ctxsetters "github.com/twitchtv/twirp/ctxsetters"
+	protojson "google.golang.org/protobuf/encoding/protojson"
+	proto "google.golang.org/protobuf/proto"
 
 	google_protobuf "google.golang.org/protobuf/types/known/emptypb"
 
 	bytes "bytes"
-
 	errors "errors"
-
-	path "path"
-
 	url "net/url"
+	path "path"
 )
 
 // Version compatibility assertion.

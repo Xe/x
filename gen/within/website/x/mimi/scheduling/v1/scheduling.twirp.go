@@ -5,33 +5,22 @@ package schedulingv1
 
 import (
 	context "context"
-	fmt "fmt"
-
-	http "net/http"
-
-	io "io"
-
 	json "encoding/json"
-
+	fmt "fmt"
+	io "io"
+	http "net/http"
 	strconv "strconv"
-
 	strings "strings"
 
+	twirp "github.com/twitchtv/twirp"
+	ctxsetters "github.com/twitchtv/twirp/ctxsetters"
 	protojson "google.golang.org/protobuf/encoding/protojson"
-
 	proto "google.golang.org/protobuf/proto"
 
-	twirp "github.com/twitchtv/twirp"
-
-	ctxsetters "github.com/twitchtv/twirp/ctxsetters"
-
 	bytes "bytes"
-
 	errors "errors"
-
-	path "path"
-
 	url "net/url"
+	path "path"
 )
 
 // Version compatibility assertion.
