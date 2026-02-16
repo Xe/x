@@ -5,13 +5,12 @@
 package statuspageconnect
 
 import (
+	connect "connectrpc.com/connect"
 	context "context"
 	errors "errors"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	http "net/http"
 	strings "strings"
-
-	connect "connectrpc.com/connect"
-	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	statuspage "within.website/x/gen/within/website/x/mimi/statuspage"
 )
 

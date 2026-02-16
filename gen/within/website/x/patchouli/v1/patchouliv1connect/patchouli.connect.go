@@ -5,12 +5,11 @@
 package patchouliv1connect
 
 import (
+	connect "connectrpc.com/connect"
 	context "context"
 	errors "errors"
 	http "net/http"
 	strings "strings"
-
-	connect "connectrpc.com/connect"
 	v1 "within.website/x/gen/within/website/x/patchouli/v1"
 )
 

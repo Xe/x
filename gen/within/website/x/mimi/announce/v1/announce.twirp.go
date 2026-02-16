@@ -3,28 +3,26 @@
 
 package announcev1
 
-import (
-	context "context"
-	json "encoding/json"
-	fmt "fmt"
-	io "io"
-	http "net/http"
-	strconv "strconv"
-	strings "strings"
+import context "context"
+import fmt "fmt"
+import http "net/http"
+import io "io"
+import json "encoding/json"
+import strconv "strconv"
+import strings "strings"
 
-	twirp "github.com/twitchtv/twirp"
-	ctxsetters "github.com/twitchtv/twirp/ctxsetters"
-	protojson "google.golang.org/protobuf/encoding/protojson"
-	proto "google.golang.org/protobuf/proto"
+import protojson "google.golang.org/protobuf/encoding/protojson"
+import proto "google.golang.org/protobuf/proto"
+import twirp "github.com/twitchtv/twirp"
+import ctxsetters "github.com/twitchtv/twirp/ctxsetters"
 
-	google_protobuf3 "google.golang.org/protobuf/types/known/emptypb"
-	within_website_x_external_jsonfeed_v1 "within.website/x/gen/within/website/x/external/jsonfeed/v1"
+import google_protobuf3 "google.golang.org/protobuf/types/known/emptypb"
+import within_website_x_external_jsonfeed_v1 "within.website/x/gen/within/website/x/external/jsonfeed/v1"
 
-	bytes "bytes"
-	errors "errors"
-	url "net/url"
-	path "path"
-)
+import bytes "bytes"
+import errors "errors"
+import path "path"
+import url "net/url"
 
 // Version compatibility assertion.
 // If the constant is not defined in the package, that likely means

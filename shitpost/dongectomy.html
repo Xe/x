@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hours Until Feb 20 (UTC)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      body {
+        font-family:
+          "Inter",
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          Roboto,
+          Helvetica,
+          Arial,
+          sans-serif;
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        color: #ffffff;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0;
+        overflow: hidden;
+      }
+
+      .glass-panel {
+        background: rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      }
+
+      .number-glow {
+        text-shadow: 0 0 30px rgba(129, 140, 248, 0.3);
+      }
+
+      /* Subtle pulse animation for the dot */
+      @keyframes pulse-dot {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.5;
+        }
+      }
+      .dot-pulse {
+        animation: pulse-dot 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      class="glass-panel rounded-3xl p-8 md:p-16 text-center max-w-lg w-full mx-4 relative overflow-hidden"
+    >
+      <!-- Background decoration -->
+      <div
+        class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-indigo-500 to-transparent opacity-50"
+      ></div>
+
+      <div class="space-y-2 mb-8">
+        <h1
+          class="text-indigo-300 text-xs md:text-sm font-bold tracking-[0.2em] uppercase"
+        >
+          Global Countdown
+        </h1>
+        <div
+          class="inline-flex items-center space-x-2 bg-white/5 rounded-full px-3 py-1 border border-white/10"
+        >
+          <div class="w-1.5 h-1.5 rounded-full bg-emerald-400 dot-pulse"></div>
+          <span class="text-[10px] md:text-xs text-gray-400 font-mono"
+            >TARGET: FEB 20 @ 07:30 UTC</span
+          >
+        </div>
+      </div>
+
+      <div class="mb-8 relative">
+        <div class="flex items-baseline justify-center">
+          <span
+            id="hours-display"
+            class="text-7xl md:text-9xl font-bold bg-clip-text text-transparent bg-gradient-to-b from-white to-indigo-200 number-glow tracking-tighter"
+          >
+            --.-
+          </span>
+        </div>
+        <span
+          class="text-xl md:text-2xl text-indigo-400/60 font-medium tracking-wide"
+          >HOURS</span
+        >
+      </div>
+
+      <div class="grid grid-cols-1 gap-4 text-center">
+        <p id="status-text" class="text-gray-400 text-sm font-light">
+          Calculating...
+        </p>
+      </div>
+
+      <!-- Subtle progress bar at bottom -->
+      <div class="absolute bottom-0 left-0 w-full h-1 bg-white/5">
+        <div
+          id="progress-bar"
+          class="h-full bg-indigo-500/50 w-0 transition-all duration-700"
+        ></div>
+      </div>
+    </div>
+
+    <script>
+      const updateTimer = () => {
+        const now = new Date();
+        const currentYear = now.getUTCFullYear();
+
+        // Define target: Feb 20th at 07:30:00 UTC
+        // Month is 0-indexed (0=Jan, 1=Feb)
+        let targetDate = new Date(Date.UTC(currentYear, 1, 20, 7, 30, 0));
+
+        // If the date has already passed in UTC time this year, target next year
+        if (now.getTime() > targetDate.getTime()) {
+          targetDate = new Date(Date.UTC(currentYear + 1, 1, 20, 7, 30, 0));
+        }
+
+        // Calculate difference in milliseconds
+        const diffMs = targetDate - now;
+
+        // Convert to hours (ms -> sec -> min -> hr)
+        const hours = diffMs / (1000 * 60 * 60);
+
+        const displayElement = document.getElementById("hours-display");
+        const statusText = document.getElementById("status-text");
+        const progressBar = document.getElementById("progress-bar");
+
+        if (diffMs <= 0) {
+          displayElement.textContent = "0.0";
+          statusText.textContent = "The time has arrived!";
+          progressBar.style.width = "100%";
+        } else {
+          // Display hours with 1 decimal place
+          displayElement.textContent = hours.toFixed(1);
+
+          const yearTarget = targetDate.getUTCFullYear();
+          statusText.innerHTML = `Until <span class="text-white">February 20, ${yearTarget}</span> at <span class="text-white">07:30 UTC</span>`;
+
+          // Visual flair: A subtle progress bar based on seconds/milliseconds
+          // to show the app is "alive" without being distracting
+          const seconds = now.getUTCSeconds();
+          const millis = now.getUTCMilliseconds();
+          const percent = ((seconds * 1000 + millis) / 60000) * 100;
+          progressBar.style.width = `${percent}%`;
+        }
+      };
+
+      // Update immediately
+      updateTimer();
+
+      // Update frequently for smooth feel
+      setInterval(updateTimer, 50);
+    </script>
+  </body>
+</html>

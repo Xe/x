@@ -3,25 +3,23 @@
 
 package uplodrv1
 
-import (
-	context "context"
-	json "encoding/json"
-	fmt "fmt"
-	io "io"
-	http "net/http"
-	strconv "strconv"
-	strings "strings"
+import context "context"
+import fmt "fmt"
+import http "net/http"
+import io "io"
+import json "encoding/json"
+import strconv "strconv"
+import strings "strings"
 
-	twirp "github.com/twitchtv/twirp"
-	ctxsetters "github.com/twitchtv/twirp/ctxsetters"
-	protojson "google.golang.org/protobuf/encoding/protojson"
-	proto "google.golang.org/protobuf/proto"
+import protojson "google.golang.org/protobuf/encoding/protojson"
+import proto "google.golang.org/protobuf/proto"
+import twirp "github.com/twitchtv/twirp"
+import ctxsetters "github.com/twitchtv/twirp/ctxsetters"
 
-	bytes "bytes"
-	errors "errors"
-	url "net/url"
-	path "path"
-)
+import bytes "bytes"
+import errors "errors"
+import path "path"
+import url "net/url"
 
 // Version compatibility assertion.
 // If the constant is not defined in the package, that likely means

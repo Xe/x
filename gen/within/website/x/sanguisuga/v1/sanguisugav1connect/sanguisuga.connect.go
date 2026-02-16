@@ -5,13 +5,12 @@
 package sanguisugav1connect
 
 import (
+	connect "connectrpc.com/connect"
 	context "context"
 	errors "errors"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	http "net/http"
 	strings "strings"
-
-	connect "connectrpc.com/connect"
-	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	v1 "within.website/x/gen/within/website/x/sanguisuga/v1"
 )
 
