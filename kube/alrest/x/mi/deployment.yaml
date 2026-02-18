@@ -4,6 +4,9 @@ metadata:
   name: mi
   annotations:
     operator.1password.io/auto-restart: "true"
+    keel.sh/policy: all
+    keel.sh/trigger: poll
+    keel.sh/pollSchedule: "@hourly"
 spec:
   replicas: 1
   template:
