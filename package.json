@@ -39,7 +39,7 @@
     "lint-staged": "^16.2.7",
     "prettier": "^3.8.1",
     "semantic-release": "^25.0.3",
-    "tailwindcss": "^4.1.18"
+    "tailwindcss": "^4.2.0"
   },
   "commitlint": {
     "extends": [
