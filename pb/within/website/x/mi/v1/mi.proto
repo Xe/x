@@ -32,16 +32,7 @@ message Switch {
 }
 
 message SwitchReq {
-  string member_name = 1 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).cel = {
-      id: "member_name.is_in_system"
-      message: "member_name must be in Within"
-      expression:
-        "this in [\"Cadey\", \"Nicole\", \"Jessie\", \"Sephie\", "
-        "\"Ashe\", \"Mai\", \"W'zamqo\"]"
-    }
-  ]; // required
+  string member_name = 1 [(buf.validate.field).required = true]; // required, resolved against member names and aliases
 }
 
 message SwitchResp {

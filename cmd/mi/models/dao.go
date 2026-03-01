@@ -74,6 +74,20 @@ func (d *DAO) Members(ctx context.Context) ([]Member, error) {
 	return result, nil
 }
 
+// MemberByName finds a member by canonical name or alias.
+func (d *DAO) MemberByName(ctx context.Context, name string) (*Member, error) {
+	var members []Member
+	if err := d.db.WithContext(ctx).Find(&members).Error; err != nil {
+		return nil, err
+	}
+	for _, m := range members {
+		if m.MatchesName(name) {
+			return &m, nil
+		}
+	}
+	return nil, gorm.ErrRecordNotFound
+}
+
 func (d *DAO) WhoIsFront(ctx context.Context) (*Switch, error) {
 	var sw Switch
 	if err := d.db.Joins("Member").Order("created_at DESC").First(&sw).Error; err != nil {
@@ -84,6 +98,13 @@ func (d *DAO) WhoIsFront(ctx context.Context) (*Switch, error) {
 }
 
 func (d *DAO) SwitchFront(ctx context.Context, memberName string) (*Switch, *Switch, error) {
+	// Resolve the member name (including aliases) before starting
+	// the transaction so the read uses the main connection.
+	newMember, err := d.MemberByName(ctx, memberName)
+	if err != nil {
+		return nil, nil, err
+	}
+
 	var old Switch
 	tx := d.db.Begin()
 
@@ -92,7 +113,7 @@ func (d *DAO) SwitchFront(ctx context.Context, memberName string) (*Switch, *Swi
 		return nil, nil, err
 	}
 
-	if old.Member.Name == memberName {
+	if old.Member.ID == newMember.ID {
 		tx.WithContext(ctx).Rollback()
 		return nil, nil, ErrCantSwitchToYourself
 	}
@@ -100,12 +121,6 @@ func (d *DAO) SwitchFront(ctx context.Context, memberName string) (*Switch, *Swi
 	now := time.Now()
 	old.EndedAt = &now
 	if err := tx.WithContext(ctx).Save(&old).Error; err != nil {
-		tx.Rollback()
-		return nil, nil, err
-	}
-
-	var newMember Member
-	if err := tx.WithContext(ctx).Where("name = ?", memberName).First(&newMember).Error; err != nil {
 		tx.Rollback()
 		return nil, nil, err
 	}

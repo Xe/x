@@ -1,6 +1,7 @@
 package models
 
 import (
+	"strings"
 	"time"
 
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -13,6 +14,21 @@ type Member struct {
 	Name      string     `gorm:"uniqueIndex"` // the name of the member
 	AvatarURL string     // public URL to the member's avatar
 	Birthday  *time.Time // optional birthday as RFC 3339 timestamp
+	Aliases   string     // comma-separated list of alternative names
+}
+
+// MatchesName reports whether the given name matches this member's
+// canonical name or any of their aliases (case-insensitive).
+func (m Member) MatchesName(name string) bool {
+	if strings.EqualFold(m.Name, name) {
+		return true
+	}
+	for _, alias := range strings.Split(m.Aliases, ",") {
+		if alias = strings.TrimSpace(alias); alias != "" && strings.EqualFold(alias, name) {
+			return true
+		}
+	}
+	return false
 }
 
 // AsProto converts a Member to its protobuf representation.
