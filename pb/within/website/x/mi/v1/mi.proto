@@ -32,9 +32,7 @@ message Switch {
 }
 
 message SwitchReq {
-  string member_name = 1 [
-    (buf.validate.field).required = true
-  ]; // required, resolved against member names and aliases
+  string member_name = 1 [(buf.validate.field).required = true]; // required, resolved against member names and aliases
 }
 
 message SwitchResp {
