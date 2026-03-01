@@ -57,9 +57,8 @@ func (s *Server) WhoIsFront(ctx context.Context, _ *emptypb.Empty) (*pb.FrontCha
 }
 
 func (s *Server) Switch(ctx context.Context, req *pb.SwitchReq) (*pb.SwitchResp, error) {
-	if err := protovalidate.Validate(req); err != nil {
-		slog.Error("can't switch without a member", "req", req, "err", err)
-		return nil, twirp.InvalidArgumentError("member_name", err.Error())
+	if req.GetMemberName() == "" {
+		return nil, twirp.RequiredArgumentError("member_name")
 	}
 
 	old, new, err := s.dao.SwitchFront(ctx, req.GetMemberName())
