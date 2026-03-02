@@ -50,7 +50,7 @@ require (
 	github.com/lib/pq v1.10.9
 	github.com/lum8rjack/go-ja4h v0.0.0-20250606032308-3a989c6635be
 	github.com/mattn/go-sqlite3 v1.14.24
-	github.com/modelcontextprotocol/go-sdk v1.0.0
+	github.com/modelcontextprotocol/go-sdk v1.3.1
 	github.com/multiformats/go-multibase v0.2.0
 	github.com/mymmrac/telego v0.31.5
 	github.com/nats-io/nats.go v1.42.0
@@ -164,7 +164,7 @@ require (
 	github.com/gogs/chardet v0.0.0-20211120154057-b7413eaefb8f // indirect
 	github.com/golang-jwt/jwt/v4 v4.5.2 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
-	github.com/google/jsonschema-go v0.3.0 // indirect
+	github.com/google/jsonschema-go v0.4.2 // indirect
 	github.com/google/pprof v0.0.0-20250317173921-a4b03ec1a45e // indirect
 	github.com/google/rpmpack v0.7.1 // indirect
 	github.com/goreleaser/chglog v0.7.3 // indirect
@@ -234,6 +234,7 @@ require (
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	github.com/savsgio/gotils v0.0.0-20240704082632-aef3928b8a38 // indirect
 	github.com/segmentio/asm v1.2.0 // indirect
+	github.com/segmentio/encoding v0.5.3 // indirect
 	github.com/sergi/go-diff v1.4.0 // indirect
 	github.com/shopspring/decimal v1.4.0 // indirect
 	github.com/skeema/knownhosts v1.3.1 // indirect
