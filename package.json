@@ -35,7 +35,7 @@
     "@semantic-release/git": "^10.0.1",
     "@semantic-release/github": "^12.0.6",
     "@semantic-release/release-notes-generator": "^14.1.0",
-    "@tailwindcss/cli": "^4.2.0",
+    "@tailwindcss/cli": "^4.2.1",
     "husky": "^9.1.7",
     "lint-staged": "^16.2.7",
     "prettier": "^3.8.1",
