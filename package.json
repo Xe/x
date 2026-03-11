@@ -27,7 +27,7 @@
   "homepage": "https://github.com/Xe/x#readme",
   "devDependencies": {
     "@bufbuild/buf": "^1.66.0",
-    "@commitlint/cli": "^20.4.2",
+    "@commitlint/cli": "^20.4.3",
     "@commitlint/config-conventional": "^20.4.3",
     "@semantic-release/changelog": "^6.0.3",
     "@semantic-release/commit-analyzer": "^13.0.1",
