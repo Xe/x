@@ -67,7 +67,7 @@
     "**/*.{js,ts,html,json,css,scss,md,mdx}": [
       "prettier -w"
     ],
-    "**/*.{go}": [
+    "**/*.go": [
       "go tool goimports -w"
     ]
   },
