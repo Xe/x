@@ -58,6 +58,13 @@ func New(dbLoc, backupDBLoc string) (*DAO, error) {
 		return nil, fmt.Errorf("failed to migrate schema: %w", err)
 	}
 
+	// Data migration: add "Zoe" as a nickname for W'zamqo.
+	if err := db.Model(&Member{}).
+		Where("name = ? AND (aliases IS NULL OR aliases = '')", "W'zamqo").
+		Update("aliases", "Zoe").Error; err != nil {
+		return nil, fmt.Errorf("failed to set aliases for W'zamqo: %w", err)
+	}
+
 	db.Use(gormPrometheus.New(gormPrometheus.Config{
 		DBName: "mi",
 	}))
