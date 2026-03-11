@@ -143,7 +143,6 @@ func (d *DAO) SwitchFront(ctx context.Context, memberName string) (*Switch, *Swi
 	}
 
 	if err := tx.WithContext(ctx).Commit().Error; err != nil {
-		tx.Rollback()
 		return nil, nil, err
 	}
 

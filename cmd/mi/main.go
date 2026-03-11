@@ -149,7 +149,7 @@ func main() {
 	mux.Handle("/mcp", mcp.New(st))
 
 	i := importer.New(dao)
-	i.Mount(http.DefaultServeMux)
+	i.Mount(mux)
 
 	mux.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
 		if err := dao.Ping(r.Context()); err != nil {
@@ -160,9 +160,9 @@ func main() {
 		w.WriteHeader(http.StatusOK)
 		fmt.Fprintln(w, "OK")
 	})
-	http.Handle("/metrics", promhttp.Handler())
+	mux.Handle("/metrics", promhttp.Handler())
 
-	g, _ := errgroup.WithContext(ctx)
+	g, ctx := errgroup.WithContext(ctx)
 
 	g.Go(func() error {
 		slog.Info("starting private grpc server", "bind", *grpcBind)
@@ -191,8 +191,12 @@ func main() {
 
 	g.Go(func() error {
 		c := cron.New()
-		c.AddFunc("@every 1h", dao.Backup)
-		c.Run()
+		if _, err := c.AddFunc("@every 1h", dao.Backup); err != nil {
+			return fmt.Errorf("failed to add cron job: %w", err)
+		}
+		c.Start()
+		<-ctx.Done()
+		c.Stop()
 		return nil
 	})
 
