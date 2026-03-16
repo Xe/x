@@ -7,14 +7,15 @@
 package miv1
 
 import (
+	reflect "reflect"
+	sync "sync"
+	unsafe "unsafe"
+
 	_ "buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
-	reflect "reflect"
-	sync "sync"
-	unsafe "unsafe"
 )
 
 const (
@@ -206,7 +207,7 @@ func (x *Switch) GetEndedAt() string {
 
 type SwitchReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	MemberName    string                 `protobuf:"bytes,1,opt,name=member_name,json=memberName,proto3" json:"member_name,omitempty"` // required
+	MemberName    string                 `protobuf:"bytes,1,opt,name=member_name,json=memberName,proto3" json:"member_name,omitempty"` // required, resolved against member names and aliases
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -656,10 +657,9 @@ const file_within_website_x_mi_v1_mi_proto_rawDesc = "" +
 	"\tmember_id\x18\x02 \x01(\x05R\bmemberId\x12\x1d\n" +
 	"\n" +
 	"started_at\x18\x03 \x01(\tR\tstartedAt\x12\x19\n" +
-	"\bended_at\x18\x04 \x01(\tR\aendedAt\"\xbf\x01\n" +
-	"\tSwitchReq\x12\xb1\x01\n" +
-	"\vmember_name\x18\x01 \x01(\tB\x8f\x01\xbaH\x8b\x01\xba\x01\x84\x01\n" +
-	"\x18member_name.is_in_system\x12\x1dmember_name must be in Within\x1aIthis in [\"Cadey\", \"Nicole\", \"Jessie\", \"Sephie\", \"Ashe\", \"Mai\", \"W'zamqo\"]\xc8\x01\x01R\n" +
+	"\bended_at\x18\x04 \x01(\tR\aendedAt\"4\n" +
+	"\tSwitchReq\x12'\n" +
+	"\vmember_name\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\n" +
 	"memberName\"x\n" +
 	"\n" +
 	"SwitchResp\x120\n" +

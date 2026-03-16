@@ -4,10 +4,10 @@ import "testing"
 
 func TestMemberMatchesName(t *testing.T) {
 	tests := []struct {
-		name    string
-		member  Member
-		input   string
-		want    bool
+		name   string
+		member Member
+		input  string
+		want   bool
 	}{
 		{
 			name:   "exact canonical name",
