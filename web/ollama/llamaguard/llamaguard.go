@@ -122,7 +122,7 @@ func Check(ctx context.Context, cli *ollama.Client, role, model string, messages
 		return nil, fmt.Errorf("llamaguard: response was not in the expected format")
 	}
 
-	for _, r := range strings.Split(reasons[1], ",") {
+	for r := range strings.SplitSeq(reasons[1], ",") {
 		result.ViolationCategories = append(result.ViolationCategories, ParseCategory(r))
 	}
 

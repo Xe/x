@@ -35,9 +35,9 @@ type API struct {
 	url string // webhook url
 }
 
-func (a API) makeRequestWith(body interface{}) (*http.Request, error) {
+func (a API) makeRequestWith(body any) (*http.Request, error) {
 	env := struct {
-		Webhook interface{} `json:"webhook"`
+		Webhook any `json:"webhook"`
 	}{
 		Webhook: body,
 	}

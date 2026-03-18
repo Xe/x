@@ -23,7 +23,7 @@ func (m Member) MatchesName(name string) bool {
 	if strings.EqualFold(m.Name, name) {
 		return true
 	}
-	for _, alias := range strings.Split(m.Aliases, ",") {
+	for alias := range strings.SplitSeq(m.Aliases, ",") {
 		if alias = strings.TrimSpace(alias); alias != "" && strings.EqualFold(alias, name) {
 			return true
 		}

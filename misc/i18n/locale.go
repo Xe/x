@@ -43,8 +43,8 @@ func supportedLocales(alstr string) []Locale {
 	if alstr == "" {
 		return locales
 	}
-	al := strings.Split(alstr, ",")
-	for _, lstr := range al {
+	al := strings.SplitSeq(alstr, ",")
+	for lstr := range al {
 		locales = append(locales, Locale{
 			Lang:    parseLang(lstr),
 			Country: parseCountry(lstr),

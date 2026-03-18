@@ -10,6 +10,7 @@ package documentfunctions
 
 import (
 	"go/ast"
+	"slices"
 	"strings"
 
 	"golang.org/x/tools/go/analysis"
@@ -28,7 +29,7 @@ var ignoreFunctions = []string{
 // run runs the analysis pass for documentfunctions. It performs a depth-first
 // traversal of all AST nodes in a file, looks for function definitions, and
 // then ensures all of them have comments.
-func run(pass *analysis.Pass) (interface{}, error) {
+func run(pass *analysis.Pass) (any, error) {
 	for _, file := range pass.Files {
 		pos := pass.Fset.Position(file.Pos())
 		if !strings.HasSuffix(".go", pos.Filename) {
@@ -40,10 +41,8 @@ func run(pass *analysis.Pass) (interface{}, error) {
 				return true
 			}
 
-			for _, ignoreName := range ignoreFunctions {
-				if fe.Name.Name == ignoreName {
-					return true
-				}
+			if slices.Contains(ignoreFunctions, fe.Name.Name) {
+				return true
 			}
 
 			if fe.Doc == nil {

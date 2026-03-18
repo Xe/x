@@ -1,7 +1,6 @@
 package switchtracker_test
 
 import (
-	"context"
 	"crypto/rand"
 	_ "embed"
 	"encoding/json"
@@ -21,8 +20,7 @@ var (
 )
 
 func TestSwitch(t *testing.T) {
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := t.Context()
 
 	dir := t.TempDir()
 	dao, err := models.New(filepath.Join(dir, "test.db"), filepath.Join(dir, "backup.db"))
@@ -107,7 +105,6 @@ func TestSwitch(t *testing.T) {
 	}
 
 	for _, s := range switches.Switches {
-		s := s
 		t.Run("get switch "+s.GetSwitch().GetId(), func(t *testing.T) {
 			fc, err := st.GetSwitch(ctx, &pb.GetSwitchReq{
 				Id: s.GetSwitch().GetId(),

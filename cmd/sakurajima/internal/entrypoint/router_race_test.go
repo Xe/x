@@ -65,11 +65,9 @@ func TestRouterServeHTTPConcurrentReloads(t *testing.T) {
 
 	// Start goroutines that continuously reload config
 	const numReloaders = 10
-	for i := 0; i < numReloaders; i++ {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			for j := 0; j < 10; j++ {
+	for i := range numReloaders {
+		wg.Go(func() {
+			for j := range 10 {
 				// Create a new access log file for each reload to trigger Rotate/Close
 				newAccessLog := fmt.Sprintf("%s/access-%d-%d.log", t.TempDir(), i, j)
 				newCfg := createTestConfig(newAccessLog)
@@ -79,16 +77,14 @@ func TestRouterServeHTTPConcurrentReloads(t *testing.T) {
 					t.Errorf("config reload failed: %v", err)
 				}
 			}
-		}()
+		})
 	}
 
 	// Start goroutines that make HTTP requests (triggers ServeHTTP -> accessLog read)
 	const numRequesters = 100
-	for i := 0; i < numRequesters; i++ {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			for j := 0; j < 20; j++ {
+	for range numRequesters {
+		wg.Go(func() {
+			for range 20 {
 				// Create a request that will trigger ServeHTTP
 				req, err := http.NewRequest(http.MethodGet, "http://test.local/path", nil)
 				if err != nil {
@@ -104,7 +100,7 @@ func TestRouterServeHTTPConcurrentReloads(t *testing.T) {
 				// while setConfig may be closing it
 				rtr.ServeHTTP(w, req)
 			}
-		}()
+		})
 	}
 
 	// Wait for all goroutines to complete

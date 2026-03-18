@@ -110,7 +110,7 @@ func (ois *OptimizedImageServer) ResizeTo(widthPixels int, character, mood, form
 		return result.Bytes(), nil
 	}
 
-	data, err, _ := ois.group.Do(string(boltPath), func() (interface{}, error) {
+	data, err, _ := ois.group.Do(string(boltPath), func() (any, error) {
 		// /file/christine-static/stickers/aoi/yawn.png
 		path := fmt.Sprintf("/file/christine-static/stickers/%s/%s.png", character, mood)
 		data, err := ois.Cache.LoadBytesOrFetch(path)

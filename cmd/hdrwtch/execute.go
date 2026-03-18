@@ -64,7 +64,6 @@ func (s *Server) cron() {
 	g.SetLimit(runtime.NumCPU())
 
 	for _, probe := range probes {
-		probe := probe
 
 		g.Go(func() error {
 			result := checkURL(gCtx, probe)

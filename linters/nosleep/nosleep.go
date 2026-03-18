@@ -14,6 +14,7 @@ import (
 	"go/ast"
 	"go/token"
 	"regexp"
+	"slices"
 	"strings"
 
 	"golang.org/x/tools/go/analysis"
@@ -44,7 +45,7 @@ func nodeFuncName(node *ast.CallExpr) string {
 
 // run finds all time.Sleep calls and raises a linter warning unless there
 // is an appropriate magic comment.
-func run(pass *analysis.Pass) (interface{}, error) {
+func run(pass *analysis.Pass) (any, error) {
 	for _, file := range pass.Files {
 		ignore := findBypassComments(pass.Fset, file.Comments)
 
@@ -57,10 +58,8 @@ func run(pass *analysis.Pass) (interface{}, error) {
 			fname := pos.Filename
 			line := pos.Line
 
-			for _, ignoreLine := range ignore {
-				if ignoreLine == line {
-					return true
-				}
+			if slices.Contains(ignore, line) {
+				return true
 			}
 
 			if strings.HasSuffix(fname, "_test.go") {

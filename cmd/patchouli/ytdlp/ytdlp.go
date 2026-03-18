@@ -32,7 +32,7 @@ type Date struct {
 func (d *Date) MarshalJSON() ([]byte, error) {
 	result := d.Format(dateFormat)
 
-	return []byte(fmt.Sprintf("%q", result)), nil
+	return fmt.Appendf(nil, "%q", result), nil
 }
 
 func (d *Date) UnmarshalJSON(data []byte) error {
@@ -54,7 +54,7 @@ func (d Date) Value() (driver.Value, error) {
 }
 
 // Scan implements the sql.Scanner interface
-func (d *Date) Scan(value interface{}) error {
+func (d *Date) Scan(value any) error {
 	if value == nil {
 		*d = Date{Time: time.Time{}}
 		return nil

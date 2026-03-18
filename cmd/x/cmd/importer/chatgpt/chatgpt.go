@@ -55,8 +55,8 @@ type Author struct {
 
 // Content holds the message's text or other parts.
 type Content struct {
-	ContentType string        `json:"content_type"`
-	Parts       []interface{} `json:"parts"`
+	ContentType string `json:"content_type"`
+	Parts       []any  `json:"parts"`
 }
 
 // Metadata stores extra information about the message.
@@ -135,7 +135,7 @@ func (p *ImportCmd) SetFlags(f *flag.FlagSet) {
 }
 
 // Execute is the main logic of the subcommand.
-func (p *ImportCmd) Execute(ctx context.Context, f *flag.FlagSet, args ...interface{}) subcommands.ExitStatus {
+func (p *ImportCmd) Execute(ctx context.Context, f *flag.FlagSet, args ...any) subcommands.ExitStatus {
 	data, err := os.ReadFile(p.jsonFile)
 	if err != nil {
 		log.Printf("error reading file: %v", err)

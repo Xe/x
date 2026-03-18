@@ -50,7 +50,7 @@ The command operates in two modes based on the number of arguments:
 func (c *ImportCmd) SetFlags(f *flag.FlagSet) {}
 
 // Execute runs the logic of the command.
-func (c *ImportCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interface{}) subcommands.ExitStatus {
+func (c *ImportCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...any) subcommands.ExitStatus {
 	log.SetFlags(0)
 
 	if f.NArg() != 0 && f.NArg() != 2 {
@@ -162,9 +162,9 @@ type Message struct {
 }
 
 type Fragment struct {
-	Type    string      `json:"type"`
-	Content interface{} `json:"content,omitempty"`
-	Results interface{} `json:"results,omitempty"`
+	Type    string `json:"type"`
+	Content any    `json:"content,omitempty"`
+	Results any    `json:"results,omitempty"`
 }
 
 type SearchResult struct {
@@ -209,9 +209,9 @@ func traverseAndWrite(mapping map[string]Node, node Node, w io.Writer) {
 		// First pass to collect search results for citation linking.
 		for _, fragment := range node.Message.Fragments {
 			if fragment.Type == "SEARCH" {
-				if results, ok := fragment.Results.([]interface{}); ok {
+				if results, ok := fragment.Results.([]any); ok {
 					for _, res := range results {
-						if resultMap, ok := res.(map[string]interface{}); ok {
+						if resultMap, ok := res.(map[string]any); ok {
 							var sr SearchResult
 							if data, err := json.Marshal(resultMap); err == nil {
 								json.Unmarshal(data, &sr)
@@ -244,9 +244,9 @@ func writeFragment(fragment Fragment, w io.Writer, citeMap map[int]SearchResult)
 		}
 	case "SEARCH":
 		fmt.Fprintf(w, "### 🔍 Search Results\n\n")
-		if results, ok := fragment.Results.([]interface{}); ok {
+		if results, ok := fragment.Results.([]any); ok {
 			for _, res := range results {
-				if resultMap, ok := res.(map[string]interface{}); ok {
+				if resultMap, ok := res.(map[string]any); ok {
 					var sr SearchResult
 					if data, err := json.Marshal(resultMap); err == nil {
 						json.Unmarshal(data, &sr)
@@ -292,11 +292,11 @@ func replaceCitations(text string, citeMap map[int]SearchResult) string {
 		}
 		num, _ := strconv.Atoi(parts[1])
 		if result, ok := citeMap[num]; ok {
-			sup := ""
+			var sup strings.Builder
 			for _, char := range parts[1] {
-				sup += superscripts[string(char)]
+				sup.WriteString(superscripts[string(char)])
 			}
-			return fmt.Sprintf(`[%s](%s "%s")`, sup, result.URL, result.Title)
+			return fmt.Sprintf(`[%s](%s "%s")`, sup.String(), result.URL, result.Title)
 		}
 		return match
 	})

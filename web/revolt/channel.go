@@ -20,11 +20,11 @@ type Channel struct {
 	Name               string      `json:"name"`
 	Active             bool        `json:"active"`
 	Recipients         []string    `json:"recipients"`
-	LastMessage        interface{} `json:"last_message"`
+	LastMessage        any         `json:"last_message"`
 	Description        string      `json:"description"`
 	Icon               *Attachment `json:"icon"`
-	DefaultPermissions interface{} `json:"default_permissions"`
-	RolePermissions    interface{} `json:"role_permissions"`
+	DefaultPermissions any         `json:"default_permissions"`
+	RolePermissions    any         `json:"role_permissions"`
 	Permissions        uint        `json:"permissions"`
 }
 
@@ -94,7 +94,7 @@ func (c *Client) ChannelFetchMessages(ctx context.Context, channelID string, opt
 	err = json.Unmarshal(resp, &fetchedMsgs)
 
 	if err != nil {
-		err = json.Unmarshal([]byte(fmt.Sprintf("{\"messages\": %s}", resp)), &fetchedMsgs)
+		err = json.Unmarshal(fmt.Appendf(nil, "{\"messages\": %s}", resp), &fetchedMsgs)
 
 		if err != nil {
 			return fetchedMsgs, err

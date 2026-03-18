@@ -23,7 +23,7 @@ Print who is front of the system.
 func (wif *WhoIsFront) SetFlags(f *flag.FlagSet) {
 	f.BoolVar(&wif.simple, "simple", false, "Print only the name of the front member.")
 }
-func (wif *WhoIsFront) Execute(ctx context.Context, f *flag.FlagSet, _ ...interface{}) subcommands.ExitStatus {
+func (wif *WhoIsFront) Execute(ctx context.Context, f *flag.FlagSet, _ ...any) subcommands.ExitStatus {
 	mi, err := New()
 	if err != nil {
 		fmt.Printf("can't connect to mi %v\n", err)

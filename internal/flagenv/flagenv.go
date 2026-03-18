@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"slices"
 	"strings"
 )
 
@@ -14,12 +15,7 @@ import (
 var Prefix = ""
 
 func contains(list []*flag.Flag, f *flag.Flag) bool {
-	for _, i := range list {
-		if i == f {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(list, f)
 }
 
 // ParseSet parses the given flagset. The specified prefix will be applied to

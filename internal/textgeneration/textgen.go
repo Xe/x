@@ -129,7 +129,7 @@ func (cr *ChatRequest) ApplyPreset(name string) error {
 
 	var data = map[string]any{}
 
-	for _, line := range strings.Split(string(finData), "\n") {
+	for line := range strings.SplitSeq(string(finData), "\n") {
 		if line == "" {
 			break
 		}

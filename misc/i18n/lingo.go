@@ -52,7 +52,7 @@ func (l *L) TranslationsForLocale(locale string) T {
 
 // T represents translations map for specific locale
 type T struct {
-	transl map[string]interface{}
+	transl map[string]any
 }
 
 // Value traverses the translations map and finds translation for
@@ -70,7 +70,7 @@ func (t T) Value(key string, args ...string) string {
 		k2 := strings.Join(ksplt[i:len(ksplt)], ".")
 		if t.exists(k1) {
 			newt := &T{
-				transl: t.transl[k1].(map[string]interface{}),
+				transl: t.transl[k1].(map[string]any),
 			}
 			return newt.Value(k2, args...)
 		}
@@ -81,7 +81,7 @@ func (t T) Value(key string, args ...string) string {
 // parseArgs replaces the argument placeholders with given arguments
 func (t T) parseArgs(value string, args []string) string {
 	res := value
-	for i := 0; i < len(args); i++ {
+	for i := range args {
 		tok := "{" + strconv.Itoa(i) + "}"
 		res = strings.Replace(res, tok, args[i], -1)
 	}
@@ -116,7 +116,7 @@ func New(deflt, path string) *L {
 			continue
 		}
 		t := T{
-			transl: make(map[string]interface{}),
+			transl: make(map[string]any),
 		}
 		err = json.Unmarshal(dat, &t.transl)
 		if err != nil {

@@ -36,7 +36,7 @@ func (act *MastodonDate) UnmarshalJSON(b []byte) error {
 
 // MarshalJSON handles serialization for custom MastodonDate type
 func (act *MastodonDate) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("\"%d\"", act.Unix())), nil
+	return fmt.Appendf(nil, "\"%d\"", act.Unix()), nil
 }
 
 // DomainName is a domain name string, as returned by the domain_blocks API

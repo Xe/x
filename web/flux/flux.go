@@ -38,17 +38,17 @@ type PredictionRequest struct {
 }
 
 type PredictionResponse struct {
-	Input       Input                  `json:"input"`
-	Output      Output                 `json:"output"`
-	ID          string                 `json:"id"`
-	Version     string                 `json:"version"`
-	CreatedAt   string                 `json:"created_at"`
-	StartedAt   string                 `json:"started_at"`
-	CompletedAt string                 `json:"completed_at"`
-	Logs        string                 `json:"logs"`
-	Error       string                 `json:"error"`
-	Status      string                 `json:"status"`
-	Metrics     map[string]interface{} `json:"metrics"`
+	Input       Input          `json:"input"`
+	Output      Output         `json:"output"`
+	ID          string         `json:"id"`
+	Version     string         `json:"version"`
+	CreatedAt   string         `json:"created_at"`
+	StartedAt   string         `json:"started_at"`
+	CompletedAt string         `json:"completed_at"`
+	Logs        string         `json:"logs"`
+	Error       string         `json:"error"`
+	Status      string         `json:"status"`
+	Metrics     map[string]any `json:"metrics"`
 }
 
 type HTTPValidationError struct {
@@ -56,9 +56,9 @@ type HTTPValidationError struct {
 }
 
 type ValidationError struct {
-	Loc  []interface{} `json:"loc"`
-	Msg  string        `json:"msg"`
-	Type string        `json:"type"`
+	Loc  []any  `json:"loc"`
+	Msg  string `json:"msg"`
+	Type string `json:"type"`
 }
 
 // HealthCheckResponse represents the response structure for the health check endpoint.

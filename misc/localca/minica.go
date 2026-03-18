@@ -160,7 +160,7 @@ func parseIPs(ipAddresses []string) ([]net.IP, error) {
 	return parsed, nil
 }
 
-func publicKeysEqual(a, b interface{}) (bool, error) {
+func publicKeysEqual(a, b any) (bool, error) {
 	aBytes, err := x509.MarshalPKIXPublicKey(a)
 	if err != nil {
 		return false, err

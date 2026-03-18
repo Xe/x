@@ -41,7 +41,7 @@ func (sd *StableDiffusion) RenderImage(ctx context.Context, w http.ResponseWrite
 
 	slog.Info("generating new image", "prompt", prompt)
 
-	imgsVal, err, _ := sd.group.Do(hash, func() (interface{}, error) {
+	imgsVal, err, _ := sd.group.Do(hash, func() (any, error) {
 		imgs, err := sd.client.Generate(ctx, stablediffusion.SimpleImageRequest{
 			Prompt:         "headshot, portrait, masterpiece, best quality, " + prompt,
 			NegativePrompt: "person in distance, worst quality, low quality, medium quality, deleted, lowres, comic, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, jpeg artifacts, signature, watermark, username, blurry",

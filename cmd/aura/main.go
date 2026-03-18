@@ -14,6 +14,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"slices"
 	"strings"
 	"time"
 
@@ -199,13 +200,7 @@ func (a *aura) Permissons(s *discordgo.Session, m *discordgo.Message, parv []str
 
 	slog.Info("want role", "role", role, "author_roles", gu.Roles)
 
-	found := false
-	for _, r := range gu.Roles {
-		if r == role {
-			found = true
-			break
-		}
-	}
+	found := slices.Contains(gu.Roles, role)
 
 	if !found {
 		return errors.New("aura: no permissions")
@@ -222,7 +217,8 @@ func (a *aura) roles(s *discordgo.Session, m *discordgo.Message, parv []string) 
 
 	gid := ch.GuildID
 
-	result := "Roles in this group:\n"
+	var result strings.Builder
+	result.WriteString("Roles in this group:\n")
 
 	roles, err := s.GuildRoles(gid)
 	if err != nil {
@@ -230,10 +226,10 @@ func (a *aura) roles(s *discordgo.Session, m *discordgo.Message, parv []string) 
 	}
 
 	for _, r := range roles {
-		result += fmt.Sprintf("- %s: %s\n", r.ID, r.Name)
+		result.WriteString(fmt.Sprintf("- %s: %s\n", r.ID, r.Name))
 	}
 
-	s.ChannelMessageSend(m.ChannelID, result)
+	s.ChannelMessageSend(m.ChannelID, result.String())
 	return nil
 }
 

@@ -71,7 +71,7 @@ func (c *Chain) Generate(n int) string {
 	defer c.mu.Unlock()
 	p := make(Prefix, c.prefixLen)
 	var words []string
-	for i := 0; i < n; i++ {
+	for range n {
 		choices := c.Chain[p.String()]
 		if len(choices) == 0 {
 			break

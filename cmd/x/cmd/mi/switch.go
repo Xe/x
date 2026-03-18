@@ -59,7 +59,7 @@ func (s *Switch) SetFlags(f *flag.FlagSet) {
 	f.StringVar(&s.member, "member", "", "Member to switch to.")
 }
 
-func (s *Switch) Execute(ctx context.Context, f *flag.FlagSet, _ ...interface{}) subcommands.ExitStatus {
+func (s *Switch) Execute(ctx context.Context, f *flag.FlagSet, _ ...any) subcommands.ExitStatus {
 	// Initialise client.
 	client, err := New()
 	if err != nil {

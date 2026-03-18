@@ -104,7 +104,7 @@ func main() {
 	for _, toolCall := range toolCalls {
 		if toolCall.Function.Name == "get_weather" {
 			// Extract the location from the function call arguments
-			var args map[string]interface{}
+			var args map[string]any
 			err := json.Unmarshal([]byte(toolCall.Function.Arguments), &args)
 			if err != nil {
 				panic(err)
@@ -120,7 +120,7 @@ func main() {
 			params.Messages = append(params.Messages, openai.ToolMessage(weatherData, toolCall.ID))
 		} else if toolCall.Function.Name == "run_python" {
 			// Extract the code from the function call arguments
-			var args map[string]interface{}
+			var args map[string]any
 			err := json.Unmarshal([]byte(toolCall.Function.Arguments), &args)
 			if err != nil {
 				panic(err)

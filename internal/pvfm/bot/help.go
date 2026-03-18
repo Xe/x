@@ -2,6 +2,7 @@ package bot
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -28,11 +29,12 @@ func (cs *CommandSet) help(s *discordgo.Session, m *discordgo.Message, parv []st
 }
 
 func (cs *CommandSet) formHelp() string {
-	result := "Bot commands: \n"
+	var result strings.Builder
+	result.WriteString("Bot commands: \n")
 
 	for verb, cmd := range cs.cmds {
-		result += fmt.Sprintf("%s%s: %s\n", cs.Prefix, verb, cmd.Helptext())
+		result.WriteString(fmt.Sprintf("%s%s: %s\n", cs.Prefix, verb, cmd.Helptext()))
 	}
 
-	return (result + "If there's any problems please don't hesitate to ask a server admin for help.")
+	return (result.String() + "If there's any problems please don't hesitate to ask a server admin for help.")
 }

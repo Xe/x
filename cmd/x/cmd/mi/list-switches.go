@@ -31,7 +31,7 @@ func (ls *ListSwitches) SetFlags(f *flag.FlagSet) {
 	f.IntVar(&ls.page, "page", 0, "Page of switches to list.")
 }
 
-func (ls *ListSwitches) Execute(ctx context.Context, f *flag.FlagSet, _ ...interface{}) subcommands.ExitStatus {
+func (ls *ListSwitches) Execute(ctx context.Context, f *flag.FlagSet, _ ...any) subcommands.ExitStatus {
 	// Initialise client.
 	client, err := New()
 	if err != nil {

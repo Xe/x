@@ -93,7 +93,7 @@ func GetApps() ([]string, error) {
 	}
 
 	var result []string
-	for _, resp := range strings.Split(appString[0], ",") {
+	for resp := range strings.SplitSeq(appString[0], ",") {
 		result = append(result, strings.Split(resp, ",")...)
 	}
 
@@ -125,7 +125,7 @@ func GetMachines(appName string) ([]Machine, error) {
 	}
 
 	var result []Machine
-	for _, machine := range strings.Split(combineString(machines), ",") {
+	for machine := range strings.SplitSeq(combineString(machines), ",") {
 		m, err := parseMachine(machine)
 		if err != nil {
 			return nil, err

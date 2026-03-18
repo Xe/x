@@ -4,6 +4,7 @@ This is an example application to demonstrate querying the user info endpoint.
 package main
 
 import (
+	context0 "context"
 	"crypto/rand"
 	"encoding/base64"
 	"encoding/json"
@@ -14,7 +15,6 @@ import (
 	"time"
 
 	"github.com/coreos/go-oidc/v3/oidc"
-	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
 	"within.website/x/internal"
 )
@@ -48,7 +48,7 @@ func setCallbackCookie(w http.ResponseWriter, r *http.Request, name, value strin
 func main() {
 	internal.HandleStartup()
 
-	ctx := context.Background()
+	ctx := context0.Background()
 
 	provider, err := oidc.NewProvider(ctx, *idpURL)
 	if err != nil {

@@ -26,19 +26,19 @@ type Wrapper struct {
 
 type Calendar struct {
 	Result []struct {
-		Body       interface{} `json:"body"`
-		EndTime    int64       `json:"end_time"`
-		Guid       string      `json:"guid"`
-		ID         float64     `json:"id"`
-		ImageURL   string      `json:"image_url"`
-		IsAllDay   bool        `json:"is_all_day"`
-		IsPromoted bool        `json:"is_promoted"`
-		Location   interface{} `json:"location"`
-		Range      string      `json:"range"`
-		StartTime  int64       `json:"start_time"`
-		StationID  int64       `json:"station_id"`
-		Title      string      `json:"title"`
-		WebURL     string      `json:"web_url"`
+		Body       any     `json:"body"`
+		EndTime    int64   `json:"end_time"`
+		Guid       string  `json:"guid"`
+		ID         float64 `json:"id"`
+		ImageURL   string  `json:"image_url"`
+		IsAllDay   bool    `json:"is_all_day"`
+		IsPromoted bool    `json:"is_promoted"`
+		Location   any     `json:"location"`
+		Range      string  `json:"range"`
+		StartTime  int64   `json:"start_time"`
+		StationID  int64   `json:"station_id"`
+		Title      string  `json:"title"`
+		WebURL     string  `json:"web_url"`
 	} `json:"result"`
 	Status string `json:"status"`
 }

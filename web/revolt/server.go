@@ -12,18 +12,18 @@ import (
 type Server struct {
 	CreatedAt time.Time
 
-	Id                 string                 `json:"_id"`
-	Nonce              string                 `json:"nonce"`
-	OwnerId            string                 `json:"owner"`
-	Name               string                 `json:"name"`
-	Description        string                 `json:"description"`
-	ChannelIds         []string               `json:"channels"`
-	Categories         []*ServerCategory      `json:"categories"`
-	SystemMessages     *ServerSystemMessages  `json:"system_messages"`
-	Roles              map[string]interface{} `json:"roles"`
-	DefaultPermissions uint                   `json:"default_permissions"`
-	Icon               *Attachment            `json:"icon"`
-	Banner             *Attachment            `json:"banner"`
+	Id                 string                `json:"_id"`
+	Nonce              string                `json:"nonce"`
+	OwnerId            string                `json:"owner"`
+	Name               string                `json:"name"`
+	Description        string                `json:"description"`
+	ChannelIds         []string              `json:"channels"`
+	Categories         []*ServerCategory     `json:"categories"`
+	SystemMessages     *ServerSystemMessages `json:"system_messages"`
+	Roles              map[string]any        `json:"roles"`
+	DefaultPermissions uint                  `json:"default_permissions"`
+	Icon               *Attachment           `json:"icon"`
+	Banner             *Attachment           `json:"banner"`
 }
 
 type Role struct {

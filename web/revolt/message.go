@@ -17,7 +17,7 @@ type Message struct {
 	ChannelId   string          `json:"channel"`
 	AuthorId    string          `json:"author"`
 	Content     string          `json:"content,omitempty"`
-	Edited      interface{}     `json:"edited"`
+	Edited      any             `json:"edited"`
 	Embeds      []*MessageEmbed `json:"embeds"`
 	Attachments []*Attachment   `json:"attachments"`
 	Mentions    []string        `json:"mentions"`

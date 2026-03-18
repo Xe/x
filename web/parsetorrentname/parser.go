@@ -33,7 +33,7 @@ type TorrentInfo struct {
 }
 
 func setField(tor *TorrentInfo, field, raw, val string) {
-	ttor := reflect.TypeOf(tor)
+	ttor := reflect.TypeFor[*TorrentInfo]()
 	torV := reflect.ValueOf(tor)
 	field = strings.Title(field)
 	v, _ := ttor.Elem().FieldByName(field)

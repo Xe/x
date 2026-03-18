@@ -69,7 +69,6 @@ func (ts *TelemetrySink) WriteBundle(ctx context.Context, items []*relayd.Reques
 	if err := ts.writeBundle(ctx, items); err != nil {
 		slog.Error("failed writing", "itemCount", len(items), "err", err)
 		for _, item := range items {
-			item := item
 			// 1 in 8 chance to drop
 			if rand.IntN(8) != 4 /* chosen by fair dice roll */ {
 				go func(rl *relayd.RequestLog) {

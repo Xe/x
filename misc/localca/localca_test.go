@@ -1,7 +1,6 @@
 package localca
 
 import (
-	"context"
 	"crypto/tls"
 	"io"
 	"io/ioutil"
@@ -40,8 +39,7 @@ func TestLocalCA(t *testing.T) {
 
 	t.Run("network", func(t *testing.T) {
 		t.Skip("no")
-		ctx, cancel := context.WithCancel(context.Background())
-		defer cancel()
+		ctx := t.Context()
 		tc := &tls.Config{
 			GetCertificate: m.GetCertificate,
 		}

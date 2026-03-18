@@ -38,7 +38,7 @@ func (sms *SendMessage) SetContent(content string) *SendMessage {
 }
 
 // Set and format content.
-func (sms *SendMessage) SetContentf(format string, values ...interface{}) *SendMessage {
+func (sms *SendMessage) SetContentf(format string, values ...any) *SendMessage {
 	sms.Content = fmt.Sprintf(format, values...)
 	return sms
 }
@@ -236,11 +236,11 @@ type EditUser struct {
 	Status struct {
 		Text     string `json:"text,omitempty"`
 		Presence string `json:"presence,omitempty"`
-	} `json:"status,omitempty"`
+	} `json:"status"`
 	Profile struct {
 		Content    string `json:"content,omitempty"`
 		Background string `json:"background,omitempty"`
-	} `json:"profile,omitempty"`
+	} `json:"profile"`
 	Avatar string `json:"avatar,omitempty"`
 	Remove string `json:"remove,omitempty"`
 }

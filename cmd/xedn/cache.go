@@ -192,7 +192,7 @@ func (dc *Cache) LoadBytesOrFetch(path string) ([]byte, error) {
 	err := dc.Load(path, buf)
 	if err != nil {
 		if err == ErrNotCached {
-			_, err, _ := dc.cacheGroup.Do(path, func() (interface{}, error) {
+			_, err, _ := dc.cacheGroup.Do(path, func() (any, error) {
 				resp, err := dc.Client.Get(fmt.Sprintf("https://%s%s", dc.ActualHost, path))
 				if err != nil {
 					cacheErrors.Add(1)
@@ -229,7 +229,7 @@ func (dc *Cache) GetFile(w http.ResponseWriter, r *http.Request) error {
 	err := dc.Load(dir, w)
 	if err != nil {
 		if err == ErrNotCached {
-			_, err, _ := dc.cacheGroup.Do(r.URL.Path, func() (interface{}, error) {
+			_, err, _ := dc.cacheGroup.Do(r.URL.Path, func() (any, error) {
 				r.URL.Host = dc.ActualHost
 				r.URL.Scheme = "https"
 				resp, err := dc.Client.Get(r.URL.String())

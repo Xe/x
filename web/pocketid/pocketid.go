@@ -98,7 +98,7 @@ func (c *Client) request(method, path string, body io.Reader, contentType string
 // GetJWKS returns the JSON Web Key Set used for token verification.
 //
 // See https://pocket-id.example.com/.well-known/jwks.json
-func (c *Client) GetJWKS() (map[string]interface{}, error) {
+func (c *Client) GetJWKS() (map[string]any, error) {
 	resp, err := c.request("GET", "/.well-known/jwks.json", nil, "")
 	if err != nil {
 		return nil, err
@@ -109,7 +109,7 @@ func (c *Client) GetJWKS() (map[string]interface{}, error) {
 		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
 	}
 
-	var jwks map[string]interface{}
+	var jwks map[string]any
 	err = json.NewDecoder(resp.Body).Decode(&jwks)
 	if err != nil {
 		return nil, err
@@ -121,7 +121,7 @@ func (c *Client) GetJWKS() (map[string]interface{}, error) {
 // GetOpenIDConfiguration returns the OpenID Connect discovery document.
 //
 // See https://pocket-id.example.com/.well-known/openid-configuration
-func (c *Client) GetOpenIDConfiguration() (map[string]interface{}, error) {
+func (c *Client) GetOpenIDConfiguration() (map[string]any, error) {
 	resp, err := c.request("GET", "/.well-known/openid-configuration", nil, "")
 	if err != nil {
 		return nil, err
@@ -132,7 +132,7 @@ func (c *Client) GetOpenIDConfiguration() (map[string]interface{}, error) {
 		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
 	}
 
-	var config map[string]interface{}
+	var config map[string]any
 	err = json.NewDecoder(resp.Body).Decode(&config)
 	if err != nil {
 		return nil, err
@@ -1215,7 +1215,7 @@ func (c *Client) EndOIDCSessionPost(idTokenHint, postLogoutRedirectURI, state st
 // CreateOIDCTokens exchanges an authorization code for ID and access tokens.
 //
 // See https://pocket-id.example.com/oidc/token
-func (c *Client) CreateOIDCTokens(clientID, clientSecret, code, grantType, codeVerifier string) (map[string]interface{}, error) {
+func (c *Client) CreateOIDCTokens(clientID, clientSecret, code, grantType, codeVerifier string) (map[string]any, error) {
 	data := url.Values{}
 	data.Set("grant_type", grantType)
 	data.Set("code", code)
@@ -1240,7 +1240,7 @@ func (c *Client) CreateOIDCTokens(clientID, clientSecret, code, grantType, codeV
 		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
 	}
 
-	var tokens map[string]interface{}
+	var tokens map[string]any
 	err = json.NewDecoder(resp.Body).Decode(&tokens)
 	if err != nil {
 		return nil, err
@@ -1252,7 +1252,7 @@ func (c *Client) CreateOIDCTokens(clientID, clientSecret, code, grantType, codeV
 // GetUserInfo gets user information based on the access token.
 //
 // See https://pocket-id.example.com/oidc/userinfo
-func (c *Client) GetUserInfo(accessToken string) (map[string]interface{}, error) {
+func (c *Client) GetUserInfo(accessToken string) (map[string]any, error) {
 
 	req, err := http.NewRequest("GET", fmt.Sprintf("%s/oidc/userinfo", c.BaseURL), nil)
 	if err != nil {
@@ -1271,7 +1271,7 @@ func (c *Client) GetUserInfo(accessToken string) (map[string]interface{}, error)
 		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
 	}
 
-	var userInfo map[string]interface{}
+	var userInfo map[string]any
 	err = json.NewDecoder(resp.Body).Decode(&userInfo)
 	if err != nil {
 		return nil, err
@@ -1282,7 +1282,7 @@ func (c *Client) GetUserInfo(accessToken string) (map[string]interface{}, error)
 
 // GetUserInfoPost gets user information based on the access token using POST.
 // See https://pocket-id.example.com/oidc/userinfo
-func (c *Client) GetUserInfoPost(accessToken string) (map[string]interface{}, error) {
+func (c *Client) GetUserInfoPost(accessToken string) (map[string]any, error) {
 	req, err := http.NewRequest("POST", fmt.Sprintf("%s/oidc/userinfo", c.BaseURL), nil)
 	if err != nil {
 		return nil, err
@@ -1300,7 +1300,7 @@ func (c *Client) GetUserInfoPost(accessToken string) (map[string]interface{}, er
 		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
 	}
 
-	var userInfo map[string]interface{}
+	var userInfo map[string]any
 	err = json.NewDecoder(resp.Body).Decode(&userInfo)
 	if err != nil {
 		return nil, err

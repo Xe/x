@@ -35,7 +35,7 @@ func (gh *GRPCHealth) SetFlags(f *flag.FlagSet) {
 	f.StringVar(&gh.service, "service", "", "Service to check, if empty check the entire server")
 }
 
-func (gh *GRPCHealth) Execute(ctx context.Context, f *flag.FlagSet, _ ...interface{}) subcommands.ExitStatus {
+func (gh *GRPCHealth) Execute(ctx context.Context, f *flag.FlagSet, _ ...any) subcommands.ExitStatus {
 	if f.NArg() != 1 {
 		fmt.Println(gh.Usage())
 		return subcommands.ExitFailure
