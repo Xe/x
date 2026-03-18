@@ -11,7 +11,7 @@ permissions:
 jobs:
   run-custom-command:
     if: ${{ github.actor_id == '49699333' }} # Dependabot
-    runs-on: alrest-x
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3.6.0
         with:
