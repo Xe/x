@@ -22,7 +22,7 @@ var (
 		Namespace: "venat",
 		Subsystem: "agentloop",
 		Name:      "tokens_used",
-	}, []string{"kind"})
+	}, []string{"model", "kind"})
 )
 
 type Impl struct {
@@ -30,13 +30,15 @@ type Impl struct {
 	Tools        map[string]Tool
 	SystemPrompt string
 
-	model    string
-	cli      *openai.Client
+	model string
+	cli   *openai.Client
+	lg    *slog.Logger
+
 	messages []openai.ChatCompletionMessageParamUnion
 	lock     sync.Mutex
 }
 
-func New(name, id, systemPrompt, model string, tools []Tool, cli *openai.Client) *Impl {
+func New(name, id, systemPrompt, model string, tools []Tool, cli *openai.Client, lg *slog.Logger) *Impl {
 	if id == "" {
 		id = uuid.Must(uuid.NewV7()).String()
 	}
@@ -61,22 +63,34 @@ func New(name, id, systemPrompt, model string, tools []Tool, cli *openai.Client)
 	return &result
 }
 
-func (i *Impl) Run(ctx context.Context, prompt string) error {
+type Result struct {
+	Messages []openai.ChatCompletionMessageParamUnion
+	Response string
+
+	PromptTokens              int64
+	PromptCachedTokens        int64
+	CompletionTokens          int64
+	CompletionReasoningTokens int64
+}
+
+func (i *Impl) Run(ctx context.Context, prompt string) (*Result, error) {
 	i.lock.Lock()
 	defer i.lock.Unlock()
 
-	lg := slog.With("component", "agentloop", "name", i.Name, "id", i.ID, "model", i.model)
+	lg := i.lg.With("component", "agentloop", "name", i.Name, "id", i.ID, "model", i.model)
 
 	i.messages = append(i.messages, openai.UserMessage(prompt))
 
 	failCount := 0
 	const failMax = 5
 
+	result := Result{}
+
 	for {
 		select {
 		case <-ctx.Done():
 			lg.Error("context done", "err", ctx.Err())
-			return ctx.Err()
+			return &result, ctx.Err()
 		default:
 		}
 
@@ -94,7 +108,7 @@ func (i *Impl) Run(ctx context.Context, prompt string) error {
 			failCount++
 
 			if failCount == failMax {
-				return fmt.Errorf("can't reach remote API: %w", err)
+				return &result, fmt.Errorf("can't reach remote API: %w", err)
 			}
 
 			lg.Error("can't get completion, sleeping and retrying", "err", err, "failCount", failCount, "failMax", failMax)
@@ -102,10 +116,25 @@ func (i *Impl) Run(ctx context.Context, prompt string) error {
 			continue
 		}
 
-		tokensUsed.WithLabelValues("input").Add(float64(completion.Usage.PromptTokens))
-		tokensUsed.WithLabelValues("output").Add(float64(completion.Usage.CompletionTokens))
+		tokensUsed.WithLabelValues(i.model, "input").Add(float64(completion.Usage.PromptTokens))
+		tokensUsed.WithLabelValues(i.model, "output").Add(float64(completion.Usage.CompletionTokens))
+		tokensUsed.WithLabelValues(i.model, "cached").Add(float64(completion.Usage.PromptTokensDetails.CachedTokens))
+		tokensUsed.WithLabelValues(i.model, "reasoning").Add(float64(completion.Usage.CompletionTokensDetails.ReasoningTokens))
 
-		i.messages = append(i.messages, completion.Choices[0].Message.ToParam())
+		result.PromptTokens += completion.Usage.PromptTokens
+		result.PromptCachedTokens += completion.Usage.PromptTokensDetails.CachedTokens
+		result.CompletionTokens += completion.Usage.CompletionTokens
+		result.CompletionReasoningTokens += completion.Usage.CompletionTokensDetails.ReasoningTokens
+
+		resp := completion.Choices[0].Message
+
+		i.messages = append(i.messages, resp.ToParam())
+		result.Messages = i.messages
+
+		if resp.Content != "" {
+			result.Response = resp.Content
+			return &result, nil
+		}
 
 		toolCalls := completion.Choices[0].Message.ToolCalls
 
@@ -125,15 +154,15 @@ func (i *Impl) Run(ctx context.Context, prompt string) error {
 				continue
 			}
 
-			result, err := tool.Run(ctx, args)
+			toolResult, err := tool.Run(ctx, args)
 			if err != nil {
 				switch {
 				case errors.Is(err, ErrSentinelOkay):
 					lg.Info("tool requested happy exit", "err", err)
-					return err
+					return &result, err
 				case errors.Is(err, ErrSentinelAbort):
 					lg.Info("tool requested unhappy abort", "err", err)
-					return err
+					return &result, err
 				default:
 					lg.Error("failed to run tool", "err", err)
 					i.messages = append(i.messages, openai.ToolMessage(fmt.Sprintf("internal error when running tool %q: %v", tool.Name(), err), tc.ID))
@@ -141,7 +170,7 @@ func (i *Impl) Run(ctx context.Context, prompt string) error {
 				}
 			}
 
-			i.messages = append(i.messages, openai.ToolMessage(string(result), tc.ID))
+			i.messages = append(i.messages, openai.ToolMessage(string(toolResult), tc.ID))
 		}
 	}
 }
