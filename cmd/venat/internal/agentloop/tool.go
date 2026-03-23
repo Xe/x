@@ -3,7 +3,7 @@ package agentloop
 import (
 	"context"
 
-	"github.com/openai/openai-go/v2"
+	"github.com/openai/openai-go/v3"
 )
 
 type Tool interface {

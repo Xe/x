@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/openai/openai-go/v2"
+	"github.com/openai/openai-go/v3"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 )
@@ -132,13 +132,18 @@ func (i *Impl) Run(ctx context.Context, prompt string, opts ...func(*openai.Chat
 		result.CompletionTokens += completion.Usage.CompletionTokens
 		result.CompletionReasoningTokens += completion.Usage.CompletionTokensDetails.ReasoningTokens
 
-		resp := completion.Choices[0].Message
+		choice := completion.Choices[0]
+		resp := choice.Message
 
 		i.messages = append(i.messages, resp.ToParam())
 		result.Messages = i.messages
 
 		if resp.Content != "" {
 			result.Response = resp.Content
+		}
+
+		lg.Debug("got finish reason", "reason", choice.FinishReason)
+		if choice.FinishReason == "stop" {
 			return &result, nil
 		}
 

@@ -6,7 +6,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/openai/openai-go/v2"
+	"github.com/openai/openai-go/v3"
 	"within.website/x/llm/codeinterpreter/python"
 )
 
