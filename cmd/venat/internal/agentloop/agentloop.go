@@ -73,7 +73,7 @@ type Result struct {
 	CompletionReasoningTokens int64
 }
 
-func (i *Impl) Run(ctx context.Context, prompt string) (*Result, error) {
+func (i *Impl) Run(ctx context.Context, prompt string, opts ...func(*openai.ChatCompletionNewParams)) (*Result, error) {
 	i.lock.Lock()
 	defer i.lock.Unlock()
 
@@ -97,6 +97,10 @@ func (i *Impl) Run(ctx context.Context, prompt string) (*Result, error) {
 		params := openai.ChatCompletionNewParams{
 			Messages: i.messages,
 			Model:    openai.ChatModel(i.model),
+		}
+
+		for _, opt := range opts {
+			opt(&params)
 		}
 
 		for _, tool := range i.Tools {
