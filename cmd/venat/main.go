@@ -39,7 +39,7 @@ func main() {
 }
 
 func run(ctx context.Context) error {
-	vectorDB, err := chromem.NewPersistentDB(filepath.Join(*dataDir, "vectordb"), false)
+	vectorDB, err := chromem.NewPersistentDB(filepath.Join(*dataDir, "vectordb"), true)
 	if err != nil {
 		return fmt.Errorf("can't create vector database: %w", err)
 	}
