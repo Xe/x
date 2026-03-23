@@ -10,11 +10,15 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/openai/openai-go/v2"
+	"github.com/openai/openai-go/v2/option"
 	"github.com/philippgille/chromem-go"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/robfig/cron/v3"
 	"golang.org/x/sync/errgroup"
+	"within.website/x/cmd/venat/internal/agentloop"
 	"within.website/x/cmd/venat/internal/models"
+	"within.website/x/cmd/venat/internal/tools/python"
 	"within.website/x/internal"
 
 	_ "net/http/pprof"
@@ -71,6 +75,28 @@ func run(ctx context.Context) error {
 		c.Start()
 		<-ctx.Done()
 		c.Stop()
+		return nil
+	})
+
+	g.Go(func() error {
+		model := "glm-4.7-flash:latest"
+		apiEndpoint := "http://localhost:11434/v1"
+		apiKey := "ollama"
+
+		cli := openai.NewClient(
+			option.WithAPIKey(apiKey),
+			option.WithBaseURL(apiEndpoint),
+		)
+
+		al := agentloop.New("test-agent", "", "You are a helpful Python assistant that writes and executes Python code according to user questions. Use the python tool to execute Python code in WebAssembly. You MUST use the python tool before answering questions. Do not comment on using the python tool, just use it.", model, []agentloop.Tool{python.Impl{}}, cli, slog.Default())
+
+		result, err := al.Run(ctx, "How many r's are in the word raspberry?")
+		if err != nil {
+			return err
+		}
+
+		fmt.Println(result.Response)
+
 		return nil
 	})
 

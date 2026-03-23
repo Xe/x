@@ -2,6 +2,7 @@ package agentloop
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log/slog"
@@ -31,14 +32,14 @@ type Impl struct {
 	SystemPrompt string
 
 	model string
-	cli   *openai.Client
+	cli   openai.Client
 	lg    *slog.Logger
 
 	messages []openai.ChatCompletionMessageParamUnion
 	lock     sync.Mutex
 }
 
-func New(name, id, systemPrompt, model string, tools []Tool, cli *openai.Client, lg *slog.Logger) *Impl {
+func New(name, id, systemPrompt, model string, tools []Tool, cli openai.Client, lg *slog.Logger) *Impl {
 	if id == "" {
 		id = uuid.Must(uuid.NewV7()).String()
 	}
@@ -55,6 +56,7 @@ func New(name, id, systemPrompt, model string, tools []Tool, cli *openai.Client,
 		SystemPrompt: systemPrompt,
 		model:        model,
 		cli:          cli,
+		lg:           lg,
 		messages: []openai.ChatCompletionMessageParamUnion{
 			openai.SystemMessage(systemPrompt),
 		},
@@ -158,6 +160,8 @@ func (i *Impl) Run(ctx context.Context, prompt string, opts ...func(*openai.Chat
 				continue
 			}
 
+			lg.Debug("calling tool", "args", json.RawMessage(args))
+
 			toolResult, err := tool.Run(ctx, args)
 			if err != nil {
 				switch {
@@ -173,6 +177,8 @@ func (i *Impl) Run(ctx context.Context, prompt string, opts ...func(*openai.Chat
 					continue
 				}
 			}
+
+			lg.Debug("got response", "result", string(toolResult))
 
 			i.messages = append(i.messages, openai.ToolMessage(string(toolResult), tc.ID))
 		}
