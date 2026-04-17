@@ -19,9 +19,9 @@ type _Parser struct {
 	deltaErr [][_N]int32
 	node     map[_key]*peg.Node
 	fail     map[_key]*peg.Fail
-	act      map[_key]any
+	act      map[_key]interface{}
 	lastFail int
-	data     any
+	data     interface{}
 }
 
 type _key struct {
@@ -44,7 +44,7 @@ func _NewParser(text string) (*_Parser, error) {
 		deltaErr: make([][_N]int32, n),
 		node:     make(map[_key]*peg.Node),
 		fail:     make(map[_key]*peg.Fail),
-		act:      make(map[_key]any),
+		act:      make(map[_key]interface{}),
 	}
 	return p, nil
 }
@@ -154,7 +154,7 @@ func _leaf(parser *_Parser, start, end int) *peg.Node {
 }
 
 // A no-op function to mark a variable as used.
-func use(any) {}
+func use(interface{}) {}
 
 func _sepAccepts(parser *_Parser, start int) (deltaPos, deltaErr int) {
 	if dp, de, ok := _memo(parser, _sep, start); ok {

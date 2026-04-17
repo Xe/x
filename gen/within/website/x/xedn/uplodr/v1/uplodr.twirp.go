@@ -5,22 +5,33 @@ package uplodrv1
 
 import (
 	context "context"
-	json "encoding/json"
 	fmt "fmt"
-	io "io"
+
 	http "net/http"
+
+	io "io"
+
+	json "encoding/json"
+
 	strconv "strconv"
+
 	strings "strings"
 
-	twirp "github.com/twitchtv/twirp"
-	ctxsetters "github.com/twitchtv/twirp/ctxsetters"
 	protojson "google.golang.org/protobuf/encoding/protojson"
+
 	proto "google.golang.org/protobuf/proto"
 
+	twirp "github.com/twitchtv/twirp"
+
+	ctxsetters "github.com/twitchtv/twirp/ctxsetters"
+
 	bytes "bytes"
+
 	errors "errors"
-	url "net/url"
+
 	path "path"
+
+	url "net/url"
 )
 
 // Version compatibility assertion.
