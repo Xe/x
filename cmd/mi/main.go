@@ -146,7 +146,7 @@ func main() {
 
 	mux.Handle("/front", homefrontshim.New(dao))
 	mux.Handle("/glance", glance.New(dao))
-	mux.Handle("/mcp", mcp.New(st))
+	mux.Handle("/mcp", mcp.New(st, es))
 
 	i := importer.New(dao)
 	i.Mount(mux)

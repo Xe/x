@@ -2,16 +2,20 @@ package mcp
 
 import (
 	"context"
+	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 	"google.golang.org/protobuf/types/known/emptypb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"within.website/x"
 	miv1 "within.website/x/gen/within/website/x/mi/v1"
 )
 
 type Server struct {
 	st miv1.SwitchTracker
+	es miv1.Events
 }
 
 type switchReq struct {
@@ -89,9 +93,107 @@ func (s *Server) listSystemMembers(ctx context.Context, req *mcp.CallToolRequest
 	return nil, result, nil
 }
 
-func New(st miv1.SwitchTracker) http.Handler {
+const dateLayout = "2006-01-02"
+
+type listEventsReq struct{}
+
+type listEventsResp struct {
+	Events []EventItem `json:"events,omitempty"`
+}
+
+type EventItem struct {
+	Name        string `json:"name"`
+	URL         string `json:"url"`
+	StartDate   string `json:"startDate"`
+	EndDate     string `json:"endDate"`
+	Location    string `json:"location"`
+	Description string `json:"description"`
+}
+
+func (s *Server) listEvents(ctx context.Context, req *mcp.CallToolRequest, _ listEventsReq) (*mcp.CallToolResult, *listEventsResp, error) {
+	resp, err := s.es.Get(ctx, &emptypb.Empty{})
+	if err != nil {
+		return nil, nil, err
+	}
+
+	result := &listEventsResp{}
+	for _, ev := range resp.Events {
+		result.Events = append(result.Events, EventItem{
+			Name:        ev.Name,
+			URL:         ev.Url,
+			StartDate:   ev.StartDate.AsTime().Format(dateLayout),
+			EndDate:     ev.EndDate.AsTime().Format(dateLayout),
+			Location:    ev.Location,
+			Description: ev.Description,
+		})
+	}
+
+	return nil, result, nil
+}
+
+type addEventReq struct {
+	Name        string `json:"name" jsonschema:"Name of the event"`
+	URL         string `json:"url" jsonschema:"URL for the event"`
+	StartDate   string `json:"startDate" jsonschema:"Start date in YYYY-MM-DD format"`
+	EndDate     string `json:"endDate,omitempty" jsonschema:"End date in YYYY-MM-DD format, defaults to start date"`
+	Location    string `json:"location" jsonschema:"Location of the event"`
+	Description string `json:"description" jsonschema:"Description of the event"`
+}
+
+type addEventResp struct {
+	Message string `json:"message"`
+}
+
+func (s *Server) addEvent(ctx context.Context, req *mcp.CallToolRequest, ae addEventReq) (*mcp.CallToolResult, *addEventResp, error) {
+	startTime, err := time.Parse(dateLayout, ae.StartDate)
+	if err != nil {
+		return nil, nil, fmt.Errorf("invalid startDate %q: %w", ae.StartDate, err)
+	}
+
+	endTime := startTime
+	if ae.EndDate != "" {
+		endTime, err = time.Parse(dateLayout, ae.EndDate)
+		if err != nil {
+			return nil, nil, fmt.Errorf("invalid endDate %q: %w", ae.EndDate, err)
+		}
+	}
+
+	_, err = s.es.Add(ctx, &miv1.Event{
+		Name:        ae.Name,
+		Url:         ae.URL,
+		StartDate:   timestamppb.New(startTime),
+		EndDate:     timestamppb.New(endTime),
+		Location:    ae.Location,
+		Description: ae.Description,
+	})
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return nil, &addEventResp{Message: "Event added successfully"}, nil
+}
+
+type removeEventReq struct {
+	ID int32 `json:"id" jsonschema:"Event ID to remove"`
+}
+
+type removeEventResp struct {
+	Message string `json:"message"`
+}
+
+func (s *Server) removeEvent(ctx context.Context, req *mcp.CallToolRequest, re removeEventReq) (*mcp.CallToolResult, *removeEventResp, error) {
+	_, err := s.es.Remove(ctx, &miv1.Event{Id: re.ID})
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return nil, &removeEventResp{Message: "Event removed successfully"}, nil
+}
+
+func New(st miv1.SwitchTracker, es miv1.Events) http.Handler {
 	s := &Server{
 		st: st,
+		es: es,
 	}
 
 	srv := mcp.NewServer(&mcp.Implementation{
@@ -114,6 +216,21 @@ func New(st miv1.SwitchTracker) http.Handler {
 		Name:        "list-system-members",
 		Description: "List all system members as Markdown",
 	}, s.listSystemMembers)
+
+	mcp.AddTool(srv, &mcp.Tool{
+		Name:        "list-events",
+		Description: "List upcoming events",
+	}, s.listEvents)
+
+	mcp.AddTool(srv, &mcp.Tool{
+		Name:        "add-event",
+		Description: "Add an event to the feed",
+	}, s.addEvent)
+
+	mcp.AddTool(srv, &mcp.Tool{
+		Name:        "remove-event",
+		Description: "Remove an event from the feed",
+	}, s.removeEvent)
 
 	handler := mcp.NewStreamableHTTPHandler(func(req *http.Request) *mcp.Server { return srv }, nil)
 
