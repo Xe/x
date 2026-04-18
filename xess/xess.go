@@ -31,6 +31,13 @@ func Mount(mux *http.ServeMux) {
 	mux.Handle("/.within.website/x/xess/", internal.UnchangingCache(http.StripPrefix("/.within.website/x/xess/", http.FileServerFS(Static))))
 }
 
+func buttonClass(v ButtonVariant) string {
+	if v == "" {
+		v = BtnPrimary
+	}
+	return "xe-btn " + string(v)
+}
+
 func NotFound(w http.ResponseWriter, r *http.Request) {
 	templ.Handler(
 		Simple("Not found: "+r.URL.Path, fourohfour(r.URL.Path)),

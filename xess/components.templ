@@ -1,0 +1,53 @@
+package xess
+
+// ButtonVariant selects the visual treatment applied to a Button.
+type ButtonVariant string
+
+const (
+	BtnPrimary   ButtonVariant = "xe-btn--primary"
+	BtnSecondary ButtonVariant = "xe-btn--secondary"
+	BtnAccent    ButtonVariant = "xe-btn--accent"
+	BtnGhost     ButtonVariant = "xe-btn--ghost"
+)
+
+// Button renders a button-styled element. If href is non-empty it becomes an
+// <a>, otherwise a <button>. Variant defaults to BtnPrimary when empty.
+// body renders inside as label/icon content.
+templ Button(variant ButtonVariant, href string, body templ.Component) {
+	if href != "" {
+		<a href={ templ.URL(href) } class={ buttonClass(variant) }>
+			@body
+		</a>
+	} else {
+		<button type="button" class={ buttonClass(variant) }>
+			@body
+		</button>
+	}
+}
+
+// Card wraps body in a .xe-card surface.
+templ Card(body templ.Component) {
+	<div class="xe-card">
+		@body
+	</div>
+}
+
+// Tag renders a single pill label.
+templ Tag(body templ.Component) {
+	<span class="xe-tag">
+		@body
+	</span>
+}
+
+// TagList renders a horizontal list of Tags from string labels.
+templ TagList(labels []string) {
+	<div class="xe-tag-list">
+		for _, label := range labels {
+			@Tag(tagLabel(label))
+		}
+	</div>
+}
+
+templ tagLabel(label string) {
+	{ label }
+}
