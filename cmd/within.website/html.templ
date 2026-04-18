@@ -25,7 +25,7 @@ templ Index(repos []Repo) {
 		<h2 id={ repo.Repo }>{ repo.Repo }</h2>
 		<p><a href={ templ.SafeURL(repo.GodocURL()) }><img src={ repo.GodocBadge() } alt="GoDoc"/></a> <a href={ templ.SafeURL(repo.URL()) }><img alt="Source code link" src="https://img.shields.io/badge/source-link-green"/></a></p>
 		<p>{ repo.Description }</p>
-		<code><pre>go get within.website/{ repo.Repo }</pre></code>
+		<pre><code>go get within.website/{ repo.Repo }</code></pre>
 	}
 }
 
