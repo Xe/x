@@ -313,7 +313,6 @@ a:visited:hover {
 
 /* ---------- Other primitives ---------- */
 blockquote {
-  border-left: 4px solid var(--border);
   color: var(--text-muted);
   margin: 1em 0;
   padding: 0.25em 1em;
