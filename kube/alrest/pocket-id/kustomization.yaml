@@ -1,4 +1,5 @@
 resources:
+  - 1password.yaml
   - configmap.yaml
   - deployment.yaml
   - ingress.yaml
