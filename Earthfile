@@ -292,4 +292,3 @@ all:
     BUILD --pass-args --platform=linux/amd64 +xedn
 
     BUILD --pass-args --platform=linux/amd64 ./kube/alrest/staticsites/caddy1+all
-    BUILD --pass-args --platform=linux/amd64 ./migroserbices/falin+run
