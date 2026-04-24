@@ -1,0 +1,6 @@
+// Trigger button points at the modal's id via data-modal-open.
+// design.js calls showModal() on the matching <dialog> when clicked.
+<button type="button" class="xe-btn xe-btn--danger" data-modal-open="demo-modal">
+    Delete this post
+</button>
+@xess.Modal("demo-modal", "Delete this post?", false, modalBody())

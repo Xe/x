@@ -1,0 +1,116 @@
+package xess
+
+// BreadcrumbItem is one hop in a Breadcrumb trail. The last item in a
+// Breadcrumb is rendered as text (current page); preceding items are links.
+type BreadcrumbItem struct {
+	Href, Label string
+}
+
+// Breadcrumb renders a breadcrumb trail.
+templ Breadcrumb(items []BreadcrumbItem) {
+	<nav class="xe-breadcrumb" aria-label="Breadcrumb">
+		<ol class="xe-breadcrumb__list">
+			for i, it := range items {
+				<li class="xe-breadcrumb__item">
+					if i == len(items)-1 {
+						<span aria-current="page">{ it.Label }</span>
+					} else {
+						<a href={ templ.URL(it.Href) }>{ it.Label }</a>
+					}
+				</li>
+			}
+		</ol>
+	</nav>
+}
+
+// Pagination renders prev/next controls for an index.
+// Empty prevHref or nextHref render the corresponding side as disabled.
+// pageLabel is optional — e.g. "Page 3 of 12".
+templ Pagination(prevHref, nextHref, pageLabel string) {
+	<nav class="xe-pagination" aria-label="Pagination">
+		if prevHref != "" {
+			<a class="xe-pagination__prev" href={ templ.URL(prevHref) } rel="prev">← Previous</a>
+		} else {
+			<span class="xe-pagination__prev xe-pagination__disabled">← Previous</span>
+		}
+		if pageLabel != "" {
+			<span class="xe-pagination__label">{ pageLabel }</span>
+		}
+		if nextHref != "" {
+			<a class="xe-pagination__next" href={ templ.URL(nextHref) } rel="next">Next →</a>
+		} else {
+			<span class="xe-pagination__next xe-pagination__disabled">Next →</span>
+		}
+	</nav>
+}
+
+// TOCItem is one heading entry in a TableOfContents. Nest via Children.
+type TOCItem struct {
+	Href     string
+	Label    string
+	Children []TOCItem
+}
+
+// TableOfContents renders a nested list of heading links.
+templ TableOfContents(items []TOCItem) {
+	<nav class="xe-toc" aria-label="Table of contents">
+		<h2 class="xe-toc__title">On this page</h2>
+		@tocList(items)
+	</nav>
+}
+
+templ tocList(items []TOCItem) {
+	<ol class="xe-toc__list">
+		for _, it := range items {
+			<li class="xe-toc__item">
+				<a href={ templ.URL(it.Href) }>{ it.Label }</a>
+				if len(it.Children) > 0 {
+					@tocList(it.Children)
+				}
+			</li>
+		}
+	</ol>
+}
+
+// SkipLink renders the "skip to main content" link that becomes visible on
+// focus. target should be an in-page anchor like "#main".
+templ SkipLink(target, label string) {
+	<a class="xe-skip-link" href={ templ.URL(target) }>{ label }</a>
+}
+
+// BackToTop renders a "back to top" anchor, typically placed at the end of
+// long articles.
+templ BackToTop(label string) {
+	<a class="xe-back-to-top" href="#top">{ label }</a>
+}
+
+// NextPrevLink is one side of a NextPrev. Empty Href hides that side.
+type NextPrevLink struct {
+	Href, Label string
+}
+
+// NextPrev renders the previous/next post pair shown at the end of posts.
+templ NextPrev(prev, next NextPrevLink) {
+	<nav class="xe-nextprev" aria-label="Post navigation">
+		if prev.Href != "" {
+			<a class="xe-nextprev__prev" href={ templ.URL(prev.Href) } rel="prev">
+				<span class="xe-nextprev__label">Previous</span>
+				<span class="xe-nextprev__title">{ prev.Label }</span>
+			</a>
+		}
+		if next.Href != "" {
+			<a class="xe-nextprev__next" href={ templ.URL(next.Href) } rel="next">
+				<span class="xe-nextprev__label">Next</span>
+				<span class="xe-nextprev__title">{ next.Label }</span>
+			</a>
+		}
+	</nav>
+}
+
+// VisuallyHidden renders text that's accessible to assistive tech but hidden
+// visually. Use for icon-only button/link labels.
+templ VisuallyHidden(body templ.Component) {
+	<span class="xe-visually-hidden">
+		@body
+	</span>
+}

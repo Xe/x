@@ -1,0 +1,16 @@
+@xess.Conv(chatRows())
+
+templ chatRows() {
+  @xess.ChatRow(
+    xess.StickerURL("cadey", "coffee"), "Cadey drinking coffee",
+    "Cadey", "",
+    p("So this is what the design system looks like..."))
+  @xess.ChatRow(
+    xess.StickerURL("aoi", "wut"), "Aoi looking confused",
+    "Aoi", "",
+    p("Wait — the stickers are fetched live..."))
+  @xess.ChatRow(
+    xess.StickerURL("cadey", "aha"), "Cadey having an aha moment",
+    "Cadey", "",
+    p("Yep. Saves on bundling..."))
+}

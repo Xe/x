@@ -8,6 +8,19 @@ const (
 	BtnSecondary ButtonVariant = "xe-btn--secondary"
 	BtnAccent    ButtonVariant = "xe-btn--accent"
 	BtnGhost     ButtonVariant = "xe-btn--ghost"
+	BtnDanger    ButtonVariant = "xe-btn--danger"
+)
+
+// AdmonitionKind selects the semantic hue applied to an Admonition.
+type AdmonitionKind string
+
+const (
+	AdmonitionInfo    AdmonitionKind = "info"
+	AdmonitionWarning AdmonitionKind = "warning"
+	AdmonitionTip     AdmonitionKind = "tip"
+	AdmonitionNote    AdmonitionKind = "note"
+	AdmonitionDanger  AdmonitionKind = "danger"
+	AdmonitionSuccess AdmonitionKind = "success"
 )
 
 // Button renders a button-styled element. If href is non-empty it becomes an
@@ -32,6 +45,23 @@ templ Card(body templ.Component) {
 	</div>
 }
 
+// SurfaceRaised wraps body in a one-step raised surface (bg-0).
+templ SurfaceRaised(body templ.Component) {
+	<div class="xe-surface-raised">
+		@body
+	</div>
+}
+
+// DividerStrong draws a 2px horizontal rule using bg-3.
+templ DividerStrong() {
+	<div class="xe-divider-strong" role="separator"></div>
+}
+
+// BorderHairline draws a 1px horizontal rule using bg-4.
+templ BorderHairline() {
+	<hr class="xe-border-hairline"/>
+}
+
 // Tag renders a single pill label.
 templ Tag(body templ.Component) {
 	<span class="xe-tag">
@@ -50,4 +80,250 @@ templ TagList(labels []string) {
 
 templ tagLabel(label string) {
 	{ label }
+}
+
+// TextStrong emphasises body text using fg-0 and body-emphasis weight.
+templ TextStrong(body templ.Component) {
+	<strong class="xe-text-strong">
+		@body
+	</strong>
+}
+
+// TextSubtle steps text down to fg-2.
+templ TextSubtle(body templ.Component) {
+	<span class="xe-text-subtle">
+		@body
+	</span>
+}
+
+// TextMuted renders small muted text at fg-3.
+templ TextMuted(body templ.Component) {
+	<span class="xe-text-muted">
+		@body
+	</span>
+}
+
+// TextCaption renders the lowest-contrast caption text at fg-4.
+templ TextCaption(body templ.Component) {
+	<span class="xe-text-caption">
+		@body
+	</span>
+}
+
+// Details renders a <details>/<summary> pair wrapped around body.
+templ Details(summary string, body templ.Component) {
+	<details>
+		<summary>{ summary }</summary>
+		@body
+	</details>
+}
+
+// Pre renders a code block. body supplies the text content.
+templ Pre(body templ.Component) {
+	<pre>@body</pre>
+}
+
+// CodeInline renders inline code with body as the content.
+templ CodeInline(body templ.Component) {
+	<code>@body</code>
+}
+
+// Blockquote renders an email-style block quote (no left bar).
+templ Blockquote(body templ.Component) {
+	<blockquote class="xe-blockquote">
+		@body
+	</blockquote>
+}
+
+// Pullquote renders a classic left-bar italic pull quote.
+templ Pullquote(body templ.Component) {
+	<aside class="xe-pullquote">
+		@body
+	</aside>
+}
+
+// ChatAvatar renders a 64x64 sticker tile.
+templ ChatAvatar(src, alt string) {
+	<img class="xe-chat__avatar" src={ src } alt={ alt } width="64" height="64"/>
+}
+
+// ChatRow renders a single speaker row inside a Conv.
+// avatarSrc is a sticker URL (see StickerURL); nameHref may be empty for plain text.
+templ ChatRow(avatarSrc, alt, name, nameHref string, body templ.Component) {
+	<div class="xe-chat__row">
+		@ChatAvatar(avatarSrc, alt)
+		<div class="xe-chat__body">
+			if nameHref != "" {
+				<a class="xe-chat__name" href={ templ.URL(nameHref) }>{ name }</a>
+			} else {
+				<span class="xe-chat__name">{ name }</span>
+			}
+			<div class="xe-chat__message">
+				@body
+			</div>
+		</div>
+	</div>
+}
+
+// Conv wraps a sequence of ChatRow components in the shared conversation surface.
+templ Conv(rows templ.Component) {
+	<div class="xe-chat">
+		@rows
+	</div>
+}
+
+// Admonition renders a semantic callout with a left rule, title dot, and body.
+templ Admonition(kind AdmonitionKind, title string, body templ.Component) {
+	<aside class={ admonitionClass(kind) }>
+		<div class="xe-admonition__rule"></div>
+		<div class="xe-admonition__body">
+			<div class="xe-admonition__header">
+				<span class="xe-admonition__dot"></span>
+				<strong class="xe-admonition__title">{ title }</strong>
+			</div>
+			<div class="xe-admonition__content">
+				@body
+			</div>
+		</div>
+	</aside>
+}
+
+// SponsorRule draws the signature 2px orange→purple top rule.
+templ SponsorRule() {
+	<div class="xe-sponsor__rule" aria-hidden="true">
+		<span class="xe-sponsor__rule-start"></span>
+		<span class="xe-sponsor__rule-end"></span>
+	</div>
+}
+
+// SponsorHeading renders an orange h5-sized lockup — used for sponsor card titles.
+templ SponsorHeading(body templ.Component) {
+	<h5 class="xe-sponsor__heading">
+		@body
+	</h5>
+}
+
+// SponsorCard composes the rule, heading, and body into a sponsor card.
+templ SponsorCard(heading, body templ.Component) {
+	<aside class="xe-sponsor">
+		@SponsorRule()
+		@SponsorHeading(heading)
+		<div class="xe-sponsor__body">
+			@body
+		</div>
+	</aside>
+}
+
+// Link renders a text link. It's just an <a> tag — link styling (magenta
+// invert on hover, visited handling) comes from xess.css.
+templ Link(href string, body templ.Component) {
+	<a href={ templ.URL(href) }>
+		@body
+	</a>
+}
+
+// NavLink is one entry in a NavBar.
+type NavLink struct {
+	Href  string
+	Label string
+}
+
+// NavBar renders a horizontal list of links, typically inside Base's nav slot.
+templ NavBar(links []NavLink) {
+	<ul class="xe-nav__list">
+		for _, l := range links {
+			<li class="xe-nav__item">
+				<a href={ templ.URL(l.Href) } class="xe-nav__link">{ l.Label }</a>
+			</li>
+		}
+	</ul>
+}
+
+// Footer wraps body in a centred footer with muted text.
+templ Footer(body templ.Component) {
+	<div class="xe-footer">
+		@body
+	</div>
+}
+
+// Figure renders a responsive figure with AVIF/WebP/JPG fallbacks and an
+// italic caption. Any of the three src values may be empty; jpgSrc is used
+// as the final <img> src. caption may be nil.
+templ Figure(avifSrc, webpSrc, jpgSrc, alt string, caption templ.Component) {
+	<figure class="xe-figure">
+		<picture>
+			if avifSrc != "" {
+				<source srcset={ avifSrc } type="image/avif"/>
+			}
+			if webpSrc != "" {
+				<source srcset={ webpSrc } type="image/webp"/>
+			}
+			<img src={ jpgSrc } alt={ alt } loading="lazy"/>
+		</picture>
+		if caption != nil {
+			<figcaption>
+				@caption
+			</figcaption>
+		}
+	</figure>
+}
+
+// Sticker renders a 64x64 sticker tile from stickers.xeiaso.net for the given
+// character and mood. Alt text is auto-derived as "<character> (<mood>)".
+templ Sticker(character, mood string) {
+	@ChatAvatar(StickerURL(character, mood), character+" ("+mood+")")
+}
+
+// Icon wraps children in a 24x24 Tabler-style stroke SVG. body supplies the
+// inner SVG path/content. Stroke colour inherits currentColor so icons pick
+// up surrounding text colour.
+templ Icon(body templ.Component) {
+	<svg class="xe-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+		@body
+	</svg>
+}
+
+// Kbd renders a keyboard key hint (Ctrl, Shift, etc.).
+templ Kbd(body templ.Component) {
+	<kbd class="xe-kbd">
+		@body
+	</kbd>
+}
+
+// Mark highlights body inline, using the purple-bright accent for the swatch.
+templ Mark(body templ.Component) {
+	<mark class="xe-mark">
+		@body
+	</mark>
+}
+
+// BadgeKind selects the hue of a Badge.
+type BadgeKind string
+
+const (
+	BadgeInfo    BadgeKind = "info"
+	BadgeWarning BadgeKind = "warning"
+	BadgeTip     BadgeKind = "tip"
+	BadgeNote    BadgeKind = "note"
+	BadgeDanger  BadgeKind = "danger"
+	BadgeSuccess BadgeKind = "success"
+	BadgeNeutral BadgeKind = "neutral"
+)
+
+// Badge renders a small status chip. Use BadgeNeutral for non-semantic chips.
+templ Badge(kind BadgeKind, body templ.Component) {
+	<span class={ badgeClass(kind) }>
+		@body
+	</span>
+}
+
+// Spinner renders the lightweight loading indicator used sparingly across
+// the site. It's decorative; callers should pair it with an aria-live region
+// or visually hidden label when meaningful.
+templ Spinner() {
+	<span class="xe-spinner" role="status" aria-label="Loading">
+		<span class="xe-spinner__dot"></span>
+		<span class="xe-spinner__dot"></span>
+		<span class="xe-spinner__dot"></span>
+	</span>
 }

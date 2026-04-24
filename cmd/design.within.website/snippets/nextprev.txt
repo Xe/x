@@ -1,0 +1,4 @@
+@xess.NextPrev(
+    xess.NextPrevLink{Href: "/posts/last-one", Label: "On the slowness..."},
+    xess.NextPrevLink{Href: "/posts/next-one", Label: "Why my blog..."},
+)

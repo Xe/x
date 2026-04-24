@@ -1,0 +1,5 @@
+<p>Above the strong divider.</p>
+@xess.DividerStrong()
+<p>Between divs.</p>
+@xess.BorderHairline()
+<p>Below the hairline.</p>

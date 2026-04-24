@@ -1,0 +1,130 @@
+.lead {
+  font-size: var(--step-2);
+  color: var(--fg-3);
+  margin: 0 0 var(--space-4);
+  text-wrap: pretty;
+}
+
+.cluster {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: center;
+  margin: var(--space-2) 0;
+}
+.cluster > .xe-btn {
+  margin: 2px 0;
+}
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.swatches {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: var(--space-3);
+  margin: var(--space-4) 0;
+}
+.swatch {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+.swatch__chip {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--bg-4);
+  flex-shrink: 0;
+}
+.swatch__name {
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  color: var(--fg-1);
+}
+.swatch__hex {
+  font-size: var(--step--1);
+  color: var(--fg-3);
+}
+
+.demo {
+  margin: var(--space-5) 0;
+  padding: var(--space-4);
+  background: var(--bg-0);
+  border: 1px solid var(--bg-4);
+  border-radius: var(--radius-md);
+}
+.demo__label {
+  font-size: var(--step--1);
+  margin: 0 0 var(--space-3);
+  color: var(--fg-3);
+  font-family: var(--font-sans);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 600;
+}
+.demo__canvas {
+  padding: var(--space-5);
+  background: var(--bg-hard);
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--space-3);
+}
+.demo__source summary {
+  cursor: pointer;
+  color: var(--fg-3);
+  font-size: var(--step--1);
+}
+.demo__source-body {
+  position: relative;
+  margin-top: var(--space-2);
+}
+.demo__source pre {
+  margin: 0;
+  font-size: 0.85em;
+  padding-right: 64px;
+}
+
+.copy-btn {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  z-index: 1;
+  background: var(--bg-2);
+  color: var(--fg-1);
+  border: 1px solid var(--bg-4);
+  border-radius: var(--radius-sm);
+  padding: 4px 10px;
+  font-family: var(--font-sans);
+  font-size: var(--step--1);
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-standard);
+}
+.copy-btn:hover {
+  background: var(--bg-3);
+}
+.copy-btn--ok {
+  background: var(--aqua);
+  color: #fff;
+  border-color: var(--aqua);
+}
+
+#main > .xe-prose > section > h2 {
+  margin-top: var(--space-6);
+  padding-top: var(--space-4);
+  border-top: 2px solid var(--bg-3);
+}
+#main > .xe-prose > section > h3 {
+  margin-top: var(--space-5);
+}
+
+.type-scale > * {
+  margin: 0 0 var(--space-2);
+}
+
+main > nav .xe-nav__list {
+  gap: var(--space-3);
+  font-size: var(--step--1);
+  margin-bottom: var(--space-5);
+}

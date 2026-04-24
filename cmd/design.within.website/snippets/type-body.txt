@@ -1,0 +1,5 @@
+<p>Schibsted Grotesk at 16px with line-height 1.55.
+<strong>Emphasis</strong> uses weight 600.
+<em>Italics</em> are the matching italic face.
+Inline code looks like <code>http.ListenAndServe</code>.
+Hit @xess.Kbd(txt("Ctrl")) + @xess.Kbd(txt("K")) to feel something.</p>

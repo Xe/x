@@ -1,0 +1,9 @@
+@xess.Table(tableInner())
+
+templ tableInner() {
+  <thead><tr><th>Token</th><th>Value</th><th>Used for</th></tr></thead>
+  <tbody>
+    <tr><td><code>--radius-xs</code></td><td>2px</td><td>Sticker avatar frames</td></tr>
+    ...
+  </tbody>
+}

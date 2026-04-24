@@ -1,0 +1,6 @@
+@xess.Select("lang", "lang", []xess.SelectOption{
+    {Value: "go",     Label: "Go",     Selected: true},
+    {Value: "rust",   Label: "Rust"},
+    {Value: "elixir", Label: "Elixir"},
+    {Value: "nix",    Label: "Nix"},
+}, false)

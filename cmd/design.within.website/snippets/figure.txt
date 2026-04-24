@@ -1,0 +1,5 @@
+@xess.Figure(
+  "", "", "https://stickers.xeiaso.net/sticker/cadey/aha",
+  "Cadey having an 'aha' moment",
+  figureCap(),
+)

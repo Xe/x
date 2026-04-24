@@ -1,0 +1,58 @@
+package xess
+
+// ToastKind selects the hue for a Toast.
+type ToastKind string
+
+const (
+	ToastInfo    ToastKind = "info"
+	ToastSuccess ToastKind = "success"
+	ToastWarning ToastKind = "warning"
+	ToastDanger  ToastKind = "danger"
+)
+
+// Toast renders a transient notification. Pair with your own aria-live
+// container for screen-reader announcement.
+templ Toast(kind ToastKind, title string, body templ.Component) {
+	<div class={ toastClass(kind) } role="status">
+		<strong class="xe-toast__title">{ title }</strong>
+		<div class="xe-toast__body">
+			@body
+		</div>
+	</div>
+}
+
+// Modal renders a `<dialog>` element. `open` toggles the open attribute; for
+// backdrop click-to-close and focus trapping, wire your own JS.
+templ Modal(id, title string, open bool, body templ.Component) {
+	<dialog class="xe-modal" id={ id } open?={ open }>
+		<header class="xe-modal__header">
+			<h2 class="xe-modal__title">{ title }</h2>
+			<form method="dialog" class="xe-modal__close-form">
+				<button class="xe-modal__close" aria-label="Close">&times;</button>
+			</form>
+		</header>
+		<div class="xe-modal__body">
+			@body
+		</div>
+	</dialog>
+}
+
+// Progress renders a horizontal progress bar. value and max are strings so
+// callers can pass integers or floats without an explicit conversion.
+templ Progress(value, max, label string) {
+	<div class="xe-progress">
+		if label != "" {
+			<div class="xe-progress__label">{ label }</div>
+		}
+		<progress class="xe-progress__bar" value={ value } max={ max }></progress>
+	</div>
+}
+
+// Tooltip wraps body with a hover/focus tooltip showing `label`. The tooltip
+// is rendered from the `data-tooltip` attribute via CSS `::after`, no JS
+// needed for the common case.
+templ Tooltip(label string, body templ.Component) {
+	<span class="xe-tooltip" data-tooltip={ label }>
+		@body
+	</span>
+}

@@ -1,0 +1,4 @@
+<p>@xess.TextStrong(txt("Strong text sits on fg-0..."))</p>
+<p>@xess.TextSubtle(txt("Subtle text steps down to fg-2..."))</p>
+<p>@xess.TextMuted(txt("Muted text runs at fg-3..."))</p>
+<p>@xess.TextCaption(txt("Caption text is the lowest contrast..."))</p>

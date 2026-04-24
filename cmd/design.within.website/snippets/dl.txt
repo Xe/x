@@ -1,0 +1,5 @@
+@xess.DefinitionList([]xess.Definition{
+    {Term: "Podkova",            Description: "Serif typeface for headings..."},
+    {Term: "Schibsted Grotesk",  Description: "Variable sans-serif..."},
+    {Term: "Iosevka Curly Iaso", Description: "Custom-cut monospace..."},
+})

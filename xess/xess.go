@@ -38,6 +38,32 @@ func buttonClass(v ButtonVariant) string {
 	return "xe-btn " + string(v)
 }
 
+func admonitionClass(k AdmonitionKind) string {
+	if k == "" {
+		k = AdmonitionInfo
+	}
+	return "xe-admonition xe-admonition--" + string(k)
+}
+
+func badgeClass(k BadgeKind) string {
+	if k == "" {
+		k = BadgeNeutral
+	}
+	return "xe-badge xe-badge--" + string(k)
+}
+
+func toastClass(k ToastKind) string {
+	if k == "" {
+		k = ToastInfo
+	}
+	return "xe-toast xe-toast--" + string(k)
+}
+
+// StickerURL builds a stickers.xeiaso.net URL for the given character and mood.
+func StickerURL(character, mood string) string {
+	return "https://stickers.xeiaso.net/sticker/" + character + "/" + mood
+}
+
 func NotFound(w http.ResponseWriter, r *http.Request) {
 	templ.Handler(
 		Simple("Not found: "+r.URL.Path, fourohfour(r.URL.Path)),

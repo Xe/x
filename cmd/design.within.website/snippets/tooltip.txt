@@ -1,0 +1,3 @@
+@xess.Tooltip(
+    "Warm-neutral palette designed by Morhetz",
+    txt("Gruvbox"))

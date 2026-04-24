@@ -1,0 +1,2 @@
+@xess.Admonition(xess.AdmonitionSuccess, "Success",
+    p("If your prose fits in 65 characters per line..."))

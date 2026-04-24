@@ -1,0 +1,2 @@
+@xess.Admonition(xess.AdmonitionDanger, "Danger",
+    p("Don't use left-border accent cards..."))

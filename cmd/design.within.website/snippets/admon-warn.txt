@@ -1,0 +1,2 @@
+@xess.Admonition(xess.AdmonitionWarning, "Warning",
+    p("Iosevka Curly Iaso is not bundled..."))

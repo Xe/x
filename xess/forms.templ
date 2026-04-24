@@ -1,0 +1,102 @@
+package xess
+
+// InputType wraps common HTML input types for ergonomics.
+type InputType string
+
+const (
+	InputText     InputType = "text"
+	InputEmail    InputType = "email"
+	InputPassword InputType = "password"
+	InputSearch   InputType = "search"
+	InputTel      InputType = "tel"
+	InputURL      InputType = "url"
+	InputNumber   InputType = "number"
+	InputDate     InputType = "date"
+)
+
+// SelectOption is one entry inside a Select.
+type SelectOption struct {
+	Value    string
+	Label    string
+	Selected bool
+}
+
+// Form wraps body in a <form> element. method should be "get" or "post".
+templ Form(action, method string, body templ.Component) {
+	<form class="xe-form" action={ templ.URL(action) } method={ method }>
+		@body
+	</form>
+}
+
+// FieldGroup stacks a Label, control, and any helper/error messaging.
+templ FieldGroup(body templ.Component) {
+	<div class="xe-field">
+		@body
+	</div>
+}
+
+// Label renders a styled <label>. forID associates it with its control.
+templ Label(forID, text string) {
+	<label class="xe-label" for={ forID }>{ text }</label>
+}
+
+// HelperText renders grey helper copy below a control.
+templ HelperText(body templ.Component) {
+	<p class="xe-field__helper">
+		@body
+	</p>
+}
+
+// ErrorText renders validation error copy below a control.
+templ ErrorText(body templ.Component) {
+	<p class="xe-field__error" role="alert">
+		@body
+	</p>
+}
+
+// Input renders a single-line text-style input.
+templ Input(id, name string, t InputType, value, placeholder string, required bool) {
+	<input class="xe-input" id={ id } name={ name } type={ string(t) } value={ value } placeholder={ placeholder } required?={ required }/>
+}
+
+// Textarea renders a multi-line text input. The inner value text is placed
+// inside the element (not as an attribute).
+templ Textarea(id, name, value, placeholder string, required bool) {
+	<textarea class="xe-textarea" id={ id } name={ name } placeholder={ placeholder } required?={ required }>{ value }</textarea>
+}
+
+// Select renders a <select> dropdown. Mark exactly one option Selected to
+// pre-select it.
+templ Select(id, name string, options []SelectOption, required bool) {
+	<select class="xe-select" id={ id } name={ name } required?={ required }>
+		for _, o := range options {
+			<option value={ o.Value } selected?={ o.Selected }>{ o.Label }</option>
+		}
+	</select>
+}
+
+// Checkbox renders a single checkbox with an inline label.
+templ Checkbox(id, name, value, label string, checked bool) {
+	<label class="xe-checkbox">
+		<input type="checkbox" id={ id } name={ name } value={ value } checked?={ checked }/>
+		<span>{ label }</span>
+	</label>
+}
+
+// Radio renders a single radio button with an inline label. Share `name` across
+// a group of Radio components to make them mutually exclusive.
+templ Radio(id, name, value, label string, checked bool) {
+	<label class="xe-radio">
+		<input type="radio" id={ id } name={ name } value={ value } checked?={ checked }/>
+		<span>{ label }</span>
+	</label>
+}
+
+// Switch renders a toggle — semantically a checkbox, visually a sliding track.
+templ Switch(id, name, label string, checked bool) {
+	<label class="xe-switch">
+		<input type="checkbox" id={ id } name={ name } checked?={ checked }/>
+		<span class="xe-switch__track"><span class="xe-switch__thumb"></span></span>
+		<span class="xe-switch__label">{ label }</span>
+	</label>
+}

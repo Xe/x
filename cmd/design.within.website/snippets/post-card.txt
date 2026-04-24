@@ -1,0 +1,9 @@
+@xess.PostCard(xess.PostCardProps{
+    Href:    "/posts/designing-xess",
+    Title:   "Designing xess",
+    Excerpt: "Why I keep re-solving the same typography questions...",
+    Date:    "2026-04-24",
+    Tags:    []string{"design-systems", "go", "templ"},
+    Hero:    "https://files.xeiaso.net/hero/santa-cruz-seals.webp",
+    HeroAlt: "Seals piled on a rock at Santa Cruz",
+})

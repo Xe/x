@@ -1,0 +1,156 @@
+package xess
+
+// Prose wraps long-form content in a narrow-column container with the prose
+// typography defaults.
+templ Prose(body templ.Component) {
+	<div class="xe-prose">
+		@body
+	</div>
+}
+
+// Hero renders a page-intro block with a title, optional subtitle, and an
+// optional body slot (call to action, lead paragraph, etc.).
+templ Hero(title, subtitle string, body templ.Component) {
+	<section class="xe-hero">
+		<h1 class="xe-hero__title">{ title }</h1>
+		if subtitle != "" {
+			<p class="xe-hero__subtitle">{ subtitle }</p>
+		}
+		if body != nil {
+			<div class="xe-hero__body">
+				@body
+			</div>
+		}
+	</section>
+}
+
+// PageHeader pairs a page title with an optional meta slot (date, author, tags).
+templ PageHeader(title string, meta templ.Component) {
+	<header class="xe-page-header">
+		<h1 class="xe-page-header__title">{ title }</h1>
+		if meta != nil {
+			<div class="xe-page-header__meta">
+				@meta
+			</div>
+		}
+	</header>
+}
+
+// PostMeta renders a row of post metadata. Any empty field is skipped.
+templ PostMeta(date, author, readingTime string, tags []string) {
+	<div class="xe-postmeta">
+		if date != "" {
+			<time class="xe-postmeta__date">{ date }</time>
+		}
+		if author != "" {
+			<span class="xe-postmeta__author">by { author }</span>
+		}
+		if readingTime != "" {
+			<span class="xe-postmeta__read">{ readingTime }</span>
+		}
+		if len(tags) > 0 {
+			<div class="xe-postmeta__tags">
+				@TagList(tags)
+			</div>
+		}
+	</div>
+}
+
+// PostCardProps bundles the inputs to PostCard.
+type PostCardProps struct {
+	Href    string
+	Title   string
+	Excerpt string
+	Date    string
+	Tags    []string
+	// Hero is the URL of an optional hero image rendered above the title.
+	// Leave empty to skip.
+	Hero string
+	// HeroAlt is the alt text for the hero image. Required when Hero is set.
+	HeroAlt string
+}
+
+// PostCard is a preview card for a blog post on an index page.
+templ PostCard(p PostCardProps) {
+	<article class="xe-postcard">
+		if p.Hero != "" {
+			<a class="xe-postcard__hero-link" href={ templ.URL(p.Href) } tabindex="-1" aria-hidden="true">
+				<img class="xe-postcard__hero" src={ p.Hero } alt={ p.HeroAlt } loading="lazy"/>
+			</a>
+		}
+		<div class="xe-postcard__body">
+			<a class="xe-postcard__title-link" href={ templ.URL(p.Href) }>
+				<h3 class="xe-postcard__title">{ p.Title }</h3>
+			</a>
+			if p.Date != "" {
+				<time class="xe-postcard__date">{ p.Date }</time>
+			}
+			if p.Excerpt != "" {
+				<p class="xe-postcard__excerpt">{ p.Excerpt }</p>
+			}
+			if len(p.Tags) > 0 {
+				@TagList(p.Tags)
+			}
+		</div>
+	</article>
+}
+
+// Definition is one term/description pair for a DefinitionList.
+type Definition struct {
+	Term, Description string
+}
+
+// DefinitionList renders a `<dl>` from term/description pairs.
+templ DefinitionList(items []Definition) {
+	<dl class="xe-dl">
+		for _, d := range items {
+			<dt class="xe-dl__term">{ d.Term }</dt>
+			<dd class="xe-dl__desc">{ d.Description }</dd>
+		}
+	</dl>
+}
+
+// TimelineEvent is one entry in a Timeline.
+type TimelineEvent struct {
+	When  string
+	Title string
+	Body  templ.Component
+}
+
+// Timeline renders a vertical list of events with a coloured rail.
+templ Timeline(events []TimelineEvent) {
+	<ol class="xe-timeline">
+		for _, ev := range events {
+			<li class="xe-timeline__event">
+				<div class="xe-timeline__dot" aria-hidden="true"></div>
+				<div class="xe-timeline__content">
+					<div class="xe-timeline__when">{ ev.When }</div>
+					<div class="xe-timeline__title">{ ev.Title }</div>
+					if ev.Body != nil {
+						<div class="xe-timeline__body">
+							@ev.Body
+						</div>
+					}
+				</div>
+			</li>
+		}
+	</ol>
+}
+
+// Stat renders a large number with a small label — for portfolio/metric blocks.
+templ Stat(value, label string) {
+	<div class="xe-stat">
+		<span class="xe-stat__value">{ value }</span>
+		<span class="xe-stat__label">{ label }</span>
+	</div>
+}
+
+// Table wraps a <table> in a horizontally-scrollable container and applies
+// xess styling. Pass your own thead/tbody/tr/th/td inside.
+templ Table(body templ.Component) {
+	<div class="xe-table-wrap">
+		<table class="xe-table">
+			@body
+		</table>
+	</div>
+}

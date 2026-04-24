@@ -1,0 +1,1 @@
+@xess.Pagination("/posts?page=2", "/posts?page=4", "Page 3 of 12")

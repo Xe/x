@@ -1,0 +1,4 @@
+@xess.Checkbox("cb", "subscribe", "yes", "Keep me in the loop", true)
+@xess.Radio("r1", "plan", "free", "Free", true)
+@xess.Radio("r2", "plan", "pro",  "Pro",  false)
+@xess.Switch("s1", "beta", "Opt into beta features", false)

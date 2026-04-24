@@ -1,0 +1,7 @@
+@xess.Badge(xess.BadgeNeutral, txt("neutral"))
+@xess.Badge(xess.BadgeInfo,    txt("info"))
+@xess.Badge(xess.BadgeSuccess, txt("success"))
+@xess.Badge(xess.BadgeTip,     txt("tip"))
+@xess.Badge(xess.BadgeNote,    txt("note"))
+@xess.Badge(xess.BadgeWarning, txt("warning"))
+@xess.Badge(xess.BadgeDanger,  txt("danger"))

@@ -1,0 +1,5 @@
+@xess.Icon(iconCoffee())
+
+templ iconCoffee() {
+  <path d="M3 14c.83 4.4 4.5 7 9 7..."></path>
+}

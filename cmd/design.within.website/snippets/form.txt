@@ -1,0 +1,8 @@
+@xess.Form("/contact", "post", formInner())
+
+templ formInner() {
+  @xess.FieldGroup(nameField())
+  @xess.FieldGroup(emailField())
+  @xess.FieldGroup(messageField())
+  @xess.Button(xess.BtnPrimary, "", txt("Send"))
+}

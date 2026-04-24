@@ -1,0 +1,4 @@
+@xess.SponsorCard(sponsorHeading(), sponsorBody())
+
+templ sponsorHeading() { Thanks to this month's sponsors }
+templ sponsorBody()    { <p>...</p> }

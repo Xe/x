@@ -1,0 +1,6 @@
+@xess.PageHeader("Designing xess", pageHeaderMeta())
+
+templ pageHeaderMeta() {
+  @xess.PostMeta("2026-04-24", "Xe Iaso", "5 min read",
+    []string{"design-systems", "go", "templ"})
+}

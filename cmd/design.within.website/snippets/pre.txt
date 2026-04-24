@@ -1,0 +1,2 @@
+@xess.CodeInline(txt("go tool templ generate"))
+@xess.Pre(txt("go get within.website/x/xess\n// ..."))

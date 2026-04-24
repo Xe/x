@@ -1,0 +1,2 @@
+@xess.Admonition(xess.AdmonitionInfo, "Info",
+    p("The link magenta hover is load-bearing..."))

@@ -1,0 +1,6 @@
+@xess.Card(cardInner())
+
+templ cardInner() {
+  <h3>The card</h3>
+  <p>It's a box with a warm surface...</p>
+}

@@ -1,0 +1,4 @@
+@xess.Toast(xess.ToastInfo,    "Heads up",        p("..."))
+@xess.Toast(xess.ToastSuccess, "Saved",           p("..."))
+@xess.Toast(xess.ToastWarning, "Careful",         p("..."))
+@xess.Toast(xess.ToastDanger,  "Something broke", p("..."))

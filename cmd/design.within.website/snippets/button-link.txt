@@ -1,0 +1,2 @@
+// Pass a non-empty href and Button renders as <a>.
+@xess.Button(xess.BtnPrimary, "https://xeiaso.net", txt("Go to xeiaso.net"))

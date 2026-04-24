@@ -1,0 +1,3 @@
+<p>A <a href="https://xeiaso.net">link to xeiaso.net</a>.</p>
+// Or via the component wrapper:
+@xess.Link("https://xeiaso.net", txt("xeiaso.net"))

@@ -1,0 +1,2 @@
+@xess.Admonition(xess.AdmonitionTip, "Tip",
+    p("Prefer the muted accent variants..."))

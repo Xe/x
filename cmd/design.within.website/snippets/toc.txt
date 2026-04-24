@@ -1,0 +1,7 @@
+@xess.TableOfContents([]xess.TOCItem{
+    {Href: "#colors", Label: "Colors", Children: []xess.TOCItem{
+        {Href: "#colors-ramp", Label: "Surface ramp"},
+        {Href: "#colors-accents", Label: "Accents"},
+    }},
+    {Href: "#typography", Label: "Typography"},
+})

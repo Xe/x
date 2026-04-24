@@ -1,0 +1,8 @@
+@xess.FieldGroup(helperInner())
+
+templ helperInner() {
+  @xess.Label("hint", "Username")
+  @xess.Input("hint", "user", xess.InputText, "", "", false)
+  @xess.HelperText(txt("Letters, numbers, and dashes..."))
+  @xess.ErrorText(txt("That username is already taken."))
+}

@@ -1,0 +1,2 @@
+@xess.Admonition(xess.AdmonitionNote, "Note",
+    p("The only decorative gradient..."))

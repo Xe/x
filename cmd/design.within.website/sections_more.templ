@@ -1,0 +1,392 @@
+package main
+
+import "within.website/x/xess"
+
+// ============================================================================
+// Chat (Conv)
+// ============================================================================
+templ chatSection() {
+	<section id="chat">
+		<h2>Chat (Conv)</h2>
+		<p>Character dialogue is the signature feature of the live site. A <code>Conv</code> block holds multiple <code>ChatRow</code> components; each row carries a 64x64 sticker avatar and a name-colored link. The rows share a <code>bg-soft</code> background and visually fuse into one surface. The avatar frame is a boxy 2px radius on purpose, because the sticker is the star.</p>
+		<p>Stickers are fetched live from <code>stickers.xeiaso.net/sticker/&#123;character&#125;/&#123;mood&#125;</code>. I didn't bundle them because there's a lot of them and because the live URLs work fine. When you're offline or the service is down, everything else on the page still renders — only the avatars 404.</p>
+		@example("A three-row Conv", chatSrc, chatDemo())
+	</section>
+}
+
+templ chatDemo() {
+	@xess.Conv(chatRows())
+}
+
+templ chatRows() {
+	@xess.ChatRow(
+		xess.StickerURL("cadey", "coffee"),
+		"Cadey drinking coffee",
+		"Cadey",
+		"",
+		p("So this is what the design system looks like when you run it."),
+	)
+	@xess.ChatRow(
+		xess.StickerURL("aoi", "wut"),
+		"Aoi looking confused",
+		"Aoi",
+		"",
+		p("Wait — the stickers are fetched live from stickers.xeiaso.net?"),
+	)
+	@xess.ChatRow(
+		xess.StickerURL("cadey", "aha"),
+		"Cadey having an aha moment",
+		"Cadey",
+		"",
+		p("Yep. Saves on bundling. When the service is down, the avatars 404 but nothing else breaks."),
+	)
+}
+
+// ============================================================================
+// Sponsor card
+// ============================================================================
+templ sponsorSection() {
+	<section id="sponsor">
+		<h2>Sponsor card</h2>
+		<p>The single decorative gradient in this whole design system: a 2px top rule running orange-bright to purple-bright, a serif heading in orange, then body copy. Used for literal sponsor callouts at the bottom of posts and nowhere else. When you find yourself wanting to reach for this gradient elsewhere, try a solid color first and thank me later.</p>
+		@example("Sponsor card", sponsorSrc, sponsorDemo())
+	</section>
+}
+
+templ sponsorDemo() {
+	@xess.SponsorCard(sponsorHeading(), sponsorBody())
+}
+
+templ sponsorHeading() {
+	Thanks to this month's sponsors
+}
+
+templ sponsorBody() {
+	<p>Sponsoring on <a href="https://github.com/sponsors/Xe">GitHub Sponsors</a> keeps the lights on for projects like this one. The orange-to-purple rule above is a promise: the system is warm, and so is the community around it.</p>
+}
+
+// ============================================================================
+// Links, icons, spinner
+// ============================================================================
+templ linksIconsSection() {
+	<section id="links-icons">
+		<h2>Links, icons, spinner</h2>
+		<p>Links are plain <code>&lt;a&gt;</code> tags — no wrapper component needed, because the stylesheet already handles hover and visited states. A <code>Link</code> component exists for parity with DESIGN.md but you rarely need it. Icons wrap a Tabler-style 24x24 stroke SVG; pass the path data as children and the wrapper sets the stroke conventions (<code>stroke-width=2</code>, round caps, <code>currentColor</code>). Spinner is three dots pulsing in sequence, used sparingly because I don't like making people wait.</p>
+		@example("Links in flow", linksSrc, linksDemo())
+		@example("Icon with path children", iconSrc, iconDemo())
+		@example("Spinner", spinnerSrc, spinnerDemo())
+	</section>
+}
+
+templ linksDemo() {
+	<p>A <a href="https://xeiaso.net">link to xeiaso.net</a>, and a <a href="https://pkg.go.dev/within.website/x/xess">visited-style link to pkg.go.dev</a> — hover to see the magenta invert.</p>
+}
+
+templ iconDemo() {
+	<div class="cluster">
+		@xess.Icon(iconCoffee())
+		@xess.Icon(iconHeart())
+		@xess.Icon(iconBolt())
+	</div>
+}
+
+templ iconCoffee() {
+	<path d="M3 14c.83 4.4 4.5 7 9 7s8.17-2.6 9-7H3zM5 14V5h14v9M16 3v2M12 3v2M8 3v2"></path>
+}
+
+templ iconHeart() {
+	<path d="M19.5 12.5l-7.5 7.5l-7.5-7.5a5 5 0 1 1 7.5-6.5a5 5 0 1 1 7.5 6.5z"></path>
+}
+
+templ iconBolt() {
+	<path d="M13 2L3 14h9l-1 8l10-12h-9z"></path>
+}
+
+templ spinnerDemo() {
+	@xess.Spinner()
+}
+
+// ============================================================================
+// Navigation
+// ============================================================================
+templ navSection() {
+	<section id="nav-demo">
+		<h2>Navigation</h2>
+		<p>Breadcrumb, Pagination, TableOfContents (recursive), SkipLink, BackToTop, NextPrev. The skip link is table stakes — invisible until a keyboard user focuses the first element, then slides down to offer a path to main content. The TOC is the classic long-form-blog addition; generate its items from your rendered headings and pass the tree in.</p>
+		@example("Breadcrumb", breadcrumbSrc, breadcrumbDemo())
+		@example("Pagination", paginationSrc, paginationDemo())
+		@example("Table of contents (recursive)", tocSrc, tocDemo())
+		@example("NextPrev", nextprevSrc, nextprevDemo())
+		@example("BackToTop", backtopSrc, backtopDemo())
+	</section>
+}
+
+templ breadcrumbDemo() {
+	@xess.Breadcrumb([]xess.BreadcrumbItem{
+		{Href: "/", Label: "Home"},
+		{Href: "/posts", Label: "Posts"},
+		{Href: "", Label: "Designing xess"},
+	})
+}
+
+templ paginationDemo() {
+	@xess.Pagination("/posts?page=2", "/posts?page=4", "Page 3 of 12")
+}
+
+templ tocDemo() {
+	@xess.TableOfContents([]xess.TOCItem{
+		{Href: "#colors", Label: "Colors", Children: []xess.TOCItem{
+			{Href: "#colors-ramp", Label: "Surface ramp"},
+			{Href: "#colors-accents", Label: "Accents"},
+		}},
+		{Href: "#typography", Label: "Typography"},
+		{Href: "#buttons", Label: "Buttons"},
+	})
+}
+
+templ nextprevDemo() {
+	@xess.NextPrev(
+		xess.NextPrevLink{Href: "/posts/last-one", Label: "On the slowness of things that should be fast"},
+		xess.NextPrevLink{Href: "/posts/next-one", Label: "Why my blog is written in Go"},
+	)
+}
+
+templ backtopDemo() {
+	@xess.BackToTop("Back to top")
+}
+
+// ============================================================================
+// Forms
+// ============================================================================
+templ formsSection() {
+	<section id="forms">
+		<h2>Forms</h2>
+		<p>Inputs, textareas, selects, checkboxes, radios, switches, labels, helper text, error text. No JS — the styling is pure CSS. The switch is semantically a checkbox wearing a sliding-track skin. The focus ring is the purple-bright accent at 2px, shared across every focusable element on the page.</p>
+		<p>Honestly, I don't love forms. Nobody does. But a design system with a glaring <code>&lt;input&gt;</code>-shaped hole is conspicuous, and real contact pages need real styling. Here it is.</p>
+		@example("A full contact form", formSrc, formDemo())
+		@example("Checkbox, radio, switch", toggleSrc, toggleDemo())
+		@example("Select", selectSrc, selectDemo())
+		@example("Helper and error text", helperSrc, helperDemo())
+	</section>
+}
+
+templ formDemo() {
+	@xess.Form("/contact", "post", formInner())
+}
+
+templ formInner() {
+	@xess.FieldGroup(nameField())
+	@xess.FieldGroup(emailField())
+	@xess.FieldGroup(messageField())
+	@xess.Button(xess.BtnPrimary, "", txt("Send"))
+}
+
+templ nameField() {
+	@xess.Label("name", "Your name")
+	@xess.Input("name", "name", xess.InputText, "", "Cadey", true)
+}
+
+templ emailField() {
+	@xess.Label("email", "Email")
+	@xess.Input("email", "email", xess.InputEmail, "", "you@example.com", true)
+}
+
+templ messageField() {
+	@xess.Label("msg", "Message")
+	@xess.Textarea("msg", "msg", "", "What's on your mind?", true)
+}
+
+templ toggleDemo() {
+	<div class="stack">
+		@xess.Checkbox("cb", "subscribe", "yes", "Keep me in the loop", true)
+		@xess.Radio("r1", "plan", "free", "Free", true)
+		@xess.Radio("r2", "plan", "pro", "Pro", false)
+		@xess.Switch("s1", "beta", "Opt into beta features", false)
+	</div>
+}
+
+templ selectDemo() {
+	@xess.Select("lang", "lang", []xess.SelectOption{
+		{Value: "go", Label: "Go", Selected: true},
+		{Value: "rust", Label: "Rust"},
+		{Value: "elixir", Label: "Elixir"},
+		{Value: "nix", Label: "Nix"},
+	}, false)
+}
+
+templ helperDemo() {
+	@xess.FieldGroup(helperInner())
+}
+
+templ helperInner() {
+	@xess.Label("hint", "Username")
+	@xess.Input("hint", "user", xess.InputText, "", "", false)
+	@xess.HelperText(txt("Letters, numbers, and dashes. No spaces."))
+	@xess.ErrorText(txt("That username is already taken."))
+}
+
+// ============================================================================
+// Content layout
+// ============================================================================
+templ layoutSection() {
+	<section id="layout">
+		<h2>Content layout</h2>
+		<p>Prose wraps long-form text in a 65ch max-width column so your eyes aren't doing line-tennis across a 1440px display. Hero is the page-intro block with title, subtitle, and body slot (that's what the top of this page is). PageHeader is the leaner variant — title plus a meta row, meant for article pages. PostCard is for blog index pages, and PostMeta formats the date, author, reading-time, and tags row that sits under a post title.</p>
+		@example("PageHeader with PostMeta", pageHeaderSrc, pageHeaderDemo())
+		@example("PostCard", postCardSrc, postCardDemo())
+	</section>
+}
+
+templ pageHeaderDemo() {
+	@xess.PageHeader("Designing xess", pageHeaderMeta())
+}
+
+templ pageHeaderMeta() {
+	@xess.PostMeta("2026-04-24", "Xe Iaso", "5 min read", []string{"design-systems", "go", "templ"})
+}
+
+templ postCardDemo() {
+	@xess.PostCard(xess.PostCardProps{
+		Href:    "/posts/designing-xess",
+		Title:   "Designing xess",
+		Excerpt: "Why I keep re-solving the same typography questions, and how xess stops the loop.",
+		Date:    "2026-04-24",
+		Tags:    []string{"design-systems", "go", "templ"},
+		Hero:    "https://files.xeiaso.net/hero/santa-cruz-seals.webp",
+		HeroAlt: "Seals piled on a rock at Santa Cruz",
+	})
+}
+
+// ============================================================================
+// Feedback and overlays
+// ============================================================================
+templ feedbackSection() {
+	<section id="feedback">
+		<h2>Feedback &amp; overlays</h2>
+		<p>Toast for transient notifications, Modal for dialogs (using the native <code>&lt;dialog&gt;</code> element), Progress for long-running operations, Tooltip for hover hints. Modal and Toast both need JS to be actually useful — the design system gives you the styles and lets you wire the behavior yourself. I'm not shipping a framework, just opinions.</p>
+		@example("Toast — all four kinds", toastSrc, toastDemo())
+		@example("Modal opened by a trigger button", modalSrc, modalDemo())
+		@example("Progress", progressSrc, progressDemo())
+		@example("Tooltip", tooltipSrc, tooltipDemo())
+	</section>
+}
+
+templ toastDemo() {
+	<div class="stack">
+		@xess.Toast(xess.ToastInfo, "Heads up", p("The design system only uses two shadow sizes. Don't add a third."))
+		@xess.Toast(xess.ToastSuccess, "Saved", p("Your settings were persisted. For real this time."))
+		@xess.Toast(xess.ToastWarning, "Careful", p("That action will email every sponsor on file."))
+		@xess.Toast(xess.ToastDanger, "Something broke", p("Couldn't reach stickers.xeiaso.net. Avatars will 404 until it's back."))
+	</div>
+}
+
+templ modalDemo() {
+	<button type="button" class="xe-btn xe-btn--danger" data-modal-open="demo-modal">
+		Delete this post
+	</button>
+	@xess.Modal("demo-modal", "Delete this post?", false, modalBody())
+}
+
+templ modalBody() {
+	<p>Deleting a post is permanent. When you've linked to it from elsewhere, those links will 404. No amount of shouting at the backup will bring the post back once this finishes.</p>
+	<div class="cluster">
+		@xess.Button(xess.BtnDanger, "", txt("Delete forever"))
+		@xess.Button(xess.BtnGhost, "", txt("Cancel"))
+	</div>
+}
+
+templ progressDemo() {
+	@xess.Progress("0.64", "1", "Rebuilding search index")
+}
+
+templ tooltipDemo() {
+	<p>
+		Hover or focus the underlined term to see the tooltip:
+		@xess.Tooltip("Warm-neutral palette designed by Morhetz", txt("Gruvbox"))
+	</p>
+}
+
+// ============================================================================
+// Data display
+// ============================================================================
+templ dataSection() {
+	<section id="data">
+		<h2>Data display</h2>
+		<p>DefinitionList for term and description pairs, Stat for big-number portfolio blocks, Timeline for career pages, Table with a horizontal-scroll wrapper so wide tables don't break mobile. When you're reaching for these, you're probably building an <code>/about</code> page or an experience timeline, and that's fine — those pages exist.</p>
+		@example("Stats", statSrc, statDemo())
+		@example("Definition list", dlSrc, dlDemo())
+		@example("Timeline", timelineSrc, timelineDemo())
+		@example("Table", tableSrc, tableDemo())
+	</section>
+}
+
+templ statDemo() {
+	<div class="cluster">
+		@xess.Stat("47", "Components")
+		@xess.Stat("35", "Color tokens")
+		@xess.Stat("11", "Type scales")
+		@xess.Stat("1", "CSS file")
+	</div>
+}
+
+templ dlDemo() {
+	@xess.DefinitionList([]xess.Definition{
+		{Term: "Podkova", Description: "Serif typeface used for every heading. Weight 600."},
+		{Term: "Schibsted Grotesk", Description: "Variable sans-serif for body copy. 400 regular, 600 emphasis."},
+		{Term: "Iosevka Curly Iaso", Description: "Custom-cut monospace. Not bundled; falls back to ui-monospace."},
+	})
+}
+
+templ timelineDemo() {
+	@xess.Timeline([]xess.TimelineEvent{
+		{When: "2018", Title: "xeiaso.net v1", Body: p("Hugo-based. Blog posts in markdown. Looked like a 2018 tech blog.")},
+		{When: "2022", Title: "Switch to Lume", Body: p("Deno-based static site generation with JSX components. Conv and Picture were born.")},
+		{When: "2024", Title: "xess extracted", Body: p("Design language pulled out of the site as a reusable package.")},
+		{When: "2026", Title: "cmd/design.within.website", Body: p("The demo page you're reading right now.")},
+	})
+}
+
+templ tableDemo() {
+	@xess.Table(tableInner())
+}
+
+templ tableInner() {
+	<thead>
+		<tr>
+			<th>Token</th>
+			<th>Value</th>
+			<th>Used for</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td><code>--radius-xs</code></td>
+			<td>2px</td>
+			<td>Sticker avatar frames</td>
+		</tr>
+		<tr>
+			<td><code>--radius-sm</code></td>
+			<td>4px</td>
+			<td>Inline code</td>
+		</tr>
+		<tr>
+			<td><code>--radius-md</code></td>
+			<td>6px</td>
+			<td>Cards, details, pre, admonitions</td>
+		</tr>
+		<tr>
+			<td><code>--radius-lg</code></td>
+			<td>8px</td>
+			<td>Tags, blockquotes</td>
+		</tr>
+		<tr>
+			<td><code>--radius-xl</code></td>
+			<td>12px</td>
+			<td>Pill buttons</td>
+		</tr>
+	</tbody>
+}
+
+// ============================================================================
+// Demo-only styles
+// ============================================================================

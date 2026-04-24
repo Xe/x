@@ -1,0 +1,6 @@
+@xess.Timeline([]xess.TimelineEvent{
+    {When: "2018", Title: "xeiaso.net v1",  Body: p("Hugo-based...")},
+    {When: "2022", Title: "Switch to Lume", Body: p("Deno-based...")},
+    {When: "2024", Title: "xess extracted", Body: p("Design language...")},
+    {When: "2026", Title: "cmd/design.within.website", Body: p("The demo...")},
+})

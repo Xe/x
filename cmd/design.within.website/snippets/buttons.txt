@@ -1,0 +1,5 @@
+@xess.Button(xess.BtnPrimary,   "", txt("Sponsor me"))
+@xess.Button(xess.BtnSecondary, "", txt("Learn more"))
+@xess.Button(xess.BtnAccent,    "", txt("Subscribe"))
+@xess.Button(xess.BtnGhost,     "", txt("Dismiss"))
+@xess.Button(xess.BtnDanger,    "", txt("Delete"))

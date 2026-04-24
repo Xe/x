@@ -1,0 +1,409 @@
+package main
+
+import "within.website/x/xess"
+
+// ==================== Page skeleton ====================
+templ Index() {
+	@xess.SkipLink("#main", "Skip to main content")
+	<div id="main">
+		@xess.Prose(mainContent())
+	</div>
+}
+
+templ demoStyleLink() {
+	<link rel="stylesheet" href="/static/design.css"/>
+	<script src="/static/design.js" defer></script>
+}
+
+templ topNav() {
+	@xess.NavBar([]xess.NavLink{
+		{Href: "#colors", Label: "Colors"},
+		{Href: "#typography", Label: "Type"},
+		{Href: "#buttons", Label: "Buttons"},
+		{Href: "#cards", Label: "Cards"},
+		{Href: "#text-scale", Label: "Text"},
+		{Href: "#primitives", Label: "Primitives"},
+		{Href: "#admonitions", Label: "Admonitions"},
+		{Href: "#chat", Label: "Chat"},
+		{Href: "#sponsor", Label: "Sponsor"},
+		{Href: "#nav-demo", Label: "Nav"},
+		{Href: "#forms", Label: "Forms"},
+		{Href: "#layout", Label: "Layout"},
+		{Href: "#feedback", Label: "Feedback"},
+		{Href: "#data", Label: "Data"},
+	})
+}
+
+templ footer() {
+	@xess.Footer(footerBody())
+}
+
+templ footerBody() {
+	<p>xess lives in <a href="https://github.com/Xe/x/tree/master/xess">within.website/x/xess</a>. The stylesheet this page links in is at <a href="/.within.website/x/xess/xess.css">xess.css</a>.</p>
+	<p>Rendered by <code>cmd/design.within.website</code>. Source fold on every demo — copy, paste, ship.</p>
+}
+
+templ notFound() {
+	<p>No such page. This whole site is one scrollable demo — head <a href="/">back to the top</a>.</p>
+}
+
+// ==================== Shared helpers ====================
+templ txt(s string) {
+	{ s }
+}
+
+templ p(s string) {
+	<p>{ s }</p>
+}
+
+// example wraps a rendered component and its source in a demo card.
+templ example(label, source string, rendered templ.Component) {
+	<section class="demo">
+		<h4 class="demo__label">{ label }</h4>
+		<div class="demo__canvas">
+			@rendered
+		</div>
+		<details class="demo__source">
+			<summary>Source</summary>
+			<div class="demo__source-body">
+				<button class="copy-btn" type="button">Copy</button>
+				<pre><code>{ source }</code></pre>
+			</div>
+		</details>
+	</section>
+}
+
+// ==================== Intro ====================
+templ introBody() {
+	<p class="lead">The within.website design system — Gruvbox warmth, serif headlines, magenta-invert links, and one CSS file.</p>
+	<p>Welcome to xess, the design system I use for everything I ship on within.website. Gruvbox Pale palette, Podkova headlines, Schibsted Grotesk body, Iosevka Curly Iaso for code, and a box of <code>templ</code> components wired to a single stylesheet. This page is the living demo — every component rendered, every line of source one fold-open away.</p>
+	<p>I built it because I kept re-solving the same typography and color questions on every side project, and picking hex values at 2am is a special kind of cursed. Now I pick them once, commit them, and the rest of my life moves a little faster.</p>
+}
+
+// introBody intentionally omits a trailing `<hr/>` — every section h2 already
+// carries a top border that acts as the separator.
+
+// ==================== Main content dispatcher ====================
+templ mainContent() {
+	@introBody()
+	@colorsSection()
+	@typographySection()
+	@buttonsSection()
+	@cardsSection()
+	@textScaleSection()
+	@surfacesSection()
+	@primitivesSection()
+	@figureSection()
+	@admonitionsSection()
+	@chatSection()
+	@sponsorSection()
+	@linksIconsSection()
+	@navSection()
+	@formsSection()
+	@layoutSection()
+	@feedbackSection()
+	@dataSection()
+}
+
+// ==================== Colors ====================
+templ colorsSection() {
+	<section id="colors">
+		<h2>Colors</h2>
+		<p>Gruvbox makes me happy. The palette is warm — nothing in it is a true neutral, every &quot;gray&quot; is yellow-leaning beige, and every accent hue has a muted and a bright variant so light mode and dark mode can pick opposite ends of the ramp and stay balanced.</p>
+		<p>The one pair you&apos;ll see everywhere is the link magenta — <code>#b80050</code> in light mode, pink <code>#ffa8ce</code> in dark — inverting to cream-on-magenta on hover. Loud, a little weird, and the first thing visitors notice. I&apos;m never changing it.</p>
+		<h3>Surface &amp; foreground ramp</h3>
+		<div class="swatches">
+			@swatch("--bg-hard", "#f9f5d7")
+			@swatch("--bg-soft", "#f2e5bc")
+			@swatch("--bg-0", "#fbf1c7")
+			@swatch("--bg-1", "#ebdbb2")
+			@swatch("--bg-2", "#d5c4a1")
+			@swatch("--bg-3", "#bdae93")
+			@swatch("--bg-4", "#a89984")
+			@swatch("--fg-0", "#282828")
+			@swatch("--fg-1", "#3c3836")
+			@swatch("--fg-2", "#504945")
+			@swatch("--fg-3", "#665c54")
+			@swatch("--fg-4", "#7c6f64")
+		</div>
+		<h3>Accents (muted)</h3>
+		<div class="swatches">
+			@swatch("--red", "#9d0006")
+			@swatch("--green", "#79740e")
+			@swatch("--yellow", "#b57614")
+			@swatch("--blue", "#076678")
+			@swatch("--purple", "#8f3f71")
+			@swatch("--aqua", "#427b58")
+			@swatch("--orange", "#af3a03")
+		</div>
+		<h3>Accents (bright)</h3>
+		<div class="swatches">
+			@swatch("--red-bright", "#cc241d")
+			@swatch("--green-bright", "#98971a")
+			@swatch("--yellow-bright", "#d79921")
+			@swatch("--blue-bright", "#458588")
+			@swatch("--purple-bright", "#b16286")
+			@swatch("--aqua-bright", "#689d6a")
+			@swatch("--orange-bright", "#d65d0e")
+		</div>
+	</section>
+}
+
+templ swatch(name, hex string) {
+	<div class="swatch">
+		<div class="swatch__chip" style={ "background: " + hex }></div>
+		<div>
+			<div class="swatch__name">{ name }</div>
+			<div class="swatch__hex"><code>{ hex }</code></div>
+		</div>
+	</div>
+}
+
+// ==================== Typography ====================
+templ typographySection() {
+	<section id="typography">
+		<h2>Typography</h2>
+		<p>Podkova is a warm slab-ish serif that pairs with the cream surfaces like butter on toast. Schibsted Grotesk carries the body copy — variable weight, quietly modern, and it gets out of the way. Iosevka Curly Iaso is the mono, though that face is custom-cut and served from <code>files.xeiaso.net</code>; the fallback chain lands on <code>ui-monospace</code> when you just pull in the stylesheet.</p>
+		<p>Scale is 14/16/18/20/24/30/36/48 pixels. Line-height 1.55 for prose. <code>text-wrap: pretty</code> on both headings and paragraphs. That&apos;s the entire typography ruleset, and I&apos;d like to keep it that way.</p>
+		@example("Heading scale", typeSrc, typeDemo())
+		@example("Body, emphasis, code, and keyboard keys", typeBodySrc, typeBodyDemo())
+	</section>
+}
+
+templ typeDemo() {
+	<div class="type-scale">
+		<h1>Heading 1 — Podkova 36px</h1>
+		<h2>Heading 2 — 30px</h2>
+		<h3>Heading 3 — 24px</h3>
+		<h4>Heading 4 — 20px</h4>
+		<h5>Heading 5 — 18px</h5>
+		<h6>Heading 6 — tracked uppercase</h6>
+	</div>
+}
+
+templ typeBodyDemo() {
+	<p>Schibsted Grotesk at 16px with line-height 1.55. <strong>Emphasis</strong> uses weight 600. <em>Italics</em> are the matching italic face. Inline code looks like <code>http.ListenAndServe</code>. Hit <kbd class="xe-kbd">Ctrl</kbd> + <kbd class="xe-kbd">K</kbd> to feel something.</p>
+}
+
+// ==================== Buttons ====================
+templ buttonsSection() {
+	<section id="buttons">
+		<h2>Buttons</h2>
+		<p>Five variants: primary, secondary, accent, ghost, danger. They all pill-shaped, they all lift 1px on hover, and they all live in the same CSS class. Primary is orange because orange is the signature CTA — the one time I tried a blue-primary button the site felt like a SaaS product, and I hated it.</p>
+		<p>Danger uses muted red because the bright variant fails WCAG AA against white text — I learned that the slow way. Hover states darken by one ramp step. That&apos;s the entire motion vocabulary of this design system.</p>
+		@example("All five variants", buttonsSrc, buttonsDemo())
+		@example("Button as a link", buttonLinkSrc, buttonLinkDemo())
+	</section>
+}
+
+templ buttonsDemo() {
+	<div class="cluster">
+		@xess.Button(xess.BtnPrimary, "", txt("Sponsor me"))
+		@xess.Button(xess.BtnSecondary, "", txt("Learn more"))
+		@xess.Button(xess.BtnAccent, "", txt("Subscribe"))
+		@xess.Button(xess.BtnGhost, "", txt("Dismiss"))
+		@xess.Button(xess.BtnDanger, "", txt("Delete"))
+	</div>
+}
+
+templ buttonLinkDemo() {
+	@xess.Button(xess.BtnPrimary, "https://xeiaso.net", txt("Go to xeiaso.net"))
+}
+
+// ==================== Cards, tags, badges ====================
+templ cardsSection() {
+	<section id="cards">
+		<h2>Cards, tags, badges</h2>
+		<p>Cards use the <code>bg-2</code> surface with a hairline border and a 6px radius. Tags are pill-shaped chips for post taxonomies or keyword lists — they inherit text color and shouldn&apos;t be expected to carry semantics. Badges are tags with <em>meaning</em> bolted on: info, success, warning, danger, plus a neutral default.</p>
+		@example("Card with content", cardSrc, cardDemo())
+		@example("TagList", tagListSrc, tagListDemo())
+		@example("Badges across all kinds", badgesSrc, badgesDemo())
+	</section>
+}
+
+templ cardDemo() {
+	@xess.Card(cardInner())
+}
+
+templ cardInner() {
+	<h3>The card</h3>
+	<p>It&apos;s a box with a warm surface and a hairline border. Use it for anything that deserves a lift off the page but shouldn&apos;t shout about it.</p>
+}
+
+templ tagListDemo() {
+	@xess.TagList([]string{"go", "templ", "gruvbox", "design-systems", "minimalism"})
+}
+
+templ badgesDemo() {
+	<div class="cluster">
+		@xess.Badge(xess.BadgeNeutral, txt("neutral"))
+		@xess.Badge(xess.BadgeInfo, txt("info"))
+		@xess.Badge(xess.BadgeSuccess, txt("success"))
+		@xess.Badge(xess.BadgeTip, txt("tip"))
+		@xess.Badge(xess.BadgeNote, txt("note"))
+		@xess.Badge(xess.BadgeWarning, txt("warning"))
+		@xess.Badge(xess.BadgeDanger, txt("danger"))
+	</div>
+}
+
+// ==================== Text scale ====================
+templ textScaleSection() {
+	<section id="text-scale">
+		<h2>Text scale</h2>
+		<p><code>TextStrong</code>, <code>TextSubtle</code>, <code>TextMuted</code>, <code>TextCaption</code>. These map to <code>fg-0</code>, <code>fg-2</code>, <code>fg-3</code>, <code>fg-4</code>. The scale exists because sometimes you need to step text down without leaning on <code>&lt;small&gt;</code> or rolling your own opacity, which nine times out of ten becomes technical debt before the week is out.</p>
+		@example("Four levels of text", textScaleSrc, textScaleDemo())
+	</section>
+}
+
+templ textScaleDemo() {
+	<p>
+		@xess.TextStrong(txt("Strong text sits on fg-0 with weight 600."))
+	</p>
+	<p>
+		@xess.TextSubtle(txt("Subtle text steps down to fg-2 — still comfortably readable."))
+	</p>
+	<p>
+		@xess.TextMuted(txt("Muted text runs at fg-3 with a smaller step — footnotes, meta."))
+	</p>
+	<p>
+		@xess.TextCaption(txt("Caption text is the lowest contrast — fg-4, still AA compliant on cream."))
+	</p>
+}
+
+// ==================== Surfaces ====================
+templ surfacesSection() {
+	<section id="surfaces">
+		<h2>Surfaces &amp; dividers</h2>
+		<p><code>SurfaceRaised</code> bumps a block up to <code>bg-0</code>, useful when a key section of a longer page wants a visible lift. <code>DividerStrong</code> is a 2px rule; <code>BorderHairline</code> is a 1px rule. That&apos;s all the <em>division of content</em> you get, on purpose — the rest of the page rhythm is whitespace and type.</p>
+		@example("Raised surface", surfaceSrc, surfaceDemo())
+		@example("Dividers", dividersSrc, dividersDemo())
+	</section>
+}
+
+templ surfaceDemo() {
+	@xess.SurfaceRaised(surfaceInner())
+}
+
+templ surfaceInner() {
+	<p>A raised panel for when a section of the page really wants your attention but you don&apos;t want to reach for a Card.</p>
+}
+
+templ dividersDemo() {
+	<p>Above the strong divider.</p>
+	@xess.DividerStrong()
+	<p>Between divs.</p>
+	@xess.BorderHairline()
+	<p>Below the hairline.</p>
+}
+
+// ==================== Content primitives ====================
+templ primitivesSection() {
+	<section id="primitives">
+		<h2>Content primitives</h2>
+		<p>Blockquote prefixes with a literal <code>&gt;</code> because email-style quoting feels right on a blog. PullQuote is the one block allowed to have a colored left bar. Pre is <code>&lt;pre&gt;</code> styled like a Gruvbox terminal. CodeInline is the little chip. Kbd looks like a keyboard key. Mark highlights with the purple-bright swatch — the same swatch your browser uses for selection.</p>
+		@example("Blockquote", quoteSrc, quoteDemo())
+		@example("Pullquote", pullSrc, pullDemo())
+		@example("Pre and CodeInline", preSrc, preDemo())
+		@example("Details fold", detailsSrc, detailsDemo())
+		@example("Mark and Kbd", markKbdSrc, markKbdDemo())
+	</section>
+}
+
+templ quoteDemo() {
+	@xess.Blockquote(txt("The best way to keep a secret is not to write it down. The second best way is to write it down in markdown and hide it in a gigantic static site."))
+}
+
+templ pullDemo() {
+	@xess.Pullquote(txt("Good design systems feel inevitable. Every decision reads as if it could not have been otherwise, even when that&rsquo;s a lie we tell in retrospect."))
+}
+
+templ preDemo() {
+	<p>Inline code like @xess.CodeInline(txt("go tool templ generate")) sits in the flow. Block code gets its own tile:</p>
+	@xess.Pre(txt("go get within.website/x/xess\n// then in your templates:\n@xess.Button(xess.BtnPrimary, \"\", txt(\"Hi\"))"))
+}
+
+templ detailsDemo() {
+	@xess.Details("Tap to reveal the long code block", detailsBody())
+}
+
+templ detailsBody() {
+	@xess.Pre(txt("// the kind of thing you don't want inlined above the fold\nfunc main() {\n    internal.HandleStartup()\n    // ...\n}"))
+}
+
+templ markKbdDemo() {
+	<p>
+		Highlight something
+		@xess.Mark(txt("important"))
+		inline.
+	</p>
+	<p>
+		Show a shortcut like
+		@xess.Kbd(txt("Ctrl"))
+		+
+		@xess.Kbd(txt("Shift"))
+		+
+		@xess.Kbd(txt("P"))
+	</p>
+}
+
+// ==================== Figure ====================
+templ figureSection() {
+	<section id="figure">
+		<h2>Figure</h2>
+		<p>Responsive <code>&lt;picture&gt;</code> with AVIF/WebP/JPG fallbacks and <code>loading=&quot;lazy&quot;</code>. Caption is italic, muted, centered. Figure is the one place on the site where imagery is allowed to go full-bleed, and the caption uses the same muted tone as all other meta text so it reads as supplementary.</p>
+		@example("Figure with caption", figureSrc, figureDemo())
+	</section>
+}
+
+templ figureDemo() {
+	@xess.Figure(
+		"",
+		"",
+		"https://stickers.xeiaso.net/sticker/cadey/aha",
+		"Cadey, having an &quot;aha&quot; moment",
+		figureCap(),
+	)
+}
+
+templ figureCap() {
+	<em>Figure 1. Cadey realising the stickers render through the Figure component too.</em>
+}
+
+// ==================== Admonitions ====================
+templ admonitionsSection() {
+	<section id="admonitions">
+		<h2>Admonitions</h2>
+		<p>Six flavors: info, warning, tip, note, danger, success. Each gets a colored left rule and a little accent dot next to the title. The body text stays on <code>fg-1</code> because colored body text on a warm surface is a contrast nightmare, and I&apos;d rather have the hue on the rule than pretend yellow text on cream is legible.</p>
+		<p>These exist because long-form posts sometimes need to say &quot;look, here is the caveat&quot; louder than regular prose can. Danger is reserved for <em>actual</em> danger — not &quot;this might surprise you&quot; but &quot;this will delete your data.&quot; Don&apos;t burn the signal.</p>
+		@example("Info", admonInfoSrc, admonInfoDemo())
+		@example("Warning", admonWarnSrc, admonWarnDemo())
+		@example("Tip", admonTipSrc, admonTipDemo())
+		@example("Note", admonNoteSrc, admonNoteDemo())
+		@example("Danger", admonDangerSrc, admonDangerDemo())
+		@example("Success", admonSuccessSrc, admonSuccessDemo())
+	</section>
+}
+
+templ admonInfoDemo() {
+	@xess.Admonition(xess.AdmonitionInfo, "Info", p("The link magenta hover is load-bearing. Don't override a:hover — it breaks visual identity."))
+}
+
+templ admonWarnDemo() {
+	@xess.Admonition(xess.AdmonitionWarning, "Warning", p("The Iosevka Curly Iaso mono face is not bundled with xess — it's served from files.xeiaso.net. If that's offline, code blocks fall back to ui-monospace."))
+}
+
+templ admonTipDemo() {
+	@xess.Admonition(xess.AdmonitionTip, "Tip", p("Prefer the muted accent variants for solid backgrounds with white text — bright variants tend to fail WCAG AA."))
+}
+
+templ admonNoteDemo() {
+	@xess.Admonition(xess.AdmonitionNote, "Note", p("The only decorative gradient in xess is the SponsorCard top rule: 2px, orange-bright → purple-bright. Nowhere else."))
+}
+
+templ admonDangerDemo() {
+	@xess.Admonition(xess.AdmonitionDanger, "Danger", p("Don't use left-border accent cards. Only PullQuote and admonitions carry a left rule, and both are intentional signals."))
+}
+
+templ admonSuccessDemo() {
+	@xess.Admonition(xess.AdmonitionSuccess, "Success", p("If your prose fits in 65 characters per line and your headings are Podkova 600, you're already on-brand."))
+}

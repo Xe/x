@@ -1,0 +1,2 @@
+@xess.Mark(txt("important"))
+@xess.Kbd(txt("Ctrl")) + @xess.Kbd(txt("Shift")) + @xess.Kbd(txt("P"))
