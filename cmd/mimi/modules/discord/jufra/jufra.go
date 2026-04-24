@@ -10,15 +10,12 @@ import (
 	"encoding/json"
 	"flag"
 	"log/slog"
-	"net/http"
 	"strings"
 	"sync"
 	"time"
 
-	"connectrpc.com/connect"
 	"github.com/bwmarrin/discordgo"
 	"within.website/x/cmd/mimi/internal"
-	falinconnect "within.website/x/migroserbices/falin/gen/genconnect"
 	"within.website/x/web/ollama"
 	"within.website/x/web/ollama/llamaguard"
 	"within.website/x/web/openai/chatgpt"
@@ -46,8 +43,6 @@ var (
 	mimiModel         = flag.String("jufra-mimi-model", "hermes3", "ollama model tag for mimi")
 	mimiNames         = flag.String("jufra-mimi-names", "mimi", "comma-separated list of names for mimi")
 	disableLlamaguard = flag.Bool("jufra-unsafe-disable-llamaguard", true, "disable llamaguard")
-	falinHost         = flag.String("jufra-falin-host", "http://localhost:8080", "host for  falin")
-	falinModel        = flag.String("jufra-falin-model", "fal-ai/flux-pro/v1.1", "model to use for Falin generations")
 	contextWindow     = flag.Int("jufra-context-window", 32768, "context window size for mimi")
 
 	//go:embed system-prompt.txt
@@ -59,7 +54,6 @@ type Module struct {
 	cli    chatgpt.Client
 	ollama *ollama.Client
 	lg     *ollama.Client
-	falin  falinconnect.ImageServiceClient
 
 	convHistory map[string]state
 	lock        sync.Mutex
@@ -76,7 +70,6 @@ func New(sess *discordgo.Session) *Module {
 		cli:         chatgpt.NewClient("").WithBaseURL(internal.OllamaHost()),
 		ollama:      internal.OllamaClient(),
 		lg:          ollama.NewClient(*llamaGuardHost),
-		falin:       falinconnect.NewImageServiceClient(http.DefaultClient, *falinHost, connect.WithProtoJSON()),
 		convHistory: make(map[string]state),
 	}
 
@@ -296,36 +289,6 @@ func (m *Module) messageCreate(s *discordgo.Session, mc *discordgo.MessageCreate
 				if err != nil {
 					slog.Error("error running python code", "err", err, "message_id", mc.ID, "channel_id", mc.ChannelID)
 					s.ChannelMessageSend(mc.ChannelID, "error running python code")
-					return
-				}
-
-				conv = append(conv, *msg)
-
-				resp, err = m.ollama.Chat(context.Background(), &ollama.CompleteRequest{
-					Model:    *mimiModel,
-					Messages: conv,
-					Options: map[string]any{
-						"num_ctx": *contextWindow,
-					},
-					Tools: m.getTools(),
-				})
-				if err != nil {
-					slog.Error("error chatting", "err", err, "message_id", mc.ID, "channel_id", mc.ChannelID)
-					s.ChannelMessageSend(mc.ChannelID, "error chatting")
-					return
-				}
-
-				conv = append(conv, resp.Message)
-
-			case "draw_image":
-				slog.Info("got draw_image tool call", "message_id", mc.ID, "channel_id", mc.ChannelID, "tc", tc)
-
-				m.sess.MessageReactionAdd(mc.ChannelID, mc.ID, "🖍️")
-
-				msg, err := m.drawImage(context.Background(), tc.Function, mc.ChannelID)
-				if err != nil {
-					slog.Error("error drawing image", "err", err, "message_id", mc.ID, "channel_id", mc.ChannelID)
-					s.ChannelMessageSend(mc.ChannelID, "error drawing image")
 					return
 				}
 

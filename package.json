@@ -10,7 +10,6 @@
     "format": "go tool goimports -w . && npx prettier -w . 2>&1 >/dev/null && buf format -w",
     "generate": "npm run generate:buf && npm run generate:go && npm run format",
     "generate:buf": "buf generate",
-    "generate:buf:falin": "cd migroserbices/falin && npm ci --force && npm run generate",
     "generate:go": "go generate ./...",
     "test": "npm run generate && go test ./...",
     "prepare": "husky"
