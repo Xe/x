@@ -1,0 +1,12 @@
+apiVersion: x.within.website/v1
+kind: App
+metadata:
+  name: design-demo
+
+spec:
+  image: ghcr.io/xe/x/design.within.website:latest
+  autoUpdate: true
+
+  ingress:
+    enabled: true
+    host: design.within.website
