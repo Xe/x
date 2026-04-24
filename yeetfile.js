@@ -5,6 +5,7 @@ yeet.setenv("VERSION", git.tag());
 programs = [
   "aerial",
   "amano",
+  "design.within.website",
   "future-sight",
   "httpdebug",
   "quickserv",
