@@ -1,0 +1,201 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: xe-x-build-test
+  namespace: ci
+
+spec:
+  description: |
+    The build and deploy process for /x/ including Go tests and linting.
+  params:
+    - name: repo-url
+      type: string
+      description: "Git repo to clone"
+      default: "https://tangled.org/did:plc:a444mvmjo4b5qfm3zfspmsyn"
+    - name: "branch"
+      type: string
+      description: "Git branch to operate against"
+    - name: "commit"
+      type: string
+      description: "Git revision to check out"
+    - name: "actor"
+      type: string
+      description: "Tangled actor"
+    - name: docker-image-base
+      type: string
+      description: string prefix for production docker images
+      default: "registry.int.xeserv.us/xe/x"
+    - name: docker-image-cache
+      type: string
+      description: string prefix for cache docker repos
+      default: "registry.int.xeserv.us/xe/x"
+  workspaces:
+    - name: repo
+      description: |
+        Cloned repo files.
+    - name: dockerconfig-ghcr
+      description: |
+        Docker config for pushing images to ghcr.io
+  tasks:
+    - name: fix-permissions
+      taskRef:
+        name: fix-permissions
+      workspaces:
+        - name: dir
+          workspace: repo
+    - name: clone-repo
+      runAfter: ["fix-permissions"]
+      taskRef:
+        name: git-clone-naive
+      workspaces:
+        - name: output
+          workspace: repo
+      params:
+        - name: url
+          value: $(params.repo-url)
+        - name: revision
+          value: $(params.commit)
+    - name: ko-build
+      runAfter: ["clone-repo"]
+      taskRef:
+        name: ko
+      workspaces:
+        - name: source
+          workspace: repo
+        - name: dockerconfig
+          workspace: dockerconfig-ghcr
+      params:
+        - name: VERSION
+          value: $(tasks.clone-repo.results.version)
+        - name: SOURCE_DATE_EPOCH
+          value: $(tasks.clone-repo.results.source-date-epoch)
+        - name: KO_DOCKER_REPO
+          value: $(params.docker-image-base)
+        - name: extra-args
+          value:
+            [
+              "--platform=all",
+              "--base-import-paths",
+              "--tags=latest,$(tasks.clone-repo.results.version),$(params.commit)",
+              "--image-label=org.tangled.actor=$(params.actor)",
+            ]
+        - name: packages
+          value:
+            [
+              "./cmd/aerial",
+              "./cmd/amano",
+              "./cmd/design.within.website",
+              "./cmd/future-sight",
+              "./cmd/httpdebug",
+              "./cmd/python-wasm-mcp",
+              "./cmd/quickserv",
+              "./cmd/relayd",
+              "./cmd/reverseproxyd",
+              "./cmd/reviewbot",
+              "./cmd/sakurajima",
+              "./cmd/sapientwindex",
+              "./cmd/stickers",
+              "./cmd/todayinmarch2020",
+              "./cmd/uncle-ted",
+              "./cmd/within.website",
+            ]
+    - name: x-git
+      runAfter: ["clone-repo"]
+      taskRef:
+        name: kaniko
+      workspaces:
+        - name: source
+          workspace: repo
+        - name: dockerconfig
+          workspace: dockerconfig-ghcr
+      params:
+        - name: IMAGE
+          value: $(params.docker-image-base)/git
+        - name: DOCKERFILE
+          value: docker/git.Dockerfile
+        - name: EXTRA_ARGS
+          value:
+            [
+              "--cache",
+              "--cache-copy-layers",
+              "--cache-run-layers",
+              "--cache-repo=$(params.docker-image-cache)/cache",
+              "--label=org.tangled.actor=$(params.actor)",
+              "--snapshot-mode=redo",
+              "--use-new-run",
+            ]
+    - name: x-aura
+      runAfter: ["clone-repo"]
+      taskRef:
+        name: kaniko
+      workspaces:
+        - name: source
+          workspace: repo
+        - name: dockerconfig
+          workspace: dockerconfig-ghcr
+      params:
+        - name: IMAGE
+          value: $(params.docker-image-base)/aura
+        - name: DOCKERFILE
+          value: docker/aura.Dockerfile
+        - name: EXTRA_ARGS
+          value:
+            [
+              "--cache",
+              "--cache-copy-layers",
+              "--cache-run-layers",
+              "--cache-repo=$(params.docker-image-cache)/cache",
+              "--label=org.tangled.actor=$(params.actor)",
+              "--snapshot-mode=redo",
+              "--use-new-run",
+            ]
+    - name: x-mi
+      runAfter: ["clone-repo"]
+      taskRef:
+        name: kaniko
+      workspaces:
+        - name: source
+          workspace: repo
+        - name: dockerconfig
+          workspace: dockerconfig-ghcr
+      params:
+        - name: IMAGE
+          value: $(params.docker-image-base)/mi
+        - name: DOCKERFILE
+          value: docker/mi.Dockerfile
+        - name: EXTRA_ARGS
+          value:
+            [
+              "--cache",
+              "--cache-copy-layers",
+              "--cache-run-layers",
+              "--cache-repo=$(params.docker-image-cache)/cache",
+              "--label=org.tangled.actor=$(params.actor)",
+              "--snapshot-mode=redo",
+              "--use-new-run",
+            ]
+    - name: x-mimi
+      runAfter: ["clone-repo"]
+      taskRef:
+        name: kaniko
+      workspaces:
+        - name: source
+          workspace: repo
+        - name: dockerconfig
+          workspace: dockerconfig-ghcr
+      params:
+        - name: IMAGE
+          value: $(params.docker-image-base)/mimi
+        - name: DOCKERFILE
+          value: docker/mimi.Dockerfile
+        - name: EXTRA_ARGS
+          value:
+            [
+              "--cache",
+              "--cache-copy-layers",
+              "--cache-run-layers",
+              "--cache-repo=$(params.docker-image-cache)/cache",
+              "--label=org.tangled.actor=$(params.actor)",
+              "--snapshot-mode=redo",
+              "--use-new-run",
+            ]

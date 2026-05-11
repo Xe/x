@@ -9,8 +9,6 @@ builds:
     main: ./cmd/reverseproxyd
     ldflags:
       - -s -w
-      - -extldflags "-static"
-      - -X within.website/x.Version={{.Env.VERSION}}
   - <<: *base
     id: relayd
     main: ./cmd/relayd

@@ -22,7 +22,6 @@ RUN --mount=type=cache,target=/root/.cache \
   CGO_ENABLED=0 \
   go build \
   -o /app/bin/sakurajima \
-  -ldflags "-s -w -extldflags -static -X within.website/x.Version=$(git describe --tags --always --dirty)" \
   ./cmd/sakurajima
 
 FROM alpine:${ALPINE_VERSION} AS run

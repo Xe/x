@@ -1,0 +1,4 @@
+namespace: ci
+
+resources:
+  - x.yaml

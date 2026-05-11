@@ -5,7 +5,7 @@ COPY go.mod go.sum ./
 RUN go mod download
 
 COPY . .
-RUN --mount=type=cache,target=/root/.cache GOBIN=/app/bin go install -ldflags="-X within.website/x.Version=$(git describe --tags --always --dirty)" ./cmd/mimi
+RUN --mount=type=cache,target=/root/.cache GOBIN=/app/bin go install ./cmd/mimi
 
 FROM debian:bookworm AS runtime
 

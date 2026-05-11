@@ -9,8 +9,7 @@ RUN go mod download
 COPY . .
 RUN --mount=type=cache,target=/root/.cache \
     GOBIN=/app/bin \
-    go install -ldflags="-X within.website/x.Version=$(git describe --tags --always --dirty)" \
-    ./cmd/python-wasm-mcp
+    go install ./cmd/python-wasm-mcp
 
 FROM debian:bookworm AS runtime
 WORKDIR /app
