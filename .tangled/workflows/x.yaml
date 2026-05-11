@@ -1,0 +1,18 @@
+when:
+  - event: ["push"]
+    branch: ["main"]
+
+engine: tack
+
+tack:
+  tekton:
+    pipeline: xe-x-build-test
+    service_account: xe-site-ci
+    workspaces:
+      - name: repo-data
+        access_modes: ["ReadWriteOnce"]
+        storage: 4Gi
+      - name: go-mod-cache
+        pvc: go-mod-cache
+      - name: dockerconfig-ghcr
+        secret: ghcr
