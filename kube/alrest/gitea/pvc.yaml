@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: gitea-2-return-of-samus
+  name: gitea
 spec:
   accessModes:
     - ReadWriteOnce

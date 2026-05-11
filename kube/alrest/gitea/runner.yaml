@@ -60,6 +60,10 @@ spec:
                 secretKeyRef:
                   name: runner-secret
                   key: token
+            - name: GITEA_RUNNER_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
           securityContext:
             privileged: true
             runAsUser: 0

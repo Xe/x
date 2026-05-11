@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gitea-custom
+data:
+  robots.txt: |
+    User-agent: *
+    Disallow: /
+  # "templates/custom/header.tmpl": |
+  #   <meta name="robots" content="noindex" />

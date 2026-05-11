@@ -1,0 +1,13 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: gitea-db
+  namespace: gitea
+spec:
+  instances: 2
+
+  superuserSecret:
+    name: gitea-db-superuser
+
+  storage:
+    size: 64Gi

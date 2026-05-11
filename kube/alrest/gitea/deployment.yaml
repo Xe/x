@@ -1,37 +1,3 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: "gitea"
-data:
-  USER: git
-  USER_UID: "1000"
-  USER_GID: "1000"
-
-  GITEA__DEFAULT__APP_NAME: "Xeserv internal git"
-  GITEA__storage__STORAGE_TYPE: minio
-  #GITEA__storage__STORAGE_TYPE: local
-  GITEA__storage__SERVE_DIRECT: "false"
-  GITEA__storage__MINIO_ENDPOINT: minio.xeserv.us
-  GITEA__storage__MINIO_BUCKET: gitea
-  GITEA__storage__MINIO_LOCATION: auto
-  GITEA__storage__MINIO_USE_SSL: "true"
-  GITEA__service__DISABLE_REGISTRATION: "false"
-  GITEA__service__REGISTER_MANUAL_CONFIRM: "true"
-  GITEA__service__ALLOW_ONLY_EXTERNAL_REGISTRATION: "true"
-  GITEA__server__SSH_DOMAIN: "git.gitea.svc.alrest.xeserv.us"
-  GITEA__service.explore__REQUIRE_SIGNIN_VIEW: "true"
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: gitea-custom
-data:
-  robots.txt: |
-    User-agent: *
-    Disallow: /
-  # "templates/custom/header.tmpl": |
-  #   <meta name="robots" content="noindex" />
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -61,10 +27,10 @@ spec:
       volumes:
         - name: data
           persistentVolumeClaim:
-            claimName: gitea-2-return-of-samus
-        - name: internal-certs
-          secret:
-            secretName: gitea-internal-tls
+            claimName: gitea
+        # - name: internal-certs
+        #   secret:
+        #     secretName: gitea-internal-tls
         - name: custom
           configMap:
             name: gitea-custom
@@ -75,7 +41,7 @@ spec:
           configMap:
             name: botstopper-custom-css
       containers:
-        - name: main
+        - name: gitea
           image: gitea/gitea:1-rootless
           imagePullPolicy: Always
           resources:
@@ -125,35 +91,35 @@ spec:
             periodSeconds: 10
             successThreshold: 1
             failureThreshold: 10
-        - name: relayd
-          image: ghcr.io/xe/x/relayd:latest
-          imagePullPolicy: "Always"
-          resources:
-            limits:
-              cpu: "500m"
-              memory: "512Mi"
-            requests:
-              cpu: "100m"
-              memory: "256Mi"
-          securityContext:
-            runAsUser: 1000
-            runAsGroup: 1000
-            runAsNonRoot: true
-            allowPrivilegeEscalation: false
-            capabilities:
-              drop:
-                - ALL
-            seccompProfile:
-              type: RuntimeDefault
-          env:
-            - name: BIND
-              value: ":8443"
-            - name: PROXY_TO
-              value: "http://localhost:3000"
-          volumeMounts:
-            - name: "internal-certs"
-              mountPath: "/xe/pki"
-              readOnly: true
+        # - name: relayd
+        #   image: ghcr.io/xe/x/relayd:latest
+        #   imagePullPolicy: "Always"
+        #   resources:
+        #     limits:
+        #       cpu: "500m"
+        #       memory: "512Mi"
+        #     requests:
+        #       cpu: "100m"
+        #       memory: "256Mi"
+        #   securityContext:
+        #     runAsUser: 1000
+        #     runAsGroup: 1000
+        #     runAsNonRoot: true
+        #     allowPrivilegeEscalation: false
+        #     capabilities:
+        #       drop:
+        #         - ALL
+        #     seccompProfile:
+        #       type: RuntimeDefault
+        #   env:
+        #     - name: BIND
+        #       value: ":8443"
+        #     - name: PROXY_TO
+        #       value: "http://localhost:3000"
+        #   volumeMounts:
+        #     - name: "internal-certs"
+        #       mountPath: "/xe/pki"
+        #       readOnly: true
         - name: anubis
           image: ghcr.io/techarohq/anubis:latest
           #image: registry.int.xeserv.us/techaro/botstopper/anubis:latest

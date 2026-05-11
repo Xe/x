@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "gitea"
+data:
+  USER: git
+  USER_UID: "1000"
+  USER_GID: "1000"
+
+  GITEA__DEFAULT__APP_NAME: "Xeserv internal git"
+  GITEA__storage__STORAGE_TYPE: minio
+  #GITEA__storage__STORAGE_TYPE: local
+  GITEA__storage__SERVE_DIRECT: "false"
+  GITEA__storage__MINIO_ENDPOINT: t3.storage.dev
+  GITEA__storage__MINIO_BUCKET: xe-alrest-gitea
+  GITEA__storage__MINIO_LOCATION: auto
+  GITEA__storage__MINIO_USE_SSL: "true"
+  GITEA__service__DISABLE_REGISTRATION: "false"
+  GITEA__service__REGISTER_MANUAL_CONFIRM: "true"
+  GITEA__service__ALLOW_ONLY_EXTERNAL_REGISTRATION: "true"
+  GITEA__server__SSH_DOMAIN: "git.gitea.svc.alrest.xeserv.us"
+  GITEA__service.explore__REQUIRE_SIGNIN_VIEW: "true"

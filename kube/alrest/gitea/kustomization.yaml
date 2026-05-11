@@ -1,14 +1,18 @@
 resources:
   - namespace.yaml
-  - pvc.yaml
   - 1password.yaml
+  - cnpg.yaml
+  - gitea-config.yaml
+  - gitea-custom-files.yaml
   - deployment.yaml
   - onionservice.yaml
   - service.yaml
   - runner.yaml
   #- external-dns.yaml
   - ingress.yaml
-  - valkey.yaml
+  - valkey-anubis.yaml
+  - valkey-gitea.yaml
+  - pvc.yaml
 namespace: gitea
 
 configMapGenerator:
