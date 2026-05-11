@@ -7,9 +7,9 @@ engine: tack
 tack:
   tekton:
     pipeline: xe-x-build-test
-    service_account: xe-site-ci
+    service_account: default
     workspaces:
-      - name: repo-data
+      - name: repo
         access_modes: ["ReadWriteOnce"]
         storage: 4Gi
       - name: go-mod-cache
