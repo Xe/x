@@ -33,7 +33,7 @@
     "@semantic-release/exec": "^7.1.0",
     "@semantic-release/git": "^10.0.1",
     "@semantic-release/github": "^12.0.8",
-    "@semantic-release/release-notes-generator": "^14.1.0",
+    "@semantic-release/release-notes-generator": "^14.1.1",
     "@tailwindcss/cli": "^4.2.4",
     "husky": "^9.1.7",
     "lint-staged": "^17.0.2",
