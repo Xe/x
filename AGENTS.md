@@ -37,15 +37,6 @@ Follow **Conventional Commits**:
 - Reference issues/PRs in the footer when applicable.
 - All commits require `--signoff`.
 
-## AI Attribution
-
-AI-generated commits must include these footers:
-
-```text
-Assisted-by: [Model Name] via [Tool Name]
-Reviewbot-request: yes
-```
-
 ## Guidelines
 
 - [Code Style](.claude/code-style.md)
