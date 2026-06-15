@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lurker
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: lurker
+  template:
+    metadata:
+      labels:
+        app: lurker
+    spec:
+      securityContext:
+        fsGroup: 1000
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: lurker
+      containers:
+        - name: main
+          image: ghcr.io/amiantos/lurker:latest
+          imagePullPolicy: Always
+          envFrom:
+            - configMapRef:
+                name: lurker
+          resources:
+            limits:
+              memory: "512Mi"
+              cpu: "1"
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+          ports:
+            - containerPort: 8015
+              name: http
+          volumeMounts:
+            - name: data
+              mountPath: /app/data
