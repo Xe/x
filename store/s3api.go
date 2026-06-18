@@ -7,19 +7,15 @@ import (
 	"io"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
-	awsConfig "github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
+	storage "github.com/tigrisdata/storage-go"
 )
 
 func NewS3API(ctx context.Context, bucket string) (Interface, error) {
-	cfg, err := awsConfig.LoadDefaultConfig(ctx)
+	client, err := storage.New(ctx, storage.WithGlobalEndpoint())
 	if err != nil {
-		return nil, fmt.Errorf("can't load AWS config from environment: %w", err)
+		return nil, fmt.Errorf("can't create Tigris client: %w", err)
 	}
-
-	client := s3.NewFromConfig(cfg, func(o *s3.Options) {
-		o.UsePathStyle = false // Tigris needs vhost style
-	})
 
 	return &S3API{
 		s3:     client,
@@ -28,7 +24,7 @@ func NewS3API(ctx context.Context, bucket string) (Interface, error) {
 }
 
 type S3API struct {
-	s3     *s3.Client
+	s3     *storage.Client
 	bucket string
 }
 

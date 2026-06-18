@@ -10,9 +10,9 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
-	awsConfig "github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/google/uuid"
+	storage "github.com/tigrisdata/storage-go"
 	"within.website/x/bundler"
 	relayd "within.website/x/gen/within/website/x/relayd/v1"
 )
@@ -20,7 +20,6 @@ import (
 var (
 	telemetryEnable          = flag.Bool("telemetry-enable", false, "if true, enable request telemetry bundling to object storage")
 	telemetryBucket          = flag.String("telemetry-bucket", "relayd-logs", "object storage bucket to dump logs to")
-	telemetryPathStyle       = flag.Bool("telemetry-path-style", false, "if true, use s3 path style")
 	telemetryHost            = flag.String("telemetry-host", "", "hostname to disambiguate telemetry")
 	telemetryBundleCount     = flag.Int("telemetry-bundle-count", 512, "maximum number of items per telemetry bundle")
 	telemetryContextDeadline = flag.Duration("telemetry-context-deadline", time.Minute, "maximum time for the telemetry context deadline")
@@ -28,7 +27,7 @@ var (
 
 type TelemetrySink struct {
 	sink *bundler.Bundler[*relayd.RequestLog]
-	s3c  *s3.Client
+	s3c  *storage.Client
 	host string
 }
 
@@ -39,14 +38,10 @@ func NewTelemetrySink(ctx context.Context) (*TelemetrySink, error) {
 
 	slog.Info("telemetry enabled")
 
-	cfg, err := awsConfig.LoadDefaultConfig(ctx)
+	s3c, err := storage.New(ctx, storage.WithGlobalEndpoint(), storage.WithPathStyle(true))
 	if err != nil {
 		return nil, err
 	}
-
-	s3c := s3.NewFromConfig(cfg, func(o *s3.Options) {
-		o.UsePathStyle = true
-	})
 
 	result := &TelemetrySink{
 		s3c:  s3c,
