@@ -29,11 +29,11 @@ spec:
                 name: lurker
           resources:
             limits:
-              memory: "512Mi"
-              cpu: "1"
+              memory: "2Gi"
+              cpu: "2"
             requests:
-              memory: "128Mi"
-              cpu: "100m"
+              memory: "512Mi"
+              cpu: "500m"
           ports:
             - containerPort: 8015
               name: http

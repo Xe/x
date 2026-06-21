@@ -3,6 +3,7 @@ resources:
   - games
   - gitea
   - glance
+  - lurker
   - minio
   - ollama
   - pocket-id

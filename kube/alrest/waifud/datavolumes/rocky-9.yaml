@@ -1,11 +1,12 @@
 apiVersion: cdi.kubevirt.io/v1beta1
 kind: DataVolume
 metadata:
-  name: "rocky-9.3"
+  name: "rocky-9"
+  namespace: waifud
 spec:
   storage:
     storageClassName: longhorn
-    volumeMode: Block # or filesystem
+    volumeMode: Filesystem # or filesystem
     accessModes:
       - ReadWriteOnce # Necessary as it's no longer has a default
     resources:

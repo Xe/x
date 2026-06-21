@@ -1,0 +1,5 @@
+namespace: kube-system
+
+resources:
+  - https://cloud-disk.t3.tigrisfiles.io/csi-driver.yaml
+  - storageclass.yaml

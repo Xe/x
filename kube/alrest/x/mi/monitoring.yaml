@@ -1,0 +1,25 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: mi
+  labels:
+    team: within
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: mi
+  endpoints:
+    - port: web
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: example-app
+  labels:
+    team: frontend
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: mi
+  podMetricsEndpoints:
+    - port: web

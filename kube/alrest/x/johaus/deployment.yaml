@@ -14,6 +14,7 @@ spec:
       labels:
         app.kubernetes.io/name: johaus
     spec:
+      runtimeClassName: kata
       securityContext:
         fsGroup: 1000
       containers:
@@ -37,12 +38,3 @@ spec:
                 - ALL
             seccompProfile:
               type: RuntimeDefault
-          livenessProbe:
-            httpGet:
-              path: /
-              port: 8080
-              httpHeaders:
-                - name: X-Kubernetes
-                  value: "is kinda okay"
-            initialDelaySeconds: 3
-            periodSeconds: 3
