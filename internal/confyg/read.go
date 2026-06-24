@@ -312,7 +312,7 @@ func (in *input) lex(sym *symType) int {
 			in.readRune()
 			c = in.peekRune()
 			if c != '#' {
-				in.Error(fmt.Sprintf("unexpected input character %#q", c))
+				in.Error(fmt.Sprintf("unexpected input character %q", rune(c)))
 			}
 
 			// Consume comment.
@@ -397,7 +397,7 @@ func (in *input) lex(sym *symType) int {
 
 	// Checked all punctuation. Must be identifier token.
 	if c := in.peekRune(); !isIdent(c) {
-		in.Error(fmt.Sprintf("unexpected input character %#q", c))
+		in.Error(fmt.Sprintf("unexpected input character %q", rune(c)))
 	}
 
 	// Scan over identifier.

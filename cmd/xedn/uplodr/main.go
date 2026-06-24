@@ -17,17 +17,16 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/disintegration/imaging"
 	"github.com/gen2brain/avif"
 	_ "github.com/gen2brain/heic"
 	"github.com/gen2brain/jpegxl"
 	"github.com/gen2brain/webp"
+	storage "github.com/tigrisdata/storage-go"
 	"google.golang.org/grpc"
 	pb "within.website/x/gen/within/website/x/xedn/uplodr/v1"
 	"within.website/x/internal"
-	"within.website/x/tigris"
 )
 
 var (
@@ -81,19 +80,22 @@ func main() {
 }
 
 type Server struct {
-	tc  *s3.Client
-	b2c *s3.Client
+	tc  *storage.Client
+	b2c *storage.Client
 
 	pb.UnimplementedImageServer
 }
 
 func New(ctx context.Context) (*Server, error) {
-	tc, err := tigris.Client(ctx)
+	tc, err := storage.New(ctx, storage.WithFlyEndpoint())
 	if err != nil {
 		return nil, fmt.Errorf("failed to create Tigris client: %w", err)
 	}
 
-	b2c := mkB2Client()
+	b2c, err := mkB2Client(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create Backblaze B2 client: %w", err)
+	}
 
 	return &Server{
 		tc:  tc,
@@ -327,15 +329,11 @@ var mimeTypes = map[string]string{
 	".css":  "text/css",
 }
 
-func mkB2Client() *s3.Client {
-	s3Config := aws.Config{
-		Credentials:  credentials.NewStaticCredentialsProvider(*b2KeyID, *b2KeySecret, ""),
-		BaseEndpoint: aws.String("https://s3.us-west-001.backblazeb2.com"),
-		Region:       "us-west-001",
-	}
-	s3Client := s3.NewFromConfig(s3Config, (func(o *s3.Options) {
-		o.UsePathStyle = true
-		o.Region = "us-west-001"
-	}))
-	return s3Client
+func mkB2Client(ctx context.Context) (*storage.Client, error) {
+	return storage.New(ctx,
+		storage.WithEndpoint("https://s3.us-west-001.backblazeb2.com"),
+		storage.WithRegion("us-west-001"),
+		storage.WithPathStyle(true),
+		storage.WithAccessKeypair(*b2KeyID, *b2KeySecret),
+	)
 }

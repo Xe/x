@@ -16,16 +16,15 @@ import (
 
 	"buf.build/go/protovalidate"
 	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/nats-io/nats.go"
 	"github.com/redis/go-redis/v9"
+	storage "github.com/tigrisdata/storage-go"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/protobuf/proto"
 	pb "within.website/x/gen/within/website/x/futuresight/v1"
 	"within.website/x/internal"
 	"within.website/x/internal/xesite"
-	"within.website/x/web/useragent"
 )
 
 var (
@@ -49,18 +48,15 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	creds := credentials.NewStaticCredentialsProvider(*awsAccessKeyID, *awsSecretKey, "")
-
-	s3c := s3.New(s3.Options{
-		AppID:            useragent.GenUserAgent("future-sight-push", "https://xeiaso.net"),
-		BaseEndpoint:     awsEndpointS3,
-		ClientLogMode:    aws.LogRetries | aws.LogRequest | aws.LogResponse,
-		Credentials:      creds,
-		EndpointResolver: s3.EndpointResolverFromURL(*awsEndpointS3),
-		//Logger:           logging.NewStandardLogger(os.Stderr),
-		UsePathStyle: *usePathStyle,
-		Region:       *awsRegion,
-	})
+	s3c, err := storage.New(ctx,
+		storage.WithEndpoint(*awsEndpointS3),
+		storage.WithRegion(*awsRegion),
+		storage.WithPathStyle(*usePathStyle),
+		storage.WithAccessKeypair(*awsAccessKeyID, *awsSecretKey),
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	slog.Debug("details",
 		"awsAccessKeyID", *awsAccessKeyID,
@@ -148,7 +144,7 @@ func main() {
 }
 
 type Server struct {
-	s3c *s3.Client
+	s3c *storage.Client
 	vk  *redis.Client
 	nc  *nats.Conn
 	zs  *xesite.ZipServer

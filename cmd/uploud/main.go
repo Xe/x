@@ -17,13 +17,13 @@ import (
 	"path/filepath"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
-	awsConfig "github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/disintegration/imaging"
 	"github.com/gen2brain/avif"
 	_ "github.com/gen2brain/heic"
 	"github.com/gen2brain/jpegxl"
 	"github.com/gen2brain/webp"
+	storage "github.com/tigrisdata/storage-go"
 	"golang.org/x/sync/errgroup"
 	"within.website/x/internal"
 )
@@ -93,14 +93,10 @@ func main() {
 		log.Fatal(err)
 	}
 
-	cfg, err := awsConfig.LoadDefaultConfig(ctx)
+	s3c, err := storage.New(ctx, storage.WithGlobalEndpoint(), storage.WithPathStyle(true))
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	s3c := s3.NewFromConfig(cfg, func(o *s3.Options) {
-		o.UsePathStyle = true
-	})
 
 	for _, finfo := range files {
 		log.Printf("uploading %s", finfo.Name())
