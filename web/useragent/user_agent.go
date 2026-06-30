@@ -6,6 +6,8 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+
+	"within.website/x"
 )
 
 var (
@@ -22,8 +24,8 @@ func init() {
 // GenUserAgent creates a unique User-Agent string for outgoing HTTP requests.
 func GenUserAgent(prefix, infoURL string) string {
 	return fmt.Sprintf(
-		"%s (%s/%s/%s; %s; +%s) Hostname/%s",
-		prefix, runtime.Version(), runtime.GOOS, runtime.GOARCH, infoURL,
+		"%s/%s (%s/%s/%s; %s; +%s) Hostname/%s",
+		prefix, x.Version, runtime.Version(), runtime.GOOS, runtime.GOARCH, infoURL,
 		filepath.Base(os.Args[0]), hostname,
 	)
 }
