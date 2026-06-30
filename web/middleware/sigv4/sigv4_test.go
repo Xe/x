@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"io"
+	"strconv"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -263,6 +264,67 @@ func TestUnsignedPayloadRespectsMaxBodySize(t *testing.T) {
 	if _, err := v.Verify(req); err != ErrBodyTooLarge {
 		t.Fatalf("err = %v, want ErrBodyTooLarge", err)
 	}
+}
+
+// TestVerifySignature checks the bodyless entry point used by central STS
+// validation: a request signed with a body verifies using only the declared
+// payload hash, without the body being present at all.
+func TestVerifySignature(t *testing.T) {
+	body := []byte(`{"hello":"world"}`)
+	req := httptest.NewRequest(http.MethodPost, "https://api.example.com/v1/submit?b=2&a=1", strings.NewReader(string(body)))
+	signWithSDK(t, req, body)
+
+	declared := req.Header.Get("X-Amz-Content-Sha256")
+	headers := req.Header.Clone()
+	// content-length is signed from the ContentLength field (not the header map)
+	// and Go strips it from r.Header on the server side, so a forwarder must
+	// carry it explicitly — mirror that here.
+	if req.ContentLength > 0 {
+		headers.Set("Content-Length", strconv.FormatInt(req.ContentLength, 10))
+	}
+	method, path, query, host := req.Method, req.URL.EscapedPath(), req.URL.RawQuery, req.Host
+
+	t.Run("valid without body", func(t *testing.T) {
+		got, err := newVerifier().VerifySignature(method, path, query, host, headers, declared)
+		if err != nil {
+			t.Fatalf("verify: %v", err)
+		}
+		if got != testKey {
+			t.Fatalf("key = %q, want %q", got, testKey)
+		}
+	})
+
+	t.Run("wrong payload hash", func(t *testing.T) {
+		_, err := newVerifier().VerifySignature(method, path, query, host, headers,
+			"0000000000000000000000000000000000000000000000000000000000000000")
+		if err != ErrUnauthorized {
+			t.Fatalf("err = %v, want ErrUnauthorized", err)
+		}
+	})
+
+	t.Run("unknown key", func(t *testing.T) {
+		v := newVerifier()
+		v.Lookup = LookuperFunc(func(string) (string, error) { return "", ErrUnknownKey })
+		_, err := v.VerifySignature(method, path, query, host, headers, declared)
+		if err != ErrUnknownKey {
+			t.Fatalf("err = %v, want ErrUnknownKey", err)
+		}
+	})
+
+	t.Run("scope mismatch", func(t *testing.T) {
+		v := newVerifier()
+		v.Region = "eu-west-1"
+		_, err := v.VerifySignature(method, path, query, host, headers, declared)
+		if err != ErrScopeMismatch {
+			t.Fatalf("err = %v, want ErrScopeMismatch", err)
+		}
+	})
+
+	t.Run("empty payload hash", func(t *testing.T) {
+		if _, err := newVerifier().VerifySignature(method, path, query, host, headers, ""); err == nil {
+			t.Fatal("expected error for empty payload hash")
+		}
+	})
 }
 
 func flipLastDigit(auth string) string {
