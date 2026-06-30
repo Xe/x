@@ -128,7 +128,7 @@ func NewSigV4RoundTripper(cfg *Config, next http.RoundTripper) (http.RoundTrippe
 }
 
 func (rt *sigV4RoundTripper) newBuf() any {
-	return bytes.NewBuffer(make([]byte, 0, 1024))
+	return bytes.NewBuffer(make([]byte, 0, 65536))
 }
 
 func (rt *sigV4RoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
@@ -141,7 +141,7 @@ func (rt *sigV4RoundTripper) RoundTrip(req *http.Request) (*http.Response, error
 
 	buf := rt.pool.Get().(*bytes.Buffer)
 
-	strHash := "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+	strHash := "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855" // sha256 of an empty file
 
 	defer func() {
 		buf.Reset()

@@ -18,8 +18,10 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"slices"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -111,6 +113,78 @@ func (v *Verifier) Verify(r *http.Request) (string, error) {
 		return "", ErrNotConfigured
 	}
 
+	sr, err := parseAuthHeader(r.Header.Get("Authorization"))
+	if err != nil {
+		return "", err
+	}
+
+	payloadHash, err := v.resolvePayloadHash(r)
+	if err != nil {
+		return "", err
+	}
+
+	return v.verify(r, sr, payloadHash)
+}
+
+// VerifySignature verifies a SigV4 signature over request material without
+// possessing the body. payloadHash is placed in the canonical request verbatim
+// (lowercased); the caller must have already confirmed the received body hashes
+// to it — this method never reads a body. It is the entry point for central STS
+// validation, where the body never reaches the verifier (the verifying service
+// checks it locally instead).
+//
+// host is taken from the host argument, not a Host header, matching how the
+// canonical "host" header is derived. headers must carry authorization and
+// x-amz-date (or date). payloadHash must be non-empty.
+//
+// On success it returns the access key id of the caller.
+func (v *Verifier) VerifySignature(method, path, query, host string, headers http.Header, payloadHash string) (string, error) {
+	if v.Lookup == nil {
+		return "", ErrNotConfigured
+	}
+
+	sr, err := parseAuthHeader(headers.Get("Authorization"))
+	if err != nil {
+		return "", err
+	}
+
+	if payloadHash == "" {
+		return "", errors.New("sigv4: payload hash required to verify a signature")
+	}
+	if strings.EqualFold(payloadHash, "STREAMING-AWS4-HMAC-SHA256-PAYLOAD") {
+		return "", ErrStreamingUnsupported
+	}
+
+	u, err := url.Parse(path)
+	if err != nil {
+		return "", fmt.Errorf("%w: bad path", ErrMissingAuth)
+	}
+	u.RawQuery = query
+
+	r := &http.Request{
+		Method: method,
+		URL:    u,
+		Host:   host,
+		Header: headers,
+	}
+	// canonicalHeaderValue derives content-length from r.ContentLength, not the
+	// header map, so mirror the forwarded value into the field when a client
+	// signed it.
+	if cl := headers.Get("Content-Length"); cl != "" {
+		if n, err := strconv.ParseInt(cl, 10, 64); err == nil {
+			r.ContentLength = n
+		}
+	}
+
+	return v.verify(r, sr, strings.ToLower(payloadHash))
+}
+
+// verify is the shared core run after the Authorization header is parsed and the
+// canonical payload hash is known. It pins the credential scope, requires a
+// signed host header, enforces the clock-skew window, resolves the signing
+// secret, and compares the recomputed signature in constant time. It never
+// touches r.Body.
+func (v *Verifier) verify(r *http.Request, sr *signedRequest, payloadHash string) (string, error) {
 	now := time.Now
 	if v.Now != nil {
 		now = v.Now
@@ -118,11 +192,6 @@ func (v *Verifier) Verify(r *http.Request) (string, error) {
 	skew := v.MaxClockSkew
 	if skew == 0 {
 		skew = 15 * time.Minute
-	}
-
-	sr, err := parseAuthHeader(r.Header.Get("Authorization"))
-	if err != nil {
-		return "", err
 	}
 
 	// Pin the scope. Without this, a signature valid for some other
@@ -162,11 +231,6 @@ func (v *Verifier) Verify(r *http.Request) (string, error) {
 	}
 
 	secret, err := v.Lookup.Lookup(sr.accessKeyID)
-	if err != nil {
-		return "", err
-	}
-
-	payloadHash, err := v.resolvePayloadHash(r)
 	if err != nil {
 		return "", err
 	}
