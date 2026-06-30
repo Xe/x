@@ -23,6 +23,9 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// Key is a SigV4 signing key. It carries only the public access key id and
+// metadata; the secret access key is deliberately omitted so that keys can be
+// listed and transported without leaking secrets.
 type Key struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	AccessKeyId   string                 `protobuf:"bytes,1,opt,name=access_key_id,json=accessKeyId,proto3" json:"access_key_id,omitempty"`
@@ -411,6 +414,9 @@ func (x *ListKeysResp) GetKeys() []*Key {
 	return nil
 }
 
+// User is an identity that owns one or more signing keys. Its id is a UUID
+// version 7 (time-ordered). A disabled user is retained with a disabled_at
+// timestamp and reason; their keys are likewise unable to authenticate.
 type User struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -419,6 +425,9 @@ type User struct {
 	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
 	DisabledAt    *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=disabled_at,json=disabledAt,proto3" json:"disabled_at,omitempty"`
 	DisableReason string                 `protobuf:"bytes,6,opt,name=disable_reason,json=disableReason,proto3" json:"disable_reason,omitempty"`
+	// is_admin marks a privileged administrator who may manage keys across all
+	// users; a non-admin may only manage their own keys.
+	IsAdmin       bool `protobuf:"varint,7,opt,name=is_admin,json=isAdmin,proto3" json:"is_admin,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -493,6 +502,13 @@ func (x *User) GetDisableReason() string {
 		return x.DisableReason
 	}
 	return ""
+}
+
+func (x *User) GetIsAdmin() bool {
+	if x != nil {
+		return x.IsAdmin
+	}
+	return false
 }
 
 type CreateUserReq struct {
@@ -814,7 +830,7 @@ const file_within_website_x_iam_v1_iam_proto_rawDesc = "" +
 	"\x04page\x18\x02 \x01(\x05B\x06\xbaH\x03\xc8\x01\x01R\x04page\x12\x17\n" +
 	"\auser_id\x18\x03 \x01(\tR\x06userId\"@\n" +
 	"\fListKeysResp\x120\n" +
-	"\x04keys\x18\x01 \x03(\v2\x1c.within.website.x.iam.v1.KeyR\x04keys\"\x84\x02\n" +
+	"\x04keys\x18\x01 \x03(\v2\x1c.within.website.x.iam.v1.KeyR\x04keys\"\x9f\x02\n" +
 	"\x04User\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x129\n" +
@@ -824,7 +840,8 @@ const file_within_website_x_iam_v1_iam_proto_rawDesc = "" +
 	"updated_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\x12;\n" +
 	"\vdisabled_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\n" +
 	"disabledAt\x12%\n" +
-	"\x0edisable_reason\x18\x06 \x01(\tR\rdisableReason\"+\n" +
+	"\x0edisable_reason\x18\x06 \x01(\tR\rdisableReason\x12\x19\n" +
+	"\bis_admin\x18\a \x01(\bR\aisAdmin\"+\n" +
 	"\rCreateUserReq\x12\x1a\n" +
 	"\x04name\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x04name\"\x93\x01\n" +
 	"\x0eCreateUserResp\x121\n" +
@@ -834,10 +851,11 @@ const file_within_website_x_iam_v1_iam_proto_rawDesc = "" +
 	"\x0eDisableUserReq\x12\x16\n" +
 	"\x02id\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x02id\x12\x1e\n" +
 	"\x06reason\x18\x02 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x06reason\"\x11\n" +
-	"\x0fDisableUserResp\"H\n" +
-	"\fListUsersReq\x12\x1c\n" +
-	"\x05count\x18\x01 \x01(\x05B\x06\xbaH\x03\xc8\x01\x01R\x05count\x12\x1a\n" +
-	"\x04page\x18\x02 \x01(\x05B\x06\xbaH\x03\xc8\x01\x01R\x04page\"D\n" +
+	"\x0fDisableUserResp\"R\n" +
+	"\fListUsersReq\x12\"\n" +
+	"\x05count\x18\x01 \x01(\x05B\f\xbaH\t\xc8\x01\x01\x1a\x04\x182 \x00R\x05count\x12\x1e\n" +
+	"\x04page\x18\x02 \x01(\x05B\n" +
+	"\xbaH\a\xc8\x01\x01\x1a\x02 \x00R\x04page\"D\n" +
 	"\rListUsersResp\x123\n" +
 	"\x05users\x18\x01 \x03(\v2\x1d.within.website.x.iam.v1.UserR\x05users2\xa0\x02\n" +
 	"\n" +

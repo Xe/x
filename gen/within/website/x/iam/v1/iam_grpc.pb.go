@@ -27,9 +27,16 @@ const (
 // KeyServiceClient is the client API for KeyService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+//
+// KeyService manages the signing keys owned by users.
 type KeyServiceClient interface {
+	// CreateKey issues a new key. The secret is returned in the response and is
+	// the only time it is available.
 	CreateKey(ctx context.Context, in *CreateKeyReq, opts ...grpc.CallOption) (*CreateKeyResp, error)
+	// DisableKey revokes a key so it can no longer authenticate. It is soft
+	// deletion: the key is retained with a disabled_at timestamp and reason.
 	DisableKey(ctx context.Context, in *DisableKeyReq, opts ...grpc.CallOption) (*DisableKeyResp, error)
+	// ListKeys enumerates keys, optionally scoped to a single user.
 	ListKeys(ctx context.Context, in *ListKeysReq, opts ...grpc.CallOption) (*ListKeysResp, error)
 }
 
@@ -74,9 +81,16 @@ func (c *keyServiceClient) ListKeys(ctx context.Context, in *ListKeysReq, opts .
 // KeyServiceServer is the server API for KeyService service.
 // All implementations must embed UnimplementedKeyServiceServer
 // for forward compatibility.
+//
+// KeyService manages the signing keys owned by users.
 type KeyServiceServer interface {
+	// CreateKey issues a new key. The secret is returned in the response and is
+	// the only time it is available.
 	CreateKey(context.Context, *CreateKeyReq) (*CreateKeyResp, error)
+	// DisableKey revokes a key so it can no longer authenticate. It is soft
+	// deletion: the key is retained with a disabled_at timestamp and reason.
 	DisableKey(context.Context, *DisableKeyReq) (*DisableKeyResp, error)
+	// ListKeys enumerates keys, optionally scoped to a single user.
 	ListKeys(context.Context, *ListKeysReq) (*ListKeysResp, error)
 	mustEmbedUnimplementedKeyServiceServer()
 }
@@ -205,9 +219,15 @@ const (
 // UserServiceClient is the client API for UserService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+//
+// UserService manages identities. Creating a user also issues their first
+// signing key, whose secret is returned once alongside the user.
 type UserServiceClient interface {
+	// CreateUser creates an identity and provisions its initial key.
 	CreateUser(ctx context.Context, in *CreateUserReq, opts ...grpc.CallOption) (*CreateUserResp, error)
+	// DisableUser revokes an identity (soft deletion).
 	DisableUser(ctx context.Context, in *DisableUserReq, opts ...grpc.CallOption) (*DisableUserResp, error)
+	// ListUsers enumerates identities.
 	ListUsers(ctx context.Context, in *ListUsersReq, opts ...grpc.CallOption) (*ListUsersResp, error)
 }
 
@@ -252,9 +272,15 @@ func (c *userServiceClient) ListUsers(ctx context.Context, in *ListUsersReq, opt
 // UserServiceServer is the server API for UserService service.
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility.
+//
+// UserService manages identities. Creating a user also issues their first
+// signing key, whose secret is returned once alongside the user.
 type UserServiceServer interface {
+	// CreateUser creates an identity and provisions its initial key.
 	CreateUser(context.Context, *CreateUserReq) (*CreateUserResp, error)
+	// DisableUser revokes an identity (soft deletion).
 	DisableUser(context.Context, *DisableUserReq) (*DisableUserResp, error)
+	// ListUsers enumerates identities.
 	ListUsers(context.Context, *ListUsersReq) (*ListUsersResp, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
