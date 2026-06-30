@@ -1,0 +1,70 @@
+syntax = "proto3";
+package within.website.x.iam.sts.v1;
+
+import "buf/validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+import "within/website/x/iam/v1/iam.proto";
+
+// STSService validates AWS Signature Version 4 requests on behalf of services
+// that must not hold signing secrets themselves. A verifying service forwards
+// the request material it actually received over an authenticated channel
+// (mTLS); STS reconstructs the canonical request, looks up the signing secret
+// internally, and returns the verified caller identity. Signing secrets never
+// leave STS, so a compromised verifier cannot exfiltrate them.
+//
+// Division of responsibility:
+//   - STS verifies the signature, the credential scope, the clock window, and
+//     that the key and owning user are enabled. It confirms the signature
+//     covers the declared payload hash and the signed headers.
+//   - The verifying service confirms that the bytes it actually received hash
+//     to the declared x-amz-content-sha256. STS never sees the body, so this
+//     check must happen where the body is.
+service STSService {
+  // GetCallerIdentity validates a SigV4-signed request and returns the user
+  // that owns the signing key. Returns UNAUTHENTICATED for any verification
+  // failure: bad signature, unknown or disabled key, disabled user, clock
+  // skew, credential-scope mismatch, or a missing/unsupported payload hash.
+  rpc GetCallerIdentity(GetCallerIdentityReq) returns (GetCallerIdentityResp);
+}
+
+// GetCallerIdentityReq carries the raw received request material. Forward it
+// verbatim; STS performs all canonicalization, so the verifier attests the
+// inputs but cannot otherwise influence what is signed.
+message GetCallerIdentityReq {
+  // HTTP method of the request being validated, e.g. "GET" or "POST".
+  string method = 1 [ (buf.validate.field).required = true ];
+
+  // The escaped request path as received, e.g. "/v1/things" or "/a%20b/c".
+  // Send the on-the-wire (escaped) form so STS can apply the correct encoding.
+  string path = 2 [ (buf.validate.field).required = true ];
+
+  // The raw query string without the leading '?', e.g. "a=1&b=2".
+  string query = 3;
+
+  // The request host as received, e.g. "api.example.com". This is the value
+  // bound to the required signed "host" header; do not also include it in
+  // headers.
+  string host = 4 [ (buf.validate.field).required = true ];
+
+  // The request headers as received. Must include: authorization, x-amz-date
+  // (or date), and x-amz-content-sha256. Lowercase the names, and repeat a name
+  // once per value so multi-valued headers keep their order.
+  repeated Header headers = 5;
+}
+
+// Header is a single received HTTP header value.
+message Header {
+  string name = 1 [ (buf.validate.field).required = true ];
+  string value = 2;
+}
+
+message GetCallerIdentityResp {
+  // The user that owns the validated signing key.
+  within.website.x.iam.v1.User user = 1;
+
+  // The access key id that signed the request, for audit logging.
+  string access_key_id = 2;
+
+  // The time the request was signed, taken from X-Amz-Date, for audit logging.
+  google.protobuf.Timestamp signed_at = 3;
+}

@@ -1,0 +1,122 @@
+syntax = "proto3";
+package within.website.x.iam.v1;
+
+import "buf/validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+
+// The IAM API manages users and the AWS Signature Version 4 signing keys that
+// authenticate them. A user owns one or more keys; each key has a public access
+// key id and a secret access key.
+//
+// Secret access keys are returned exactly once, at creation time
+// (CreateKey, CreateUser), and are never present in Key messages returned by
+// ListKeys or elsewhere. Store the secret when it is first issued; there is no
+// read-it-back API.
+
+// Key is a SigV4 signing key. It carries only the public access key id and
+// metadata; the secret access key is deliberately omitted so that keys can be
+// listed and transported without leaking secrets.
+message Key {
+  string access_key_id = 1;
+  string comment = 2;
+  google.protobuf.Timestamp created_at = 3;
+  google.protobuf.Timestamp updated_at = 4;
+  google.protobuf.Timestamp disabled_at = 5;
+  string disable_reason = 6;
+}
+
+// KeyService manages the signing keys owned by users.
+service KeyService {
+  // CreateKey issues a new key. The secret is returned in the response and is
+  // the only time it is available.
+  rpc CreateKey(CreateKeyReq) returns (CreateKeyResp);
+
+  // DisableKey revokes a key so it can no longer authenticate. It is soft
+  // deletion: the key is retained with a disabled_at timestamp and reason.
+  rpc DisableKey(DisableKeyReq) returns (DisableKeyResp);
+
+  // ListKeys enumerates keys, optionally scoped to a single user.
+  rpc ListKeys(ListKeysReq) returns (ListKeysResp);
+}
+
+message CreateKeyReq {
+  string comment = 1 [ (buf.validate.field).required = true ];
+  string user_id = 2; // optional, if set create key for a given user
+}
+
+message CreateKeyResp {
+  Key key = 1;
+  string secret_access_key = 2;
+}
+
+message DisableKeyReq {
+  string key_id = 1 [ (buf.validate.field).required = true ];
+  string reason = 2 [ (buf.validate.field).required = true ];
+  string user_id = 3; // optional, if set target disable for a given user
+}
+
+message DisableKeyResp {}
+
+message ListKeysReq {
+  int32 count = 1 [ (buf.validate.field).required = true ];
+  int32 page = 2 [ (buf.validate.field).required = true ];
+  string user_id = 3; // optional, if set target list for a given user
+}
+
+message ListKeysResp { repeated Key keys = 1; }
+
+// User is an identity that owns one or more signing keys. Its id is a UUID
+// version 7 (time-ordered). A disabled user is retained with a disabled_at
+// timestamp and reason; their keys are likewise unable to authenticate.
+message User {
+  string id = 1;
+  string name = 2;
+  google.protobuf.Timestamp created_at = 3;
+  google.protobuf.Timestamp updated_at = 4;
+  google.protobuf.Timestamp disabled_at = 5;
+  string disable_reason = 6;
+}
+
+// UserService manages identities. Creating a user also issues their first
+// signing key, whose secret is returned once alongside the user.
+service UserService {
+  // CreateUser creates an identity and provisions its initial key.
+  rpc CreateUser(CreateUserReq) returns (CreateUserResp);
+
+  // DisableUser revokes an identity (soft deletion).
+  rpc DisableUser(DisableUserReq) returns (DisableUserResp);
+
+  // ListUsers enumerates identities.
+  rpc ListUsers(ListUsersReq) returns (ListUsersResp);
+}
+
+message CreateUserReq {
+  string name = 1 [ (buf.validate.field).required = true ];
+}
+
+message CreateUserResp {
+  User user = 1;
+  string access_key_id = 2;
+  string secret_access_key = 3;
+}
+
+message DisableUserReq {
+  string id = 1 [ (buf.validate.field).required = true ];
+  string reason = 2 [ (buf.validate.field).required = true ];
+}
+
+message DisableUserResp {}
+
+message ListUsersReq {
+  int32 count = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).int32.gt = 0,
+    (buf.validate.field).int32.lte = 50
+  ];
+  int32 page = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).int32.gt = 0
+  ];
+}
+
+message ListUsersResp { repeated User users = 1; }
