@@ -51,8 +51,13 @@ const (
 
 // KeyServiceClient is a client for the within.website.x.iam.v1.KeyService service.
 type KeyServiceClient interface {
+	// CreateKey issues a new key. The secret is returned in the response and is
+	// the only time it is available.
 	CreateKey(context.Context, *connect.Request[v1.CreateKeyReq]) (*connect.Response[v1.CreateKeyResp], error)
+	// DisableKey revokes a key so it can no longer authenticate. It is soft
+	// deletion: the key is retained with a disabled_at timestamp and reason.
 	DisableKey(context.Context, *connect.Request[v1.DisableKeyReq]) (*connect.Response[v1.DisableKeyResp], error)
+	// ListKeys enumerates keys, optionally scoped to a single user.
 	ListKeys(context.Context, *connect.Request[v1.ListKeysReq]) (*connect.Response[v1.ListKeysResp], error)
 }
 
@@ -112,8 +117,13 @@ func (c *keyServiceClient) ListKeys(ctx context.Context, req *connect.Request[v1
 
 // KeyServiceHandler is an implementation of the within.website.x.iam.v1.KeyService service.
 type KeyServiceHandler interface {
+	// CreateKey issues a new key. The secret is returned in the response and is
+	// the only time it is available.
 	CreateKey(context.Context, *connect.Request[v1.CreateKeyReq]) (*connect.Response[v1.CreateKeyResp], error)
+	// DisableKey revokes a key so it can no longer authenticate. It is soft
+	// deletion: the key is retained with a disabled_at timestamp and reason.
 	DisableKey(context.Context, *connect.Request[v1.DisableKeyReq]) (*connect.Response[v1.DisableKeyResp], error)
+	// ListKeys enumerates keys, optionally scoped to a single user.
 	ListKeys(context.Context, *connect.Request[v1.ListKeysReq]) (*connect.Response[v1.ListKeysResp], error)
 }
 
@@ -173,8 +183,11 @@ func (UnimplementedKeyServiceHandler) ListKeys(context.Context, *connect.Request
 
 // UserServiceClient is a client for the within.website.x.iam.v1.UserService service.
 type UserServiceClient interface {
+	// CreateUser creates an identity and provisions its initial key.
 	CreateUser(context.Context, *connect.Request[v1.CreateUserReq]) (*connect.Response[v1.CreateUserResp], error)
+	// DisableUser revokes an identity (soft deletion).
 	DisableUser(context.Context, *connect.Request[v1.DisableUserReq]) (*connect.Response[v1.DisableUserResp], error)
+	// ListUsers enumerates identities.
 	ListUsers(context.Context, *connect.Request[v1.ListUsersReq]) (*connect.Response[v1.ListUsersResp], error)
 }
 
@@ -234,8 +247,11 @@ func (c *userServiceClient) ListUsers(ctx context.Context, req *connect.Request[
 
 // UserServiceHandler is an implementation of the within.website.x.iam.v1.UserService service.
 type UserServiceHandler interface {
+	// CreateUser creates an identity and provisions its initial key.
 	CreateUser(context.Context, *connect.Request[v1.CreateUserReq]) (*connect.Response[v1.CreateUserResp], error)
+	// DisableUser revokes an identity (soft deletion).
 	DisableUser(context.Context, *connect.Request[v1.DisableUserReq]) (*connect.Response[v1.DisableUserResp], error)
+	// ListUsers enumerates identities.
 	ListUsers(context.Context, *connect.Request[v1.ListUsersReq]) (*connect.Response[v1.ListUsersResp], error)
 }
 

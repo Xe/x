@@ -75,6 +75,9 @@ message User {
   google.protobuf.Timestamp updated_at = 4;
   google.protobuf.Timestamp disabled_at = 5;
   string disable_reason = 6;
+  // is_admin marks a privileged administrator who may manage keys across all
+  // users; a non-admin may only manage their own keys.
+  bool is_admin = 7;
 }
 
 // UserService manages identities. Creating a user also issues their first
