@@ -1,0 +1,10 @@
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: avalon-homehub
+  namespace: metallb-system
+spec:
+  addresses:
+    - 192.168.2.245-192.168.2.254
+  autoAssign: true
+  avoidBuggyIPs: false

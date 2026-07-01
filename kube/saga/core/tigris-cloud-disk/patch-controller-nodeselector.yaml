@@ -1,0 +1,9 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tigris-csi-controller
+spec:
+  template:
+    spec:
+      nodeSelector:
+        role: infra

@@ -1,0 +1,9 @@
+resources:
+  - https://cloud-disk.t3.tigrisfiles.io/csi-driver.yaml
+  - storageclass.yaml
+
+patches:
+  - path: patch-controller-nodeselector.yaml
+    target:
+      kind: Deployment
+      name: tigris-csi-controller

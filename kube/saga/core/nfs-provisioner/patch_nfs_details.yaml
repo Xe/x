@@ -1,0 +1,24 @@
+# patch_nfs_details.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: nfs-client-provisioner
+  name: nfs-client-provisioner
+spec:
+  template:
+    spec:
+      nodeSelector:
+        role: infra
+      containers:
+        - name: nfs-client-provisioner
+          env:
+            - name: NFS_SERVER
+              value: 192.168.2.241
+            - name: NFS_PATH
+              value: /itsuki/safe/kubernetes
+      volumes:
+        - name: nfs-client-root
+          nfs:
+            server: 192.168.2.241
+            path: /itsuki/safe/kubernetes

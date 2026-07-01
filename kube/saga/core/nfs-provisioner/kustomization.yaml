@@ -1,0 +1,15 @@
+namespace: kube-system
+resources:
+  - github.com/kubernetes-sigs/nfs-subdir-external-provisioner//deploy
+patches:
+  - path: ./patch_nfs_details.yaml
+    target:
+      kind: Deployment
+      name: nfs-client-provisioner
+  - target:
+      kind: StorageClass
+      name: nfs-client
+    patch: |-
+      - op: replace
+        path: /metadata/name
+        value: itsuki

@@ -1,0 +1,10 @@
+resources:
+  - https://infra.tekton.dev/tekton-releases/pipeline/latest/release.yaml
+  - https://infra.tekton.dev/tekton-releases/dashboard/latest/release-full.yaml
+  - https://infra.tekton.dev/tekton-releases/pruner/latest/release.yaml
+
+patches:
+  - path: ./pruner-cm.yaml
+    target:
+      kind: ConfigMap
+      name: tekton-pruner-default-spec

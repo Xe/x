@@ -1,0 +1,9 @@
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: keel
+  namespace: kube-system
+spec:
+  repo: https://charts.keel.sh
+  chart: keel
+  targetNamespace: kube-system

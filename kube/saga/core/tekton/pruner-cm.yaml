@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tekton-pruner-default-spec
+  namespace: tekton-pipelines
+  labels:
+    app.kubernetes.io/part-of: tekton-pruner
+    pruner.tekton.dev/config-type: global
+data:
+  global-config: |
+    enforcedConfigLevel: global
+    ttlSecondsAfterFinished: 3600
+    successfulHistoryLimit: 3
+    failedHistoryLimit: 3

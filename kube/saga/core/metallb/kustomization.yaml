@@ -1,0 +1,4 @@
+resources:
+  #- metallb-native.yaml
+  - github.com/metallb/metallb/config/native?ref=v0.16.1
+  - ipaddresspool.yaml

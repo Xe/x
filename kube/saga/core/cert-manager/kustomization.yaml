@@ -1,0 +1,6 @@
+namespace: cert-manager
+resources:
+  - 1password.yaml
+  - helmchart.yaml
+  - prod-issuer.yaml
+  - staging-issuer.yaml
