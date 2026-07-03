@@ -2,8 +2,8 @@ tap "hashicorp/tap"
 tap "xe/pkgs"
 
 # programming languages
-brew "go@1.25"
-brew "node@24"
+brew "go"
+brew "node"
 brew "deno"
 brew "python@3.11"
 brew "rustup-init"
