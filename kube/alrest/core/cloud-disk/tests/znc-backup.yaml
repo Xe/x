@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: znc-backup
+spec:
+  storageClassName: cloud-disk-cached
+  resources:
+    requests:
+      storage: 32Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: znc-clone
+spec:
+  resources:
+    requests:
+      storage: 32Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  dataSource:
+    kind: PersistentVolumeClaim
+    name: znc

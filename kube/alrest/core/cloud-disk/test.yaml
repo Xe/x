@@ -4,7 +4,7 @@ metadata:
   name: my-data
 spec:
   accessModes: ["ReadWriteOnce"]
-  storageClassName: longhorn
+  storageClassName: cloud-disk-cached
   resources:
     requests:
       storage: 10Gi
@@ -15,9 +15,9 @@ metadata:
   name: my-app
 spec:
   securityContext:
-    runAsNonRoot: true
-    runAsUser: 1000
-    runAsGroup: 1000
+    runAsNonRoot: false
+    runAsUser: 0
+    runAsGroup: 0
     fsGroup: 1000 # kubelet chowns the volume to this GID + sets setgid
   initContainers:
     - name: stat-data

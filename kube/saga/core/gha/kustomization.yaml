@@ -1,0 +1,4 @@
+resources:
+  - arc-systems.yaml
+  - saga-techaro.yaml
+  - saga-xe-x.yaml

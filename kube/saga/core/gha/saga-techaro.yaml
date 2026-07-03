@@ -1,0 +1,26 @@
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: saga-techaro
+  namespace: arc-runners
+spec:
+  chart: oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set
+  targetNamespace: arc-runners
+  valuesContent: |-
+    githubConfigUrl: https://github.com/TecharoHQ
+    githubConfigSecret: techarohq-arc-creds
+
+    runnerGroup: YOW
+
+    minRunners: 5
+    maxRunners: 10
+
+    containerMode:
+      type: "dind"
+
+    template:
+      spec:
+        containers:
+          - name: runner
+            image: ghcr.io/actions/actions-runner:latest
+            command: ["/home/runner/run.sh"]

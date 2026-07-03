@@ -1,0 +1,37 @@
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: kube-prometheus-stack
+  namespace: kube-system
+spec:
+  chart: oci://ghcr.io/prometheus-community/charts/kube-prometheus-stack
+  version: "87.5.0"
+  targetNamespace: monitoring
+  createNamespace: true
+  valuesContent: |-
+    grafana:
+      enabled: true
+      defaultDashboardsTimezone: browser
+    prometheus:
+      prometheusSpec:
+        retention: 15d
+        storageSpec:
+          volumeClaimTemplate:
+            spec:
+              storageClassName: itsuki
+              accessModes:
+                - ReadWriteOnce
+              resources:
+                requests:
+                  storage: 50Gi
+    alertmanager:
+      alertmanagerSpec:
+        storage:
+          volumeClaimTemplate:
+            spec:
+              storageClassName: itsuki
+              accessModes:
+                - ReadWriteOnce
+              resources:
+                requests:
+                  storage: 5Gi
