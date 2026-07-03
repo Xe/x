@@ -39,11 +39,7 @@ import (
 
 	stsv1 "within.website/x/gen/within/website/x/iam/sts/v1"
 	iamv1 "within.website/x/gen/within/website/x/iam/v1"
-)
-
-const (
-	unsignedPayload  = "UNSIGNED-PAYLOAD"
-	streamingPayload = "STREAMING-AWS4-HMAC-SHA256-PAYLOAD"
+	"within.website/x/web/middleware/sigv4"
 )
 
 // Errors returned by Verify. ErrBodyHash and ErrBodyTooLarge are local checks;
@@ -144,8 +140,8 @@ func toTwirpErr(err error) error {
 // no hash was declared (STS is the authority on whether that is acceptable).
 // The body is reset on every return path so it stays re-readable.
 func (v *Verifier) verifyBody(r *http.Request) error {
-	declared := strings.ToLower(strings.TrimSpace(r.Header.Get("X-Amz-Content-Sha256")))
-	if declared == "" || declared == unsignedPayload || declared == streamingPayload {
+	declared := strings.TrimSpace(r.Header.Get("X-Amz-Content-Sha256"))
+	if declared == "" || declared == sigv4.UnsignedPayload || strings.EqualFold(declared, sigv4.StreamingPayload) {
 		return nil
 	}
 
@@ -163,7 +159,7 @@ func (v *Verifier) verifyBody(r *http.Request) error {
 	}
 
 	sum := sha256.Sum256(body)
-	if subtle.ConstantTimeCompare([]byte(declared), []byte(hex.EncodeToString(sum[:]))) != 1 {
+	if subtle.ConstantTimeCompare([]byte(strings.ToLower(declared)), []byte(hex.EncodeToString(sum[:]))) != 1 {
 		return ErrBodyHash
 	}
 	return nil

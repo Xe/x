@@ -21,7 +21,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"path"
 	"sync"
 	"time"
 
@@ -46,8 +45,6 @@ type sigV4RoundTripper struct {
 	signer      *signer.Signer
 }
 
-var ctx context.Context = context.TODO()
-
 // NewSigV4RoundTripper returns a new http.RoundTripper that will sign requests
 // using Amazon's Signature Verification V4 signing procedure. The request will
 // then be handed off to the next RoundTripper provided by next. If next is nil,
@@ -56,6 +53,7 @@ var ctx context.Context = context.TODO()
 // Credentials for signing are retrieved using the the default AWS credential
 // chain. If credentials cannot be found, an error will be returned.
 func NewSigV4RoundTripper(cfg *Config, next http.RoundTripper) (http.RoundTripper, error) {
+	ctx := context.Background()
 	if next == nil {
 		next = http.DefaultTransport
 	}
@@ -167,10 +165,12 @@ func (rt *sigV4RoundTripper) RoundTrip(req *http.Request) (*http.Response, error
 		strHash = hex.EncodeToString(hash[:])
 	}
 
-	// Clean path like documented in AWS documentation.
-	// https://docs.aws.amazon.com/general/latest/gr/sigv4-create-canonical-request.html
-	signReq.URL.Path = path.Clean(signReq.URL.Path)
+	// Declare the payload hash in the request itself, like the AWS SDKs do for
+	// S3. Verifiers that never see the body (central STS validation) require
+	// this header to reconstruct the canonical request.
+	signReq.Header.Set("X-Amz-Content-Sha256", strHash)
 
+	ctx := signReq.Context()
 	creds, err := rt.creds.Retrieve(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("error retrieving credentials: %w", err)

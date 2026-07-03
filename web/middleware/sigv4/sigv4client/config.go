@@ -17,9 +17,9 @@ import (
 	"fmt"
 )
 
-// SigV4Config is the configuration for signing remote write requests with
-// AWS's SigV4 verification process. Empty values will be retrieved using the
-// AWS default credentials chain.
+// Config is the configuration for signing outgoing requests with AWS's SigV4
+// signing process. Empty values will be retrieved using the AWS default
+// credentials chain.
 type Config struct { //nolint:revive
 	Region             string `yaml:"region,omitempty"`
 	AccessKey          string `yaml:"access_key,omitempty"`

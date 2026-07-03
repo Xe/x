@@ -51,7 +51,13 @@ func newVerifier() *Verifier {
 func signWithSDK(t *testing.T, req *http.Request, body []byte) {
 	t.Helper()
 	sum := sha256.Sum256(body)
-	payloadHash := hex.EncodeToString(sum[:])
+	signWithSDKPayloadHash(t, req, hex.EncodeToString(sum[:]))
+}
+
+// signWithSDKPayloadHash is signWithSDK for callers that declare a payload
+// hash sentinel (e.g. UNSIGNED-PAYLOAD) instead of hashing a body.
+func signWithSDKPayloadHash(t *testing.T, req *http.Request, payloadHash string) {
+	t.Helper()
 	req.Header.Set("X-Amz-Content-Sha256", payloadHash)
 
 	creds := aws.Credentials{AccessKeyID: testKey, SecretAccessKey: testSecret}
@@ -94,6 +100,18 @@ func TestRoundTrip_POSTWithBody(t *testing.T) {
 	}
 }
 
+// Query canonicalization must sort by parameter name, not by the joined
+// "key=value" string: "list" and "list-type" order differently under the two
+// rules because '-' sorts below '='.
+func TestRoundTrip_QueryKeyPrefix(t *testing.T) {
+	req := httptest.NewRequest(http.MethodGet, "https://api.example.com/v1/things?list=1&list-type=2", nil)
+	signWithSDK(t, req, nil)
+
+	if _, err := newVerifier().Verify(req); err != nil {
+		t.Fatalf("verify: %v", err)
+	}
+}
+
 // Exercises the non-S3 double-encoding branch: the wire path /a%20b/c is
 // encoded a second time when building the canonical URI.
 func TestRoundTrip_PathWithSpace(t *testing.T) {
@@ -120,48 +138,61 @@ func TestTamperedBody(t *testing.T) {
 	}
 }
 
-func TestTamperedSignature(t *testing.T) {
-	req := httptest.NewRequest(http.MethodGet, "https://api.example.com/", nil)
-	signWithSDK(t, req, nil)
-	req.Header.Set("Authorization", flipLastDigit(req.Header.Get("Authorization")))
-
-	if _, err := newVerifier().Verify(req); err != ErrUnauthorized {
-		t.Fatalf("err = %v, want ErrUnauthorized", err)
+// TestVerifyRejections covers rejection paths that only differ in how the
+// verifier or the signed request is perturbed.
+func TestVerifyRejections(t *testing.T) {
+	cases := []struct {
+		name    string
+		mutate  func(v *Verifier)
+		tamper  func(req *http.Request)
+		wantErr error
+	}{
+		{
+			name: "tampered signature",
+			tamper: func(req *http.Request) {
+				req.Header.Set("Authorization", flipLastDigit(req.Header.Get("Authorization")))
+			},
+			wantErr: ErrUnauthorized,
+		},
+		{
+			name: "clock skew",
+			mutate: func(v *Verifier) {
+				v.Now = func() time.Time { return time.Date(2026, 6, 29, 13, 0, 0, 0, time.UTC) } // +1h
+			},
+			wantErr: ErrClockSkew,
+		},
+		{
+			name: "unknown key",
+			mutate: func(v *Verifier) {
+				v.Lookup = LookuperFunc(func(string) (string, error) { return "", ErrUnknownKey })
+			},
+			wantErr: ErrUnknownKey,
+		},
+		{
+			// A signature minted for one region/service must not verify against
+			// another, even though the math would otherwise check out.
+			name:    "wrong scope",
+			mutate:  func(v *Verifier) { v.Region = "eu-west-1" },
+			wantErr: ErrScopeMismatch,
+		},
 	}
-}
 
-func TestClockSkew(t *testing.T) {
-	req := httptest.NewRequest(http.MethodGet, "https://api.example.com/", nil)
-	signWithSDK(t, req, nil)
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			req := httptest.NewRequest(http.MethodGet, "https://api.example.com/", nil)
+			signWithSDK(t, req, nil)
+			if tc.tamper != nil {
+				tc.tamper(req)
+			}
 
-	v := newVerifier()
-	v.Now = func() time.Time { return time.Date(2026, 6, 29, 13, 0, 0, 0, time.UTC) } // +1h
-	if _, err := v.Verify(req); err != ErrClockSkew {
-		t.Fatalf("err = %v, want ErrClockSkew", err)
-	}
-}
-
-func TestUnknownKey(t *testing.T) {
-	req := httptest.NewRequest(http.MethodGet, "https://api.example.com/", nil)
-	signWithSDK(t, req, nil)
-
-	v := newVerifier()
-	v.Lookup = LookuperFunc(func(string) (string, error) { return "", ErrUnknownKey })
-	if _, err := v.Verify(req); err != ErrUnknownKey {
-		t.Fatalf("err = %v, want ErrUnknownKey", err)
-	}
-}
-
-// A signature minted for one region/service must not verify against another,
-// even though the math would otherwise check out.
-func TestWrongScope(t *testing.T) {
-	req := httptest.NewRequest(http.MethodGet, "https://api.example.com/", nil)
-	signWithSDK(t, req, nil)
-
-	v := newVerifier()
-	v.Region = "eu-west-1"
-	if _, err := v.Verify(req); err != ErrScopeMismatch {
-		t.Fatalf("err = %v, want ErrScopeMismatch", err)
+			v := newVerifier()
+			if tc.mutate != nil {
+				tc.mutate(v)
+			}
+			if _, err := v.Verify(req); !errors.Is(err, tc.wantErr) {
+				t.Fatalf("err = %v, want %v", err, tc.wantErr)
+			}
+		})
 	}
 }
 
@@ -325,6 +356,40 @@ func TestVerifySignature(t *testing.T) {
 			t.Fatal("expected error for empty payload hash")
 		}
 	})
+}
+
+// UNSIGNED-PAYLOAD is case-sensitive and must reach the canonical request
+// verbatim: lowercasing it would reject every unsigned-payload client on the
+// central STS path.
+func TestVerifySignature_UnsignedPayload(t *testing.T) {
+	req := httptest.NewRequest(http.MethodGet, "https://api.example.com/v1/things", nil)
+	signWithSDKPayloadHash(t, req, UnsignedPayload)
+
+	got, err := newVerifier().VerifySignature(
+		req.Method, req.URL.EscapedPath(), req.URL.RawQuery, req.Host, req.Header.Clone(), UnsignedPayload)
+	if err != nil {
+		t.Fatalf("verify: %v", err)
+	}
+	if got != testKey {
+		t.Fatalf("key = %q, want %q", got, testKey)
+	}
+}
+
+// A forwarded path starting with "//" must canonicalize verbatim rather than
+// being mis-parsed as a scheme-relative authority (host + shorter path).
+func TestVerifySignature_DoubleSlashPath(t *testing.T) {
+	req := httptest.NewRequest(http.MethodGet, "https://api.example.com//foo/bar", nil)
+	signWithSDK(t, req, nil)
+
+	got, err := newVerifier().VerifySignature(
+		req.Method, req.URL.EscapedPath(), req.URL.RawQuery, req.Host, req.Header.Clone(),
+		req.Header.Get("X-Amz-Content-Sha256"))
+	if err != nil {
+		t.Fatalf("verify: %v", err)
+	}
+	if got != testKey {
+		t.Fatalf("key = %q, want %q", got, testKey)
+	}
 }
 
 func flipLastDigit(auth string) string {

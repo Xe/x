@@ -56,18 +56,29 @@ func collapseSpaces(s string) string {
 	return b.String()
 }
 
+// canonicalQuery sorts by parameter name, then by value for repeated names,
+// matching the AWS SDKs. Sorting the joined "key=value" strings instead would
+// disagree with them whenever one name is a prefix of another whose next byte
+// sorts below '=' (e.g. "list" vs "list-type").
 func canonicalQuery(values url.Values, exclude string) string {
-	pairs := make([]string, 0, len(values))
-	for k, vs := range values {
+	keys := make([]string, 0, len(values))
+	for k := range values {
 		if k == exclude {
 			continue
 		}
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+
+	pairs := make([]string, 0, len(values))
+	for _, k := range keys {
 		ek := awsURIEncode(k, true)
+		vs := append([]string(nil), values[k]...)
+		sort.Strings(vs)
 		for _, val := range vs {
 			pairs = append(pairs, ek+"="+awsURIEncode(val, true))
 		}
 	}
-	sort.Strings(pairs)
 	return strings.Join(pairs, "&")
 }
 

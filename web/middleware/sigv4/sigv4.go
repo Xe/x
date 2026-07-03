@@ -17,6 +17,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log/slog"
 	"net/http"
 	"net/url"
 	"slices"
@@ -24,6 +25,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/twitchtv/twirp"
 )
 
 const (
@@ -31,7 +34,16 @@ const (
 	terminator      = "aws4_request"
 	amzTimeFormat   = "20060102T150405Z"
 	shortDateFormat = "20060102"
-	unsignedPayload = "UNSIGNED-PAYLOAD"
+)
+
+// Payload-hash sentinels defined by AWS SigV4. They are shared with the iamsts
+// middleware so both sides agree on one definition and one comparison rule:
+// UnsignedPayload matches exactly (AWS defines it case-sensitively), while
+// StreamingPayload is matched case-insensitively because it is only ever used
+// to reject requests, and rejecting more is the safe direction.
+const (
+	UnsignedPayload  = "UNSIGNED-PAYLOAD"
+	StreamingPayload = "STREAMING-AWS4-HMAC-SHA256-PAYLOAD"
 )
 
 // Errors returned by Verify. Callers typically map ErrUnauthorized and
@@ -84,21 +96,27 @@ func (v *Verifier) Middleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		keyID, err := v.Verify(r)
 		if err != nil {
-			status := http.StatusForbidden
+			slog.Debug("cannot serve request", "err", err, "method", r.Method, "path", r.URL.Path)
 			switch {
 			case errors.Is(err, ErrMissingAuth):
-				status = http.StatusUnauthorized
+				err = twirp.WrapError(twirp.Unauthenticated.Error("no authentication header present"), err)
 			case errors.Is(err, ErrScopeMismatch),
 				errors.Is(err, ErrClockSkew), errors.Is(err, ErrBodyTooLarge),
 				errors.Is(err, ErrStreamingUnsupported), errors.Is(err, ErrMissingSignedHost):
-				status = http.StatusBadRequest
+				// These sentinels describe the caller's own request and carry no
+				// internal detail, so surface them: a client cannot correct clock
+				// skew it can't distinguish from a scope mismatch.
+				err = twirp.WrapError(twirp.InvalidArgument.Error(err.Error()), err)
 			case errors.Is(err, ErrUnknownKey), errors.Is(err, ErrUnauthorized),
 				errors.Is(err, ErrBodyHash):
-				status = http.StatusForbidden
+				err = twirp.WrapError(twirp.PermissionDenied.Error("invalid authentication header"), err)
 			default:
-				status = http.StatusInternalServerError
+				// Unexpected errors (e.g. the key store being down) are server
+				// faults; log the cause but never echo it to the caller.
+				slog.Error("sigv4 verification failed unexpectedly", "err", err)
+				err = twirp.WrapError(twirp.Internal.Error("internal error"), err)
 			}
-			http.Error(w, err.Error(), status)
+			twirp.WriteError(w, err)
 			return
 		}
 		next.ServeHTTP(w, r.WithContext(withKeyID(r.Context(), keyID)))
@@ -128,10 +146,11 @@ func (v *Verifier) Verify(r *http.Request) (string, error) {
 
 // VerifySignature verifies a SigV4 signature over request material without
 // possessing the body. payloadHash is placed in the canonical request verbatim
-// (lowercased); the caller must have already confirmed the received body hashes
-// to it — this method never reads a body. It is the entry point for central STS
-// validation, where the body never reaches the verifier (the verifying service
-// checks it locally instead).
+// — it must be exactly what the client signed, sentinel case included; the
+// caller must have already confirmed the received body hashes to it — this
+// method never reads a body. It is the entry point for central STS validation,
+// where the body never reaches the verifier (the verifying service checks it
+// locally instead).
 //
 // host is taken from the host argument, not a Host header, matching how the
 // canonical "host" header is derived. headers must carry authorization and
@@ -151,19 +170,21 @@ func (v *Verifier) VerifySignature(method, path, query, host string, headers htt
 	if payloadHash == "" {
 		return "", errors.New("sigv4: payload hash required to verify a signature")
 	}
-	if strings.EqualFold(payloadHash, "STREAMING-AWS4-HMAC-SHA256-PAYLOAD") {
+	if strings.EqualFold(payloadHash, StreamingPayload) {
 		return "", ErrStreamingUnsupported
 	}
 
-	u, err := url.Parse(path)
+	// Build the URL directly rather than via url.Parse: a forwarded path like
+	// "//foo/bar" would parse as a scheme-relative authority, silently moving
+	// "foo" into the host and canonicalizing the wrong path.
+	unescaped, err := url.PathUnescape(path)
 	if err != nil {
 		return "", fmt.Errorf("%w: bad path", ErrMissingAuth)
 	}
-	u.RawQuery = query
 
 	r := &http.Request{
 		Method: method,
-		URL:    u,
+		URL:    &url.URL{Path: unescaped, RawPath: path, RawQuery: query},
 		Host:   host,
 		Header: headers,
 	}
@@ -176,7 +197,7 @@ func (v *Verifier) VerifySignature(method, path, query, host string, headers htt
 		}
 	}
 
-	return v.verify(r, sr, strings.ToLower(payloadHash))
+	return v.verify(r, sr, payloadHash)
 }
 
 // verify is the shared core run after the Authorization header is parsed and the
@@ -264,7 +285,7 @@ func (v *Verifier) resolvePayloadHash(r *http.Request) (string, error) {
 	// Chunked streaming integrity lives in per-chunk signatures in the body
 	// framing, which this package does not verify. Reject rather than accept a
 	// payload whose integrity is unverified.
-	if declared == "STREAMING-AWS4-HMAC-SHA256-PAYLOAD" {
+	if strings.EqualFold(declared, StreamingPayload) {
 		return "", ErrStreamingUnsupported
 	}
 
@@ -276,8 +297,8 @@ func (v *Verifier) resolvePayloadHash(r *http.Request) (string, error) {
 		return "", err
 	}
 
-	if declared == unsignedPayload {
-		return unsignedPayload, nil
+	if declared == UnsignedPayload {
+		return UnsignedPayload, nil
 	}
 
 	sum := sha256.Sum256(body)
