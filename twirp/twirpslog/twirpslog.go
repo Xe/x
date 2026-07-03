@@ -11,6 +11,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/twitchtv/twirp"
+	xslog "within.website/x/internal/slog"
 	"within.website/x/web/middleware/sigv4"
 	"within.website/x/web/middleware/sigv4/iamsts"
 )
@@ -71,12 +72,23 @@ func Interceptor(lg *slog.Logger) twirp.Interceptor {
 				userID = caller.User.GetId()
 			}
 
-			lg := lg.With("package", pkg, "service", svc, "method", meth)
+			attrs := []slog.Attr{
+				slog.String("package", pkg),
+				slog.String("service", svc),
+				slog.String("method", meth),
+			}
 			if userID != "" {
-				lg = lg.With("user_id", userID)
+				attrs = append(attrs, slog.String("user_id", userID))
 			}
 
-			lg.Debug("started request")
+			lg := lg.With(attrsToArgs(attrs)...)
+
+			// Attach the same attributes to the context so downstream handlers
+			// logging via slog.*Context surface the call's package, service,
+			// method, and user_id.
+			ctx = xslog.ContextWithAttrs(ctx, attrs...)
+
+			lg.DebugContext(ctx, "started request")
 			t0 := time.Now()
 			resp, err := next(ctx, req)
 			taken := time.Since(t0)
@@ -90,8 +102,19 @@ func Interceptor(lg *slog.Logger) twirp.Interceptor {
 
 			latency.WithLabelValues(pkg, svc, meth).Observe(taken.Seconds())
 
-			lg.Debug("ended request", "err", err, "taken", taken.String())
+			lg.DebugContext(ctx, "ended request", "err", err, "taken", taken.String())
 			return resp, err
 		}
 	}
+}
+
+// attrsToArgs adapts a slice of [slog.Attr] to the variadic ...any that
+// [slog.Logger.With] expects, so the same attributes feed both the
+// request-scoped logger and the context.
+func attrsToArgs(attrs []slog.Attr) []any {
+	args := make([]any, len(attrs))
+	for i, a := range attrs {
+		args[i] = a
+	}
+	return args
 }
