@@ -1,3 +1,5 @@
+// Package twirpslog instruments Twirp services with slog request logging and
+// Prometheus RPC metrics.
 package twirpslog
 
 import (
@@ -14,35 +16,46 @@ import (
 )
 
 var (
-	invocations = promauto.NewGaugeVec(prometheus.GaugeOpts{
+	invocations = promauto.NewCounterVec(prometheus.CounterOpts{
 		Namespace: "within_website_x",
 		Subsystem: "twirp",
-		Name:      "invocations",
+		Name:      "invocations_total",
+		Help:      "Twirp method calls, successful or not.",
 	}, []string{"package", "service", "method"})
 
-	errorHits = promauto.NewGaugeVec(prometheus.GaugeOpts{
+	errorHits = promauto.NewCounterVec(prometheus.CounterOpts{
 		Namespace: "within_website_x",
 		Subsystem: "twirp",
-		Name:      "errors",
+		Name:      "errors_total",
+		Help:      "Twirp method calls that returned an error.",
 	}, []string{"package", "service", "method"})
 
 	latency = promauto.NewHistogramVec(prometheus.HistogramOpts{
 		Namespace: "within_website_x",
 		Subsystem: "twirp",
-		Name:      "latency_microseconds",
-		Buckets:   prometheus.ExponentialBuckets(64, 2, 16),
+		Name:      "latency_seconds",
+		Help:      "Twirp method call duration.",
+		Buckets:   prometheus.DefBuckets,
 	}, []string{"package", "service", "method"})
 
-	usage = promauto.NewGaugeVec(prometheus.GaugeOpts{
+	// usage attributes calls to the verified caller for billing. Only
+	// successful calls are billed, by design. The user_id label is bounded by
+	// the IAM user population.
+	usage = promauto.NewCounterVec(prometheus.CounterOpts{
 		Namespace: "within_website_x",
 		Subsystem: "twirp",
-		Name:      "api_calls",
+		Name:      "api_calls_total",
+		Help:      "Successful Twirp method calls per verified user, for billing.",
 	}, []string{"method", "user_id"})
 )
 
+// Interceptor returns a Twirp server interceptor that debug-logs every call to
+// lg and records the RPC metrics above. Request and response payloads are
+// never logged: on IAM services they carry forwarded Authorization material
+// that would let a log reader replay a signed request.
 func Interceptor(lg *slog.Logger) twirp.Interceptor {
 	return func(next twirp.Method) twirp.Method {
-		return func(ctx context.Context, req interface{}) (interface{}, error) {
+		return func(ctx context.Context, req any) (any, error) {
 			pkg, _ := twirp.PackageName(ctx)
 			svc, _ := twirp.ServiceName(ctx)
 			meth, _ := twirp.MethodName(ctx)
@@ -63,22 +76,19 @@ func Interceptor(lg *slog.Logger) twirp.Interceptor {
 				lg = lg.With("user_id", userID)
 			}
 
-			lg.Debug("started request", "req", req)
+			lg.Debug("started request")
 			t0 := time.Now()
 			resp, err := next(ctx, req)
 			taken := time.Since(t0)
 
+			invocations.WithLabelValues(pkg, svc, meth).Inc()
 			if err != nil {
 				errorHits.WithLabelValues(pkg, svc, meth).Inc()
-			} else {
-				invocations.WithLabelValues(pkg, svc, meth).Inc()
-
-				if userID != "" {
-					usage.WithLabelValues(fmt.Sprintf("%s/%s/%s", pkg, svc, meth), userID).Inc()
-				}
+			} else if userID != "" {
+				usage.WithLabelValues(fmt.Sprintf("%s/%s/%s", pkg, svc, meth), userID).Inc()
 			}
 
-			latency.WithLabelValues(pkg, svc, meth).Observe(float64(taken.Microseconds()))
+			latency.WithLabelValues(pkg, svc, meth).Observe(taken.Seconds())
 
 			lg.Debug("ended request", "err", err, "taken", taken.String())
 			return resp, err
