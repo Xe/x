@@ -102,6 +102,14 @@ func TestInterceptorContextAttrs(t *testing.T) {
 		if rec["msg"] == "inside handler" {
 			handlerLine = rec
 		}
+		// Each attribute key must appear exactly once per line: attaching the
+		// attrs to both the logger and the context would emit duplicates that
+		// json.Unmarshal silently collapses, so check the raw bytes.
+		for _, key := range []string{`"package"`, `"service"`, `"method"`} {
+			if n := bytes.Count(line, []byte(key)); n > 1 {
+				t.Errorf("key %s appears %d times in %s", key, n, line)
+			}
+		}
 	}
 	if handlerLine == nil {
 		t.Fatalf("no %q line in output:\n%s", "inside handler", buf.String())

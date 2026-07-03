@@ -182,6 +182,7 @@ func (d *DAO) Backup() {
 	err := d.backup(ctx, d.backupDBLoc)
 	if err != nil {
 		slog.ErrorContext(ctx, "failed to backup database", "err", err)
+		return
 	}
 	slog.InfoContext(ctx, "backup done")
 }

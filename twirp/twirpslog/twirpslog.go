@@ -81,11 +81,10 @@ func Interceptor(lg *slog.Logger) twirp.Interceptor {
 				attrs = append(attrs, slog.String("user_id", userID))
 			}
 
-			lg := lg.With(attrsToArgs(attrs)...)
-
-			// Attach the same attributes to the context so downstream handlers
-			// logging via slog.*Context surface the call's package, service,
-			// method, and user_id.
+			// The attributes live only on the context: the interceptor's own
+			// log lines below and anything downstream logging via slog.*Context
+			// get them from the ContextHandler that internal/slog.Init installs.
+			// Attaching them to lg as well would emit every key twice.
 			ctx = xslog.ContextWithAttrs(ctx, attrs...)
 
 			lg.DebugContext(ctx, "started request")
@@ -106,15 +105,4 @@ func Interceptor(lg *slog.Logger) twirp.Interceptor {
 			return resp, err
 		}
 	}
-}
-
-// attrsToArgs adapts a slice of [slog.Attr] to the variadic ...any that
-// [slog.Logger.With] expects, so the same attributes feed both the
-// request-scoped logger and the context.
-func attrsToArgs(attrs []slog.Attr) []any {
-	args := make([]any, len(attrs))
-	for i, a := range attrs {
-		args[i] = a
-	}
-	return args
 }
