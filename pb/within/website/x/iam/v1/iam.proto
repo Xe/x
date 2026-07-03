@@ -40,7 +40,7 @@ service KeyService {
 }
 
 message CreateKeyReq {
-  string comment = 1 [ (buf.validate.field).required = true ];
+  string comment = 1 [(buf.validate.field).required = true];
   string user_id = 2; // optional, if set create key for a given user
 }
 
@@ -50,20 +50,22 @@ message CreateKeyResp {
 }
 
 message DisableKeyReq {
-  string key_id = 1 [ (buf.validate.field).required = true ];
-  string reason = 2 [ (buf.validate.field).required = true ];
+  string key_id = 1 [(buf.validate.field).required = true];
+  string reason = 2 [(buf.validate.field).required = true];
   string user_id = 3; // optional, if set target disable for a given user
 }
 
 message DisableKeyResp {}
 
 message ListKeysReq {
-  int32 count = 1 [ (buf.validate.field).required = true ];
-  int32 page = 2 [ (buf.validate.field).required = true ];
+  int32 count = 1 [(buf.validate.field).required = true];
+  int32 page = 2 [(buf.validate.field).required = true];
   string user_id = 3; // optional, if set target list for a given user
 }
 
-message ListKeysResp { repeated Key keys = 1; }
+message ListKeysResp {
+  repeated Key keys = 1;
+}
 
 // User is an identity that owns one or more signing keys. Its id is a UUID
 // version 7 (time-ordered). A disabled user is retained with a disabled_at
@@ -94,7 +96,7 @@ service UserService {
 }
 
 message CreateUserReq {
-  string name = 1 [ (buf.validate.field).required = true ];
+  string name = 1 [(buf.validate.field).required = true];
 }
 
 message CreateUserResp {
@@ -104,8 +106,8 @@ message CreateUserResp {
 }
 
 message DisableUserReq {
-  string id = 1 [ (buf.validate.field).required = true ];
-  string reason = 2 [ (buf.validate.field).required = true ];
+  string id = 1 [(buf.validate.field).required = true];
+  string reason = 2 [(buf.validate.field).required = true];
 }
 
 message DisableUserResp {}
@@ -122,4 +124,6 @@ message ListUsersReq {
   ];
 }
 
-message ListUsersResp { repeated User users = 1; }
+message ListUsersResp {
+  repeated User users = 1;
+}

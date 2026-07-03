@@ -32,11 +32,11 @@ service STSService {
 // inputs but cannot otherwise influence what is signed.
 message GetCallerIdentityReq {
   // HTTP method of the request being validated, e.g. "GET" or "POST".
-  string method = 1 [ (buf.validate.field).required = true ];
+  string method = 1 [(buf.validate.field).required = true];
 
   // The escaped request path as received, e.g. "/v1/things" or "/a%20b/c".
   // Send the on-the-wire (escaped) form so STS can apply the correct encoding.
-  string path = 2 [ (buf.validate.field).required = true ];
+  string path = 2 [(buf.validate.field).required = true];
 
   // The raw query string without the leading '?', e.g. "a=1&b=2".
   string query = 3;
@@ -44,7 +44,7 @@ message GetCallerIdentityReq {
   // The request host as received, e.g. "api.example.com". This is the value
   // bound to the required signed "host" header; do not also include it in
   // headers.
-  string host = 4 [ (buf.validate.field).required = true ];
+  string host = 4 [(buf.validate.field).required = true];
 
   // The request headers as received. Must include: authorization, x-amz-date
   // (or date), and x-amz-content-sha256. Lowercase the names, and repeat a name
@@ -54,7 +54,7 @@ message GetCallerIdentityReq {
 
 // Header is a single received HTTP header value.
 message Header {
-  string name = 1 [ (buf.validate.field).required = true ];
+  string name = 1 [(buf.validate.field).required = true];
   string value = 2;
 }
 
