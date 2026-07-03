@@ -16,7 +16,7 @@ permissions:
 
 jobs:
   build:
-    runs-on: alrest-xe-x
+    runs-on: ubuntu-24.04
     if: ${{ !contains(github.event.head_commit.message, '[skip ci]') }}
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
@@ -42,7 +42,7 @@ jobs:
         with:
           token: ${{ secrets.BUF_TOKEN }}
 
-      # - uses: ko-build/setup-ko@d982fec422852203cfb2053a8ec6ad302280d04d # v0.8
+      - uses: ko-build/setup-ko@d982fec422852203cfb2053a8ec6ad302280d04d # v0.8
 
       - name: Build
         run: go build ./...
