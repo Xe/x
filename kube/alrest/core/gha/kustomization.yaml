@@ -1,0 +1,5 @@
+resources:
+  - arc-systems.yaml
+  - techaro.yaml
+  - xe-site.yaml
+  - xe-x.yaml

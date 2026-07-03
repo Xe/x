@@ -1,0 +1,2 @@
+resources:
+  - https://github.com/k3s-io/helm-controller/releases/download/v0.17.3/deploy-cluster-scoped.yaml

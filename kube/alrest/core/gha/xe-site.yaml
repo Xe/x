@@ -1,21 +1,24 @@
 apiVersion: helm.cattle.io/v1
 kind: HelmChart
 metadata:
-  name: saga-xe-x
+  name: alrest-xe-site
   namespace: arc-runners
 spec:
   chart: oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set
   targetNamespace: arc-runners
   valuesContent: |-
-    githubConfigUrl: https://github.com/Xe/x
+    githubConfigUrl: https://github.com/Xe/site
     githubConfigSecret: xe-arc-creds
 
     containerMode:
       type: "dind"
 
+    runnerScaleSetName: alrest-xe-site
+    #runnerGroup: YOW
+
     template:
       spec:
         containers:
           - name: runner
-            image: ghcr.io/actions/actions-runner:latest
+            image: ghcr.io/xe/x/actions-runner:latest
             command: ["/home/runner/run.sh"]
