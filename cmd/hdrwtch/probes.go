@@ -41,7 +41,7 @@ func (s *Server) probeList(w http.ResponseWriter, r *http.Request) {
 	var probes []Probe
 
 	if err := s.dao.db.Where("user_id = ?", tu.ID).Preload("LastResult").Find(&probes).Error; err != nil {
-		slog.Error("failed to get probes", "err", err)
+		slog.ErrorContext(r.Context(), "failed to get probes", "err", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -70,7 +70,7 @@ func (s *Server) probeCreate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := s.dao.db.Create(newProbe).Error; err != nil {
-		slog.Error("failed to create probe", "err", err)
+		slog.ErrorContext(r.Context(), "failed to create probe", "err", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -78,7 +78,7 @@ func (s *Server) probeCreate(w http.ResponseWriter, r *http.Request) {
 	var probes []Probe
 
 	if err := s.dao.db.Preload("LastResult").Where("user_id = ?", tu.ID).Find(&probes).Error; err != nil {
-		slog.Error("failed to get probes", "err", err)
+		slog.ErrorContext(r.Context(), "failed to get probes", "err", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -97,7 +97,7 @@ func (s *Server) probeEdit(w http.ResponseWriter, r *http.Request) {
 
 	probe, err := s.dao.GetProbe(r.Context(), r.PathValue("id"), tu.ID)
 	if err != nil {
-		slog.Error("failed to get probe", "path", r.URL.Path, "err", err)
+		slog.ErrorContext(r.Context(), "failed to get probe", "path", r.URL.Path, "err", err)
 		http.Error(w, "no probe data", http.StatusUnauthorized)
 		return
 	}
@@ -116,7 +116,7 @@ func (s *Server) probeGet(w http.ResponseWriter, r *http.Request) {
 
 	probe, err := s.dao.GetProbe(r.Context(), r.PathValue("id"), tu.ID)
 	if err != nil {
-		slog.Error("failed to get probe", "path", r.URL.Path, "err", err)
+		slog.ErrorContext(r.Context(), "failed to get probe", "path", r.URL.Path, "err", err)
 		http.Error(w, "no probe data", http.StatusUnauthorized)
 		return
 	}
@@ -134,7 +134,7 @@ func (s *Server) probeGet(w http.ResponseWriter, r *http.Request) {
 			Find(&results).
 			Error; err != nil {
 
-			slog.Error("failed to get probe results", "err", err)
+			slog.ErrorContext(r.Context(), "failed to get probe results", "err", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
@@ -154,13 +154,13 @@ func (s *Server) probeUpdate(w http.ResponseWriter, r *http.Request) {
 
 	probe, err := s.dao.GetProbe(r.Context(), r.PathValue("id"), tu.ID)
 	if err != nil {
-		slog.Error("failed to get probe", "path", r.URL.Path, "err", err)
+		slog.ErrorContext(r.Context(), "failed to get probe", "path", r.URL.Path, "err", err)
 		http.Error(w, "no probe data", http.StatusUnauthorized)
 		return
 	}
 
 	if err := r.ParseForm(); err != nil {
-		slog.Error("failed to parse form", "err", err)
+		slog.ErrorContext(r.Context(), "failed to parse form", "err", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -169,7 +169,7 @@ func (s *Server) probeUpdate(w http.ResponseWriter, r *http.Request) {
 	probe.URL = r.FormValue("url")
 
 	if err := s.dao.db.Save(probe).Error; err != nil {
-		slog.Error("failed to update probe", "err", err)
+		slog.ErrorContext(r.Context(), "failed to update probe", "err", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -188,13 +188,13 @@ func (s *Server) probeDelete(w http.ResponseWriter, r *http.Request) {
 
 	probe, err := s.dao.GetProbe(r.Context(), r.PathValue("id"), tu.ID)
 	if err != nil {
-		slog.Error("failed to get probe", "path", r.URL.Path, "err", err)
+		slog.ErrorContext(r.Context(), "failed to get probe", "path", r.URL.Path, "err", err)
 		http.Error(w, "no probe data", http.StatusUnauthorized)
 		return
 	}
 
 	if err := s.dao.db.Delete(probe).Error; err != nil {
-		slog.Error("failed to delete probe", "err", err)
+		slog.ErrorContext(r.Context(), "failed to delete probe", "err", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -219,14 +219,14 @@ func (s *Server) probeRunGet(w http.ResponseWriter, r *http.Request) {
 
 	probe, err := s.dao.GetProbe(r.Context(), r.PathValue("id"), tu.ID)
 	if err != nil {
-		slog.Error("failed to get probe", "path", r.URL.Path, "err", err)
+		slog.ErrorContext(r.Context(), "failed to get probe", "path", r.URL.Path, "err", err)
 		http.Error(w, "no probe data", http.StatusUnauthorized)
 		return
 	}
 
 	resultID, err := strconv.Atoi(r.PathValue("result_id"))
 	if err != nil {
-		slog.Error("failed to parse result ID", "err", err)
+		slog.ErrorContext(r.Context(), "failed to parse result ID", "err", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -234,7 +234,7 @@ func (s *Server) probeRunGet(w http.ResponseWriter, r *http.Request) {
 	var result ProbeResult
 
 	if err := s.dao.db.First(&result, resultID).WithContext(r.Context()).Error; err != nil {
-		slog.Error("failed to get probe", "err", err)
+		slog.ErrorContext(r.Context(), "failed to get probe", "err", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

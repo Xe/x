@@ -87,7 +87,7 @@ func (s *Server) Info(
 ) {
 	metadata, err := ytdlp.Metadata(ctx, req.Msg.GetUrl())
 	if err != nil {
-		slog.Error("can't fetch metadata for video", "url", req.Msg.GetUrl(), "err", err)
+		slog.ErrorContext(ctx, "can't fetch metadata for video", "url", req.Msg.GetUrl(), "err", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 

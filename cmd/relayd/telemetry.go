@@ -37,7 +37,7 @@ func NewTelemetrySink(ctx context.Context) (*TelemetrySink, error) {
 		return nil, nil
 	}
 
-	slog.Info("telemetry enabled")
+	slog.InfoContext(ctx, "telemetry enabled")
 
 	cfg, err := awsConfig.LoadDefaultConfig(ctx)
 	if err != nil {
@@ -67,7 +67,7 @@ func (ts *TelemetrySink) Add(item *relayd.RequestLog) {
 
 func (ts *TelemetrySink) WriteBundle(ctx context.Context, items []*relayd.RequestLog) {
 	if err := ts.writeBundle(ctx, items); err != nil {
-		slog.Error("failed writing", "itemCount", len(items), "err", err)
+		slog.ErrorContext(ctx, "failed writing", "itemCount", len(items), "err", err)
 		for _, item := range items {
 			// 1 in 8 chance to drop
 			if rand.IntN(8) != 4 /* chosen by fair dice roll */ {

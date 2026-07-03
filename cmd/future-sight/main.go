@@ -159,27 +159,27 @@ func (s *Server) UploadVersion(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithCancel(r.Context())
 	defer cancel()
 
-	slog.Info("uploading version")
+	slog.InfoContext(ctx, "uploading version")
 
 	if err := r.ParseMultipartForm(10 << 24); err != nil {
-		slog.Error("failed to parse form", "err", err)
+		slog.ErrorContext(ctx, "failed to parse form", "err", err)
 		http.Error(w, "failed to parse form", http.StatusBadRequest)
 		return
 	}
 
 	f, header, err := r.FormFile("file")
 	if err != nil {
-		slog.Error("failed to get file", "err", err)
+		slog.ErrorContext(ctx, "failed to get file", "err", err)
 		http.Error(w, "failed to get file", http.StatusBadRequest)
 		return
 	}
 	defer f.Close()
 
-	slog.Info("got file", "filename", header.Filename)
+	slog.InfoContext(ctx, "got file", "filename", header.Filename)
 
 	fout, err := os.CreateTemp(s.dir, "future-sight-upload-*")
 	if err != nil {
-		slog.Error("failed to create temp file", "err", err)
+		slog.ErrorContext(ctx, "failed to create temp file", "err", err)
 		http.Error(w, "failed to create temp file", http.StatusInternalServerError)
 		return
 	}
@@ -187,7 +187,7 @@ func (s *Server) UploadVersion(w http.ResponseWriter, r *http.Request) {
 	defer os.Remove(fout.Name())
 
 	if _, err := io.Copy(fout, f); err != nil {
-		slog.Error("failed to copy file", "err", err)
+		slog.ErrorContext(ctx, "failed to copy file", "err", err)
 		http.Error(w, "failed to copy file", http.StatusInternalServerError)
 		return
 	}
@@ -196,19 +196,19 @@ func (s *Server) UploadVersion(w http.ResponseWriter, r *http.Request) {
 
 	hash, err := hashFileSha256(fout)
 	if err != nil {
-		slog.Error("failed to hash file", "err", err)
+		slog.ErrorContext(ctx, "failed to hash file", "err", err)
 		http.Error(w, "failed to hash file", http.StatusInternalServerError)
 		return
 	}
 
 	st, err := fout.Stat()
 	if err != nil {
-		slog.Error("failed to stat file", "err", err)
+		slog.ErrorContext(ctx, "failed to stat file", "err", err)
 		http.Error(w, "failed to stat file", http.StatusInternalServerError)
 		return
 	}
 
-	slog.Info("hashed file", "hash", hash)
+	slog.InfoContext(ctx, "hashed file", "hash", hash)
 
 	if _, err := s.s3c.PutObject(ctx, &s3.PutObjectInput{
 		Bucket:        bucketName,
@@ -220,7 +220,7 @@ func (s *Server) UploadVersion(w http.ResponseWriter, r *http.Request) {
 			"host_os": runtime.GOOS,
 		},
 	}); err != nil {
-		slog.Error("failed to push file", "bucketName", *bucketName, "hash", hash, "err", err)
+		slog.ErrorContext(ctx, "failed to push file", "bucketName", *bucketName, "hash", hash, "err", err)
 		http.Error(w, "failed to push file", http.StatusInternalServerError)
 		return
 	}
@@ -230,7 +230,7 @@ func (s *Server) UploadVersion(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := s.PushVersion(ctx, nv); err != nil {
-		slog.Error("failed to push version", "slug", nv.Slug, "err", err)
+		slog.ErrorContext(ctx, "failed to push version", "slug", nv.Slug, "err", err)
 		http.Error(w, "failed to push version", http.StatusInternalServerError)
 		return
 	}
@@ -239,21 +239,21 @@ func (s *Server) UploadVersion(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) PushVersion(ctx context.Context, nv *pb.NewVersion) error {
-	slog.Info("got new version", "version", nv)
+	slog.InfoContext(ctx, "got new version", "version", nv)
 
 	msg, err := proto.Marshal(nv)
 	if err != nil {
-		slog.Error("failed to marshal message", "slug", nv.Slug, "err", err)
+		slog.ErrorContext(ctx, "failed to marshal message", "slug", nv.Slug, "err", err)
 		return err
 	}
 
 	if err := s.nc.Publish("future-sight-push", msg); err != nil {
-		slog.Error("failed to publish message", "slug", nv.Slug, "err", err)
+		slog.ErrorContext(ctx, "failed to publish message", "slug", nv.Slug, "err", err)
 		return err
 	}
 
 	if _, err := s.vk.Set(ctx, "future-sight:current", nv.Slug, 0).Result(); err != nil {
-		slog.Error("failed to set current version", "slug", nv.Slug, "err", err)
+		slog.ErrorContext(ctx, "failed to set current version", "slug", nv.Slug, "err", err)
 		return err
 	}
 
@@ -298,19 +298,19 @@ func (s *Server) fetchVersion(ctx context.Context, nv *pb.NewVersion) error {
 	})
 	if err != nil {
 		os.Remove(filepath.Join(s.dir, "current.zip"))
-		slog.Error("failed to get object", "slug", nv.Slug, "err", err)
+		slog.ErrorContext(ctx, "failed to get object", "slug", nv.Slug, "err", err)
 		return err
 	}
 	defer obj.Body.Close()
 
 	if _, err := io.Copy(fout, obj.Body); err != nil {
 		os.Remove(filepath.Join(s.dir, "current.zip"))
-		slog.Error("failed to copy object", "slug", nv.Slug, "err", err)
+		slog.ErrorContext(ctx, "failed to copy object", "slug", nv.Slug, "err", err)
 		return err
 	}
 
 	if err := s.zs.Update(filepath.Join(s.dir, "current.zip")); err != nil {
-		slog.Error("failed to update zipserver", "slug", nv.Slug, "err", err)
+		slog.ErrorContext(ctx, "failed to update zipserver", "slug", nv.Slug, "err", err)
 		return err
 	}
 

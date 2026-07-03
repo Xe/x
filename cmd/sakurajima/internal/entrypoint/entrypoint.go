@@ -53,7 +53,7 @@ func Main(ctx context.Context, opts Options) error {
 		}()
 
 		if logger := rtr.log.Load(); logger != nil {
-			logger.(*slog.Logger).Info("listening", "for", "http", "bind", cfg.Bind.HTTP)
+			logger.(*slog.Logger).InfoContext(gCtx, "listening", "for", "http", "bind", cfg.Bind.HTTP)
 		}
 
 		return rtr.HandleHTTP(gCtx, ln)
@@ -73,7 +73,7 @@ func Main(ctx context.Context, opts Options) error {
 		}()
 
 		if logger := rtr.log.Load(); logger != nil {
-			logger.(*slog.Logger).Info("listening", "for", "https", "bind", cfg.Bind.HTTPS)
+			logger.(*slog.Logger).InfoContext(gCtx, "listening", "for", "https", "bind", cfg.Bind.HTTPS)
 		}
 
 		return rtr.HandleHTTPS(gCtx, ln)

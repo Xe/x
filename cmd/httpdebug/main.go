@@ -41,7 +41,7 @@ func main() {
 		}
 
 		contains := strings.Contains(r.Header.Get("Accept"), "text/html")
-		slog.Info("got request", "method", r.Method, "path", sanitizedURI)
+		slog.InfoContext(r.Context(), "got request", "method", r.Method, "path", sanitizedURI)
 
 		// Set Content-Type based on response format
 		if contains {

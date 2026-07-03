@@ -14,7 +14,7 @@ import (
 func healthz(w http.ResponseWriter, r *http.Request) {
 	services, err := internal.HealthSrv.List(r.Context(), nil)
 	if err != nil {
-		slog.Error("can't get list of services", "err", err)
+		slog.ErrorContext(r.Context(), "can't get list of services", "err", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -54,7 +54,7 @@ func healthz(w http.ResponseWriter, r *http.Request) {
 func readyz(w http.ResponseWriter, r *http.Request) {
 	st, ok := internal.GetHealth("osiris")
 	if !ok {
-		slog.Error("health service osiris does not exist, file a bug")
+		slog.ErrorContext(r.Context(), "health service osiris does not exist, file a bug")
 		http.Error(w, "health service osiris does not exist", http.StatusExpectationFailed)
 		return
 	}

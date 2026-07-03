@@ -222,17 +222,17 @@ func main() {
 		if ja4 := foundJa4; db != nil && ja4 != "" {
 			var application, userAgent, notes sql.NullString
 			if err := db.QueryRowContext(r.Context(), "SELECT application, user_agent_string, notes FROM fingerprints WHERE ja4_fingerprint = ?", ja4).Scan(&application, &userAgent, &notes); err == nil {
-				slog.Debug("found a hit", "application", application, "userAgent", userAgent, "notes", notes)
+				slog.DebugContext(r.Context(), "found a hit", "application", application, "userAgent", userAgent, "notes", notes)
 			} else if errors.Is(err, sql.ErrNoRows) {
 				userAgent := r.UserAgent()
 				notes := fmt.Sprintf("Observed via relayd on host %s at %s", r.Host, time.Now().Format(time.RFC3339))
 				if _, err := db.ExecContext(r.Context(), "INSERT INTO fingerprints(user_agent_string, notes, ja4_fingerprint, ip_address, headers) VALUES (?, ?, ?, ?, ?)", userAgent, notes, ja4, host, string(headers)); err != nil {
-					slog.Error("can't insert fingerprint into database", "err", err)
+					slog.ErrorContext(r.Context(), "can't insert fingerprint into database", "err", err)
 				}
 
 				r.Header.Set("Xe-X-Relayd-New-Client", "true")
 			} else {
-				slog.Debug("can't read from database", "err", err)
+				slog.DebugContext(r.Context(), "can't read from database", "err", err)
 			}
 
 			rp.ServeHTTP(w, r)

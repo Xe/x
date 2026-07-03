@@ -86,7 +86,7 @@ func (s *Server) searchHTMXPage(w http.ResponseWriter, r *http.Request) {
 
 	posts, err := s.getPostsByAuthor(query)
 	if err != nil {
-		slog.Error("can't find posts", "author", query, "err", err)
+		slog.ErrorContext(r.Context(), "can't find posts", "author", query, "err", err)
 		templ.Handler(Error(err.Error())).ServeHTTP(w, r)
 		return
 	}

@@ -47,7 +47,7 @@ func main() {
 			t0 := time.Now()
 			output, err := getImage(r.Context(), *apiURL, prompt, negPrompt)
 			if err != nil {
-				slog.Error("can't make image", "err", err)
+				slog.ErrorContext(r.Context(), "can't make image", "err", err)
 				templ.Handler(
 					xess.Simple("It broke!", ohNoes(err.Error())),
 					templ.WithStatus(http.StatusInternalServerError),

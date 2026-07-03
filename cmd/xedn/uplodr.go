@@ -62,14 +62,14 @@ func (iu *ImageUploader) CreateImage(w http.ResponseWriter, r *http.Request) {
 
 	data, err := io.ReadAll(r.Body)
 	if err != nil {
-		slog.Error("cannot read body", "err", err)
+		slog.ErrorContext(r.Context(), "cannot read body", "err", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	chonkiness := len(data) + 4096
 
-	slog.Debug("creating machine")
+	slog.DebugContext(r.Context(), "creating machine")
 	m, err := iu.fmc.CreateMachine(ctx, *flyAppName, flymachines.CreateMachine{
 		Name:   "uplodr-" + uuid.New().String(),
 		Region: *flyRegion,
@@ -96,7 +96,7 @@ func (iu *ImageUploader) CreateImage(w http.ResponseWriter, r *http.Request) {
 		},
 	})
 	if err != nil {
-		slog.Error("cannot create machine", "err", err)
+		slog.ErrorContext(r.Context(), "cannot create machine", "err", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -113,11 +113,11 @@ func (iu *ImageUploader) CreateImage(w http.ResponseWriter, r *http.Request) {
 			default:
 			}
 
-			slog.Debug("deleting machine", "machine", m.ID)
+			slog.DebugContext(ctx, "deleting machine", "machine", m.ID)
 			return iu.fmc.DestroyAppMachine(ctx, *flyAppName, m.ID)
 		}, bo)
 		if err != nil {
-			slog.Error("cannot delete machine", "err", err, "machine", m.ID)
+			slog.ErrorContext(ctx, "cannot delete machine", "err", err, "machine", m.ID)
 		}
 	}()
 
@@ -126,12 +126,12 @@ func (iu *ImageUploader) CreateImage(w http.ResponseWriter, r *http.Request) {
 		time.Sleep(time.Second)
 		mi, err := iu.fmc.GetAppMachine(ctx, *flyAppName, m.ID)
 		if err != nil {
-			slog.Error("can't get machine state", "id", m.ID, "err", err)
+			slog.ErrorContext(r.Context(), "can't get machine state", "id", m.ID, "err", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 		if mi.State != "started" {
-			slog.Debug("not started", "want", "started", "got", mi.State)
+			slog.DebugContext(r.Context(), "not started", "want", "started", "got", mi.State)
 			continue
 		}
 		running = true
@@ -147,32 +147,32 @@ func (iu *ImageUploader) CreateImage(w http.ResponseWriter, r *http.Request) {
 		}
 		return conn.Close()
 	}, bo); err != nil {
-		slog.Error("cannot test dial machine", "err", err)
+		slog.ErrorContext(r.Context(), "cannot test dial machine", "err", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	bo.Reset()
 	conn, err := backoff.RetryWithData[*grpc.ClientConn](func() (*grpc.ClientConn, error) {
-		slog.Debug("dialing machine", "addr", addr)
+		slog.DebugContext(r.Context(), "dialing machine", "addr", addr)
 
 		conn, err := grpc.DialContext(ctx, addr,
 			grpc.WithTransportCredentials(insecure.NewCredentials()),
 			grpc.WithMaxMsgSize(chonkiness),
 		)
 		if err != nil {
-			slog.Error("cannot dial machine", "err", err, "addr", addr)
+			slog.ErrorContext(r.Context(), "cannot dial machine", "err", err, "addr", addr)
 		}
 
 		return conn, err
 	}, bo)
 	if err != nil {
-		slog.Error("cannot dial machine", "err", err)
+		slog.ErrorContext(r.Context(), "cannot dial machine", "err", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	defer conn.Close()
-	slog.Debug("conn created")
+	slog.DebugContext(r.Context(), "conn created")
 
 	client := pb.NewImageClient(conn)
 	id := uuid.New().String()
@@ -181,21 +181,21 @@ func (iu *ImageUploader) CreateImage(w http.ResponseWriter, r *http.Request) {
 		return client.Ping(ctx, &pb.Echo{Nonce: id})
 	}, bo)
 	if err != nil {
-		slog.Error("cannot ping machine", "err", err)
+		slog.ErrorContext(r.Context(), "cannot ping machine", "err", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	if pong.GetNonce() != id {
-		slog.Error("invalid nonce", "got", pong.GetNonce(), "want", id)
+		slog.ErrorContext(r.Context(), "invalid nonce", "got", pong.GetNonce(), "want", id)
 		http.Error(w, "invalid nonce", http.StatusInternalServerError)
 		return
 	}
 
-	slog.Info("pong", "msg", pong.GetNonce())
+	slog.InfoContext(r.Context(), "pong", "msg", pong.GetNonce())
 
 	bo.Reset()
 	imageData, err := backoff.RetryWithData[*pb.UploadResp](func() (*pb.UploadResp, error) {
-		slog.Debug("uploading image", "fname", fname, "ext", ext)
+		slog.DebugContext(r.Context(), "uploading image", "fname", fname, "ext", ext)
 		resp, err := client.Upload(ctx, &pb.UploadReq{
 			FileName: fname + "." + ext,
 			Data:     data,
@@ -205,13 +205,13 @@ func (iu *ImageUploader) CreateImage(w http.ResponseWriter, r *http.Request) {
 			grpc.MaxCallSendMsgSize(chonkiness),
 		)
 		if err != nil {
-			slog.Error("can't upload image", "err", err)
+			slog.ErrorContext(r.Context(), "can't upload image", "err", err)
 		}
 
 		return resp, err
 	}, bo)
 	if err != nil {
-		slog.Error("cannot upload image", "err", err)
+		slog.ErrorContext(r.Context(), "cannot upload image", "err", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

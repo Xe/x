@@ -134,7 +134,7 @@ func (c closeArgs) LogValue() slog.Value {
 func runcmd(cmdName string, args ...string) (string, error) {
 	ctx := context.Background()
 
-	slog.Info("running command", "cmd", cmdName, "args", args)
+	slog.InfoContext(ctx, "running command", "cmd", cmdName, "args", args)
 
 	result, err := yeet.Output(ctx, cmdName, args...)
 	if err != nil {
@@ -249,14 +249,14 @@ func (i *Incident) Step() error {
 
 	i.Messages = append(i.Messages, msg)
 
-	slog.Info("got response", "message", msg.Content, "function", msg.FunctionCall)
+	slog.InfoContext(ctx, "got response", "message", msg.Content, "function", msg.FunctionCall)
 
 	if resp.Choices[0].Message.FunctionCall != nil {
 		if err := i.ExecFunction(ctx, msg); err != nil {
 			return err
 		}
 	} else {
-		slog.Info("incident note", "incident", i, "note", msg.Content)
+		slog.InfoContext(ctx, "incident note", "incident", i, "note", msg.Content)
 	}
 
 	return nil
@@ -307,7 +307,7 @@ func (i *Incident) ExecFunction(ctx context.Context, msg chatgpt.Message) error 
 
 		i.Annotatef("restarting app %s: %s", args.App, args.Reason)
 
-		slog.Info("got restart_fly_app", "args", args)
+		slog.InfoContext(ctx, "got restart_fly_app", "args", args)
 
 		if _, err := i.fly.RestartApp(ctx, args.App); err != nil {
 			i.Annotatef("error restarting app: %s", err)
@@ -336,7 +336,7 @@ func (i *Incident) ExecFunction(ctx context.Context, msg chatgpt.Message) error 
 		if err := json.Unmarshal([]byte(msg.FunctionCall.Arguments), &args); err != nil {
 			return err
 		}
-		slog.Info("got wait", "args", args)
+		slog.InfoContext(ctx, "got wait", "args", args)
 
 		i.Annotatef("waiting %d minutes", args.DurationMinutes)
 		time.Sleep(time.Duration(args.DurationMinutes) * time.Minute)
@@ -347,7 +347,7 @@ func (i *Incident) ExecFunction(ctx context.Context, msg chatgpt.Message) error 
 		if err := json.Unmarshal([]byte(msg.FunctionCall.Arguments), &args); err != nil {
 			return err
 		}
-		slog.Info("got close", "args", args)
+		slog.InfoContext(ctx, "got close", "args", args)
 		i.Close(args.Reason)
 
 	case "escalate":
@@ -400,7 +400,7 @@ func performFunctionFiveTimesWithDelay(ctx context.Context, url string) error {
 		if err := healthCheck(ctx, url); err == nil {
 			passCount++
 		} else {
-			slog.Error("error performing function", "url", url, "err", err)
+			slog.ErrorContext(ctx, "error performing function", "url", url, "err", err)
 			errs = append(errs, err)
 		}
 		time.Sleep(time.Second)

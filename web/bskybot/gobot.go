@@ -69,7 +69,7 @@ func (c *BskyAgent) Connect(ctx context.Context) error {
 		Did:        session.Did,
 	}
 
-	slog.Debug("authed", "did", session.Did, "handle", session.Handle)
+	slog.DebugContext(ctx, "authed", "did", session.Did, "handle", session.Handle)
 
 	c.lock.Lock()
 	defer c.lock.Unlock()
@@ -92,7 +92,7 @@ func (c *BskyAgent) reauthLoop() {
 	defer cancel()
 	for range c.t.C {
 		if err := c.refreshAuth(ctx); err != nil {
-			slog.Error("can't refresh auth, auth may be bad?", "err", err)
+			slog.ErrorContext(ctx, "can't refresh auth, auth may be bad?", "err", err)
 			continue
 		}
 	}

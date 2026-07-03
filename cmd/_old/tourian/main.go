@@ -125,7 +125,7 @@ func (s *Server) WebsocketHandler(w http.ResponseWriter, r *http.Request) {
 	convID := uuid.New().String()
 	name := "User"
 
-	slog.Info("new websocket connection", "remote", r.RemoteAddr, "conversation_id", convID)
+	slog.InfoContext(r.Context(), "new websocket connection", "remote", r.RemoteAddr, "conversation_id", convID)
 
 	messages := []ollama.Message{
 		{
@@ -138,7 +138,7 @@ func (s *Server) WebsocketHandler(w http.ResponseWriter, r *http.Request) {
 	avatarURL := "https://cdn.xeiaso.net/avatar/" + internal.Hash(convID, name)
 
 	if err := s.ExecTemplate(r.Context(), conn, setConvID(convID, avatarURL)); err != nil {
-		slog.Error("failed to execute template", "err", err)
+		slog.ErrorContext(r.Context(), "failed to execute template", "err", err)
 		return
 	}
 
@@ -147,22 +147,22 @@ func (s *Server) WebsocketHandler(w http.ResponseWriter, r *http.Request) {
 	for {
 		_, msg, err := conn.ReadMessage()
 		if err != nil {
-			slog.Error("failed to read message", "err", err)
+			slog.ErrorContext(r.Context(), "failed to read message", "err", err)
 			return
 		}
 
 		var cm ChatMessage
 		if err := json.Unmarshal(msg, &cm); err != nil {
-			slog.Error("failed to unmarshal message", "err", err)
+			slog.ErrorContext(r.Context(), "failed to unmarshal message", "err", err)
 		}
 
 		cm.ConversationID = convID
 		cm.ID = uuid.New().String()
 
-		slog.Info("received message", "msg", json.RawMessage(msg), "remote", r.RemoteAddr)
+		slog.InfoContext(r.Context(), "received message", "msg", json.RawMessage(msg), "remote", r.RemoteAddr)
 
 		if err := s.ExecTemplate(r.Context(), conn, chatBubble(avatarURL, cm.ID, name, cm.Content)); err != nil {
-			slog.Error("failed to execute template", "err", err)
+			slog.ErrorContext(r.Context(), "failed to execute template", "err", err)
 			break
 		}
 
@@ -176,7 +176,7 @@ func (s *Server) WebsocketHandler(w http.ResponseWriter, r *http.Request) {
 				Content: trollSystemPrompt,
 			})
 
-			slog.Debug("changed prompt to the troll one", "num_messages", len(messages))
+			slog.DebugContext(r.Context(), "changed prompt to the troll one", "num_messages", len(messages))
 			trolled = true
 
 		case trolled && len(messages) >= 15:
@@ -185,7 +185,7 @@ func (s *Server) WebsocketHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if err := s.ExecTemplate(r.Context(), conn, formReset()); err != nil {
-			slog.Error("failed to execute template", "err", err)
+			slog.ErrorContext(r.Context(), "failed to execute template", "err", err)
 			break
 		}
 
@@ -196,7 +196,7 @@ func (s *Server) WebsocketHandler(w http.ResponseWriter, r *http.Request) {
 			SetConversationID(cm.ConversationID).
 			Save(context.Background())
 		if err != nil {
-			slog.Error("failed to save chat message", "err", err)
+			slog.ErrorContext(r.Context(), "failed to save chat message", "err", err)
 		}
 
 		messages = append(messages, ollama.Message{
@@ -204,18 +204,18 @@ func (s *Server) WebsocketHandler(w http.ResponseWriter, r *http.Request) {
 			Content: cm.Content,
 		})
 
-		slog.Debug("starting ollama")
+		slog.DebugContext(r.Context(), "starting ollama")
 		olresp, err := s.Ollama.Chat(r.Context(), &ollama.CompleteRequest{
 			Model:    *ollamaModel,
 			Messages: messages,
 			Stream:   false,
 		})
 		if err != nil {
-			slog.Error("failed to chat with ollama", "err", err)
+			slog.ErrorContext(r.Context(), "failed to chat with ollama", "err", err)
 			break
 		}
 
-		slog.Debug("ollama response", "message", olresp.Message.Content)
+		slog.DebugContext(r.Context(), "ollama response", "message", olresp.Message.Content)
 
 		messages = append(messages, ollama.Message{
 			Role:    "assistant",
@@ -231,7 +231,7 @@ func (s *Server) WebsocketHandler(w http.ResponseWriter, r *http.Request) {
 			SetConversationID(convID).
 			Save(context.Background())
 		if err != nil {
-			slog.Error("failed to save chat message", "err", err)
+			slog.ErrorContext(r.Context(), "failed to save chat message", "err", err)
 		}
 
 		buf.Reset()
@@ -240,7 +240,7 @@ func (s *Server) WebsocketHandler(w http.ResponseWriter, r *http.Request) {
 		mood := moods[rand.Intn(len(moods))]
 
 		if err := s.ExecTemplate(r.Context(), conn, chatBubble(mimiAvatar(mood), mid, "Mimi", mdToHTML([]byte(olresp.Message.Content)))); err != nil {
-			slog.Error("failed to execute template", "err", err)
+			slog.ErrorContext(r.Context(), "failed to execute template", "err", err)
 			break
 		}
 	}

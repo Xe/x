@@ -153,7 +153,7 @@ func main() {
 
 	mux.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
 		if err := dao.Ping(r.Context()); err != nil {
-			slog.Error("database not healthy", "err", err)
+			slog.ErrorContext(r.Context(), "database not healthy", "err", err)
 			http.Error(w, "database not healthy", http.StatusInternalServerError)
 			return
 		}
@@ -165,7 +165,7 @@ func main() {
 	g, ctx := errgroup.WithContext(ctx)
 
 	g.Go(func() error {
-		slog.Info("starting private grpc server", "bind", *grpcBind)
+		slog.InfoContext(ctx, "starting private grpc server", "bind", *grpcBind)
 		lis, err := net.Listen("tcp", *grpcBind)
 		if err != nil {
 			return err
@@ -175,12 +175,12 @@ func main() {
 	})
 
 	g.Go(func() error {
-		slog.Info("starting internal server", "bind", *internalBind)
+		slog.InfoContext(ctx, "starting internal server", "bind", *internalBind)
 		return http.ListenAndServe(*internalBind, nil)
 	})
 
 	g.Go(func() error {
-		slog.Info("starting server", "bind", *bind)
+		slog.InfoContext(ctx, "starting server", "bind", *bind)
 		return http.ListenAndServe(*bind, mux)
 	})
 

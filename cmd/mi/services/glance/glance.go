@@ -24,7 +24,7 @@ func (g *Glance) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	sw, err := g.dao.WhoIsFront(r.Context())
 	if err != nil {
-		slog.Error("can't query front", "err", err)
+		slog.ErrorContext(r.Context(), "can't query front", "err", err)
 		templ.Handler(ohNoes(err), templ.WithStatus(http.StatusInternalServerError)).ServeHTTP(w, r)
 		return
 	}

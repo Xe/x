@@ -67,12 +67,12 @@ func New(ctx context.Context, dao *models.DAO, cfg Config) (*Announcer, error) {
 func (a *Announcer) Announce(ctx context.Context, it *jsonfeedv1.Item) (*emptypb.Empty, error) {
 	u, err := url.Parse(it.GetUrl())
 	if err != nil {
-		slog.Error("[unexpected] can't parse URL", "err", err, "url", it.GetUrl())
+		slog.ErrorContext(ctx, "[unexpected] can't parse URL", "err", err, "url", it.GetUrl())
 		return &emptypb.Empty{}, nil
 	}
 
 	if u.Host != "xeiaso.net" {
-		slog.Info("skipping announcement", "url", it.GetUrl(), "reason", "non-prod URLs")
+		slog.InfoContext(ctx, "skipping announcement", "url", it.GetUrl(), "reason", "non-prod URLs")
 		return &emptypb.Empty{}, nil
 	}
 	if has, err := a.dao.HasBlogpost(ctx, it.GetUrl()); err != nil {
@@ -96,11 +96,11 @@ func (a *Announcer) Announce(ctx context.Context, it *jsonfeedv1.Item) (*emptypb
 		})
 		if err != nil {
 			posseErrors.WithLabelValues("mastodon").Inc()
-			slog.Error("failed to announce to mastodon", "err", err)
+			slog.ErrorContext(gCtx, "failed to announce to mastodon", "err", err)
 			return err
 		}
 		possePosts.WithLabelValues("mastodon").Inc()
-		slog.Info("posted to mastodon", "blogpost_url", it.GetUrl(), "mastodon_url", post.URL)
+		slog.InfoContext(gCtx, "posted to mastodon", "blogpost_url", it.GetUrl(), "mastodon_url", post.URL)
 		return nil
 	})
 
@@ -108,20 +108,20 @@ func (a *Announcer) Announce(ctx context.Context, it *jsonfeedv1.Item) (*emptypb
 		bluesky := bsky.NewAgent(gCtx, a.cfg.BlueskyPDS, a.cfg.BlueskyHandle, a.cfg.BlueskyAuthkey)
 		if err := bluesky.Connect(gCtx); err != nil {
 			posseErrors.WithLabelValues("bluesky").Inc()
-			slog.Error("failed to connect to bluesky", "err", err)
+			slog.ErrorContext(gCtx, "failed to connect to bluesky", "err", err)
 			return err
 		}
 
 		if err := bluesky.Connect(gCtx); err != nil {
 			posseErrors.WithLabelValues("bluesky").Inc()
-			slog.Error("failed to connect to bluesky", "err", err)
+			slog.ErrorContext(gCtx, "failed to connect to bluesky", "err", err)
 			return err
 		}
 
 		u, err := url.Parse(it.GetUrl())
 		if err != nil {
 			posseErrors.WithLabelValues("bluesky").Inc()
-			slog.Error("failed to parse url", "err", err)
+			slog.ErrorContext(gCtx, "failed to parse url", "err", err)
 			return err
 		}
 
@@ -141,25 +141,25 @@ func (a *Announcer) Announce(ctx context.Context, it *jsonfeedv1.Item) (*emptypb
 			Build()
 		if err != nil {
 			posseErrors.WithLabelValues("bluesky").Inc()
-			slog.Error("failed to build bluesky post", "err", err)
+			slog.ErrorContext(gCtx, "failed to build bluesky post", "err", err)
 			return err
 		}
 
 		cid, uri, err := bluesky.PostToFeed(ctx, post)
 		if err != nil {
 			posseErrors.WithLabelValues("bluesky").Inc()
-			slog.Error("failed to post to bluesky", "err", err)
+			slog.ErrorContext(ctx, "failed to post to bluesky", "err", err)
 			return err
 		}
 
 		possePosts.WithLabelValues("bluesky").Inc()
-		slog.Info("posted to bluesky", "blogpost_url", it.GetUrl(), "bluesky_cid", cid, "bluesky_uri", uri)
+		slog.InfoContext(ctx, "posted to bluesky", "blogpost_url", it.GetUrl(), "bluesky_cid", cid, "bluesky_uri", uri)
 		return nil
 	})
 
 	g.Go(func() error {
 		if _, err := a.mimi.Announce(gCtx, it); err != nil {
-			slog.Error("failed to announce to mimi", "err", err)
+			slog.ErrorContext(gCtx, "failed to announce to mimi", "err", err)
 			return nil
 		}
 		possePosts.WithLabelValues("irc").Inc()

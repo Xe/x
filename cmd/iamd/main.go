@@ -43,7 +43,7 @@ func main() {
 	slog.SetDefault(lg)
 
 	if err := run(ctx, lg); err != nil {
-		lg.Error("can't run service", "err", err)
+		lg.ErrorContext(ctx, "can't run service", "err", err)
 		os.Exit(1)
 	}
 }
@@ -73,7 +73,7 @@ func newMux(lg *slog.Logger, dao *models.DAO, verifier *sigv4.Verifier) *http.Se
 }
 
 func run(ctx context.Context, lg *slog.Logger) error {
-	lg.Info(
+	lg.InfoContext(ctx,
 		"starting up",
 		"bind", *bind,
 		"db-loc", *dbLoc,
@@ -104,12 +104,12 @@ func run(ctx context.Context, lg *slog.Logger) error {
 	g, ctx := errgroup.WithContext(ctx)
 
 	g.Go(func() error {
-		lg.Info("Listening for metrics", "metrics-bind", *metricsBind)
+		lg.InfoContext(ctx, "Listening for metrics", "metrics-bind", *metricsBind)
 		return http.ListenAndServe(*metricsBind, nil)
 	})
 
 	g.Go(func() error {
-		slog.Info("starting server", "bind", *bind)
+		slog.InfoContext(ctx, "starting server", "bind", *bind)
 		return http.ListenAndServe(*bind, mux)
 	})
 
@@ -136,7 +136,7 @@ func bootstrap(ctx context.Context, lg *slog.Logger, dao *models.DAO, name strin
 		return fmt.Errorf("check for existing users: %w", err)
 	}
 	if len(existing) > 0 {
-		lg.Info("bootstrap skipped: users already present")
+		lg.InfoContext(ctx, "bootstrap skipped: users already present")
 		return nil
 	}
 
@@ -153,7 +153,7 @@ func bootstrap(ctx context.Context, lg *slog.Logger, dao *models.DAO, name strin
 		return fmt.Errorf("create bootstrap key: %w", err)
 	}
 
-	lg.Info("bootstrap complete: created admin user and signing key",
+	lg.InfoContext(ctx, "bootstrap complete: created admin user and signing key",
 		"user_id", u.UUID,
 		"access_key_id", k.AccessKeyID,
 		"secret_access_key", k.SecretAccessKey,

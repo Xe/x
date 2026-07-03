@@ -96,7 +96,7 @@ func (v *Verifier) Middleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		keyID, err := v.Verify(r)
 		if err != nil {
-			slog.Debug("cannot serve request", "err", err, "method", r.Method, "path", r.URL.Path)
+			slog.DebugContext(r.Context(), "cannot serve request", "err", err, "method", r.Method, "path", r.URL.Path)
 			switch {
 			case errors.Is(err, ErrMissingAuth):
 				err = twirp.WrapError(twirp.Unauthenticated.Error("no authentication header present"), err)
@@ -113,7 +113,7 @@ func (v *Verifier) Middleware(next http.Handler) http.Handler {
 			default:
 				// Unexpected errors (e.g. the key store being down) are server
 				// faults; log the cause but never echo it to the caller.
-				slog.Error("sigv4 verification failed unexpectedly", "err", err)
+				slog.ErrorContext(r.Context(), "sigv4 verification failed unexpectedly", "err", err)
 				err = twirp.WrapError(twirp.Internal.Error("internal error"), err)
 			}
 			twirp.WriteError(w, err)

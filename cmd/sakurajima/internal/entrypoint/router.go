@@ -316,7 +316,7 @@ func (rtr *Router) backgroundReloadConfig(ctx context.Context) {
 			return
 		case <-ch:
 			if err := rtr.loadConfig(); err != nil {
-				slog.Error("can't reload config", "fname", rtr.opts.ConfigFname, "err", err)
+				slog.ErrorContext(ctx, "can't reload config", "fname", rtr.opts.ConfigFname, "err", err)
 			}
 		}
 	}
@@ -413,7 +413,7 @@ func (rtr *Router) ListenAndServeMetrics(ctx context.Context, addr string) error
 	mux.HandleFunc("/healthz", healthz)
 
 	if logger := rtr.log.Load(); logger != nil {
-		logger.(*slog.Logger).Info("listening", "for", "metrics", "bind", addr)
+		logger.(*slog.Logger).InfoContext(ctx, "listening", "for", "metrics", "bind", addr)
 	}
 
 	srv := http.Server{
@@ -442,7 +442,7 @@ func (rtr *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	ja4hFP := ja4h.JA4H(r)
 
 	if logger := rtr.log.Load(); logger != nil {
-		logger.(*slog.Logger).Debug("got request", "method", r.Method, "host", host, "path", r.URL.Path)
+		logger.(*slog.Logger).DebugContext(r.Context(), "got request", "method", r.Method, "host", host, "path", r.URL.Path)
 	}
 
 	rtr.lock.RLock()
@@ -476,7 +476,7 @@ func (rtr *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	responseTime.WithLabelValues(host).Observe(float64(m.Duration.Milliseconds()))
 
 	if logger := rtr.log.Load(); logger != nil {
-		logger.(*slog.Logger).Debug("request completed", "host", host, "method", r.Method, "response_code", m.Code, "duration_ms", m.Duration.Milliseconds())
+		logger.(*slog.Logger).DebugContext(r.Context(), "request completed", "host", host, "method", r.Method, "response_code", m.Code, "duration_ms", m.Duration.Milliseconds())
 	}
 
 	if accessLog := rtr.accessLog.Load(); accessLog != nil {

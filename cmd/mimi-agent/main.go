@@ -47,7 +47,7 @@ func main() {
 	})
 
 	go func() {
-		slog.Info("listening", "kind", "http", "addr", *httpAddr)
+		slog.InfoContext(ctx, "listening", "kind", "http", "addr", *httpAddr)
 		log.Fatal(http.ListenAndServe(*httpAddr, mux))
 	}()
 

@@ -51,7 +51,7 @@ func run(ctx context.Context) error {
 		return fmt.Errorf("cloning repo %s at commit %s: %w", *githubRepo, *githubSha, err)
 	}
 
-	slog.Info("cloned repo filesystem", "commit-hash", hash.String())
+	slog.InfoContext(ctx, "cloned repo filesystem", "commit-hash", hash.String())
 
 	details := strings.SplitN(*githubRepo, "/", 2)
 	owner, repoName := details[0], details[1]
@@ -60,7 +60,7 @@ func run(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("getting PR information: status %d: %w", resp.StatusCode, err)
 	}
-	slog.Info("got PR info", "title", pr.Title, "node-id", pr.NodeID)
+	slog.InfoContext(ctx, "got PR info", "title", pr.Title, "node-id", pr.NodeID)
 
 	files, resp, err := gh.PullRequests.ListFiles(ctx, owner, repoName, *prNumber, nil)
 	if err != nil {
@@ -203,7 +203,7 @@ func run(ctx context.Context) error {
 					return fmt.Errorf("validating tool call args %s: %w", toolCall.Function.Arguments, err)
 				}
 
-				slog.Info("got tool call", "name", toolCall.Function.Name, "args", args)
+				slog.InfoContext(ctx, "got tool call", "name", toolCall.Function.Name, "args", args)
 
 				result, err := python.Run(ctx, fs, args.Code)
 				if err != nil {
@@ -232,7 +232,7 @@ func run(ctx context.Context) error {
 					return fmt.Errorf("validating tool call args %s: %w", toolCall.Function.Arguments, err)
 				}
 
-				slog.Info("got tool call", "name", toolCall.Function.Name, "args", args)
+				slog.InfoContext(ctx, "got tool call", "name", toolCall.Function.Name, "args", args)
 
 				event := "REQUEST_CHANGES"
 				if args.Approved {

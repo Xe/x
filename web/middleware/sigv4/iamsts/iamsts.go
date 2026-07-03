@@ -77,7 +77,7 @@ func (v *Verifier) Middleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		caller, err := v.Verify(r)
 		if err != nil {
-			slog.Debug("can't verify request", "err", err)
+			slog.DebugContext(r.Context(), "can't verify request", "err", err)
 			twirp.WriteError(w, err)
 			return
 		}

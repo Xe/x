@@ -55,7 +55,7 @@ func (s *Server) CreateUser(ctx context.Context, req *iamv1.CreateUserReq) (*iam
 
 	u, err := s.dao.CreateUser(ctx, req.GetName())
 	if err != nil {
-		slog.Error("can't create user", "err", err)
+		slog.ErrorContext(ctx, "can't create user", "err", err)
 		userErrors.WithLabelValues("CreateUser", "create_user").Inc()
 		switch {
 		case errors.Is(err, gorm.ErrRecordNotFound):
@@ -67,7 +67,7 @@ func (s *Server) CreateUser(ctx context.Context, req *iamv1.CreateUserReq) (*iam
 
 	k, err := s.dao.CreateKey(ctx, u, "initial access key")
 	if err != nil {
-		slog.Error("can't create user", "err", err)
+		slog.ErrorContext(ctx, "can't create user", "err", err)
 		userErrors.WithLabelValues("CreateUser", "create_key").Inc()
 		switch {
 		case errors.Is(err, gorm.ErrRecordNotFound):
@@ -93,7 +93,7 @@ func (s *Server) DisableUser(ctx context.Context, req *iamv1.DisableUserReq) (*i
 
 	err := s.dao.DisableUser(ctx, req.GetId(), req.GetReason())
 	if err != nil {
-		slog.Error("can't create user", "err", err)
+		slog.ErrorContext(ctx, "can't create user", "err", err)
 		userErrors.WithLabelValues("DisableUser", "upsert").Inc()
 		switch {
 		case errors.Is(err, gorm.ErrRecordNotFound):
@@ -109,7 +109,7 @@ func (s *Server) DisableUser(ctx context.Context, req *iamv1.DisableUserReq) (*i
 func (s *Server) ListUsers(ctx context.Context, req *iamv1.ListUsersReq) (*iamv1.ListUsersResp, error) {
 	users, err := s.dao.ListUsers(ctx, int(req.GetCount()), int(req.GetPage()))
 	if err != nil {
-		slog.Error("can't create user", "err", err)
+		slog.ErrorContext(ctx, "can't create user", "err", err)
 		userErrors.WithLabelValues("ListUsers", "select").Inc()
 		switch {
 		case errors.Is(err, gorm.ErrRecordNotFound):

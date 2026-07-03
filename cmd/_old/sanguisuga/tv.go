@@ -12,7 +12,7 @@ func (s *Sanguisuga) UntrackTV(w http.ResponseWriter, r *http.Request) {
 	var show Show
 	err := json.NewDecoder(http.MaxBytesReader(w, r.Body, 4096)).Decode(&show)
 	if err != nil {
-		slog.Error("can't read request body", "err", err)
+		slog.ErrorContext(r.Context(), "can't read request body", "err", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -24,10 +24,10 @@ func (s *Sanguisuga) UntrackTV(w http.ResponseWriter, r *http.Request) {
 		return s.Title == show.Title
 	})
 
-	slog.Info("no longer tracking TV show", "show", show)
+	slog.InfoContext(r.Context(), "no longer tracking TV show", "show", show)
 
 	if err := s.db.Save(); err != nil {
-		slog.Error("can't save database", "err", err)
+		slog.ErrorContext(r.Context(), "can't save database", "err", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -41,7 +41,7 @@ func (s *Sanguisuga) TrackTV(w http.ResponseWriter, r *http.Request) {
 	var show Show
 	err := json.NewDecoder(http.MaxBytesReader(w, r.Body, 4096)).Decode(&show)
 	if err != nil {
-		slog.Error("can't read request body", "err", err)
+		slog.ErrorContext(r.Context(), "can't read request body", "err", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -51,7 +51,7 @@ func (s *Sanguisuga) TrackTV(w http.ResponseWriter, r *http.Request) {
 
 	s.db.Data.TVWatch = append(s.db.Data.TVWatch, show)
 	if err := s.db.Save(); err != nil {
-		slog.Error("can't save database", "err", err)
+		slog.ErrorContext(r.Context(), "can't save database", "err", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

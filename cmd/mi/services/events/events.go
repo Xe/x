@@ -34,7 +34,7 @@ func New(dao *models.DAO, flyghtTrackerURL string) *Events {
 func (e *Events) Get(ctx context.Context, _ *emptypb.Empty) (*pb.EventFeed, error) {
 	events, err := e.dao.UpcomingEvents(ctx, 10)
 	if err != nil {
-		slog.Error("can't fetch upcoming events", "err", err)
+		slog.ErrorContext(ctx, "can't fetch upcoming events", "err", err)
 		switch {
 		case errors.Is(err, gorm.ErrRecordNotFound):
 			return nil, twirp.NotFoundError("can't find any events")
@@ -71,7 +71,7 @@ func (e *Events) Add(ctx context.Context, ev *pb.Event) (*emptypb.Empty, error) 
 		return nil, err
 	}
 
-	slog.Info("tracking new event", "event", event)
+	slog.InfoContext(ctx, "tracking new event", "event", event)
 
 	return &emptypb.Empty{}, nil
 }

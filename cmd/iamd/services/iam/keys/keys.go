@@ -79,7 +79,7 @@ func (s *Server) CreateKey(ctx context.Context, req *iamv1.CreateKeyReq) (*iamv1
 
 	u, err := s.dao.GetUser(ctx, req.GetUserId())
 	if err != nil {
-		slog.Error("can't create key", "err", err)
+		slog.ErrorContext(ctx, "can't create key", "err", err)
 		keyErrors.WithLabelValues("CreateKey", "get_user").Inc()
 		switch {
 		case errors.Is(err, gorm.ErrRecordNotFound):
@@ -91,7 +91,7 @@ func (s *Server) CreateKey(ctx context.Context, req *iamv1.CreateKeyReq) (*iamv1
 
 	k, err := s.dao.CreateKey(ctx, u, req.GetComment())
 	if err != nil {
-		slog.Error("can't create key", "err", err)
+		slog.ErrorContext(ctx, "can't create key", "err", err)
 		keyErrors.WithLabelValues("CreateKey", "create_key").Inc()
 		return nil, twirp.InternalErrorWith(err)
 	}
@@ -123,7 +123,7 @@ func (s *Server) DisableKey(ctx context.Context, req *iamv1.DisableKeyReq) (*iam
 	}
 
 	if err := s.dao.DisableKey(ctx, req.GetKeyId(), req.GetReason(), scopeUserID); err != nil {
-		slog.Error("can't disable key", "err", err)
+		slog.ErrorContext(ctx, "can't disable key", "err", err)
 		keyErrors.WithLabelValues("DisableKey", "disable").Inc()
 		switch {
 		case errors.Is(err, gorm.ErrRecordNotFound):
@@ -165,7 +165,7 @@ func (s *Server) ListKeys(ctx context.Context, req *iamv1.ListKeysReq) (*iamv1.L
 
 	keys, err := s.dao.ListKeys(ctx, int(req.GetCount()), int(req.GetPage()), userID)
 	if err != nil {
-		slog.Error("can't list keys", "err", err)
+		slog.ErrorContext(ctx, "can't list keys", "err", err)
 		keyErrors.WithLabelValues("ListKeys", "select").Inc()
 		switch {
 		case errors.Is(err, gorm.ErrRecordNotFound):
