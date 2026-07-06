@@ -7,79 +7,39 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
-
-	"github.com/twitchtv/twirp"
+	"time"
 
 	stsv1 "within.website/x/gen/within/website/x/iam/sts/v1"
-	iamv1 "within.website/x/gen/within/website/x/iam/v1"
-	"within.website/x/web/middleware/sigv4"
 	"within.website/x/web/middleware/sigv4/sigv4client"
 )
 
-const (
-	testKey    = "AKIDEXAMPLE"
-	testSecret = "wJalrXUtnFEMI/K7MDENG+bPxRfiCYEXAMPLEKEY"
-	testRegion = "us-east-1"
-	testSvc    = "execute-api"
-)
+// TestEndToEnd_SigV4ClientToLocalVerify drives the full chain in its
+// deployment shape: sigv4client (AWS SDK signer) signs an outgoing request,
+// the iamsts middleware verifies it locally with a derived key fetched over a
+// real Twirp round trip from a SigningKeyService stub that derives real keys.
+// Any canonicalization disagreement between signer and verifier fails here.
+func TestEndToEnd_SigV4ClientToLocalVerify(t *testing.T) {
+	fake := &fakeKeys{cacheTTL: 5 * time.Minute, now: time.Now}
+	keySrv := httptest.NewServer(stsv1.NewSigningKeyServiceServer(fake))
+	defer keySrv.Close()
 
-// realSTS validates forwarded request material with a real sigv4.Verifier,
-// mirroring cmd/iamd's STS service, so these tests exercise actual signature
-// verification rather than a stubbed identity.
-type realSTS struct {
-	v *sigv4.Verifier
-}
+	v := New(Config{
+		BaseURL:     keySrv.URL,
+		HTTPClient:  http.DefaultClient,
+		Region:      testRegion,
+		Service:     testSvc,
+		MaxBodySize: 1 << 20,
+	})
 
-func (s realSTS) GetCallerIdentity(_ context.Context, req *stsv1.GetCallerIdentityReq) (*stsv1.GetCallerIdentityResp, error) {
-	headers := make(http.Header, len(req.GetHeaders()))
-	for _, h := range req.GetHeaders() {
-		headers.Add(h.GetName(), h.GetValue())
-	}
-	declared := headers.Get("X-Amz-Content-Sha256")
-	if declared == "" {
-		return nil, twirp.InvalidArgumentError("x-amz-content-sha256", "must be forwarded so the signature can be verified without the body")
-	}
-
-	keyID, err := s.v.VerifySignature(req.GetMethod(), req.GetPath(), req.GetQuery(), req.GetHost(), headers, declared)
-	if err != nil {
-		return nil, twirp.NewError(twirp.Unauthenticated, err.Error())
-	}
-	return &stsv1.GetCallerIdentityResp{
-		AccessKeyId: keyID,
-		User:        &iamv1.User{Id: "u1", Name: "tester"},
-	}, nil
-}
-
-// TestEndToEnd_SigV4ClientToSTS drives the full central-validation chain:
-// sigv4client signs an outgoing request, the iamsts middleware forwards the
-// received material to an STS server, and that server verifies the signature
-// with the sigv4 package. This is the deployment shape of cmd/iamd, so any
-// canonicalization or header-forwarding disagreement between the three parts
-// fails here.
-func TestEndToEnd_SigV4ClientToSTS(t *testing.T) {
-	verifier := &sigv4.Verifier{
-		Region:  testRegion,
-		Service: testSvc,
-		Lookup: sigv4.LookuperFunc(func(id string) (string, error) {
-			if id == testKey {
-				return testSecret, nil
-			}
-			return "", sigv4.ErrUnknownKey
-		}),
-	}
-	stsSrv := httptest.NewServer(stsv1.NewSTSServiceServer(realSTS{v: verifier}))
-	defer stsSrv.Close()
-
-	var gotKey, gotBody string
-	v := NewVerifier(stsSrv.URL, http.DefaultClient, 1<<20)
-	svc := httptest.NewServer(v.Middleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		caller, _ := Caller(r.Context())
-		gotKey = caller.AccessKeyID
+	var gotBody string
+	var gotCaller *Identity
+	app := httptest.NewServer(v.Middleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		b, _ := io.ReadAll(r.Body)
 		gotBody = string(b)
+		gotCaller, _ = Caller(r.Context())
 		w.WriteHeader(http.StatusNoContent)
 	})))
-	defer svc.Close()
+	defer app.Close()
 
 	rt, err := sigv4client.NewSigV4RoundTripper(&sigv4client.Config{
 		Region:      testRegion,
@@ -88,61 +48,60 @@ func TestEndToEnd_SigV4ClientToSTS(t *testing.T) {
 		ServiceName: testSvc,
 	}, nil)
 	if err != nil {
-		t.Fatalf("new round tripper: %v", err)
+		t.Fatalf("round tripper: %v", err)
 	}
 	client := &http.Client{Transport: rt}
 
-	t.Run("GET", func(t *testing.T) {
-		gotKey, gotBody = "", ""
-		resp, err := client.Get(svc.URL + "/v1/things?list=1&list-type=2")
-		if err != nil {
-			t.Fatalf("GET: %v", err)
-		}
-		defer resp.Body.Close()
-		if resp.StatusCode != http.StatusNoContent {
-			t.Fatalf("status = %d, want 204", resp.StatusCode)
-		}
-		if gotKey != testKey {
-			t.Fatalf("caller key = %q, want %q", gotKey, testKey)
-		}
-	})
-
-	t.Run("POST", func(t *testing.T) {
-		gotKey, gotBody = "", ""
-		body := `{"hello":"world"}`
-		resp, err := client.Post(svc.URL+"/v1/submit", "application/json", strings.NewReader(body))
+	t.Run("signed POST with body verifies and body survives", func(t *testing.T) {
+		resp, err := client.Post(app.URL+"/things?a=1&b=2", "application/json", strings.NewReader(`{"x":1}`))
 		if err != nil {
 			t.Fatalf("POST: %v", err)
 		}
 		defer resp.Body.Close()
 		if resp.StatusCode != http.StatusNoContent {
-			t.Fatalf("status = %d, want 204", resp.StatusCode)
+			body, _ := io.ReadAll(resp.Body)
+			t.Fatalf("status = %d, body=%s", resp.StatusCode, body)
 		}
-		if gotKey != testKey {
-			t.Fatalf("caller key = %q, want %q", gotKey, testKey)
+		if gotBody != `{"x":1}` {
+			t.Errorf("downstream body = %q", gotBody)
 		}
-		if gotBody != body {
-			t.Fatalf("body = %q, want %q", gotBody, body)
+		if gotCaller == nil || gotCaller.PrincipalID != "u1" {
+			t.Errorf("caller = %+v, want principal u1", gotCaller)
 		}
 	})
 
-	t.Run("unknown key rejected", func(t *testing.T) {
-		badRT, err := sigv4client.NewSigV4RoundTripper(&sigv4client.Config{
-			Region:      testRegion,
-			AccessKey:   "AKIDWRONG",
-			SecretKey:   testSecret,
-			ServiceName: testSvc,
-		}, nil)
-		if err != nil {
-			t.Fatalf("new round tripper: %v", err)
-		}
-		resp, err := (&http.Client{Transport: badRT}).Get(svc.URL + "/v1/things")
+	t.Run("unsigned request rejected", func(t *testing.T) {
+		resp, err := http.Get(app.URL + "/things")
 		if err != nil {
 			t.Fatalf("GET: %v", err)
 		}
 		defer resp.Body.Close()
 		if resp.StatusCode != http.StatusUnauthorized {
 			t.Fatalf("status = %d, want 401", resp.StatusCode)
+		}
+	})
+
+	t.Run("tampered body rejected", func(t *testing.T) {
+		// Sign one request, then replay its headers over a different body.
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodPost, app.URL+"/things", strings.NewReader(`{"x":1}`))
+		req.Header.Set("Content-Type", "application/json")
+		resp, err := client.Do(req)
+		if err != nil {
+			t.Fatalf("signed POST: %v", err)
+		}
+		resp.Body.Close()
+
+		forged, _ := http.NewRequestWithContext(context.Background(), http.MethodPost, app.URL+"/things", strings.NewReader(`{"x":2}`))
+		// sigv4client clones and signs per attempt, so forge manually: reuse
+		// a stale signature against new bytes via a plain client.
+		forged.Header = resp.Request.Header.Clone()
+		plainResp, err := http.DefaultClient.Do(forged)
+		if err != nil {
+			t.Fatalf("forged POST: %v", err)
+		}
+		defer plainResp.Body.Close()
+		if plainResp.StatusCode != http.StatusForbidden {
+			t.Fatalf("status = %d, want 403 (body swap must not verify)", plainResp.StatusCode)
 		}
 	})
 }

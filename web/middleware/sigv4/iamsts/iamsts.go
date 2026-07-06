@@ -1,175 +1,306 @@
-// Package iamsts authenticates HTTP requests signed with AWS Signature Version
-// 4 by delegating signature verification to a central STS service over Twirp.
+// Package iamsts authenticates HTTP requests signed with AWS Signature
+// Version 4 by verifying them locally against a cached derived signing key
+// fetched from IAM's SigningKeyService.
 //
-// It is the "central validation" counterpart to the local sigv4 middleware:
-// the verifying service never holds signing secrets. Instead it forwards the
-// material it actually received (method, path, query, host, headers) to STS,
-// which validates the signature and returns the caller identity. Secrets never
-// cross the wire.
+// The verifying service never holds raw secret access keys. It fetches the
+// SigV4 derived key HMAC(HMAC(HMAC(HMAC("AWS4"+secret, date), region),
+// service), "aws4_request") for a credential scope once, caches it for the
+// server-advised TTL, and recomputes/compares signatures itself. When the
+// cache is warm, verification is a pure function of the request bytes and
+// the cached key — no IAM RPC on the hot path.
 //
-// Responsibility is split deliberately:
-//   - STS verifies the signature, the credential scope, the clock window, and
-//     that the key/user are enabled. It confirms the signature covers the
-//     declared payload hash.
-//   - This middleware confirms that the bytes it actually received hash to the
-//     declared x-amz-content-sha256. STS never sees the body, so this check
-//     must run where the body is — otherwise a body swapped after signing would
-//     go undetected.
+// Caching rules follow the SigV4 spec: the key is uniquely scoped to the
+// exact (access_key_id, YYYYMMDD, region, service) tuple from the request's
+// Credential= component, entries honor the response's cache_until and are
+// never kept past not_valid_after, concurrent misses for one scope collapse
+// into a single RPC, and refusals (unknown or disabled keys) are cached
+// briefly so a flood of bad credentials cannot hammer IAM.
 //
-// Configure the STS client's underlying *http.Client with mTLS so STS can
-// authenticate the verifier, and so the channel carrying the forwarded headers
-// is trusted.
+// Authenticate the SigningKeyService client the same way as any other iamd
+// caller: give Config.HTTPClient a sigv4client transport signing with the
+// verifier's own IAM credential.
 package iamsts
 
 import (
-	"bytes"
 	"context"
-	"crypto/sha256"
-	"crypto/subtle"
-	"encoding/hex"
 	"errors"
-	"io"
 	"log/slog"
 	"net/http"
-	"strconv"
 	"strings"
+	"sync"
+	"time"
 
 	"github.com/twitchtv/twirp"
-	"google.golang.org/protobuf/types/known/timestamppb"
+	"golang.org/x/sync/singleflight"
 
 	stsv1 "within.website/x/gen/within/website/x/iam/sts/v1"
-	iamv1 "within.website/x/gen/within/website/x/iam/v1"
 	"within.website/x/web/middleware/sigv4"
 )
 
-// Errors returned by Verify. ErrBodyHash and ErrBodyTooLarge are local checks;
-// any signature/key/scope/clock failure arrives as a Twirp error from STS.
-var (
-	ErrBodyHash     = errors.New("iamsts: body does not match x-amz-content-sha256")
-	ErrBodyTooLarge = errors.New("iamsts: request body exceeds limit")
-)
+// amzTimeFormat is the AWS X-Amz-Date timestamp format.
+const amzTimeFormat = "20060102T150405Z"
 
-// Verifier authenticates requests by asking STS to validate their signature.
-type Verifier struct {
-	// Client is the Twirp client for the STS service. Build it with
-	// stsv1.NewSTSServiceProtobufClient (or NewVerifier) and point its
-	// underlying *http.Client at STS over mTLS.
-	Client stsv1.STSService
+// defaultNegativeTTL bounds how long a refusal (unknown or disabled key) is
+// remembered before IAM is asked again.
+const defaultNegativeTTL = 30 * time.Second
+
+// Config configures a Verifier. BaseURL, HTTPClient, Region, and Service are
+// required.
+type Config struct {
+	// BaseURL is the iamd endpoint serving SigningKeyService.
+	BaseURL string
+
+	// HTTPClient carries the GetSigningKey RPCs. It must authenticate to
+	// iamd — typically a sigv4client transport signing with the verifier's
+	// own IAM credential.
+	HTTPClient *http.Client
+
+	// Region and Service pin the credential scope incoming requests must be
+	// signed for, exactly as on sigv4.Verifier.
+	Region  string
+	Service string
 
 	// MaxBodySize caps the bytes buffered to verify the payload hash. Zero
 	// means unlimited.
 	MaxBodySize int64
+
+	// NegativeTTL is how long a refusal is cached. Defaults to 30s.
+	NegativeTTL time.Duration
+
+	// Now is overridable for tests. Defaults to time.Now.
+	Now func() time.Time
 }
 
-// NewVerifier returns a Verifier that validates requests against the STS
-// service at baseURL. Configure mTLS and timeouts on httpClient; it must not
-// be nil (use http.DefaultClient for non-production).
-func NewVerifier(baseURL string, httpClient *http.Client, maxBodySize int64) *Verifier {
-	return &Verifier{
-		Client:      stsv1.NewSTSServiceProtobufClient(baseURL, httpClient),
-		MaxBodySize: maxBodySize,
+// Verifier authenticates requests locally using cached derived signing keys.
+// It implements sigv4.SigningKeyLookuper against a SigningKeyService client.
+type Verifier struct {
+	client stsv1.SigningKeyService
+	inner  *sigv4.Verifier
+	negTTL time.Duration
+	now    func() time.Time
+
+	sf    singleflight.Group
+	mu    sync.Mutex
+	cache map[scopeKey]*entry
+}
+
+// scopeKey is the exact tuple a derived key is scoped to: the literal strings
+// from the request's Credential= component, unnormalized.
+type scopeKey struct {
+	accessKeyID string
+	date        string
+	region      string
+	service     string
+}
+
+func (k scopeKey) String() string {
+	return strings.Join([]string{k.accessKeyID, k.date, k.region, k.service}, "\x00")
+}
+
+// entry is one cache slot: either a derived key with its identity, or a
+// remembered refusal (err set). expiresAt of zero means "use once, do not
+// serve from cache".
+type entry struct {
+	signingKey []byte
+	identity   *stsv1.TokenIdentity
+	err        error
+	expiresAt  time.Time
+}
+
+// New returns a Verifier fetching derived keys from cfg.BaseURL.
+func New(cfg Config) *Verifier {
+	v := &Verifier{
+		client: stsv1.NewSigningKeyServiceProtobufClient(cfg.BaseURL, cfg.HTTPClient),
+		negTTL: cfg.NegativeTTL,
+		now:    cfg.Now,
+		cache:  make(map[scopeKey]*entry),
 	}
+	if v.negTTL == 0 {
+		v.negTTL = defaultNegativeTTL
+	}
+	if v.now == nil {
+		v.now = time.Now
+	}
+	v.inner = &sigv4.Verifier{
+		Region:      cfg.Region,
+		Service:     cfg.Service,
+		MaxBodySize: cfg.MaxBodySize,
+		KeyLookup:   v,
+		Now:         cfg.Now,
+	}
+	return v
 }
 
-// Middleware wraps next so every request is authenticated against STS. On
-// success the verified caller is stored in the request context (see Caller).
+// Middleware wraps next so every request is verified locally against a cached
+// signing key. On success the caller identity is stored in the request
+// context (see Caller). Error mapping matches the local sigv4 middleware.
 func (v *Verifier) Middleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		caller, err := v.Verify(r)
+		id, err := v.Verify(r)
 		if err != nil {
-			slog.DebugContext(r.Context(), "can't verify request", "err", err)
-			twirp.WriteError(w, err)
+			slog.DebugContext(r.Context(), "iamsts: cannot verify request", "err", err, "method", r.Method, "path", r.URL.Path)
+			twirp.WriteError(w, sigv4.TwirpError(r.Context(), err))
 			return
 		}
-		next.ServeHTTP(w, r.WithContext(withCaller(r.Context(), caller)))
+		next.ServeHTTP(w, r.WithContext(withCaller(r.Context(), id)))
 	})
 }
 
-// Verify authenticates r by asking STS to validate its signature, then confirms
-// the received body matches the declared payload hash. On success it returns the
-// caller identity. The request body is buffered and reset so downstream
-// handlers can read it; on STS failure the body is left untouched.
+// Verify authenticates r locally: the inner sigv4 verifier performs every
+// pre-check (clock skew, scope pinning, signed host, payload hash) and the
+// constant-time signature comparison, pulling the derived key through this
+// Verifier's cache. The request body is buffered and reset so downstream
+// handlers can read it. On success it returns the caller identity.
 func (v *Verifier) Verify(r *http.Request) (*Identity, error) {
-	headers := toSTHeaders(r.Header)
-	// content-length is signed from the ContentLength field, not the header map,
-	// and net/http strips it from r.Header on the server side — forward it
-	// explicitly so STS can reconstruct the canonical request for body-bearing
-	// requests.
-	if r.ContentLength > 0 {
-		headers = append(headers, &stsv1.Header{Name: "content-length", Value: strconv.FormatInt(r.ContentLength, 10)})
-	}
-
-	resp, err := v.Client.GetCallerIdentity(r.Context(), &stsv1.GetCallerIdentityReq{
-		Method:  r.Method,
-		Path:    r.URL.EscapedPath(),
-		Query:   r.URL.RawQuery,
-		Host:    r.Host,
-		Headers: headers,
-	})
+	keyID, err := v.inner.Verify(r)
 	if err != nil {
 		return nil, err
 	}
 
-	if err := v.verifyBody(r); err != nil {
-		return nil, toTwirpErr(err)
-	}
-
-	return &Identity{
-		AccessKeyID: resp.GetAccessKeyId(),
-		User:        resp.GetUser(),
-		SignedAt:    resp.GetSignedAt(),
-	}, nil
-}
-
-// toTwirpErr maps the local body checks to Twirp error codes so a forged or
-// oversized body is reported as a client error rather than masked as a server
-// fault (which twirp.WriteError would otherwise turn a plain error into).
-func toTwirpErr(err error) error {
-	switch {
-	case errors.Is(err, ErrBodyHash):
-		return twirp.NewError(twirp.PermissionDenied, err.Error())
-	case errors.Is(err, ErrBodyTooLarge):
-		return twirp.NewError(twirp.InvalidArgument, err.Error())
-	default:
-		return err
-	}
-}
-
-// verifyBody confirms the received body hashes to the declared
-// x-amz-content-sha256. It is skipped for unsigned/streaming payloads and when
-// no hash was declared (STS is the authority on whether that is acceptable).
-// The body is reset on every return path so it stays re-readable.
-func (v *Verifier) verifyBody(r *http.Request) error {
-	declared := strings.TrimSpace(r.Header.Get("X-Amz-Content-Sha256"))
-	if declared == "" || declared == sigv4.UnsignedPayload || strings.EqualFold(declared, sigv4.StreamingPayload) {
-		return nil
-	}
-
-	var reader io.Reader = r.Body
-	if v.MaxBodySize > 0 {
-		reader = io.LimitReader(r.Body, v.MaxBodySize+1)
-	}
-	body, err := io.ReadAll(reader)
-	r.Body = io.NopCloser(bytes.NewReader(body))
+	// The signature checked out, so the credential parses and its scope
+	// entry was just used; re-read it for the identity. In the unlikely case
+	// it expired in between, this refetches — still off the hot path.
+	cred, err := sigv4.ParseCredential(r.Header.Get("Authorization"))
 	if err != nil {
-		return err
+		return nil, err
 	}
-	if v.MaxBodySize > 0 && int64(len(body)) > v.MaxBodySize {
-		return ErrBodyTooLarge
+	e, err := v.entry(r.Context(), scopeKey{cred.AccessKeyID, cred.Date, cred.Region, cred.Service})
+	if err != nil {
+		return nil, err
 	}
 
-	sum := sha256.Sum256(body)
-	if subtle.ConstantTimeCompare([]byte(strings.ToLower(declared)), []byte(hex.EncodeToString(sum[:]))) != 1 {
-		return ErrBodyHash
+	id := &Identity{
+		AccessKeyID:    keyID,
+		OrganizationID: e.identity.GetOrganizationId(),
+		PrincipalID:    e.identity.GetPrincipalId(),
+		DisplayName:    e.identity.GetDisplayName(),
 	}
-	return nil
+	if t, terr := time.Parse(amzTimeFormat, r.Header.Get("X-Amz-Date")); terr == nil {
+		id.SignedAt = t
+	}
+	return id, nil
+}
+
+// LookupSigningKey implements sigv4.SigningKeyLookuper through the cache. The
+// inner verifier only calls it after the clock-skew and scope checks pass, so
+// unverifiable garbage never triggers an RPC.
+func (v *Verifier) LookupSigningKey(ctx context.Context, accessKeyID, date, region, service string) ([]byte, error) {
+	e, err := v.entry(ctx, scopeKey{accessKeyID, date, region, service})
+	if err != nil {
+		return nil, err
+	}
+	return e.signingKey, nil
+}
+
+// entry returns the cache slot for k, fetching it once (singleflight) on a
+// miss. Remembered refusals return their error.
+func (v *Verifier) entry(ctx context.Context, k scopeKey) (*entry, error) {
+	now := v.now()
+	v.mu.Lock()
+	if e, ok := v.cache[k]; ok && now.Before(e.expiresAt) {
+		v.mu.Unlock()
+		if e.err != nil {
+			return nil, e.err
+		}
+		return e, nil
+	}
+	v.mu.Unlock()
+
+	res, err, _ := v.sf.Do(k.String(), func() (any, error) {
+		return v.fetch(ctx, k)
+	})
+	if err != nil {
+		return nil, err
+	}
+	e := res.(*entry)
+	if e.err != nil {
+		return nil, e.err
+	}
+	return e, nil
+}
+
+// fetch performs the GetSigningKey RPC and stores the result. NOT_FOUND and
+// PERMISSION_DENIED become cached refusals surfacing as ErrUnknownKey, so a
+// probe cannot distinguish unknown from disabled credentials; the distinction
+// is logged here. Any other failure (iamd down, transport fault) is returned
+// uncached and surfaces as an internal error — an IAM outage must read as an
+// outage, not as a denial. Signing key bytes are never logged.
+func (v *Verifier) fetch(ctx context.Context, k scopeKey) (*entry, error) {
+	resp, err := v.client.GetSigningKey(ctx, &stsv1.GetSigningKeyRequest{
+		AccessKeyId: k.accessKeyID,
+		Date:        k.date,
+		Region:      k.region,
+		Service:     k.service,
+	})
+	if err != nil {
+		var te twirp.Error
+		if errors.As(err, &te) {
+			switch te.Code() {
+			case twirp.NotFound, twirp.PermissionDenied:
+				slog.InfoContext(ctx, "iamsts: signing key refused",
+					"code", string(te.Code()),
+					"access_key_id", k.accessKeyID,
+					"date", k.date,
+				)
+				e := &entry{err: sigv4.ErrUnknownKey, expiresAt: v.now().Add(v.negTTL)}
+				v.store(k, e)
+				return e, nil
+			}
+		}
+		return nil, err
+	}
+
+	e := &entry{
+		signingKey: resp.GetSigningKey(),
+		identity:   resp.GetIdentity(),
+	}
+	// Honor the server's caching bounds exactly: cache_until is the TTL,
+	// clamped by not_valid_after. A response without cache_until is used for
+	// this request but never cached — the server declined to grant a TTL and
+	// we do not invent one.
+	if cu := resp.GetCacheUntil(); cu != nil {
+		e.expiresAt = cu.AsTime()
+		if nva := resp.GetNotValidAfter(); nva != nil && nva.AsTime().Before(e.expiresAt) {
+			e.expiresAt = nva.AsTime()
+		}
+	}
+	if e.expiresAt.After(v.now()) {
+		v.store(k, e)
+	}
+	return e, nil
+}
+
+// store inserts e and sweeps expired slots, so scopes for rolled-over dates
+// do not accumulate: at UTC midnight every cached key expires and the next
+// insert evicts the stale day.
+func (v *Verifier) store(k scopeKey, e *entry) {
+	now := v.now()
+	v.mu.Lock()
+	defer v.mu.Unlock()
+	for old, oe := range v.cache {
+		if !now.Before(oe.expiresAt) {
+			delete(v.cache, old)
+		}
+	}
+	v.cache[k] = e
+}
+
+// cacheLen reports the live slot count, for tests.
+func (v *Verifier) cacheLen() int {
+	v.mu.Lock()
+	defer v.mu.Unlock()
+	return len(v.cache)
 }
 
 // Identity is the verified caller stored in the request context on success.
+// The fields come from the SigningKeyService response identity; SignedAt is
+// parsed from the request's X-Amz-Date.
 type Identity struct {
-	AccessKeyID string
-	User        *iamv1.User
-	SignedAt    *timestamppb.Timestamp
+	AccessKeyID    string
+	OrganizationID string
+	PrincipalID    string
+	DisplayName    string
+	SignedAt       time.Time
 }
 
 type ctxKey struct{}
@@ -182,19 +313,4 @@ func withCaller(ctx context.Context, c *Identity) context.Context {
 func Caller(ctx context.Context) (*Identity, bool) {
 	c, ok := ctx.Value(ctxKey{}).(*Identity)
 	return c, ok
-}
-
-// toSTHeaders flattens the received headers into STS Header pairs. Names are
-// lowercased; a repeated header yields one entry per value so multi-valued
-// headers keep their order. Host is excluded (Go keeps it on r.Host) and is
-// forwarded via the request's Host field instead.
-func toSTHeaders(h http.Header) []*stsv1.Header {
-	out := make([]*stsv1.Header, 0, len(h))
-	for name, vals := range h {
-		name = strings.ToLower(name)
-		for _, val := range vals {
-			out = append(out, &stsv1.Header{Name: name, Value: val})
-		}
-	}
-	return out
 }

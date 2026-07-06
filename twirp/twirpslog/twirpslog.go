@@ -69,7 +69,7 @@ func Interceptor(lg *slog.Logger) twirp.Interceptor {
 			if u, ok := sigv4.User(ctx); ok {
 				userID = u.GetId()
 			} else if caller, ok := iamsts.Caller(ctx); ok {
-				userID = caller.User.GetId()
+				userID = caller.PrincipalID
 			}
 
 			attrs := []slog.Attr{
