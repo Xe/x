@@ -158,3 +158,151 @@ var STSService_ServiceDesc = grpc.ServiceDesc{
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "within/website/x/iam/sts/v1/sts.proto",
 }
+
+const (
+	SigningKeyService_GetSigningKey_FullMethodName = "/within.website.x.iam.sts.v1.SigningKeyService/GetSigningKey"
+)
+
+// SigningKeyServiceClient is the client API for SigningKeyService service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+//
+// SigningKeyService hands out SigV4 derived signing keys so that downstream
+// services can verify request signatures locally without ever holding raw
+// secret access keys.
+//
+// A derived key is HMAC(HMAC(HMAC(HMAC("AWS4"+secret, date), region),
+// service), "aws4_request"). It can only validate requests whose credential
+// scope matches (date, region, service) exactly, so a leaked response is
+// bounded to one service, one region, one UTC day.
+//
+// This API is internal-only and its responses contain key material. Callers
+// authenticate to it the same way as every other iamd route: by signing the
+// RPC with their own IAM credential (see cmd/iamd's route middleware).
+type SigningKeyServiceClient interface {
+	// GetSigningKey returns the derived signing key for the given access key
+	// id and credential scope, plus the identity the key belongs to.
+	//
+	// Errors:
+	//
+	//	NOT_FOUND         - no such access key id
+	//	PERMISSION_DENIED - key or owning user is disabled, or the requested
+	//	                    (region, service, date) scope is outside what this
+	//	                    deployment issues keys for
+	//	INVALID_ARGUMENT  - malformed access_key_id/date/region/service
+	GetSigningKey(ctx context.Context, in *GetSigningKeyRequest, opts ...grpc.CallOption) (*GetSigningKeyResponse, error)
+}
+
+type signingKeyServiceClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewSigningKeyServiceClient(cc grpc.ClientConnInterface) SigningKeyServiceClient {
+	return &signingKeyServiceClient{cc}
+}
+
+func (c *signingKeyServiceClient) GetSigningKey(ctx context.Context, in *GetSigningKeyRequest, opts ...grpc.CallOption) (*GetSigningKeyResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetSigningKeyResponse)
+	err := c.cc.Invoke(ctx, SigningKeyService_GetSigningKey_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// SigningKeyServiceServer is the server API for SigningKeyService service.
+// All implementations must embed UnimplementedSigningKeyServiceServer
+// for forward compatibility.
+//
+// SigningKeyService hands out SigV4 derived signing keys so that downstream
+// services can verify request signatures locally without ever holding raw
+// secret access keys.
+//
+// A derived key is HMAC(HMAC(HMAC(HMAC("AWS4"+secret, date), region),
+// service), "aws4_request"). It can only validate requests whose credential
+// scope matches (date, region, service) exactly, so a leaked response is
+// bounded to one service, one region, one UTC day.
+//
+// This API is internal-only and its responses contain key material. Callers
+// authenticate to it the same way as every other iamd route: by signing the
+// RPC with their own IAM credential (see cmd/iamd's route middleware).
+type SigningKeyServiceServer interface {
+	// GetSigningKey returns the derived signing key for the given access key
+	// id and credential scope, plus the identity the key belongs to.
+	//
+	// Errors:
+	//
+	//	NOT_FOUND         - no such access key id
+	//	PERMISSION_DENIED - key or owning user is disabled, or the requested
+	//	                    (region, service, date) scope is outside what this
+	//	                    deployment issues keys for
+	//	INVALID_ARGUMENT  - malformed access_key_id/date/region/service
+	GetSigningKey(context.Context, *GetSigningKeyRequest) (*GetSigningKeyResponse, error)
+	mustEmbedUnimplementedSigningKeyServiceServer()
+}
+
+// UnimplementedSigningKeyServiceServer must be embedded to have
+// forward compatible implementations.
+//
+// NOTE: this should be embedded by value instead of pointer to avoid a nil
+// pointer dereference when methods are called.
+type UnimplementedSigningKeyServiceServer struct{}
+
+func (UnimplementedSigningKeyServiceServer) GetSigningKey(context.Context, *GetSigningKeyRequest) (*GetSigningKeyResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetSigningKey not implemented")
+}
+func (UnimplementedSigningKeyServiceServer) mustEmbedUnimplementedSigningKeyServiceServer() {}
+func (UnimplementedSigningKeyServiceServer) testEmbeddedByValue()                           {}
+
+// UnsafeSigningKeyServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to SigningKeyServiceServer will
+// result in compilation errors.
+type UnsafeSigningKeyServiceServer interface {
+	mustEmbedUnimplementedSigningKeyServiceServer()
+}
+
+func RegisterSigningKeyServiceServer(s grpc.ServiceRegistrar, srv SigningKeyServiceServer) {
+	// If the following call panics, it indicates UnimplementedSigningKeyServiceServer was
+	// embedded by pointer and is nil.  This will cause panics if an
+	// unimplemented method is ever invoked, so we test this at initialization
+	// time to prevent it from happening at runtime later due to I/O.
+	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
+		t.testEmbeddedByValue()
+	}
+	s.RegisterService(&SigningKeyService_ServiceDesc, srv)
+}
+
+func _SigningKeyService_GetSigningKey_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetSigningKeyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SigningKeyServiceServer).GetSigningKey(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: SigningKeyService_GetSigningKey_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SigningKeyServiceServer).GetSigningKey(ctx, req.(*GetSigningKeyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// SigningKeyService_ServiceDesc is the grpc.ServiceDesc for SigningKeyService service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var SigningKeyService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "within.website.x.iam.sts.v1.SigningKeyService",
+	HandlerType: (*SigningKeyServiceServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "GetSigningKey",
+			Handler:    _SigningKeyService_GetSigningKey_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "within/website/x/iam/sts/v1/sts.proto",
+}

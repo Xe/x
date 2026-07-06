@@ -24,6 +24,8 @@ const _ = connect.IsAtLeastVersion1_13_0
 const (
 	// STSServiceName is the fully-qualified name of the STSService service.
 	STSServiceName = "within.website.x.iam.sts.v1.STSService"
+	// SigningKeyServiceName is the fully-qualified name of the SigningKeyService service.
+	SigningKeyServiceName = "within.website.x.iam.sts.v1.SigningKeyService"
 )
 
 // These constants are the fully-qualified names of the RPCs defined in this package. They're
@@ -37,6 +39,9 @@ const (
 	// STSServiceGetCallerIdentityProcedure is the fully-qualified name of the STSService's
 	// GetCallerIdentity RPC.
 	STSServiceGetCallerIdentityProcedure = "/within.website.x.iam.sts.v1.STSService/GetCallerIdentity"
+	// SigningKeyServiceGetSigningKeyProcedure is the fully-qualified name of the SigningKeyService's
+	// GetSigningKey RPC.
+	SigningKeyServiceGetSigningKeyProcedure = "/within.website.x.iam.sts.v1.SigningKeyService/GetSigningKey"
 )
 
 // STSServiceClient is a client for the within.website.x.iam.sts.v1.STSService service.
@@ -115,4 +120,97 @@ type UnimplementedSTSServiceHandler struct{}
 
 func (UnimplementedSTSServiceHandler) GetCallerIdentity(context.Context, *connect.Request[v1.GetCallerIdentityReq]) (*connect.Response[v1.GetCallerIdentityResp], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("within.website.x.iam.sts.v1.STSService.GetCallerIdentity is not implemented"))
+}
+
+// SigningKeyServiceClient is a client for the within.website.x.iam.sts.v1.SigningKeyService
+// service.
+type SigningKeyServiceClient interface {
+	// GetSigningKey returns the derived signing key for the given access key
+	// id and credential scope, plus the identity the key belongs to.
+	//
+	// Errors:
+	//
+	//	NOT_FOUND         - no such access key id
+	//	PERMISSION_DENIED - key or owning user is disabled, or the requested
+	//	                    (region, service, date) scope is outside what this
+	//	                    deployment issues keys for
+	//	INVALID_ARGUMENT  - malformed access_key_id/date/region/service
+	GetSigningKey(context.Context, *connect.Request[v1.GetSigningKeyRequest]) (*connect.Response[v1.GetSigningKeyResponse], error)
+}
+
+// NewSigningKeyServiceClient constructs a client for the
+// within.website.x.iam.sts.v1.SigningKeyService service. By default, it uses the Connect protocol
+// with the binary Protobuf Codec, asks for gzipped responses, and sends uncompressed requests. To
+// use the gRPC or gRPC-Web protocols, supply the connect.WithGRPC() or connect.WithGRPCWeb()
+// options.
+//
+// The URL supplied here should be the base URL for the Connect or gRPC server (for example,
+// http://api.acme.com or https://acme.com/grpc).
+func NewSigningKeyServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) SigningKeyServiceClient {
+	baseURL = strings.TrimRight(baseURL, "/")
+	signingKeyServiceMethods := v1.File_within_website_x_iam_sts_v1_sts_proto.Services().ByName("SigningKeyService").Methods()
+	return &signingKeyServiceClient{
+		getSigningKey: connect.NewClient[v1.GetSigningKeyRequest, v1.GetSigningKeyResponse](
+			httpClient,
+			baseURL+SigningKeyServiceGetSigningKeyProcedure,
+			connect.WithSchema(signingKeyServiceMethods.ByName("GetSigningKey")),
+			connect.WithClientOptions(opts...),
+		),
+	}
+}
+
+// signingKeyServiceClient implements SigningKeyServiceClient.
+type signingKeyServiceClient struct {
+	getSigningKey *connect.Client[v1.GetSigningKeyRequest, v1.GetSigningKeyResponse]
+}
+
+// GetSigningKey calls within.website.x.iam.sts.v1.SigningKeyService.GetSigningKey.
+func (c *signingKeyServiceClient) GetSigningKey(ctx context.Context, req *connect.Request[v1.GetSigningKeyRequest]) (*connect.Response[v1.GetSigningKeyResponse], error) {
+	return c.getSigningKey.CallUnary(ctx, req)
+}
+
+// SigningKeyServiceHandler is an implementation of the
+// within.website.x.iam.sts.v1.SigningKeyService service.
+type SigningKeyServiceHandler interface {
+	// GetSigningKey returns the derived signing key for the given access key
+	// id and credential scope, plus the identity the key belongs to.
+	//
+	// Errors:
+	//
+	//	NOT_FOUND         - no such access key id
+	//	PERMISSION_DENIED - key or owning user is disabled, or the requested
+	//	                    (region, service, date) scope is outside what this
+	//	                    deployment issues keys for
+	//	INVALID_ARGUMENT  - malformed access_key_id/date/region/service
+	GetSigningKey(context.Context, *connect.Request[v1.GetSigningKeyRequest]) (*connect.Response[v1.GetSigningKeyResponse], error)
+}
+
+// NewSigningKeyServiceHandler builds an HTTP handler from the service implementation. It returns
+// the path on which to mount the handler and the handler itself.
+//
+// By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
+// and JSON codecs. They also support gzip compression.
+func NewSigningKeyServiceHandler(svc SigningKeyServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
+	signingKeyServiceMethods := v1.File_within_website_x_iam_sts_v1_sts_proto.Services().ByName("SigningKeyService").Methods()
+	signingKeyServiceGetSigningKeyHandler := connect.NewUnaryHandler(
+		SigningKeyServiceGetSigningKeyProcedure,
+		svc.GetSigningKey,
+		connect.WithSchema(signingKeyServiceMethods.ByName("GetSigningKey")),
+		connect.WithHandlerOptions(opts...),
+	)
+	return "/within.website.x.iam.sts.v1.SigningKeyService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case SigningKeyServiceGetSigningKeyProcedure:
+			signingKeyServiceGetSigningKeyHandler.ServeHTTP(w, r)
+		default:
+			http.NotFound(w, r)
+		}
+	})
+}
+
+// UnimplementedSigningKeyServiceHandler returns CodeUnimplemented from all methods.
+type UnimplementedSigningKeyServiceHandler struct{}
+
+func (UnimplementedSigningKeyServiceHandler) GetSigningKey(context.Context, *connect.Request[v1.GetSigningKeyRequest]) (*connect.Response[v1.GetSigningKeyResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("within.website.x.iam.sts.v1.SigningKeyService.GetSigningKey is not implemented"))
 }

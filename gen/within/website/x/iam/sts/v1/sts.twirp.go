@@ -552,6 +552,521 @@ func (s *sTSServiceServer) PathPrefix() string {
 	return baseServicePath(s.pathPrefix, "within.website.x.iam.sts.v1", "STSService")
 }
 
+// ===========================
+// SigningKeyService Interface
+// ===========================
+
+// SigningKeyService hands out SigV4 derived signing keys so that downstream
+// services can verify request signatures locally without ever holding raw
+// secret access keys.
+//
+// A derived key is HMAC(HMAC(HMAC(HMAC("AWS4"+secret, date), region),
+// service), "aws4_request"). It can only validate requests whose credential
+// scope matches (date, region, service) exactly, so a leaked response is
+// bounded to one service, one region, one UTC day.
+//
+// This API is internal-only and its responses contain key material. Callers
+// authenticate to it the same way as every other iamd route: by signing the
+// RPC with their own IAM credential (see cmd/iamd's route middleware).
+type SigningKeyService interface {
+	// GetSigningKey returns the derived signing key for the given access key
+	// id and credential scope, plus the identity the key belongs to.
+	//
+	// Errors:
+	//   NOT_FOUND         - no such access key id
+	//   PERMISSION_DENIED - key or owning user is disabled, or the requested
+	//                       (region, service, date) scope is outside what this
+	//                       deployment issues keys for
+	//   INVALID_ARGUMENT  - malformed access_key_id/date/region/service
+	GetSigningKey(context.Context, *GetSigningKeyRequest) (*GetSigningKeyResponse, error)
+}
+
+// =================================
+// SigningKeyService Protobuf Client
+// =================================
+
+type signingKeyServiceProtobufClient struct {
+	client      HTTPClient
+	urls        [1]string
+	interceptor twirp.Interceptor
+	opts        twirp.ClientOptions
+}
+
+// NewSigningKeyServiceProtobufClient creates a Protobuf client that implements the SigningKeyService interface.
+// It communicates using Protobuf and can be configured with a custom HTTPClient.
+func NewSigningKeyServiceProtobufClient(baseURL string, client HTTPClient, opts ...twirp.ClientOption) SigningKeyService {
+	if c, ok := client.(*http.Client); ok {
+		client = withoutRedirects(c)
+	}
+
+	clientOpts := twirp.ClientOptions{}
+	for _, o := range opts {
+		o(&clientOpts)
+	}
+
+	// Using ReadOpt allows backwards and forwards compatibility with new options in the future
+	literalURLs := false
+	_ = clientOpts.ReadOpt("literalURLs", &literalURLs)
+	var pathPrefix string
+	if ok := clientOpts.ReadOpt("pathPrefix", &pathPrefix); !ok {
+		pathPrefix = "/twirp" // default prefix
+	}
+
+	// Build method URLs: <baseURL>[<prefix>]/<package>.<Service>/<Method>
+	serviceURL := sanitizeBaseURL(baseURL)
+	serviceURL += baseServicePath(pathPrefix, "within.website.x.iam.sts.v1", "SigningKeyService")
+	urls := [1]string{
+		serviceURL + "GetSigningKey",
+	}
+
+	return &signingKeyServiceProtobufClient{
+		client:      client,
+		urls:        urls,
+		interceptor: twirp.ChainInterceptors(clientOpts.Interceptors...),
+		opts:        clientOpts,
+	}
+}
+
+func (c *signingKeyServiceProtobufClient) GetSigningKey(ctx context.Context, in *GetSigningKeyRequest) (*GetSigningKeyResponse, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "within.website.x.iam.sts.v1")
+	ctx = ctxsetters.WithServiceName(ctx, "SigningKeyService")
+	ctx = ctxsetters.WithMethodName(ctx, "GetSigningKey")
+	caller := c.callGetSigningKey
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *GetSigningKeyRequest) (*GetSigningKeyResponse, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*GetSigningKeyRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*GetSigningKeyRequest) when calling interceptor")
+					}
+					return c.callGetSigningKey(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*GetSigningKeyResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*GetSigningKeyResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *signingKeyServiceProtobufClient) callGetSigningKey(ctx context.Context, in *GetSigningKeyRequest) (*GetSigningKeyResponse, error) {
+	out := new(GetSigningKeyResponse)
+	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[0], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+// =============================
+// SigningKeyService JSON Client
+// =============================
+
+type signingKeyServiceJSONClient struct {
+	client      HTTPClient
+	urls        [1]string
+	interceptor twirp.Interceptor
+	opts        twirp.ClientOptions
+}
+
+// NewSigningKeyServiceJSONClient creates a JSON client that implements the SigningKeyService interface.
+// It communicates using JSON and can be configured with a custom HTTPClient.
+func NewSigningKeyServiceJSONClient(baseURL string, client HTTPClient, opts ...twirp.ClientOption) SigningKeyService {
+	if c, ok := client.(*http.Client); ok {
+		client = withoutRedirects(c)
+	}
+
+	clientOpts := twirp.ClientOptions{}
+	for _, o := range opts {
+		o(&clientOpts)
+	}
+
+	// Using ReadOpt allows backwards and forwards compatibility with new options in the future
+	literalURLs := false
+	_ = clientOpts.ReadOpt("literalURLs", &literalURLs)
+	var pathPrefix string
+	if ok := clientOpts.ReadOpt("pathPrefix", &pathPrefix); !ok {
+		pathPrefix = "/twirp" // default prefix
+	}
+
+	// Build method URLs: <baseURL>[<prefix>]/<package>.<Service>/<Method>
+	serviceURL := sanitizeBaseURL(baseURL)
+	serviceURL += baseServicePath(pathPrefix, "within.website.x.iam.sts.v1", "SigningKeyService")
+	urls := [1]string{
+		serviceURL + "GetSigningKey",
+	}
+
+	return &signingKeyServiceJSONClient{
+		client:      client,
+		urls:        urls,
+		interceptor: twirp.ChainInterceptors(clientOpts.Interceptors...),
+		opts:        clientOpts,
+	}
+}
+
+func (c *signingKeyServiceJSONClient) GetSigningKey(ctx context.Context, in *GetSigningKeyRequest) (*GetSigningKeyResponse, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "within.website.x.iam.sts.v1")
+	ctx = ctxsetters.WithServiceName(ctx, "SigningKeyService")
+	ctx = ctxsetters.WithMethodName(ctx, "GetSigningKey")
+	caller := c.callGetSigningKey
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *GetSigningKeyRequest) (*GetSigningKeyResponse, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*GetSigningKeyRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*GetSigningKeyRequest) when calling interceptor")
+					}
+					return c.callGetSigningKey(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*GetSigningKeyResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*GetSigningKeyResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *signingKeyServiceJSONClient) callGetSigningKey(ctx context.Context, in *GetSigningKeyRequest) (*GetSigningKeyResponse, error) {
+	out := new(GetSigningKeyResponse)
+	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[0], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+// ================================
+// SigningKeyService Server Handler
+// ================================
+
+type signingKeyServiceServer struct {
+	SigningKeyService
+	interceptor      twirp.Interceptor
+	hooks            *twirp.ServerHooks
+	pathPrefix       string // prefix for routing
+	jsonSkipDefaults bool   // do not include unpopulated fields (default values) in the response
+	jsonCamelCase    bool   // JSON fields are serialized as lowerCamelCase rather than keeping the original proto names
+}
+
+// NewSigningKeyServiceServer builds a TwirpServer that can be used as an http.Handler to handle
+// HTTP requests that are routed to the right method in the provided svc implementation.
+// The opts are twirp.ServerOption modifiers, for example twirp.WithServerHooks(hooks).
+func NewSigningKeyServiceServer(svc SigningKeyService, opts ...interface{}) TwirpServer {
+	serverOpts := newServerOpts(opts)
+
+	// Using ReadOpt allows backwards and forwards compatibility with new options in the future
+	jsonSkipDefaults := false
+	_ = serverOpts.ReadOpt("jsonSkipDefaults", &jsonSkipDefaults)
+	jsonCamelCase := false
+	_ = serverOpts.ReadOpt("jsonCamelCase", &jsonCamelCase)
+	var pathPrefix string
+	if ok := serverOpts.ReadOpt("pathPrefix", &pathPrefix); !ok {
+		pathPrefix = "/twirp" // default prefix
+	}
+
+	return &signingKeyServiceServer{
+		SigningKeyService: svc,
+		hooks:             serverOpts.Hooks,
+		interceptor:       twirp.ChainInterceptors(serverOpts.Interceptors...),
+		pathPrefix:        pathPrefix,
+		jsonSkipDefaults:  jsonSkipDefaults,
+		jsonCamelCase:     jsonCamelCase,
+	}
+}
+
+// writeError writes an HTTP response with a valid Twirp error format, and triggers hooks.
+// If err is not a twirp.Error, it will get wrapped with twirp.InternalErrorWith(err)
+func (s *signingKeyServiceServer) writeError(ctx context.Context, resp http.ResponseWriter, err error) {
+	writeError(ctx, resp, err, s.hooks)
+}
+
+// handleRequestBodyError is used to handle error when the twirp server cannot read request
+func (s *signingKeyServiceServer) handleRequestBodyError(ctx context.Context, resp http.ResponseWriter, msg string, err error) {
+	if context.Canceled == ctx.Err() {
+		s.writeError(ctx, resp, twirp.NewError(twirp.Canceled, "failed to read request: context canceled"))
+		return
+	}
+	if context.DeadlineExceeded == ctx.Err() {
+		s.writeError(ctx, resp, twirp.NewError(twirp.DeadlineExceeded, "failed to read request: deadline exceeded"))
+		return
+	}
+	s.writeError(ctx, resp, twirp.WrapError(malformedRequestError(msg), err))
+}
+
+// SigningKeyServicePathPrefix is a convenience constant that may identify URL paths.
+// Should be used with caution, it only matches routes generated by Twirp Go clients,
+// with the default "/twirp" prefix and default CamelCase service and method names.
+// More info: https://twitchtv.github.io/twirp/docs/routing.html
+const SigningKeyServicePathPrefix = "/twirp/within.website.x.iam.sts.v1.SigningKeyService/"
+
+func (s *signingKeyServiceServer) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
+	ctx := req.Context()
+	ctx = ctxsetters.WithPackageName(ctx, "within.website.x.iam.sts.v1")
+	ctx = ctxsetters.WithServiceName(ctx, "SigningKeyService")
+	ctx = ctxsetters.WithResponseWriter(ctx, resp)
+
+	var err error
+	ctx, err = callRequestReceived(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	if req.Method != "POST" {
+		msg := fmt.Sprintf("unsupported method %q (only POST is allowed)", req.Method)
+		s.writeError(ctx, resp, badRouteError(msg, req.Method, req.URL.Path))
+		return
+	}
+
+	// Verify path format: [<prefix>]/<package>.<Service>/<Method>
+	prefix, pkgService, method := parseTwirpPath(req.URL.Path)
+	if pkgService != "within.website.x.iam.sts.v1.SigningKeyService" {
+		msg := fmt.Sprintf("no handler for path %q", req.URL.Path)
+		s.writeError(ctx, resp, badRouteError(msg, req.Method, req.URL.Path))
+		return
+	}
+	if prefix != s.pathPrefix {
+		msg := fmt.Sprintf("invalid path prefix %q, expected %q, on path %q", prefix, s.pathPrefix, req.URL.Path)
+		s.writeError(ctx, resp, badRouteError(msg, req.Method, req.URL.Path))
+		return
+	}
+
+	switch method {
+	case "GetSigningKey":
+		s.serveGetSigningKey(ctx, resp, req)
+		return
+	default:
+		msg := fmt.Sprintf("no handler for path %q", req.URL.Path)
+		s.writeError(ctx, resp, badRouteError(msg, req.Method, req.URL.Path))
+		return
+	}
+}
+
+func (s *signingKeyServiceServer) serveGetSigningKey(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	header := req.Header.Get("Content-Type")
+	i := strings.Index(header, ";")
+	if i == -1 {
+		i = len(header)
+	}
+	switch strings.TrimSpace(strings.ToLower(header[:i])) {
+	case "application/json":
+		s.serveGetSigningKeyJSON(ctx, resp, req)
+	case "application/protobuf":
+		s.serveGetSigningKeyProtobuf(ctx, resp, req)
+	default:
+		msg := fmt.Sprintf("unexpected Content-Type: %q", req.Header.Get("Content-Type"))
+		twerr := badRouteError(msg, req.Method, req.URL.Path)
+		s.writeError(ctx, resp, twerr)
+	}
+}
+
+func (s *signingKeyServiceServer) serveGetSigningKeyJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "GetSigningKey")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	d := json.NewDecoder(req.Body)
+	rawReqBody := json.RawMessage{}
+	if err := d.Decode(&rawReqBody); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+	reqContent := new(GetSigningKeyRequest)
+	unmarshaler := protojson.UnmarshalOptions{DiscardUnknown: true}
+	if err = unmarshaler.Unmarshal(rawReqBody, reqContent); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+
+	handler := s.SigningKeyService.GetSigningKey
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *GetSigningKeyRequest) (*GetSigningKeyResponse, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*GetSigningKeyRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*GetSigningKeyRequest) when calling interceptor")
+					}
+					return s.SigningKeyService.GetSigningKey(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*GetSigningKeyResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*GetSigningKeyResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *GetSigningKeyResponse
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *GetSigningKeyResponse and nil error while calling GetSigningKey. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	marshaler := &protojson.MarshalOptions{UseProtoNames: !s.jsonCamelCase, EmitUnpopulated: !s.jsonSkipDefaults}
+	respBytes, err := marshaler.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal json response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/json")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *signingKeyServiceServer) serveGetSigningKeyProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "GetSigningKey")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	buf, err := io.ReadAll(req.Body)
+	if err != nil {
+		s.handleRequestBodyError(ctx, resp, "failed to read request body", err)
+		return
+	}
+	reqContent := new(GetSigningKeyRequest)
+	if err = proto.Unmarshal(buf, reqContent); err != nil {
+		s.writeError(ctx, resp, malformedRequestError("the protobuf request could not be decoded"))
+		return
+	}
+
+	handler := s.SigningKeyService.GetSigningKey
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *GetSigningKeyRequest) (*GetSigningKeyResponse, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*GetSigningKeyRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*GetSigningKeyRequest) when calling interceptor")
+					}
+					return s.SigningKeyService.GetSigningKey(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*GetSigningKeyResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*GetSigningKeyResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *GetSigningKeyResponse
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *GetSigningKeyResponse and nil error while calling GetSigningKey. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	respBytes, err := proto.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal proto response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/protobuf")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *signingKeyServiceServer) ServiceDescriptor() ([]byte, int) {
+	return twirpFileDescriptor0, 1
+}
+
+func (s *signingKeyServiceServer) ProtocGenTwirpVersion() string {
+	return "v8.1.3"
+}
+
+// PathPrefix returns the base service path, in the form: "/<prefix>/<package>.<Service>/"
+// that is everything in a Twirp route except for the <Method>. This can be used for routing,
+// for example to identify the requests that are targeted to this service in a mux.
+func (s *signingKeyServiceServer) PathPrefix() string {
+	return baseServicePath(s.pathPrefix, "within.website.x.iam.sts.v1", "SigningKeyService")
+}
+
 // =====
 // Utils
 // =====
@@ -1118,38 +1633,55 @@ func callClientError(ctx context.Context, h *twirp.ClientHooks, err twirp.Error)
 }
 
 var twirpFileDescriptor0 = []byte{
-	// 518 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x53, 0x4f, 0x8b, 0xd3, 0x40,
-	0x14, 0x27, 0xfd, 0xe7, 0xee, 0x14, 0x0f, 0x86, 0x15, 0x4a, 0x8b, 0x6e, 0xad, 0x88, 0x7b, 0x9a,
-	0x90, 0x0a, 0x0a, 0x23, 0x1e, 0xac, 0x87, 0xdd, 0x20, 0x42, 0x49, 0xd6, 0xb6, 0x48, 0xa0, 0x4c,
-	0x9b, 0x67, 0x3b, 0xd8, 0x69, 0xba, 0x99, 0xd7, 0x6c, 0xeb, 0x27, 0xf0, 0x73, 0x78, 0x11, 0xfc,
-	0x08, 0x5e, 0xbd, 0x88, 0x1f, 0xc3, 0xa3, 0x1f, 0xc0, 0xb3, 0x4c, 0x26, 0x15, 0xaa, 0x25, 0xe0,
-	0x69, 0xf2, 0x7e, 0x7f, 0xe6, 0xfd, 0xf2, 0x1e, 0x43, 0x1e, 0x5c, 0x0b, 0x9c, 0x8b, 0xa5, 0x73,
-	0x0d, 0x13, 0x25, 0x10, 0x9c, 0x8d, 0x23, 0xb8, 0x74, 0x14, 0x2a, 0x27, 0x75, 0xf5, 0x41, 0x57,
-	0x49, 0x8c, 0xb1, 0xdd, 0x32, 0x32, 0x9a, 0xcb, 0xe8, 0x86, 0x0a, 0x2e, 0xa9, 0xe6, 0x53, 0xb7,
-	0xd9, 0x9a, 0xac, 0xdf, 0x3a, 0x29, 0x5f, 0x88, 0x88, 0x23, 0xfc, 0xf9, 0x30, 0xce, 0xe6, 0xe9,
-	0x2c, 0x8e, 0x67, 0x0b, 0x70, 0xb2, 0x4a, 0x0b, 0x51, 0x48, 0x50, 0xc8, 0xe5, 0x2a, 0x17, 0xdc,
-	0x3b, 0x98, 0x20, 0x75, 0xf5, 0x61, 0x24, 0x9d, 0xaf, 0x16, 0x39, 0x39, 0x07, 0x7c, 0xc1, 0x17,
-	0x0b, 0x48, 0xbc, 0x08, 0x96, 0x28, 0x70, 0xeb, 0xc3, 0x95, 0x7d, 0x97, 0xd4, 0x24, 0xe0, 0x3c,
-	0x8e, 0x1a, 0x56, 0xdb, 0x3a, 0x3b, 0xee, 0xd5, 0xbe, 0x5c, 0x94, 0xbf, 0x59, 0x96, 0x9f, 0xa3,
-	0x76, 0x93, 0x54, 0x56, 0x1c, 0xe7, 0x8d, 0xd2, 0x1e, 0x9b, 0x61, 0xf6, 0x09, 0xa9, 0x5e, 0xad,
-	0x21, 0xd9, 0x36, 0xca, 0x9a, 0xf4, 0x4d, 0xa1, 0x1d, 0xf3, 0x58, 0x61, 0xa3, 0xb2, 0xef, 0xd0,
-	0x98, 0xfd, 0x8c, 0xdc, 0x98, 0x03, 0x8f, 0x20, 0x51, 0x8d, 0x6a, 0xbb, 0x7c, 0x56, 0xef, 0xde,
-	0xa7, 0x05, 0x63, 0xa1, 0x17, 0x99, 0xd6, 0xdf, 0x79, 0x3a, 0x8c, 0xd4, 0x0c, 0xa4, 0x9b, 0x2c,
-	0xb9, 0x84, 0xbf, 0x42, 0x67, 0x98, 0x8e, 0x95, 0xf2, 0xc5, 0x1a, 0x4c, 0x66, 0xdf, 0x14, 0x9d,
-	0x4f, 0x16, 0xb9, 0x7d, 0x60, 0x02, 0x6a, 0x65, 0xbb, 0xa4, 0xb2, 0x56, 0x90, 0x64, 0x77, 0xd5,
-	0xbb, 0x77, 0x0e, 0x27, 0x4a, 0x5d, 0xfa, 0x5a, 0x41, 0xe2, 0x67, 0x52, 0xbb, 0x43, 0x6e, 0xf2,
-	0xe9, 0x14, 0x94, 0x1a, 0xbf, 0x83, 0xed, 0x58, 0x44, 0x79, 0xab, 0xba, 0x01, 0x5f, 0xc2, 0xd6,
-	0x8b, 0xec, 0x27, 0xe4, 0x58, 0x89, 0xd9, 0x12, 0xa2, 0x31, 0xc7, 0x6c, 0x42, 0xf5, 0x6e, 0x93,
-	0x9a, 0x55, 0xd2, 0xdd, 0x2a, 0xe9, 0xe5, 0x6e, 0x95, 0xfe, 0x91, 0x11, 0x3f, 0xc7, 0xee, 0x07,
-	0x8b, 0x90, 0xe0, 0x32, 0x08, 0x20, 0x49, 0xc5, 0x14, 0xec, 0xf7, 0xe4, 0xd6, 0x3f, 0xb9, 0x6d,
-	0xb7, 0x70, 0x6e, 0x87, 0x36, 0xdd, 0xec, 0xfe, 0xaf, 0x45, 0xad, 0x7a, 0xbf, 0x2c, 0x72, 0x3a,
-	0x8d, 0x65, 0x91, 0xb3, 0x77, 0x14, 0xa0, 0xea, 0xeb, 0xff, 0xe9, 0x5b, 0x6f, 0x1e, 0xef, 0x0b,
-	0x9d, 0x8d, 0x33, 0x83, 0xa5, 0x53, 0xf0, 0x40, 0x9e, 0x2a, 0x54, 0xa9, 0xfb, 0xb1, 0x54, 0x1d,
-	0x0e, 0x47, 0x5e, 0xf0, 0xb9, 0xd4, 0x1a, 0x9a, 0x0b, 0x86, 0x79, 0xa7, 0x11, 0xf5, 0xb8, 0xa4,
-	0x01, 0x2a, 0x3a, 0x70, 0xbf, 0xef, 0xd8, 0x30, 0x67, 0xc3, 0x51, 0xe8, 0x71, 0x19, 0x06, 0xa8,
-	0xc2, 0x81, 0xfb, 0xa3, 0xf4, 0xb0, 0x80, 0x0d, 0xcf, 0xfb, 0xbd, 0x57, 0x80, 0x3c, 0xe2, 0xc8,
-	0x7f, 0x96, 0xda, 0x46, 0xc9, 0x58, 0x2e, 0x65, 0x6c, 0xc4, 0x98, 0xc7, 0x25, 0x63, 0x01, 0x2a,
-	0xc6, 0x06, 0xee, 0xa4, 0x96, 0x6d, 0xe8, 0xd1, 0xef, 0x00, 0x00, 0x00, 0xff, 0xff, 0xd4, 0xb8,
-	0x15, 0x40, 0xdd, 0x03, 0x00, 0x00,
+	// 795 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x55, 0xcf, 0x6f, 0xe3, 0x44,
+	0x14, 0x96, 0xd3, 0x34, 0xdb, 0x1d, 0x37, 0xac, 0x3a, 0x2a, 0x52, 0x94, 0x0a, 0x9a, 0x0d, 0xa0,
+	0xad, 0x56, 0xc2, 0xc6, 0x46, 0xe2, 0x87, 0x57, 0x1c, 0x36, 0x48, 0x6c, 0xa3, 0x15, 0xa8, 0xb2,
+	0xbb, 0x49, 0x04, 0x81, 0x68, 0x1a, 0xbf, 0x75, 0x46, 0x6b, 0x8f, 0xbd, 0x9e, 0x89, 0xb7, 0x59,
+	0xc4, 0x81, 0x1b, 0x12, 0xff, 0xc5, 0x5e, 0x90, 0x38, 0xf0, 0x07, 0xec, 0x95, 0x4b, 0xc5, 0x9f,
+	0xc1, 0x91, 0x3f, 0x80, 0x33, 0x9a, 0x19, 0x27, 0x6d, 0x9a, 0x28, 0x65, 0x4f, 0xee, 0x7c, 0xef,
+	0x7b, 0x9e, 0xcf, 0xef, 0xfb, 0x5e, 0x83, 0x3e, 0x78, 0x41, 0xc5, 0x84, 0x32, 0xfb, 0x05, 0x9c,
+	0x71, 0x2a, 0xc0, 0x3e, 0xb7, 0x29, 0x49, 0x6c, 0x2e, 0xb8, 0x5d, 0x38, 0xf2, 0x61, 0x65, 0x79,
+	0x2a, 0x52, 0x7c, 0xa0, 0x69, 0x56, 0x49, 0xb3, 0xce, 0x2d, 0x4a, 0x12, 0x4b, 0xd6, 0x0b, 0xa7,
+	0x79, 0x70, 0x36, 0x7d, 0x6a, 0x17, 0x24, 0xa6, 0x21, 0x11, 0xb0, 0xf8, 0x43, 0x77, 0x36, 0x0f,
+	0xa3, 0x34, 0x8d, 0x62, 0xb0, 0xd5, 0x49, 0x12, 0x05, 0x4d, 0x80, 0x0b, 0x92, 0x64, 0x25, 0xe1,
+	0xee, 0x5a, 0x05, 0x85, 0x23, 0x1f, 0x9a, 0xd2, 0xfe, 0xd3, 0x40, 0xfb, 0x8f, 0x40, 0x7c, 0x49,
+	0xe2, 0x18, 0xf2, 0x6e, 0x08, 0x4c, 0x50, 0x31, 0xf3, 0xe1, 0x39, 0x7e, 0x17, 0xd5, 0x12, 0x10,
+	0x93, 0x34, 0x6c, 0x18, 0x2d, 0xe3, 0xe8, 0x76, 0xa7, 0xf6, 0xfa, 0x78, 0xeb, 0xc2, 0x30, 0xfc,
+	0x12, 0xc5, 0x4d, 0x54, 0xcd, 0x88, 0x98, 0x34, 0x2a, 0x4b, 0x55, 0x85, 0xe1, 0x7d, 0xb4, 0xfd,
+	0x7c, 0x0a, 0xf9, 0xac, 0xb1, 0x25, 0x8b, 0xbe, 0x3e, 0xc8, 0x8e, 0x49, 0xca, 0x45, 0xa3, 0xba,
+	0xdc, 0x21, 0x31, 0xfc, 0x05, 0xba, 0x35, 0x01, 0x12, 0x42, 0xce, 0x1b, 0xdb, 0xad, 0xad, 0x23,
+	0xd3, 0x7d, 0xcf, 0xda, 0x30, 0x16, 0xeb, 0x58, 0x71, 0xfd, 0x79, 0x4f, 0xdb, 0x43, 0x35, 0x0d,
+	0xc9, 0x4b, 0x18, 0x49, 0xe0, 0x9a, 0x68, 0x85, 0x49, 0x59, 0x05, 0x89, 0xa7, 0xa0, 0x35, 0xfb,
+	0xfa, 0xd0, 0xfe, 0xcd, 0x40, 0x6f, 0xaf, 0x99, 0x00, 0xcf, 0xb0, 0x83, 0xaa, 0x53, 0x0e, 0xb9,
+	0x7a, 0x97, 0xe9, 0xbe, 0xb3, 0x5e, 0x51, 0xe1, 0x58, 0x4f, 0x38, 0xe4, 0xbe, 0xa2, 0xe2, 0x36,
+	0xaa, 0x93, 0xf1, 0x18, 0x38, 0x1f, 0x3d, 0x83, 0xd9, 0x88, 0x86, 0xe5, 0x55, 0xa6, 0x06, 0x1f,
+	0xc3, 0xac, 0x1b, 0xe2, 0x4f, 0xd1, 0x6d, 0x4e, 0x23, 0x06, 0xe1, 0x88, 0x08, 0x35, 0x21, 0xd3,
+	0x6d, 0x5a, 0xda, 0x4a, 0x6b, 0x6e, 0xa5, 0x75, 0x3a, 0xb7, 0xd2, 0xdf, 0xd1, 0xe4, 0x87, 0xa2,
+	0xfd, 0x87, 0xf6, 0x2a, 0xa0, 0x11, 0xa3, 0x2c, 0x7a, 0x0c, 0xd2, 0xa7, 0x29, 0x70, 0x81, 0xef,
+	0x5f, 0xbf, 0x75, 0xf9, 0xeb, 0x97, 0x6e, 0x3f, 0x42, 0x55, 0x19, 0xa1, 0xd2, 0xb7, 0xfd, 0xd7,
+	0xc7, 0x7b, 0x17, 0x86, 0x91, 0xef, 0xba, 0xe8, 0x87, 0xef, 0x3e, 0xfa, 0xf0, 0xf3, 0xef, 0x7f,
+	0xfc, 0xec, 0xa7, 0xf7, 0x7d, 0xc5, 0x90, 0x09, 0xc8, 0x21, 0xa2, 0x29, 0xd3, 0x36, 0x5e, 0x26,
+	0x40, 0xa3, 0xb8, 0x85, 0x6e, 0x71, 0xc8, 0x0b, 0x3a, 0x86, 0x6b, 0x96, 0xce, 0xe1, 0xf6, 0xcf,
+	0x15, 0x35, 0xda, 0xab, 0x82, 0x79, 0x96, 0x32, 0x0e, 0xf8, 0x10, 0x99, 0x5c, 0xa3, 0x52, 0xb2,
+	0xd2, 0xbb, 0xeb, 0x23, 0xbe, 0x20, 0xe2, 0xaf, 0xd0, 0x0e, 0x2d, 0xbd, 0x50, 0x52, 0x4d, 0xf7,
+	0xfe, 0xc6, 0x44, 0x9c, 0xa6, 0xcf, 0x80, 0x2d, 0xdc, 0x5b, 0xf4, 0xe2, 0x0e, 0xba, 0xc3, 0x52,
+	0x31, 0x52, 0x9b, 0x33, 0x22, 0x4f, 0x05, 0xe4, 0xff, 0x63, 0xe4, 0x75, 0x96, 0x8a, 0x9e, 0xec,
+	0x78, 0x28, 0x1b, 0xf0, 0x03, 0x64, 0x8e, 0xc9, 0x78, 0x02, 0xa3, 0x29, 0x13, 0x34, 0x56, 0x1f,
+	0xbb, 0xb9, 0x1f, 0x29, 0xfa, 0x13, 0xc9, 0x6e, 0xbf, 0x32, 0x50, 0x7d, 0x49, 0xdc, 0x6a, 0x46,
+	0x8c, 0xd5, 0x8c, 0xdc, 0x43, 0x77, 0xd2, 0x3c, 0x22, 0x8c, 0xbe, 0x24, 0x82, 0xa6, 0xec, 0x32,
+	0x49, 0x6f, 0x5d, 0x85, 0xbb, 0x21, 0xbe, 0x8b, 0x76, 0xb3, 0x9c, 0xb2, 0x31, 0xcd, 0x48, 0x2c,
+	0x59, 0x7a, 0xe3, 0xcc, 0x05, 0xa6, 0x29, 0x21, 0xe5, 0x59, 0x4c, 0x66, 0x23, 0xb5, 0x1a, 0x55,
+	0x4d, 0x29, 0xb1, 0x6f, 0x48, 0x02, 0xee, 0x2f, 0x06, 0x42, 0xc1, 0x69, 0x10, 0x68, 0xdf, 0xf0,
+	0x4b, 0xb4, 0xb7, 0xb2, 0x11, 0xd8, 0xd9, 0x38, 0xff, 0x75, 0xff, 0x43, 0x9a, 0xee, 0x9b, 0xb6,
+	0xf0, 0xcc, 0xfd, 0xd5, 0x40, 0x7b, 0x97, 0x81, 0x99, 0x2b, 0x2a, 0x50, 0x7d, 0x29, 0x48, 0x37,
+	0xab, 0x59, 0xd9, 0x92, 0x9b, 0xd5, 0xac, 0xe6, 0xb4, 0xf3, 0xaf, 0x81, 0x0e, 0xc7, 0x69, 0xb2,
+	0xa9, 0xb3, 0xb3, 0x13, 0x08, 0x7e, 0x22, 0x43, 0x70, 0x62, 0x7c, 0xfb, 0xc9, 0x32, 0xd1, 0x3e,
+	0xb7, 0x23, 0x60, 0xf6, 0x86, 0x1f, 0x82, 0x07, 0x5c, 0xf0, 0xc2, 0x79, 0x55, 0xd9, 0xee, 0xf7,
+	0x07, 0xdd, 0xe0, 0xf7, 0xca, 0x41, 0x5f, 0xbf, 0xa0, 0x5f, 0xde, 0x34, 0xb0, 0xba, 0x24, 0xb1,
+	0x02, 0xc1, 0xad, 0x9e, 0xf3, 0xd7, 0xbc, 0x3a, 0x2c, 0xab, 0xc3, 0xc1, 0xb0, 0x4b, 0x92, 0x61,
+	0x20, 0xf8, 0xb0, 0xe7, 0xfc, 0x5d, 0xb9, 0xb7, 0xa1, 0x3a, 0x7c, 0x74, 0xd2, 0xf9, 0x1a, 0x04,
+	0x09, 0x89, 0x20, 0xff, 0x54, 0x5a, 0x9a, 0xe9, 0x79, 0x25, 0xd5, 0xf3, 0x06, 0x9e, 0xd7, 0x25,
+	0x89, 0xe7, 0x05, 0x82, 0x7b, 0x5e, 0xcf, 0x39, 0xab, 0xa9, 0x58, 0x7f, 0xfc, 0x5f, 0x00, 0x00,
+	0x00, 0xff, 0xff, 0xa8, 0x8b, 0x7c, 0x55, 0xc5, 0x06, 0x00, 0x00,
 }

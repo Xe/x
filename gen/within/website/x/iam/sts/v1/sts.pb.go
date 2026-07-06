@@ -230,6 +230,230 @@ func (x *GetCallerIdentityResp) GetSignedAt() *timestamppb.Timestamp {
 	return nil
 }
 
+type GetSigningKeyRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The access key id parsed from the request's Credential= component.
+	AccessKeyId string `protobuf:"bytes,1,opt,name=access_key_id,json=accessKeyId,proto3" json:"access_key_id,omitempty"`
+	// UTC date in YYYYMMDD form, e.g. "20260706".
+	Date string `protobuf:"bytes,2,opt,name=date,proto3" json:"date,omitempty"`
+	// Region code, e.g. "us-east-1".
+	Region string `protobuf:"bytes,3,opt,name=region,proto3" json:"region,omitempty"`
+	// Service code, e.g. "iam".
+	Service       string `protobuf:"bytes,4,opt,name=service,proto3" json:"service,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetSigningKeyRequest) Reset() {
+	*x = GetSigningKeyRequest{}
+	mi := &file_within_website_x_iam_sts_v1_sts_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetSigningKeyRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetSigningKeyRequest) ProtoMessage() {}
+
+func (x *GetSigningKeyRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_within_website_x_iam_sts_v1_sts_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetSigningKeyRequest.ProtoReflect.Descriptor instead.
+func (*GetSigningKeyRequest) Descriptor() ([]byte, []int) {
+	return file_within_website_x_iam_sts_v1_sts_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *GetSigningKeyRequest) GetAccessKeyId() string {
+	if x != nil {
+		return x.AccessKeyId
+	}
+	return ""
+}
+
+func (x *GetSigningKeyRequest) GetDate() string {
+	if x != nil {
+		return x.Date
+	}
+	return ""
+}
+
+func (x *GetSigningKeyRequest) GetRegion() string {
+	if x != nil {
+		return x.Region
+	}
+	return ""
+}
+
+func (x *GetSigningKeyRequest) GetService() string {
+	if x != nil {
+		return x.Service
+	}
+	return ""
+}
+
+type GetSigningKeyResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The 32-byte derived signing key. Raw bytes, not hex.
+	SigningKey []byte `protobuf:"bytes,1,opt,name=signing_key,json=signingKey,proto3" json:"signing_key,omitempty"`
+	// Who this key authenticates as. Downstream services use this for
+	// authorization and audit attribution after the signature checks out.
+	Identity *TokenIdentity `protobuf:"bytes,2,opt,name=identity,proto3" json:"identity,omitempty"`
+	// Hard upper bound on validity: the scope date's UTC day plus the maximum
+	// clock skew, after which no legitimate request can carry this scope.
+	// Never cache the key past this instant.
+	NotValidAfter *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=not_valid_after,json=notValidAfter,proto3" json:"not_valid_after,omitempty"`
+	// How long the caller may cache this response before asking again. Bounds
+	// revocation latency: a disabled key stops verifying within one cache TTL
+	// instead of at end of day. Always <= not_valid_after.
+	CacheUntil    *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=cache_until,json=cacheUntil,proto3" json:"cache_until,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetSigningKeyResponse) Reset() {
+	*x = GetSigningKeyResponse{}
+	mi := &file_within_website_x_iam_sts_v1_sts_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetSigningKeyResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetSigningKeyResponse) ProtoMessage() {}
+
+func (x *GetSigningKeyResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_within_website_x_iam_sts_v1_sts_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetSigningKeyResponse.ProtoReflect.Descriptor instead.
+func (*GetSigningKeyResponse) Descriptor() ([]byte, []int) {
+	return file_within_website_x_iam_sts_v1_sts_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *GetSigningKeyResponse) GetSigningKey() []byte {
+	if x != nil {
+		return x.SigningKey
+	}
+	return nil
+}
+
+func (x *GetSigningKeyResponse) GetIdentity() *TokenIdentity {
+	if x != nil {
+		return x.Identity
+	}
+	return nil
+}
+
+func (x *GetSigningKeyResponse) GetNotValidAfter() *timestamppb.Timestamp {
+	if x != nil {
+		return x.NotValidAfter
+	}
+	return nil
+}
+
+func (x *GetSigningKeyResponse) GetCacheUntil() *timestamppb.Timestamp {
+	if x != nil {
+		return x.CacheUntil
+	}
+	return nil
+}
+
+// TokenIdentity identifies the principal a signing key belongs to.
+type TokenIdentity struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The access key id the identity was resolved from.
+	AccessKeyId string `protobuf:"bytes,1,opt,name=access_key_id,json=accessKeyId,proto3" json:"access_key_id,omitempty"`
+	// The organization the credential belongs to. Reserved for multi-tenant
+	// deployments; iamd currently has no organization concept and leaves it
+	// empty.
+	OrganizationId string `protobuf:"bytes,2,opt,name=organization_id,json=organizationId,proto3" json:"organization_id,omitempty"`
+	// The principal within the organization: iamd's user UUID.
+	PrincipalId string `protobuf:"bytes,3,opt,name=principal_id,json=principalId,proto3" json:"principal_id,omitempty"`
+	// Human-readable name for logs and error messages: iamd's user name.
+	DisplayName   string `protobuf:"bytes,4,opt,name=display_name,json=displayName,proto3" json:"display_name,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TokenIdentity) Reset() {
+	*x = TokenIdentity{}
+	mi := &file_within_website_x_iam_sts_v1_sts_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TokenIdentity) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TokenIdentity) ProtoMessage() {}
+
+func (x *TokenIdentity) ProtoReflect() protoreflect.Message {
+	mi := &file_within_website_x_iam_sts_v1_sts_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TokenIdentity.ProtoReflect.Descriptor instead.
+func (*TokenIdentity) Descriptor() ([]byte, []int) {
+	return file_within_website_x_iam_sts_v1_sts_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *TokenIdentity) GetAccessKeyId() string {
+	if x != nil {
+		return x.AccessKeyId
+	}
+	return ""
+}
+
+func (x *TokenIdentity) GetOrganizationId() string {
+	if x != nil {
+		return x.OrganizationId
+	}
+	return ""
+}
+
+func (x *TokenIdentity) GetPrincipalId() string {
+	if x != nil {
+		return x.PrincipalId
+	}
+	return ""
+}
+
+func (x *TokenIdentity) GetDisplayName() string {
+	if x != nil {
+		return x.DisplayName
+	}
+	return ""
+}
+
 var File_within_website_x_iam_sts_v1_sts_proto protoreflect.FileDescriptor
 
 const file_within_website_x_iam_sts_v1_sts_proto_rawDesc = "" +
@@ -247,10 +471,30 @@ const file_within_website_x_iam_sts_v1_sts_proto_rawDesc = "" +
 	"\x15GetCallerIdentityResp\x121\n" +
 	"\x04user\x18\x01 \x01(\v2\x1d.within.website.x.iam.v1.UserR\x04user\x12\"\n" +
 	"\raccess_key_id\x18\x02 \x01(\tR\vaccessKeyId\x127\n" +
-	"\tsigned_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\bsignedAt2\x88\x01\n" +
+	"\tsigned_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\bsignedAt\"\xae\x01\n" +
+	"\x14GetSigningKeyRequest\x12*\n" +
+	"\raccess_key_id\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\vaccessKeyId\x12(\n" +
+	"\x04date\x18\x02 \x01(\tB\x14\xbaH\x11\xc8\x01\x01r\f2\n" +
+	"^[0-9]{8}$R\x04date\x12\x1e\n" +
+	"\x06region\x18\x03 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x06region\x12 \n" +
+	"\aservice\x18\x04 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\aservice\"\x81\x02\n" +
+	"\x15GetSigningKeyResponse\x12\x1f\n" +
+	"\vsigning_key\x18\x01 \x01(\fR\n" +
+	"signingKey\x12F\n" +
+	"\bidentity\x18\x02 \x01(\v2*.within.website.x.iam.sts.v1.TokenIdentityR\bidentity\x12B\n" +
+	"\x0fnot_valid_after\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\rnotValidAfter\x12;\n" +
+	"\vcache_until\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\n" +
+	"cacheUntil\"\xa2\x01\n" +
+	"\rTokenIdentity\x12\"\n" +
+	"\raccess_key_id\x18\x01 \x01(\tR\vaccessKeyId\x12'\n" +
+	"\x0forganization_id\x18\x02 \x01(\tR\x0eorganizationId\x12!\n" +
+	"\fprincipal_id\x18\x03 \x01(\tR\vprincipalId\x12!\n" +
+	"\fdisplay_name\x18\x04 \x01(\tR\vdisplayName2\x88\x01\n" +
 	"\n" +
 	"STSService\x12z\n" +
-	"\x11GetCallerIdentity\x121.within.website.x.iam.sts.v1.GetCallerIdentityReq\x1a2.within.website.x.iam.sts.v1.GetCallerIdentityRespB\xf6\x01\n" +
+	"\x11GetCallerIdentity\x121.within.website.x.iam.sts.v1.GetCallerIdentityReq\x1a2.within.website.x.iam.sts.v1.GetCallerIdentityResp2\x8b\x01\n" +
+	"\x11SigningKeyService\x12v\n" +
+	"\rGetSigningKey\x121.within.website.x.iam.sts.v1.GetSigningKeyRequest\x1a2.within.website.x.iam.sts.v1.GetSigningKeyResponseB\xf6\x01\n" +
 	"\x1fcom.within.website.x.iam.sts.v1B\bStsProtoP\x01Z6within.website/x/gen/within/website/x/iam/sts/v1;stsv1\xa2\x02\x05WWXIS\xaa\x02\x1bWithin.Website.X.Iam.Sts.V1\xca\x02\x1bWithin\\Website\\X\\Iam\\Sts\\V1\xe2\x02'Within\\Website\\X\\Iam\\Sts\\V1\\GPBMetadata\xea\x02 Within::Website::X::Iam::Sts::V1b\x06proto3"
 
 var (
@@ -265,25 +509,33 @@ func file_within_website_x_iam_sts_v1_sts_proto_rawDescGZIP() []byte {
 	return file_within_website_x_iam_sts_v1_sts_proto_rawDescData
 }
 
-var file_within_website_x_iam_sts_v1_sts_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_within_website_x_iam_sts_v1_sts_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_within_website_x_iam_sts_v1_sts_proto_goTypes = []any{
 	(*GetCallerIdentityReq)(nil),  // 0: within.website.x.iam.sts.v1.GetCallerIdentityReq
 	(*Header)(nil),                // 1: within.website.x.iam.sts.v1.Header
 	(*GetCallerIdentityResp)(nil), // 2: within.website.x.iam.sts.v1.GetCallerIdentityResp
-	(*v1.User)(nil),               // 3: within.website.x.iam.v1.User
-	(*timestamppb.Timestamp)(nil), // 4: google.protobuf.Timestamp
+	(*GetSigningKeyRequest)(nil),  // 3: within.website.x.iam.sts.v1.GetSigningKeyRequest
+	(*GetSigningKeyResponse)(nil), // 4: within.website.x.iam.sts.v1.GetSigningKeyResponse
+	(*TokenIdentity)(nil),         // 5: within.website.x.iam.sts.v1.TokenIdentity
+	(*v1.User)(nil),               // 6: within.website.x.iam.v1.User
+	(*timestamppb.Timestamp)(nil), // 7: google.protobuf.Timestamp
 }
 var file_within_website_x_iam_sts_v1_sts_proto_depIdxs = []int32{
 	1, // 0: within.website.x.iam.sts.v1.GetCallerIdentityReq.headers:type_name -> within.website.x.iam.sts.v1.Header
-	3, // 1: within.website.x.iam.sts.v1.GetCallerIdentityResp.user:type_name -> within.website.x.iam.v1.User
-	4, // 2: within.website.x.iam.sts.v1.GetCallerIdentityResp.signed_at:type_name -> google.protobuf.Timestamp
-	0, // 3: within.website.x.iam.sts.v1.STSService.GetCallerIdentity:input_type -> within.website.x.iam.sts.v1.GetCallerIdentityReq
-	2, // 4: within.website.x.iam.sts.v1.STSService.GetCallerIdentity:output_type -> within.website.x.iam.sts.v1.GetCallerIdentityResp
-	4, // [4:5] is the sub-list for method output_type
-	3, // [3:4] is the sub-list for method input_type
-	3, // [3:3] is the sub-list for extension type_name
-	3, // [3:3] is the sub-list for extension extendee
-	0, // [0:3] is the sub-list for field type_name
+	6, // 1: within.website.x.iam.sts.v1.GetCallerIdentityResp.user:type_name -> within.website.x.iam.v1.User
+	7, // 2: within.website.x.iam.sts.v1.GetCallerIdentityResp.signed_at:type_name -> google.protobuf.Timestamp
+	5, // 3: within.website.x.iam.sts.v1.GetSigningKeyResponse.identity:type_name -> within.website.x.iam.sts.v1.TokenIdentity
+	7, // 4: within.website.x.iam.sts.v1.GetSigningKeyResponse.not_valid_after:type_name -> google.protobuf.Timestamp
+	7, // 5: within.website.x.iam.sts.v1.GetSigningKeyResponse.cache_until:type_name -> google.protobuf.Timestamp
+	0, // 6: within.website.x.iam.sts.v1.STSService.GetCallerIdentity:input_type -> within.website.x.iam.sts.v1.GetCallerIdentityReq
+	3, // 7: within.website.x.iam.sts.v1.SigningKeyService.GetSigningKey:input_type -> within.website.x.iam.sts.v1.GetSigningKeyRequest
+	2, // 8: within.website.x.iam.sts.v1.STSService.GetCallerIdentity:output_type -> within.website.x.iam.sts.v1.GetCallerIdentityResp
+	4, // 9: within.website.x.iam.sts.v1.SigningKeyService.GetSigningKey:output_type -> within.website.x.iam.sts.v1.GetSigningKeyResponse
+	8, // [8:10] is the sub-list for method output_type
+	6, // [6:8] is the sub-list for method input_type
+	6, // [6:6] is the sub-list for extension type_name
+	6, // [6:6] is the sub-list for extension extendee
+	0, // [0:6] is the sub-list for field type_name
 }
 
 func init() { file_within_website_x_iam_sts_v1_sts_proto_init() }
@@ -297,9 +549,9 @@ func file_within_website_x_iam_sts_v1_sts_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_within_website_x_iam_sts_v1_sts_proto_rawDesc), len(file_within_website_x_iam_sts_v1_sts_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   3,
+			NumMessages:   6,
 			NumExtensions: 0,
-			NumServices:   1,
+			NumServices:   2,
 		},
 		GoTypes:           file_within_website_x_iam_sts_v1_sts_proto_goTypes,
 		DependencyIndexes: file_within_website_x_iam_sts_v1_sts_proto_depIdxs,
