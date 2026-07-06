@@ -84,7 +84,7 @@
     let r = !1;
     if ((t(e, () => (r = !0)), r)) return;
     let n = e.firstElementChild;
-    for (; n; ) (O(n, t, !1), (n = n.nextElementSibling));
+    for (; n;) (O(n, t, !1), (n = n.nextElementSibling));
   }
   function S(e, ...t) {
     console.warn(`Alpine Warning: ${e}`, ...t);
@@ -191,7 +191,7 @@
       });
   }
   function er(e) {
-    if (e._x_cleanups) for (; e._x_cleanups.length; ) e._x_cleanups.pop()();
+    if (e._x_cleanups) for (; e._x_cleanups.length;) e._x_cleanups.pop()();
   }
   var at = new MutationObserver(ft),
     ct = !1;
@@ -595,7 +595,7 @@ ${
     let t = Symbol();
     ((dr = t), de.set(t, []));
     let r = () => {
-        for (; de.get(t).length; ) de.get(t).shift()();
+        for (; de.get(t).length;) de.get(t).shift()();
         de.delete(t);
       },
       n = () => {
@@ -714,7 +714,7 @@ ${
     );
   }
   function ke() {
-    for (Et = !1; wt.length; ) wt.shift()();
+    for (Et = !1; wt.length;) wt.shift()();
   }
   function gr() {
     Et = !0;
@@ -1022,7 +1022,7 @@ ${
         this.beforeCancels.push(s);
       },
       cancel: me(function () {
-        for (; this.beforeCancels.length; ) this.beforeCancels.shift()();
+        for (; this.beforeCancels.length;) this.beforeCancels.shift()();
         o();
       }),
       finish: o,
@@ -1349,7 +1349,7 @@ ${
   }
   function St(e, t, r) {
     let n = [];
-    for (; n.length; ) n.pop()();
+    for (; n.length;) n.pop()();
     let i = Object.entries(t).map(([s, a]) => ({ name: s, value: a })),
       o = bt(i);
     return (
@@ -1362,7 +1362,7 @@ ${
         (n.push(s.runCleanups), s());
       }),
       () => {
-        for (; n.length; ) n.pop()();
+        for (; n.length;) n.pop()();
       }
     );
   }
@@ -1985,7 +1985,7 @@ ${
   function Ri(e) {
     let t = [],
       r = e;
-    for (; r; ) (r._x_refs && t.push(r._x_refs), (r = r.parentNode));
+    for (; r;) (r._x_refs && t.push(r._x_refs), (r = r.parentNode));
     return t;
   }
   var Lt = {};
