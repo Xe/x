@@ -402,3 +402,31 @@ func flipLastDigit(auth string) string {
 	}
 	return string(b)
 }
+
+// TestDeriveSigningKey pins the derivation against the worked example in the
+// AWS documentation ("Examples of how to derive a signing key for Signature
+// Version 4"), so it is a known-answer test against AWS, not against ourselves.
+func TestDeriveSigningKey(t *testing.T) {
+	got := hex.EncodeToString(DeriveSigningKey(
+		"wJalrXUtnFEMI/K7MDENG+bPxRfiCYEXAMPLEKEY", "20120215", "us-east-1", "iam"))
+	const want = "f4780e2d9f65fa895f9c67b32ce1baf0b0d8a43505a000a1a9e090d414db404d"
+	if got != want {
+		t.Errorf("DeriveSigningKey = %s, want %s", got, want)
+	}
+}
+
+// TestParseCredential extracts the scope tuple from an Authorization header.
+func TestParseCredential(t *testing.T) {
+	const h = "AWS4-HMAC-SHA256 Credential=AKIDEXAMPLE/20150830/us-east-1/iam/aws4_request, SignedHeaders=content-type;host;x-amz-date, Signature=5d672d79c15b13162d9279b0855cfba6789a8edb4c82c400e06b5924a6f2b5d7"
+	c, err := ParseCredential(h)
+	if err != nil {
+		t.Fatalf("ParseCredential: %v", err)
+	}
+	want := Credential{AccessKeyID: "AKIDEXAMPLE", Date: "20150830", Region: "us-east-1", Service: "iam"}
+	if *c != want {
+		t.Errorf("credential = %+v, want %+v", *c, want)
+	}
+	if _, err := ParseCredential("Bearer nope"); !errors.Is(err, ErrMissingAuth) {
+		t.Errorf("bad header err = %v, want ErrMissingAuth", err)
+	}
+}

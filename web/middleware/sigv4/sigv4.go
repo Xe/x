@@ -10,6 +10,7 @@ package sigv4
 
 import (
 	"bytes"
+	"context"
 	"crypto/hmac"
 	"crypto/sha256"
 	"crypto/subtle"
@@ -58,7 +59,7 @@ var (
 	ErrBodyHash             = errors.New("sigv4: body does not match x-amz-content-sha256")
 	ErrUnauthorized         = errors.New("sigv4: signature mismatch")
 	ErrBodyTooLarge         = errors.New("sigv4: request body exceeds limit")
-	ErrNotConfigured        = errors.New("sigv4: Verifier.Lookup is not set")
+	ErrNotConfigured        = errors.New("sigv4: neither Verifier.Lookup nor Verifier.KeyLookup is set")
 )
 
 // Verifier validates SigV4-signed requests for a single region/service.
@@ -70,6 +71,13 @@ type Verifier struct {
 	// Lookup resolves an access key id to its secret. Return ErrUnknownKey
 	// for unknown keys. This is the one piece you must supply.
 	Lookup Lookuper
+
+	// KeyLookup resolves a credential scope to its derived signing key. When
+	// set it takes precedence over Lookup, and the verifier never sees the
+	// raw secret — this is how services that must not hold secrets verify
+	// locally (see web/middleware/sigv4/iamsts). Exactly one of Lookup or
+	// KeyLookup must be set.
+	KeyLookup SigningKeyLookuper
 
 	// MaxClockSkew bounds how far the request's X-Amz-Date may be from now.
 	// Defaults to 15 minutes (matching AWS) when zero.
@@ -97,37 +105,46 @@ func (v *Verifier) Middleware(next http.Handler) http.Handler {
 		keyID, err := v.Verify(r)
 		if err != nil {
 			slog.DebugContext(r.Context(), "cannot serve request", "err", err, "method", r.Method, "path", r.URL.Path)
-			switch {
-			case errors.Is(err, ErrMissingAuth):
-				err = twirp.WrapError(twirp.Unauthenticated.Error("no authentication header present"), err)
-			case errors.Is(err, ErrScopeMismatch),
-				errors.Is(err, ErrClockSkew), errors.Is(err, ErrBodyTooLarge),
-				errors.Is(err, ErrStreamingUnsupported), errors.Is(err, ErrMissingSignedHost):
-				// These sentinels describe the caller's own request and carry no
-				// internal detail, so surface them: a client cannot correct clock
-				// skew it can't distinguish from a scope mismatch.
-				err = twirp.WrapError(twirp.InvalidArgument.Error(err.Error()), err)
-			case errors.Is(err, ErrUnknownKey), errors.Is(err, ErrUnauthorized),
-				errors.Is(err, ErrBodyHash):
-				err = twirp.WrapError(twirp.PermissionDenied.Error("invalid authentication header"), err)
-			default:
-				// Unexpected errors (e.g. the key store being down) are server
-				// faults; log the cause but never echo it to the caller.
-				slog.ErrorContext(r.Context(), "sigv4 verification failed unexpectedly", "err", err)
-				err = twirp.WrapError(twirp.Internal.Error("internal error"), err)
-			}
-			twirp.WriteError(w, err)
+			twirp.WriteError(w, TwirpError(r.Context(), err))
 			return
 		}
 		next.ServeHTTP(w, r.WithContext(withKeyID(r.Context(), keyID)))
 	})
 }
 
+// TwirpError maps a verification error to the twirp error middlewares write
+// to clients. Sentinels that describe the caller's own request keep their
+// message; key and signature failures collapse to one opaque message so a
+// probe cannot distinguish unknown, disabled, and mis-signed credentials.
+// Unexpected errors are logged with their cause and surfaced as an opaque
+// internal error.
+func TwirpError(ctx context.Context, err error) error {
+	switch {
+	case errors.Is(err, ErrMissingAuth):
+		return twirp.WrapError(twirp.Unauthenticated.Error("no authentication header present"), err)
+	case errors.Is(err, ErrScopeMismatch),
+		errors.Is(err, ErrClockSkew), errors.Is(err, ErrBodyTooLarge),
+		errors.Is(err, ErrStreamingUnsupported), errors.Is(err, ErrMissingSignedHost):
+		// These sentinels describe the caller's own request and carry no
+		// internal detail, so surface them: a client cannot correct clock
+		// skew it can't distinguish from a scope mismatch.
+		return twirp.WrapError(twirp.InvalidArgument.Error(err.Error()), err)
+	case errors.Is(err, ErrUnknownKey), errors.Is(err, ErrUnauthorized),
+		errors.Is(err, ErrBodyHash):
+		return twirp.WrapError(twirp.PermissionDenied.Error("invalid authentication header"), err)
+	default:
+		// Unexpected errors (e.g. the key store being down) are server
+		// faults; log the cause but never echo it to the caller.
+		slog.ErrorContext(ctx, "sigv4 verification failed unexpectedly", "err", err)
+		return twirp.WrapError(twirp.Internal.Error("internal error"), err)
+	}
+}
+
 // Verify checks a single request. On success it returns the access key id of
 // the caller. The request body is buffered and reset so downstream handlers
 // can read it normally.
 func (v *Verifier) Verify(r *http.Request) (string, error) {
-	if v.Lookup == nil {
+	if v.Lookup == nil && v.KeyLookup == nil {
 		return "", ErrNotConfigured
 	}
 
@@ -251,7 +268,16 @@ func (v *Verifier) verify(r *http.Request, sr *signedRequest, payloadHash string
 		return "", ErrClockSkew
 	}
 
-	secret, err := v.Lookup.Lookup(sr.accessKeyID)
+	var key []byte
+	if v.KeyLookup != nil {
+		key, err = v.KeyLookup.LookupSigningKey(r.Context(), sr.accessKeyID, sr.scope.date, sr.scope.region, sr.scope.service)
+	} else {
+		var secret string
+		secret, err = v.Lookup.Lookup(sr.accessKeyID)
+		if err == nil {
+			key = DeriveSigningKey(secret, sr.scope.date, sr.scope.region, sr.scope.service)
+		}
+	}
 	if err != nil {
 		return "", err
 	}
@@ -266,7 +292,6 @@ func (v *Verifier) verify(r *http.Request, sr *signedRequest, payloadHash string
 		hex.EncodeToString(hashed[:]),
 	}, "\n")
 
-	key := signingKey(secret, sr.scope.date, sr.scope.region, sr.scope.service)
 	want := hex.EncodeToString(hmacSHA256(key, []byte(stringToSign)))
 
 	if subtle.ConstantTimeCompare([]byte(want), []byte(sr.signature)) != 1 {
@@ -423,13 +448,43 @@ func parseAuthHeader(h string) (*signedRequest, error) {
 	}, nil
 }
 
+// Credential is the parsed Credential= component of a SigV4 Authorization
+// header: the access key id plus the literal, unnormalized scope strings.
+type Credential struct {
+	AccessKeyID string
+	Date        string
+	Region      string
+	Service     string
+}
+
+// ParseCredential extracts the credential scope from an AWS4-HMAC-SHA256
+// Authorization header value. It returns ErrMissingAuth for anything
+// malformed, matching Verify.
+func ParseCredential(authorization string) (*Credential, error) {
+	sr, err := parseAuthHeader(authorization)
+	if err != nil {
+		return nil, err
+	}
+	return &Credential{
+		AccessKeyID: sr.accessKeyID,
+		Date:        sr.scope.date,
+		Region:      sr.scope.region,
+		Service:     sr.scope.service,
+	}, nil
+}
+
 func hmacSHA256(key, data []byte) []byte {
 	h := hmac.New(sha256.New, key)
 	h.Write(data)
 	return h.Sum(nil)
 }
 
-func signingKey(secret, date, region, service string) []byte {
+// DeriveSigningKey computes the SigV4 derived signing key for a credential
+// scope: HMAC(HMAC(HMAC(HMAC("AWS4"+secret, date), region), service),
+// "aws4_request"). The derived key can only validate requests whose scope
+// matches (date, region, service) exactly, so exposure is bounded to one UTC
+// day and one service; it never reveals the secret.
+func DeriveSigningKey(secret, date, region, service string) []byte {
 	kDate := hmacSHA256([]byte("AWS4"+secret), []byte(date))
 	kRegion := hmacSHA256(kDate, []byte(region))
 	kService := hmacSHA256(kRegion, []byte(service))
