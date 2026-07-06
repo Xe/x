@@ -7,6 +7,7 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/twitchtv/twirp"
@@ -31,6 +32,8 @@ var (
 	service       = flag.String("service", "iam", "SigV4 credential-scope service all clients must sign with")
 	maxBodySize   = flag.Int64("max-body-size", 1<<20, "max request body bytes hashed for SigV4 verification")
 	bootstrapUser = flag.String("bootstrap-username", "", "if set and the DB has no users, create an admin user and signing key with this name at startup and log the credentials")
+
+	signingKeyCacheTTL = flag.Duration("signing-key-cache-ttl", 5*time.Minute, "how long downstream verifiers may cache a derived signing key before re-fetching; bounds revocation latency")
 )
 
 func main() {
@@ -53,7 +56,7 @@ func main() {
 // then resolve the caller to its DAO user (available downstream via sigv4.User)
 // — including the STS route, whose callers are downstream verifiers
 // authenticating with their own IAM credential.
-func newMux(lg *slog.Logger, dao *models.DAO, verifier *sigv4.Verifier) *http.ServeMux {
+func newMux(lg *slog.Logger, dao *models.DAO, verifier *sigv4.Verifier, signingKeyCacheTTL time.Duration) *http.ServeMux {
 	mux := http.NewServeMux()
 
 	// Verify the signature, then annotate the request with the caller's user
@@ -68,6 +71,9 @@ func newMux(lg *slog.Logger, dao *models.DAO, verifier *sigv4.Verifier) *http.Se
 
 	stsSvc := sts.New(dao, verifier)
 	mux.Handle(stsv1.STSServicePathPrefix, stack(stsv1.NewSTSServiceServer(stsSvc, twirp.WithServerInterceptors(twirpslog.Interceptor(lg)))))
+
+	sk := sts.NewSigningKeys(dao, *region, *service, signingKeyCacheTTL)
+	mux.Handle(stsv1.SigningKeyServicePathPrefix, stack(stsv1.NewSigningKeyServiceServer(sk, twirp.WithServerInterceptors(twirpslog.Interceptor(lg)))))
 
 	return mux
 }
@@ -99,7 +105,7 @@ func run(ctx context.Context, lg *slog.Logger) error {
 	// One verifier backs the route middleware (authenticating every caller to
 	// iamd, including STS) and the STS handler's bodyless end-user checks.
 	verifier := newVerifier(dao, *region, *service, *maxBodySize)
-	mux := newMux(lg, dao, verifier)
+	mux := newMux(lg, dao, verifier, *signingKeyCacheTTL)
 
 	g, ctx := errgroup.WithContext(ctx)
 

@@ -7,6 +7,7 @@ import (
 	"net/http/httptest"
 	"path/filepath"
 	"testing"
+	"time"
 
 	"within.website/x/cmd/iamd/models"
 	iamv1 "within.website/x/gen/within/website/x/iam/v1"
@@ -81,7 +82,7 @@ func TestIntegration_SignedTwirpRoundTrip(t *testing.T) {
 	}
 
 	verifier := newVerifier(dao, intRegion, intService, 1<<20)
-	mux := newMux(quietLogger(), dao, verifier)
+	mux := newMux(quietLogger(), dao, verifier, 5*time.Minute)
 	srv := httptest.NewServer(mux)
 	defer srv.Close()
 
