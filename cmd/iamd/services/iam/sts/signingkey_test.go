@@ -24,8 +24,7 @@ const (
 // is unambiguous.
 var fixedNow = time.Date(2026, 7, 6, 12, 0, 0, 0, time.UTC)
 
-// newDAO opens a fresh SQLite-backed DAO in a temp directory, mirroring the
-// setup newTestServer uses in sts_test.go.
+// newDAO opens a fresh SQLite-backed DAO in a temp directory for testing.
 func newDAO(t *testing.T) *models.DAO {
 	t.Helper()
 	dao, err := models.Open(filepath.Join(t.TempDir(), "test.db"))
@@ -37,7 +36,7 @@ func newDAO(t *testing.T) *models.DAO {
 
 func newSigningKeysTest(t *testing.T) (*SigningKeys, *models.DAO, string, string) {
 	t.Helper()
-	dao := newDAO(t) // reuse/mirror the helper pattern already in sts_test.go
+	dao := newDAO(t)
 	u, err := dao.CreateUser(context.Background(), "tester")
 	if err != nil {
 		t.Fatalf("CreateUser: %v", err)

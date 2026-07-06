@@ -166,8 +166,8 @@ func (rt *sigV4RoundTripper) RoundTrip(req *http.Request) (*http.Response, error
 	}
 
 	// Declare the payload hash in the request itself, like the AWS SDKs do for
-	// S3. Verifiers that never see the body (central STS validation) require
-	// this header to reconstruct the canonical request.
+	// S3. Verifiers that check the body hash (such as the iamsts local verifier)
+	// require this header to reconstruct the canonical request.
 	signReq.Header.Set("X-Amz-Content-Sha256", strHash)
 
 	ctx := signReq.Context()

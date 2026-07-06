@@ -51,10 +51,10 @@ func main() {
 	}
 }
 
-// newMux builds the HTTP mux serving the SigV4-protected IAM and STS Twirp
-// services. Every route runs the same pipeline — verify the SigV4 signature,
-// then resolve the caller to its DAO user (available downstream via sigv4.User)
-// — including the STS route, whose callers are downstream verifiers
+// newMux builds the HTTP mux serving the SigV4-protected IAM and signing-key
+// Twirp services. Every route runs the same pipeline — verify the SigV4
+// signature, then resolve the caller to its DAO user (available downstream via
+// sigv4.User). The SigningKeyService route's callers are downstream verifiers
 // authenticating with their own IAM credential.
 func newMux(lg *slog.Logger, dao *models.DAO, verifier *sigv4.Verifier, signingKeyCacheTTL time.Duration) *http.ServeMux {
 	mux := http.NewServeMux()

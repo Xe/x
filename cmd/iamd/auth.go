@@ -10,10 +10,9 @@ import (
 	"within.website/x/web/middleware/sigv4"
 )
 
-// newVerifier builds the local SigV4 verifier shared by the route middleware
-// (authenticating callers to iamd) and the STS handler (validating end-user
-// signatures forwarded by downstream services). It resolves access key ids to
-// their secrets from the DAO.
+// newVerifier builds the local SigV4 verifier used by the route middleware to
+// authenticate callers to iamd. It resolves access key ids to their secrets
+// from the DAO.
 //
 // A missing key maps to sigv4.ErrUnknownKey (a 403/401 verification failure),
 // but any other backing-store error propagates unwrapped so the middleware
