@@ -86,6 +86,15 @@ func run(ctx context.Context, lg *slog.Logger) error {
 		"max-body-size", *maxBodySize,
 	)
 
+	// A zero or negative TTL would make every GetSigningKey response
+	// use-once (cache_until in the past or equal to now never keeps a key),
+	// silently degrading every downstream verifier to an RPC per request
+	// instead of the intended warm-cache hot path. Reject it at startup
+	// rather than let it fail open into a latent load problem.
+	if *signingKeyCacheTTL <= 0 {
+		return fmt.Errorf("-signing-key-cache-ttl must be positive, got %s", *signingKeyCacheTTL)
+	}
+
 	dao, err := models.New(*dbLoc)
 	if err != nil {
 		return err
