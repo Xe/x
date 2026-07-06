@@ -12,6 +12,7 @@ import (
 	"within.website/x/cmd/iamd/models"
 	iamv1 "within.website/x/gen/within/website/x/iam/v1"
 	"within.website/x/web/middleware/sigv4"
+	"within.website/x/web/middleware/sigv4/iamsts"
 	"within.website/x/web/middleware/sigv4/sigv4client"
 )
 
@@ -152,4 +153,88 @@ func TestUserMiddleware_resolvesCaller(t *testing.T) {
 	if gotUUID != us[0].UUID {
 		t.Errorf("context user = %q, want %q", gotUUID, us[0].UUID)
 	}
+}
+
+// TestIntegration_SigningKeyVerifierChain drives the new deployment shape end
+// to end against a real iamd: a downstream service verifies incoming SigV4
+// requests locally with derived keys fetched from iamd's SigningKeyService,
+// authenticating that fetch with its own IAM credential.
+func TestIntegration_SigningKeyVerifierChain(t *testing.T) {
+	dao := newDAO(t)
+	verifierAKID, verifierSecret := bootstrapCreds(t, dao)
+
+	// A second identity acts as the end user calling the downstream service.
+	ctx := context.Background()
+	endUser, err := dao.CreateUser(ctx, "end-user")
+	if err != nil {
+		t.Fatalf("CreateUser: %v", err)
+	}
+	endKey, err := dao.CreateKey(ctx, endUser, "end user key")
+	if err != nil {
+		t.Fatalf("CreateKey: %v", err)
+	}
+
+	verifier := newVerifier(dao, intRegion, intService, 1<<20)
+	iamd := httptest.NewServer(newMux(quietLogger(), dao, verifier, 5*time.Minute))
+	defer iamd.Close()
+
+	// The downstream service: fetches signing keys from iamd (signing those
+	// fetches with its own credential) and verifies end-user requests locally.
+	downstreamVerifier := iamsts.New(iamsts.Config{
+		BaseURL:     iamd.URL,
+		HTTPClient:  &http.Client{Transport: signedTransport(t, verifierAKID, verifierSecret)},
+		Region:      intRegion,
+		Service:     intService,
+		MaxBodySize: 1 << 20,
+	})
+	var gotPrincipal string
+	app := httptest.NewServer(downstreamVerifier.Middleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if c, ok := iamsts.Caller(r.Context()); ok {
+			gotPrincipal = c.PrincipalID
+		}
+		w.WriteHeader(http.StatusNoContent)
+	})))
+	defer app.Close()
+
+	endUserClient := &http.Client{Transport: signedTransport(t, endKey.AccessKeyID, endKey.SecretAccessKey)}
+
+	t.Run("end user verified locally", func(t *testing.T) {
+		resp, err := endUserClient.Get(app.URL + "/resource")
+		if err != nil {
+			t.Fatalf("GET: %v", err)
+		}
+		defer resp.Body.Close()
+		if resp.StatusCode != http.StatusNoContent {
+			t.Fatalf("status = %d, want 204", resp.StatusCode)
+		}
+		if gotPrincipal != endUser.UUID {
+			t.Errorf("principal = %q, want %q", gotPrincipal, endUser.UUID)
+		}
+	})
+
+	t.Run("disabled key stops verifying after cache expiry", func(t *testing.T) {
+		if err := dao.DisableKey(ctx, endKey.AccessKeyID, "compromised", ""); err != nil {
+			t.Fatalf("DisableKey: %v", err)
+		}
+		// The cached key may still verify (bounded staleness by design); a
+		// fresh verifier simulates post-TTL behavior deterministically.
+		fresh := iamsts.New(iamsts.Config{
+			BaseURL:    iamd.URL,
+			HTTPClient: &http.Client{Transport: signedTransport(t, verifierAKID, verifierSecret)},
+			Region:     intRegion,
+			Service:    intService,
+		})
+		freshApp := httptest.NewServer(fresh.Middleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusNoContent)
+		})))
+		defer freshApp.Close()
+		resp, err := endUserClient.Get(freshApp.URL + "/resource")
+		if err != nil {
+			t.Fatalf("GET: %v", err)
+		}
+		defer resp.Body.Close()
+		if resp.StatusCode != http.StatusForbidden {
+			t.Fatalf("status = %d, want 403 (disabled key)", resp.StatusCode)
+		}
+	})
 }
