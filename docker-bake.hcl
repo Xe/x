@@ -3,6 +3,7 @@ variable "VERSION" { default = "devel" }
 group "default" {
   targets = [
     "aura",
+    "iamd",
     "mimi",
     "mi",
     "python-wasm-mcp",
@@ -33,6 +34,20 @@ target "mimi" {
   tags = [
     "ghcr.io/xe/x/mimi:${VERSION}",
     "ghcr.io/xe/x/mimi:latest",
+  ]
+}
+
+target "iamd" {
+  context = "."
+  dockerfile = "./docker/iamd.Dockerfile"
+  platforms = [
+    "linux/amd64",
+    "linux/arm64",
+  ]
+  pull = true
+  tags = [
+    "ghcr.io/xe/x/iamd:${VERSION}",
+    "ghcr.io/xe/x/iamd:latest",
   ]
 }
 
