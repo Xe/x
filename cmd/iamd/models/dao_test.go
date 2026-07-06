@@ -248,3 +248,73 @@ func TestListKeys(t *testing.T) {
 		})
 	}
 }
+
+func TestGetKeyWithUser(t *testing.T) {
+	ctx := context.Background()
+	d := openTestDAO(t)
+
+	u, err := d.CreateUser(ctx, "kayla")
+	if err != nil {
+		t.Fatalf("CreateUser: %v", err)
+	}
+	k, err := d.CreateKey(ctx, u, "test key")
+	if err != nil {
+		t.Fatalf("CreateKey: %v", err)
+	}
+
+	t.Run("active key and user", func(t *testing.T) {
+		got, err := d.GetKeyWithUser(ctx, k.AccessKeyID)
+		if err != nil {
+			t.Fatalf("GetKeyWithUser: %v", err)
+		}
+		if got.DeletedAt.Valid {
+			t.Error("active key reported as disabled")
+		}
+		if got.User == nil || got.User.UUID != u.UUID {
+			t.Fatalf("user = %+v, want UUID %s", got.User, u.UUID)
+		}
+		if got.SecretAccessKey != k.SecretAccessKey {
+			t.Error("secret not loaded")
+		}
+	})
+
+	t.Run("unknown key is not found", func(t *testing.T) {
+		if _, err := d.GetKeyWithUser(ctx, "AKIDNOPE"); !errors.Is(err, gorm.ErrRecordNotFound) {
+			t.Fatalf("err = %v, want ErrRecordNotFound", err)
+		}
+	})
+
+	t.Run("disabled key still loads, marked disabled", func(t *testing.T) {
+		if err := d.DisableKey(ctx, k.AccessKeyID, "test", ""); err != nil {
+			t.Fatalf("DisableKey: %v", err)
+		}
+		got, err := d.GetKeyWithUser(ctx, k.AccessKeyID)
+		if err != nil {
+			t.Fatalf("GetKeyWithUser after disable: %v", err)
+		}
+		if !got.DeletedAt.Valid {
+			t.Error("disabled key not marked disabled")
+		}
+	})
+
+	t.Run("disabled user still loads, marked disabled", func(t *testing.T) {
+		u2, err := d.CreateUser(ctx, "mara")
+		if err != nil {
+			t.Fatalf("CreateUser: %v", err)
+		}
+		k2, err := d.CreateKey(ctx, u2, "second")
+		if err != nil {
+			t.Fatalf("CreateKey: %v", err)
+		}
+		if err := d.DisableUser(ctx, u2.UUID, "test"); err != nil {
+			t.Fatalf("DisableUser: %v", err)
+		}
+		got, err := d.GetKeyWithUser(ctx, k2.AccessKeyID)
+		if err != nil {
+			t.Fatalf("GetKeyWithUser: %v", err)
+		}
+		if got.User == nil || !got.User.DeletedAt.Valid {
+			t.Errorf("disabled user = %+v, want loaded with DeletedAt set", got.User)
+		}
+	})
+}

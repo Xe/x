@@ -55,27 +55,29 @@ func (d *DAO) CreateUser(ctx context.Context, name string) (*User, error) {
 }
 
 func (d *DAO) DisableUser(ctx context.Context, userID, reason string) error {
-	keys := gorm.G[Key](d.db.Unscoped())
-	users := gorm.G[User](d.db.Unscoped())
+	keysUnscoped := gorm.G[Key](d.db.Unscoped())
+	usersUnscoped := gorm.G[User](d.db.Unscoped())
 
-	u, err := users.Where("uuid = ?", userID).First(ctx)
+	u, err := usersUnscoped.Where("uuid = ?", userID).First(ctx)
 	if err != nil {
 		return err
 	}
 
-	if _, err := users.Where("uuid = ?", userID).Update(ctx, "disable_reason", reason); err != nil {
+	if _, err := usersUnscoped.Where("uuid = ?", userID).Update(ctx, "disable_reason", reason); err != nil {
 		return err
 	}
 
-	if _, err := keys.Where("user_id = ?", u.Model.ID).Update(ctx, "disable_reason", "user disabled: "+reason); err != nil {
+	if _, err := keysUnscoped.Where("user_id = ?", u.Model.ID).Update(ctx, "disable_reason", "user disabled: "+reason); err != nil {
 		return err
 	}
 
-	if _, err := keys.Where("user_id = ?", u.Model.ID).Delete(ctx); err != nil {
+	// Use scoped interfaces for deletion to ensure soft-delete, not hard-delete
+	if _, err := d.keys.Where("user_id = ?", u.Model.ID).Delete(ctx); err != nil {
 		return err
 	}
 
-	if _, err := users.Where("uuid = ?", userID).Delete(ctx); err != nil {
+	// Use scoped interface for deletion to ensure soft-delete, not hard-delete
+	if _, err := d.users.Where("uuid = ?", userID).Delete(ctx); err != nil {
 		return err
 	}
 

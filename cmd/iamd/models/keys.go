@@ -119,3 +119,21 @@ func (d *DAO) SecretFor(ctx context.Context, accessKeyID string) (string, error)
 	}
 	return k.SecretAccessKey, nil
 }
+
+// GetKeyWithUser returns the key with the given access key id and its owning
+// user, including soft-deleted (disabled) rows for both — disabled state is
+// visible on DeletedAt rather than hidden by GORM's default scope. It exists
+// for the signing-key issuer, which must distinguish "no such key" from "key
+// or user disabled". Use SecretFor when disabled keys must not load at all.
+func (d *DAO) GetKeyWithUser(ctx context.Context, accessKeyID string) (*Key, error) {
+	var k Key
+	// PropagateUnscoped is set on the session, so Unscoped applies to the
+	// User preload as well.
+	if err := d.db.WithContext(ctx).Unscoped().
+		Preload("User").
+		Where("access_key_id = ?", accessKeyID).
+		First(&k).Error; err != nil {
+		return nil, err
+	}
+	return &k, nil
+}
