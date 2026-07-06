@@ -69,9 +69,6 @@ func newMux(lg *slog.Logger, dao *models.DAO, verifier *sigv4.Verifier, signingK
 	ks := keys.New(dao)
 	mux.Handle(iamv1.KeyServicePathPrefix, stack(iamv1.NewKeyServiceServer(ks, twirp.WithServerInterceptors(twirpslog.Interceptor(lg)))))
 
-	stsSvc := sts.New(dao, verifier)
-	mux.Handle(stsv1.STSServicePathPrefix, stack(stsv1.NewSTSServiceServer(stsSvc, twirp.WithServerInterceptors(twirpslog.Interceptor(lg)))))
-
 	sk := sts.NewSigningKeys(dao, *region, *service, signingKeyCacheTTL)
 	mux.Handle(stsv1.SigningKeyServicePathPrefix, stack(stsv1.NewSigningKeyServiceServer(sk, twirp.WithServerInterceptors(twirpslog.Interceptor(lg)))))
 
@@ -102,8 +99,8 @@ func run(ctx context.Context, lg *slog.Logger) error {
 
 	http.Handle("/metrics", promhttp.Handler())
 
-	// One verifier backs the route middleware (authenticating every caller to
-	// iamd, including STS) and the STS handler's bodyless end-user checks.
+	// The route middleware is the verifier's only consumer: it authenticates
+	// every caller to iamd, including SigningKeyService.
 	verifier := newVerifier(dao, *region, *service, *maxBodySize)
 	mux := newMux(lg, dao, verifier, *signingKeyCacheTTL)
 

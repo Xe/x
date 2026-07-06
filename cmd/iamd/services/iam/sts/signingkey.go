@@ -1,3 +1,6 @@
+// Package sts hosts iamd's security-token-service surface: the
+// SigningKeyService that distributes SigV4 derived signing keys to
+// downstream verifiers.
 package sts
 
 import (

@@ -22,8 +22,6 @@ import (
 const _ = connect.IsAtLeastVersion1_13_0
 
 const (
-	// STSServiceName is the fully-qualified name of the STSService service.
-	STSServiceName = "within.website.x.iam.sts.v1.STSService"
 	// SigningKeyServiceName is the fully-qualified name of the SigningKeyService service.
 	SigningKeyServiceName = "within.website.x.iam.sts.v1.SigningKeyService"
 )
@@ -36,91 +34,10 @@ const (
 // reflection-formatted method names, remove the leading slash and convert the remaining slash to a
 // period.
 const (
-	// STSServiceGetCallerIdentityProcedure is the fully-qualified name of the STSService's
-	// GetCallerIdentity RPC.
-	STSServiceGetCallerIdentityProcedure = "/within.website.x.iam.sts.v1.STSService/GetCallerIdentity"
 	// SigningKeyServiceGetSigningKeyProcedure is the fully-qualified name of the SigningKeyService's
 	// GetSigningKey RPC.
 	SigningKeyServiceGetSigningKeyProcedure = "/within.website.x.iam.sts.v1.SigningKeyService/GetSigningKey"
 )
-
-// STSServiceClient is a client for the within.website.x.iam.sts.v1.STSService service.
-type STSServiceClient interface {
-	// GetCallerIdentity validates a SigV4-signed request and returns the user
-	// that owns the signing key. Returns UNAUTHENTICATED for any verification
-	// failure: bad signature, unknown or disabled key, disabled user, clock
-	// skew, credential-scope mismatch, or a missing/unsupported payload hash.
-	GetCallerIdentity(context.Context, *connect.Request[v1.GetCallerIdentityReq]) (*connect.Response[v1.GetCallerIdentityResp], error)
-}
-
-// NewSTSServiceClient constructs a client for the within.website.x.iam.sts.v1.STSService service.
-// By default, it uses the Connect protocol with the binary Protobuf Codec, asks for gzipped
-// responses, and sends uncompressed requests. To use the gRPC or gRPC-Web protocols, supply the
-// connect.WithGRPC() or connect.WithGRPCWeb() options.
-//
-// The URL supplied here should be the base URL for the Connect or gRPC server (for example,
-// http://api.acme.com or https://acme.com/grpc).
-func NewSTSServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) STSServiceClient {
-	baseURL = strings.TrimRight(baseURL, "/")
-	sTSServiceMethods := v1.File_within_website_x_iam_sts_v1_sts_proto.Services().ByName("STSService").Methods()
-	return &sTSServiceClient{
-		getCallerIdentity: connect.NewClient[v1.GetCallerIdentityReq, v1.GetCallerIdentityResp](
-			httpClient,
-			baseURL+STSServiceGetCallerIdentityProcedure,
-			connect.WithSchema(sTSServiceMethods.ByName("GetCallerIdentity")),
-			connect.WithClientOptions(opts...),
-		),
-	}
-}
-
-// sTSServiceClient implements STSServiceClient.
-type sTSServiceClient struct {
-	getCallerIdentity *connect.Client[v1.GetCallerIdentityReq, v1.GetCallerIdentityResp]
-}
-
-// GetCallerIdentity calls within.website.x.iam.sts.v1.STSService.GetCallerIdentity.
-func (c *sTSServiceClient) GetCallerIdentity(ctx context.Context, req *connect.Request[v1.GetCallerIdentityReq]) (*connect.Response[v1.GetCallerIdentityResp], error) {
-	return c.getCallerIdentity.CallUnary(ctx, req)
-}
-
-// STSServiceHandler is an implementation of the within.website.x.iam.sts.v1.STSService service.
-type STSServiceHandler interface {
-	// GetCallerIdentity validates a SigV4-signed request and returns the user
-	// that owns the signing key. Returns UNAUTHENTICATED for any verification
-	// failure: bad signature, unknown or disabled key, disabled user, clock
-	// skew, credential-scope mismatch, or a missing/unsupported payload hash.
-	GetCallerIdentity(context.Context, *connect.Request[v1.GetCallerIdentityReq]) (*connect.Response[v1.GetCallerIdentityResp], error)
-}
-
-// NewSTSServiceHandler builds an HTTP handler from the service implementation. It returns the path
-// on which to mount the handler and the handler itself.
-//
-// By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
-// and JSON codecs. They also support gzip compression.
-func NewSTSServiceHandler(svc STSServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
-	sTSServiceMethods := v1.File_within_website_x_iam_sts_v1_sts_proto.Services().ByName("STSService").Methods()
-	sTSServiceGetCallerIdentityHandler := connect.NewUnaryHandler(
-		STSServiceGetCallerIdentityProcedure,
-		svc.GetCallerIdentity,
-		connect.WithSchema(sTSServiceMethods.ByName("GetCallerIdentity")),
-		connect.WithHandlerOptions(opts...),
-	)
-	return "/within.website.x.iam.sts.v1.STSService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		switch r.URL.Path {
-		case STSServiceGetCallerIdentityProcedure:
-			sTSServiceGetCallerIdentityHandler.ServeHTTP(w, r)
-		default:
-			http.NotFound(w, r)
-		}
-	})
-}
-
-// UnimplementedSTSServiceHandler returns CodeUnimplemented from all methods.
-type UnimplementedSTSServiceHandler struct{}
-
-func (UnimplementedSTSServiceHandler) GetCallerIdentity(context.Context, *connect.Request[v1.GetCallerIdentityReq]) (*connect.Response[v1.GetCallerIdentityResp], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("within.website.x.iam.sts.v1.STSService.GetCallerIdentity is not implemented"))
-}
 
 // SigningKeyServiceClient is a client for the within.website.x.iam.sts.v1.SigningKeyService
 // service.

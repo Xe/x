@@ -20,10 +20,8 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
-	"net/url"
 	"slices"
 	"sort"
-	"strconv"
 	"strings"
 	"time"
 
@@ -156,62 +154,6 @@ func (v *Verifier) Verify(r *http.Request) (string, error) {
 	payloadHash, err := v.resolvePayloadHash(r)
 	if err != nil {
 		return "", err
-	}
-
-	return v.verify(r, sr, payloadHash)
-}
-
-// VerifySignature verifies a SigV4 signature over request material without
-// possessing the body. payloadHash is placed in the canonical request verbatim
-// — it must be exactly what the client signed, sentinel case included; the
-// caller must have already confirmed the received body hashes to it — this
-// method never reads a body. It is the entry point for central STS validation,
-// where the body never reaches the verifier (the verifying service checks it
-// locally instead).
-//
-// host is taken from the host argument, not a Host header, matching how the
-// canonical "host" header is derived. headers must carry authorization and
-// x-amz-date (or date). payloadHash must be non-empty.
-//
-// On success it returns the access key id of the caller.
-func (v *Verifier) VerifySignature(method, path, query, host string, headers http.Header, payloadHash string) (string, error) {
-	if v.Lookup == nil {
-		return "", ErrNotConfigured
-	}
-
-	sr, err := parseAuthHeader(headers.Get("Authorization"))
-	if err != nil {
-		return "", err
-	}
-
-	if payloadHash == "" {
-		return "", errors.New("sigv4: payload hash required to verify a signature")
-	}
-	if strings.EqualFold(payloadHash, StreamingPayload) {
-		return "", ErrStreamingUnsupported
-	}
-
-	// Build the URL directly rather than via url.Parse: a forwarded path like
-	// "//foo/bar" would parse as a scheme-relative authority, silently moving
-	// "foo" into the host and canonicalizing the wrong path.
-	unescaped, err := url.PathUnescape(path)
-	if err != nil {
-		return "", fmt.Errorf("%w: bad path", ErrMissingAuth)
-	}
-
-	r := &http.Request{
-		Method: method,
-		URL:    &url.URL{Path: unescaped, RawPath: path, RawQuery: query},
-		Host:   host,
-		Header: headers,
-	}
-	// canonicalHeaderValue derives content-length from r.ContentLength, not the
-	// header map, so mirror the forwarded value into the field when a client
-	// signed it.
-	if cl := headers.Get("Content-Length"); cl != "" {
-		if n, err := strconv.ParseInt(cl, 10, 64); err == nil {
-			r.ContentLength = n
-		}
 	}
 
 	return v.verify(r, sr, payloadHash)
