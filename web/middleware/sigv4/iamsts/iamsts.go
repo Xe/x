@@ -207,7 +207,19 @@ func (v *Verifier) entry(ctx context.Context, k scopeKey) (*entry, error) {
 	v.mu.Unlock()
 
 	res, err, _ := v.sf.Do(k.String(), func() (any, error) {
-		return v.fetch(ctx, k)
+		// The singleflight leader runs this fetch on behalf of every caller
+		// collapsed onto it, not just the first one whose context happens to
+		// be attached here. If that first caller's request is canceled (e.g.
+		// the client disconnects), ctx must not cancel the in-flight RPC and
+		// fail every collapsed waiter with it — an attacker could otherwise
+		// induce a 500 burst for an uncached scope just by opening a request
+		// and dropping the connection. context.WithoutCancel detaches from
+		// the caller's cancellation/deadline while preserving trace/log
+		// values (fetch logs with this ctx), and the explicit timeout below
+		// replaces the deadline WithoutCancel drops.
+		fctx, cancel := context.WithTimeout(context.WithoutCancel(ctx), 10*time.Second)
+		defer cancel()
+		return v.fetch(fctx, k)
 	})
 	if err != nil {
 		return nil, err

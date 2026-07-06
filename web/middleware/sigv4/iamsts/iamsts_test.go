@@ -306,6 +306,30 @@ func TestVerifier_IAMOutageIs500(t *testing.T) {
 	}
 }
 
+// TestVerifier_FetchSurvivesCallerCancel pins the fix for a collapsed-waiter
+// 500 burst: the singleflight leader's fetch used to run on the first
+// caller's request context, so a client disconnecting mid-RPC canceled the
+// fetch and failed every request collapsed onto it. A request must still
+// verify successfully even if its own context is already canceled by the
+// time the fetch runs.
+func TestVerifier_FetchSurvivesCallerCancel(t *testing.T) {
+	h, closeSrv := newHarness(t, 5*time.Minute)
+	defer closeSrv()
+
+	req := signedGET(t, h.clock())
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+	req = req.WithContext(ctx)
+
+	rec := do(h, req)
+	if rec.Code != http.StatusNoContent {
+		t.Fatalf("status = %d, want 204 (fetch must survive caller cancellation), body=%s", rec.Code, rec.Body.String())
+	}
+	if got := h.fake.calls.Load(); got != 1 {
+		t.Errorf("RPCs = %d, want 1", got)
+	}
+}
+
 // TestVerifier_KnownAnswerFixture replays the worked example from the AWS
 // SigV4 documentation (GET iam.amazonaws.com ListUsers, AKIDEXAMPLE,
 // 20150830T123600Z) whose final signature AWS publishes, so the full
