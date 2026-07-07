@@ -99,12 +99,10 @@ func (s *widgetServer) MakeWidget(ctx context.Context, req *widgetsv1.MakeWidget
 }
 ```
 
-`twirp/twirpslog.Interceptor` currently attributes calls by reading
-`web/middleware/sigv4.User` (local classic verification) or
-`web/middleware/sigv4/iamsts.Caller` (classic central verification) — it does
-not yet look at this package's `iamsts.Caller`. Until that's wired up, log
-and bill SigV4A-verified callers explicitly in your own handlers or
-interceptor using `iamsts.Caller(ctx)` as shown above.
+`twirp/twirpslog.Interceptor` already reads this package's `iamsts.Caller`
+(checked ahead of the classic `sigv4`/`sigv4/iamsts` pair) for its `user_id`
+log attribute and billing metric, so add it as a server interceptor and
+attribution comes for free.
 
 ## Behavior to know about
 
