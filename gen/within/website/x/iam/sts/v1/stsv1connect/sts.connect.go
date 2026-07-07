@@ -37,6 +37,9 @@ const (
 	// SigningKeyServiceGetSigningKeyProcedure is the fully-qualified name of the SigningKeyService's
 	// GetSigningKey RPC.
 	SigningKeyServiceGetSigningKeyProcedure = "/within.website.x.iam.sts.v1.SigningKeyService/GetSigningKey"
+	// SigningKeyServiceGetPublicKeyProcedure is the fully-qualified name of the SigningKeyService's
+	// GetPublicKey RPC.
+	SigningKeyServiceGetPublicKeyProcedure = "/within.website.x.iam.sts.v1.SigningKeyService/GetPublicKey"
 )
 
 // SigningKeyServiceClient is a client for the within.website.x.iam.sts.v1.SigningKeyService
@@ -53,6 +56,17 @@ type SigningKeyServiceClient interface {
 	//	                    deployment issues keys for
 	//	INVALID_ARGUMENT  - malformed access_key_id/date/region/service
 	GetSigningKey(context.Context, *connect.Request[v1.GetSigningKeyRequest]) (*connect.Response[v1.GetSigningKeyResponse], error)
+	// GetPublicKey returns the SigV4A (ECDSA P-256) public verification key
+	// for an access key id, plus the identity it authenticates. Public keys
+	// are not secret: holding one lets a service verify signatures but never
+	// mint them, unlike the symmetric derived keys from GetSigningKey.
+	//
+	// Errors:
+	//
+	//	NOT_FOUND         - no such access key id
+	//	PERMISSION_DENIED - key or owning user is disabled
+	//	INVALID_ARGUMENT  - missing access_key_id
+	GetPublicKey(context.Context, *connect.Request[v1.GetPublicKeyRequest]) (*connect.Response[v1.GetPublicKeyResponse], error)
 }
 
 // NewSigningKeyServiceClient constructs a client for the
@@ -73,17 +87,29 @@ func NewSigningKeyServiceClient(httpClient connect.HTTPClient, baseURL string, o
 			connect.WithSchema(signingKeyServiceMethods.ByName("GetSigningKey")),
 			connect.WithClientOptions(opts...),
 		),
+		getPublicKey: connect.NewClient[v1.GetPublicKeyRequest, v1.GetPublicKeyResponse](
+			httpClient,
+			baseURL+SigningKeyServiceGetPublicKeyProcedure,
+			connect.WithSchema(signingKeyServiceMethods.ByName("GetPublicKey")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
 // signingKeyServiceClient implements SigningKeyServiceClient.
 type signingKeyServiceClient struct {
 	getSigningKey *connect.Client[v1.GetSigningKeyRequest, v1.GetSigningKeyResponse]
+	getPublicKey  *connect.Client[v1.GetPublicKeyRequest, v1.GetPublicKeyResponse]
 }
 
 // GetSigningKey calls within.website.x.iam.sts.v1.SigningKeyService.GetSigningKey.
 func (c *signingKeyServiceClient) GetSigningKey(ctx context.Context, req *connect.Request[v1.GetSigningKeyRequest]) (*connect.Response[v1.GetSigningKeyResponse], error) {
 	return c.getSigningKey.CallUnary(ctx, req)
+}
+
+// GetPublicKey calls within.website.x.iam.sts.v1.SigningKeyService.GetPublicKey.
+func (c *signingKeyServiceClient) GetPublicKey(ctx context.Context, req *connect.Request[v1.GetPublicKeyRequest]) (*connect.Response[v1.GetPublicKeyResponse], error) {
+	return c.getPublicKey.CallUnary(ctx, req)
 }
 
 // SigningKeyServiceHandler is an implementation of the
@@ -100,6 +126,17 @@ type SigningKeyServiceHandler interface {
 	//	                    deployment issues keys for
 	//	INVALID_ARGUMENT  - malformed access_key_id/date/region/service
 	GetSigningKey(context.Context, *connect.Request[v1.GetSigningKeyRequest]) (*connect.Response[v1.GetSigningKeyResponse], error)
+	// GetPublicKey returns the SigV4A (ECDSA P-256) public verification key
+	// for an access key id, plus the identity it authenticates. Public keys
+	// are not secret: holding one lets a service verify signatures but never
+	// mint them, unlike the symmetric derived keys from GetSigningKey.
+	//
+	// Errors:
+	//
+	//	NOT_FOUND         - no such access key id
+	//	PERMISSION_DENIED - key or owning user is disabled
+	//	INVALID_ARGUMENT  - missing access_key_id
+	GetPublicKey(context.Context, *connect.Request[v1.GetPublicKeyRequest]) (*connect.Response[v1.GetPublicKeyResponse], error)
 }
 
 // NewSigningKeyServiceHandler builds an HTTP handler from the service implementation. It returns
@@ -115,10 +152,18 @@ func NewSigningKeyServiceHandler(svc SigningKeyServiceHandler, opts ...connect.H
 		connect.WithSchema(signingKeyServiceMethods.ByName("GetSigningKey")),
 		connect.WithHandlerOptions(opts...),
 	)
+	signingKeyServiceGetPublicKeyHandler := connect.NewUnaryHandler(
+		SigningKeyServiceGetPublicKeyProcedure,
+		svc.GetPublicKey,
+		connect.WithSchema(signingKeyServiceMethods.ByName("GetPublicKey")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/within.website.x.iam.sts.v1.SigningKeyService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case SigningKeyServiceGetSigningKeyProcedure:
 			signingKeyServiceGetSigningKeyHandler.ServeHTTP(w, r)
+		case SigningKeyServiceGetPublicKeyProcedure:
+			signingKeyServiceGetPublicKeyHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -130,4 +175,8 @@ type UnimplementedSigningKeyServiceHandler struct{}
 
 func (UnimplementedSigningKeyServiceHandler) GetSigningKey(context.Context, *connect.Request[v1.GetSigningKeyRequest]) (*connect.Response[v1.GetSigningKeyResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("within.website.x.iam.sts.v1.SigningKeyService.GetSigningKey is not implemented"))
+}
+
+func (UnimplementedSigningKeyServiceHandler) GetPublicKey(context.Context, *connect.Request[v1.GetPublicKeyRequest]) (*connect.Response[v1.GetPublicKeyResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("within.website.x.iam.sts.v1.SigningKeyService.GetPublicKey is not implemented"))
 }

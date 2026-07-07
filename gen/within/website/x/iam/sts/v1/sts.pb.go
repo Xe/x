@@ -173,6 +173,118 @@ func (x *GetSigningKeyResponse) GetCacheUntil() *timestamppb.Timestamp {
 	return nil
 }
 
+type GetPublicKeyRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The access key id parsed from the request's Credential= component.
+	AccessKeyId   string `protobuf:"bytes,1,opt,name=access_key_id,json=accessKeyId,proto3" json:"access_key_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetPublicKeyRequest) Reset() {
+	*x = GetPublicKeyRequest{}
+	mi := &file_within_website_x_iam_sts_v1_sts_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetPublicKeyRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetPublicKeyRequest) ProtoMessage() {}
+
+func (x *GetPublicKeyRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_within_website_x_iam_sts_v1_sts_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetPublicKeyRequest.ProtoReflect.Descriptor instead.
+func (*GetPublicKeyRequest) Descriptor() ([]byte, []int) {
+	return file_within_website_x_iam_sts_v1_sts_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *GetPublicKeyRequest) GetAccessKeyId() string {
+	if x != nil {
+		return x.AccessKeyId
+	}
+	return ""
+}
+
+type GetPublicKeyResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// PKIX, ASN.1 DER-encoded ECDSA P-256 public key, as produced by Go's
+	// x509.MarshalPKIXPublicKey and parsed by x509.ParsePKIXPublicKey.
+	PublicKey []byte `protobuf:"bytes,1,opt,name=public_key,json=publicKey,proto3" json:"public_key,omitempty"`
+	// Who this key authenticates as. Downstream services use this for
+	// authorization and audit attribution after the signature checks out.
+	Identity *TokenIdentity `protobuf:"bytes,2,opt,name=identity,proto3" json:"identity,omitempty"`
+	// How long the caller may cache this response before asking again. Bounds
+	// revocation latency: a disabled key stops verifying within one cache TTL.
+	// A response without cache_until may be used once but never cached.
+	CacheUntil    *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=cache_until,json=cacheUntil,proto3" json:"cache_until,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetPublicKeyResponse) Reset() {
+	*x = GetPublicKeyResponse{}
+	mi := &file_within_website_x_iam_sts_v1_sts_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetPublicKeyResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetPublicKeyResponse) ProtoMessage() {}
+
+func (x *GetPublicKeyResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_within_website_x_iam_sts_v1_sts_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetPublicKeyResponse.ProtoReflect.Descriptor instead.
+func (*GetPublicKeyResponse) Descriptor() ([]byte, []int) {
+	return file_within_website_x_iam_sts_v1_sts_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *GetPublicKeyResponse) GetPublicKey() []byte {
+	if x != nil {
+		return x.PublicKey
+	}
+	return nil
+}
+
+func (x *GetPublicKeyResponse) GetIdentity() *TokenIdentity {
+	if x != nil {
+		return x.Identity
+	}
+	return nil
+}
+
+func (x *GetPublicKeyResponse) GetCacheUntil() *timestamppb.Timestamp {
+	if x != nil {
+		return x.CacheUntil
+	}
+	return nil
+}
+
 // TokenIdentity identifies the principal a signing key belongs to.
 type TokenIdentity struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -192,7 +304,7 @@ type TokenIdentity struct {
 
 func (x *TokenIdentity) Reset() {
 	*x = TokenIdentity{}
-	mi := &file_within_website_x_iam_sts_v1_sts_proto_msgTypes[2]
+	mi := &file_within_website_x_iam_sts_v1_sts_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -204,7 +316,7 @@ func (x *TokenIdentity) String() string {
 func (*TokenIdentity) ProtoMessage() {}
 
 func (x *TokenIdentity) ProtoReflect() protoreflect.Message {
-	mi := &file_within_website_x_iam_sts_v1_sts_proto_msgTypes[2]
+	mi := &file_within_website_x_iam_sts_v1_sts_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -217,7 +329,7 @@ func (x *TokenIdentity) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TokenIdentity.ProtoReflect.Descriptor instead.
 func (*TokenIdentity) Descriptor() ([]byte, []int) {
-	return file_within_website_x_iam_sts_v1_sts_proto_rawDescGZIP(), []int{2}
+	return file_within_website_x_iam_sts_v1_sts_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *TokenIdentity) GetAccessKeyId() string {
@@ -265,14 +377,23 @@ const file_within_website_x_iam_sts_v1_sts_proto_rawDesc = "" +
 	"\bidentity\x18\x02 \x01(\v2*.within.website.x.iam.sts.v1.TokenIdentityR\bidentity\x12B\n" +
 	"\x0fnot_valid_after\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\rnotValidAfter\x12;\n" +
 	"\vcache_until\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\n" +
+	"cacheUntil\"A\n" +
+	"\x13GetPublicKeyRequest\x12*\n" +
+	"\raccess_key_id\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\vaccessKeyId\"\xba\x01\n" +
+	"\x14GetPublicKeyResponse\x12\x1d\n" +
+	"\n" +
+	"public_key\x18\x01 \x01(\fR\tpublicKey\x12F\n" +
+	"\bidentity\x18\x02 \x01(\v2*.within.website.x.iam.sts.v1.TokenIdentityR\bidentity\x12;\n" +
+	"\vcache_until\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\n" +
 	"cacheUntil\"\xa2\x01\n" +
 	"\rTokenIdentity\x12\"\n" +
 	"\raccess_key_id\x18\x01 \x01(\tR\vaccessKeyId\x12'\n" +
 	"\x0forganization_id\x18\x02 \x01(\tR\x0eorganizationId\x12!\n" +
 	"\fprincipal_id\x18\x03 \x01(\tR\vprincipalId\x12!\n" +
-	"\fdisplay_name\x18\x04 \x01(\tR\vdisplayName2\x8b\x01\n" +
+	"\fdisplay_name\x18\x04 \x01(\tR\vdisplayName2\x80\x02\n" +
 	"\x11SigningKeyService\x12v\n" +
-	"\rGetSigningKey\x121.within.website.x.iam.sts.v1.GetSigningKeyRequest\x1a2.within.website.x.iam.sts.v1.GetSigningKeyResponseB\xf6\x01\n" +
+	"\rGetSigningKey\x121.within.website.x.iam.sts.v1.GetSigningKeyRequest\x1a2.within.website.x.iam.sts.v1.GetSigningKeyResponse\x12s\n" +
+	"\fGetPublicKey\x120.within.website.x.iam.sts.v1.GetPublicKeyRequest\x1a1.within.website.x.iam.sts.v1.GetPublicKeyResponseB\xf6\x01\n" +
 	"\x1fcom.within.website.x.iam.sts.v1B\bStsProtoP\x01Z6within.website/x/gen/within/website/x/iam/sts/v1;stsv1\xa2\x02\x05WWXIS\xaa\x02\x1bWithin.Website.X.Iam.Sts.V1\xca\x02\x1bWithin\\Website\\X\\Iam\\Sts\\V1\xe2\x02'Within\\Website\\X\\Iam\\Sts\\V1\\GPBMetadata\xea\x02 Within::Website::X::Iam::Sts::V1b\x06proto3"
 
 var (
@@ -287,24 +408,30 @@ func file_within_website_x_iam_sts_v1_sts_proto_rawDescGZIP() []byte {
 	return file_within_website_x_iam_sts_v1_sts_proto_rawDescData
 }
 
-var file_within_website_x_iam_sts_v1_sts_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_within_website_x_iam_sts_v1_sts_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
 var file_within_website_x_iam_sts_v1_sts_proto_goTypes = []any{
 	(*GetSigningKeyRequest)(nil),  // 0: within.website.x.iam.sts.v1.GetSigningKeyRequest
 	(*GetSigningKeyResponse)(nil), // 1: within.website.x.iam.sts.v1.GetSigningKeyResponse
-	(*TokenIdentity)(nil),         // 2: within.website.x.iam.sts.v1.TokenIdentity
-	(*timestamppb.Timestamp)(nil), // 3: google.protobuf.Timestamp
+	(*GetPublicKeyRequest)(nil),   // 2: within.website.x.iam.sts.v1.GetPublicKeyRequest
+	(*GetPublicKeyResponse)(nil),  // 3: within.website.x.iam.sts.v1.GetPublicKeyResponse
+	(*TokenIdentity)(nil),         // 4: within.website.x.iam.sts.v1.TokenIdentity
+	(*timestamppb.Timestamp)(nil), // 5: google.protobuf.Timestamp
 }
 var file_within_website_x_iam_sts_v1_sts_proto_depIdxs = []int32{
-	2, // 0: within.website.x.iam.sts.v1.GetSigningKeyResponse.identity:type_name -> within.website.x.iam.sts.v1.TokenIdentity
-	3, // 1: within.website.x.iam.sts.v1.GetSigningKeyResponse.not_valid_after:type_name -> google.protobuf.Timestamp
-	3, // 2: within.website.x.iam.sts.v1.GetSigningKeyResponse.cache_until:type_name -> google.protobuf.Timestamp
-	0, // 3: within.website.x.iam.sts.v1.SigningKeyService.GetSigningKey:input_type -> within.website.x.iam.sts.v1.GetSigningKeyRequest
-	1, // 4: within.website.x.iam.sts.v1.SigningKeyService.GetSigningKey:output_type -> within.website.x.iam.sts.v1.GetSigningKeyResponse
-	4, // [4:5] is the sub-list for method output_type
-	3, // [3:4] is the sub-list for method input_type
-	3, // [3:3] is the sub-list for extension type_name
-	3, // [3:3] is the sub-list for extension extendee
-	0, // [0:3] is the sub-list for field type_name
+	4, // 0: within.website.x.iam.sts.v1.GetSigningKeyResponse.identity:type_name -> within.website.x.iam.sts.v1.TokenIdentity
+	5, // 1: within.website.x.iam.sts.v1.GetSigningKeyResponse.not_valid_after:type_name -> google.protobuf.Timestamp
+	5, // 2: within.website.x.iam.sts.v1.GetSigningKeyResponse.cache_until:type_name -> google.protobuf.Timestamp
+	4, // 3: within.website.x.iam.sts.v1.GetPublicKeyResponse.identity:type_name -> within.website.x.iam.sts.v1.TokenIdentity
+	5, // 4: within.website.x.iam.sts.v1.GetPublicKeyResponse.cache_until:type_name -> google.protobuf.Timestamp
+	0, // 5: within.website.x.iam.sts.v1.SigningKeyService.GetSigningKey:input_type -> within.website.x.iam.sts.v1.GetSigningKeyRequest
+	2, // 6: within.website.x.iam.sts.v1.SigningKeyService.GetPublicKey:input_type -> within.website.x.iam.sts.v1.GetPublicKeyRequest
+	1, // 7: within.website.x.iam.sts.v1.SigningKeyService.GetSigningKey:output_type -> within.website.x.iam.sts.v1.GetSigningKeyResponse
+	3, // 8: within.website.x.iam.sts.v1.SigningKeyService.GetPublicKey:output_type -> within.website.x.iam.sts.v1.GetPublicKeyResponse
+	7, // [7:9] is the sub-list for method output_type
+	5, // [5:7] is the sub-list for method input_type
+	5, // [5:5] is the sub-list for extension type_name
+	5, // [5:5] is the sub-list for extension extendee
+	0, // [0:5] is the sub-list for field type_name
 }
 
 func init() { file_within_website_x_iam_sts_v1_sts_proto_init() }
@@ -318,7 +445,7 @@ func file_within_website_x_iam_sts_v1_sts_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_within_website_x_iam_sts_v1_sts_proto_rawDesc), len(file_within_website_x_iam_sts_v1_sts_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   3,
+			NumMessages:   5,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

@@ -21,6 +21,7 @@ const _ = grpc.SupportPackageIsVersion9
 
 const (
 	SigningKeyService_GetSigningKey_FullMethodName = "/within.website.x.iam.sts.v1.SigningKeyService/GetSigningKey"
+	SigningKeyService_GetPublicKey_FullMethodName  = "/within.website.x.iam.sts.v1.SigningKeyService/GetPublicKey"
 )
 
 // SigningKeyServiceClient is the client API for SigningKeyService service.
@@ -51,6 +52,17 @@ type SigningKeyServiceClient interface {
 	//	                    deployment issues keys for
 	//	INVALID_ARGUMENT  - malformed access_key_id/date/region/service
 	GetSigningKey(ctx context.Context, in *GetSigningKeyRequest, opts ...grpc.CallOption) (*GetSigningKeyResponse, error)
+	// GetPublicKey returns the SigV4A (ECDSA P-256) public verification key
+	// for an access key id, plus the identity it authenticates. Public keys
+	// are not secret: holding one lets a service verify signatures but never
+	// mint them, unlike the symmetric derived keys from GetSigningKey.
+	//
+	// Errors:
+	//
+	//	NOT_FOUND         - no such access key id
+	//	PERMISSION_DENIED - key or owning user is disabled
+	//	INVALID_ARGUMENT  - missing access_key_id
+	GetPublicKey(ctx context.Context, in *GetPublicKeyRequest, opts ...grpc.CallOption) (*GetPublicKeyResponse, error)
 }
 
 type signingKeyServiceClient struct {
@@ -65,6 +77,16 @@ func (c *signingKeyServiceClient) GetSigningKey(ctx context.Context, in *GetSign
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetSigningKeyResponse)
 	err := c.cc.Invoke(ctx, SigningKeyService_GetSigningKey_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *signingKeyServiceClient) GetPublicKey(ctx context.Context, in *GetPublicKeyRequest, opts ...grpc.CallOption) (*GetPublicKeyResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetPublicKeyResponse)
+	err := c.cc.Invoke(ctx, SigningKeyService_GetPublicKey_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -99,6 +121,17 @@ type SigningKeyServiceServer interface {
 	//	                    deployment issues keys for
 	//	INVALID_ARGUMENT  - malformed access_key_id/date/region/service
 	GetSigningKey(context.Context, *GetSigningKeyRequest) (*GetSigningKeyResponse, error)
+	// GetPublicKey returns the SigV4A (ECDSA P-256) public verification key
+	// for an access key id, plus the identity it authenticates. Public keys
+	// are not secret: holding one lets a service verify signatures but never
+	// mint them, unlike the symmetric derived keys from GetSigningKey.
+	//
+	// Errors:
+	//
+	//	NOT_FOUND         - no such access key id
+	//	PERMISSION_DENIED - key or owning user is disabled
+	//	INVALID_ARGUMENT  - missing access_key_id
+	GetPublicKey(context.Context, *GetPublicKeyRequest) (*GetPublicKeyResponse, error)
 	mustEmbedUnimplementedSigningKeyServiceServer()
 }
 
@@ -111,6 +144,9 @@ type UnimplementedSigningKeyServiceServer struct{}
 
 func (UnimplementedSigningKeyServiceServer) GetSigningKey(context.Context, *GetSigningKeyRequest) (*GetSigningKeyResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetSigningKey not implemented")
+}
+func (UnimplementedSigningKeyServiceServer) GetPublicKey(context.Context, *GetPublicKeyRequest) (*GetPublicKeyResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetPublicKey not implemented")
 }
 func (UnimplementedSigningKeyServiceServer) mustEmbedUnimplementedSigningKeyServiceServer() {}
 func (UnimplementedSigningKeyServiceServer) testEmbeddedByValue()                           {}
@@ -151,6 +187,24 @@ func _SigningKeyService_GetSigningKey_Handler(srv interface{}, ctx context.Conte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _SigningKeyService_GetPublicKey_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetPublicKeyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SigningKeyServiceServer).GetPublicKey(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: SigningKeyService_GetPublicKey_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SigningKeyServiceServer).GetPublicKey(ctx, req.(*GetPublicKeyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // SigningKeyService_ServiceDesc is the grpc.ServiceDesc for SigningKeyService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -161,6 +215,10 @@ var SigningKeyService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetSigningKey",
 			Handler:    _SigningKeyService_GetSigningKey_Handler,
+		},
+		{
+			MethodName: "GetPublicKey",
+			Handler:    _SigningKeyService_GetPublicKey_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

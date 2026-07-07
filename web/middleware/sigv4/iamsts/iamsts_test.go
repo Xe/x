@@ -44,6 +44,10 @@ func (f *fakeKeys) setRefuse(code twirp.ErrorCode) {
 	f.refuseCode = code
 }
 
+func (f *fakeKeys) GetPublicKey(ctx context.Context, req *stsv1.GetPublicKeyRequest) (*stsv1.GetPublicKeyResponse, error) {
+	return nil, twirp.NewError(twirp.Unimplemented, "not implemented in this fake")
+}
+
 func (f *fakeKeys) GetSigningKey(_ context.Context, req *stsv1.GetSigningKeyRequest) (*stsv1.GetSigningKeyResponse, error) {
 	f.calls.Add(1)
 	f.mu.Lock()

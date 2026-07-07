@@ -27,6 +27,17 @@ service SigningKeyService {
   //                       deployment issues keys for
   //   INVALID_ARGUMENT  - malformed access_key_id/date/region/service
   rpc GetSigningKey(GetSigningKeyRequest) returns (GetSigningKeyResponse);
+
+  // GetPublicKey returns the SigV4A (ECDSA P-256) public verification key
+  // for an access key id, plus the identity it authenticates. Public keys
+  // are not secret: holding one lets a service verify signatures but never
+  // mint them, unlike the symmetric derived keys from GetSigningKey.
+  //
+  // Errors:
+  //   NOT_FOUND         - no such access key id
+  //   PERMISSION_DENIED - key or owning user is disabled
+  //   INVALID_ARGUMENT  - missing access_key_id
+  rpc GetPublicKey(GetPublicKeyRequest) returns (GetPublicKeyResponse);
 }
 
 message GetSigningKeyRequest {
@@ -67,6 +78,26 @@ message GetSigningKeyResponse {
   // revocation latency: a disabled key stops verifying within one cache TTL
   // instead of at end of day. Always <= not_valid_after.
   google.protobuf.Timestamp cache_until = 4;
+}
+
+message GetPublicKeyRequest {
+  // The access key id parsed from the request's Credential= component.
+  string access_key_id = 1 [(buf.validate.field).required = true];
+}
+
+message GetPublicKeyResponse {
+  // PKIX, ASN.1 DER-encoded ECDSA P-256 public key, as produced by Go's
+  // x509.MarshalPKIXPublicKey and parsed by x509.ParsePKIXPublicKey.
+  bytes public_key = 1;
+
+  // Who this key authenticates as. Downstream services use this for
+  // authorization and audit attribution after the signature checks out.
+  TokenIdentity identity = 2;
+
+  // How long the caller may cache this response before asking again. Bounds
+  // revocation latency: a disabled key stops verifying within one cache TTL.
+  // A response without cache_until may be used once but never cached.
+  google.protobuf.Timestamp cache_until = 3;
 }
 
 // TokenIdentity identifies the principal a signing key belongs to.
