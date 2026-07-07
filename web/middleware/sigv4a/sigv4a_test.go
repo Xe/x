@@ -18,6 +18,12 @@ import (
 // header-signed-request.txt.
 func parseVectorRequest(t *testing.T, raw string) (*http.Request, []byte) {
 	t.Helper()
+	// Upstream aws-c-auth ships request.txt as a headers-only dump without the
+	// wire-format blank-line terminator; header-signed-request.txt already
+	// ends in "\n\n", so this is a no-op there.
+	if !strings.HasSuffix(raw, "\n\n") {
+		raw += "\n"
+	}
 	r, err := http.ReadRequest(bufio.NewReader(strings.NewReader(raw)))
 	if err != nil {
 		t.Fatalf("ReadRequest: %v", err)
