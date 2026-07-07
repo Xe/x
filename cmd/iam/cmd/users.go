@@ -117,6 +117,9 @@ var (
 				Count: userListCount,
 				Page:  userListPage,
 			})
+			if err != nil {
+				return fmt.Errorf("can't list users: %w", err)
+			}
 
 			if userListJSON {
 				enc := json.NewEncoder(os.Stdout)
