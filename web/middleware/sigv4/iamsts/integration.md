@@ -1,5 +1,9 @@
 # Integrating iamsts with a Twirp API
 
+> This guide documents the classic SigV4 derived-key chain, kept in place as
+> a working illustration. New services should use
+> [`web/middleware/sigv4a/iamsts`](../../sigv4a/iamsts/integration.md) instead.
+
 `iamsts` authenticates incoming SigV4-signed requests locally: it fetches the
 derived signing key for each credential scope from iamd's `SigningKeyService`
 once, caches it for the server-advised TTL, and recomputes signatures itself.
