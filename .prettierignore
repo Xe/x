@@ -7,3 +7,6 @@ cmd/_old/**.*.json
 
 # terraform files
 .terraform/
+# AWS SigV4A test vectors: byte-identical copies of the aws-c-auth suite,
+# must never be reformatted
+web/middleware/sigv4a/testdata/
