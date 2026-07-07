@@ -89,7 +89,7 @@ var (
 				Reason: reason,
 				UserId: keyDisableUserID,
 			}); err != nil {
-				return err
+				return fmt.Errorf("can't disable key: %w", err)
 			}
 
 			fmt.Println("key", args[0], "disabled")
@@ -123,6 +123,9 @@ var (
 				Page:   keyListPage,
 				UserId: keyListUserID,
 			})
+			if err != nil {
+				return fmt.Errorf("can't list keys: %w", err)
+			}
 
 			if keyListJSON {
 				enc := json.NewEncoder(os.Stdout)
