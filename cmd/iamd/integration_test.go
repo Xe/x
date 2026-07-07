@@ -11,9 +11,10 @@ import (
 
 	"within.website/x/cmd/iamd/models"
 	iamv1 "within.website/x/gen/within/website/x/iam/v1"
-	"within.website/x/web/middleware/sigv4"
 	"within.website/x/web/middleware/sigv4/iamsts"
 	"within.website/x/web/middleware/sigv4/sigv4client"
+	"within.website/x/web/middleware/sigv4a"
+	"within.website/x/web/middleware/sigv4a/sigv4aclient"
 )
 
 const (
@@ -52,9 +53,28 @@ func bootstrapCreds(t *testing.T, dao *models.DAO) (akid, secret string) {
 	return ks[0].AccessKeyID, ks[0].SecretAccessKey
 }
 
-// signedTransport builds a sigv4client round tripper that signs requests with
-// the given credentials for the test region/service.
+// signedTransport builds a sigv4aclient round tripper that signs requests
+// with the given credentials for the test region/service. It is used for
+// every transport authenticating to iamd.
 func signedTransport(t *testing.T, akid, secret string) http.RoundTripper {
+	t.Helper()
+	rt, err := sigv4aclient.NewSigV4ARoundTripper(&sigv4aclient.Config{
+		Region:      intRegion,
+		AccessKey:   akid,
+		SecretKey:   secret,
+		ServiceName: intService,
+	}, nil)
+	if err != nil {
+		t.Fatalf("round tripper: %v", err)
+	}
+	return rt
+}
+
+// classicSignedTransport builds a sigv4client round tripper that signs
+// requests with the given credentials for the test region/service. It is
+// used only by the retained classic sigv4/iamsts downstream leg, which
+// verifies classic SigV4 rather than SigV4A.
+func classicSignedTransport(t *testing.T, akid, secret string) http.RoundTripper {
 	t.Helper()
 	rt, err := sigv4client.NewSigV4RoundTripper(&sigv4client.Config{
 		Region:      intRegion,
@@ -129,7 +149,7 @@ func TestUserMiddleware_resolvesCaller(t *testing.T) {
 
 	var gotUUID string
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if u, ok := sigv4.User(r.Context()); ok {
+		if u, ok := sigv4a.User(r.Context()); ok {
 			gotUUID = u.GetId()
 		}
 		w.WriteHeader(http.StatusNoContent)
@@ -196,7 +216,7 @@ func TestIntegration_SigningKeyVerifierChain(t *testing.T) {
 	})))
 	defer app.Close()
 
-	endUserClient := &http.Client{Transport: signedTransport(t, endKey.AccessKeyID, endKey.SecretAccessKey)}
+	endUserClient := &http.Client{Transport: classicSignedTransport(t, endKey.AccessKeyID, endKey.SecretAccessKey)}
 
 	t.Run("end user verified locally", func(t *testing.T) {
 		resp, err := endUserClient.Get(app.URL + "/resource")

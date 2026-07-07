@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	iamv1 "within.website/x/gen/within/website/x/iam/v1"
-	"within.website/x/web/middleware/sigv4/sigv4client"
+	"within.website/x/web/middleware/sigv4a/sigv4aclient"
 	"within.website/x/web/useragent"
 )
 
@@ -17,7 +17,7 @@ type Client struct {
 func New(ctx context.Context, endpoint, region, accessKeyID, secretAccessKey string) (*Client, error) {
 	ua := useragent.Transport("within.website/x/cmd/iamd/pub/iam", "https://xeiaso.net/contact", http.DefaultTransport)
 
-	rt, err := sigv4client.NewSigV4RoundTripper(&sigv4client.Config{
+	rt, err := sigv4aclient.NewSigV4ARoundTripper(&sigv4aclient.Config{
 		Region:      region,
 		AccessKey:   accessKeyID,
 		SecretKey:   secretAccessKey,

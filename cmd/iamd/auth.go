@@ -7,26 +7,26 @@ import (
 
 	"gorm.io/gorm"
 	"within.website/x/cmd/iamd/models"
-	"within.website/x/web/middleware/sigv4"
+	"within.website/x/web/middleware/sigv4a"
 )
 
-// newVerifier builds the local SigV4 verifier used by the route middleware to
+// newVerifier builds the local SigV4A verifier used by the route middleware to
 // authenticate callers to iamd. It resolves access key ids to their secrets
 // from the DAO.
 //
-// A missing key maps to sigv4.ErrUnknownKey (a 403/401 verification failure),
+// A missing key maps to sigv4a.ErrUnknownKey (a 403/401 verification failure),
 // but any other backing-store error propagates unwrapped so the middleware
 // surfaces it as a 500 rather than masking an outage as an auth denial.
-func newVerifier(dao *models.DAO, region, service string, maxBodySize int64) *sigv4.Verifier {
-	return &sigv4.Verifier{
+func newVerifier(dao *models.DAO, region, service string, maxBodySize int64) *sigv4a.Verifier {
+	return &sigv4a.Verifier{
 		Region:      region,
 		Service:     service,
 		MaxBodySize: maxBodySize,
-		Lookup: sigv4.LookuperFunc(func(accessKeyID string) (string, error) {
+		Lookup: sigv4a.LookuperFunc(func(accessKeyID string) (string, error) {
 			secret, err := dao.SecretFor(context.Background(), accessKeyID)
 			if err != nil {
 				if errors.Is(err, gorm.ErrRecordNotFound) {
-					return "", sigv4.ErrUnknownKey
+					return "", sigv4a.ErrUnknownKey
 				}
 				return "", err
 			}
@@ -47,25 +47,26 @@ func chain(mws ...func(http.Handler) http.Handler) func(http.Handler) http.Handl
 	}
 }
 
-// UserMiddleware resolves the sigv4-authenticated caller (access key id) to its
-// owning DAO user and stores it in the request context via sigv4.WithUser, so
-// shared downstream code can read the caller's user through sigv4.User. It must
-// run after sigv4.Verifier.Middleware, which populates sigv4.KeyID. A key whose
-// owning user is gone or disabled is rejected as 403.
+// UserMiddleware resolves the sigv4a-authenticated caller (access key id) to
+// its owning DAO user and stores it in the request context via
+// sigv4a.WithUser, so shared downstream code can read the caller's user
+// through sigv4a.User. It must run after sigv4a.Verifier.Middleware, which
+// populates sigv4a.KeyID. A key whose owning user is gone or disabled is
+// rejected as 403.
 func UserMiddleware(dao *models.DAO) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			keyID, ok := sigv4.KeyID(r.Context())
+			keyID, ok := sigv4a.KeyID(r.Context())
 			if !ok {
-				http.Error(w, "sigv4: no authenticated caller", http.StatusUnauthorized)
+				http.Error(w, "sigv4a: no authenticated caller", http.StatusUnauthorized)
 				return
 			}
 			u, err := dao.GetUserByAccessKeyID(r.Context(), keyID)
 			if err != nil {
-				http.Error(w, "sigv4: caller has no enabled user", http.StatusForbidden)
+				http.Error(w, "sigv4a: caller has no enabled user", http.StatusForbidden)
 				return
 			}
-			next.ServeHTTP(w, r.WithContext(sigv4.WithUser(r.Context(), u.AsProto())))
+			next.ServeHTTP(w, r.WithContext(sigv4a.WithUser(r.Context(), u.AsProto())))
 		})
 	}
 }

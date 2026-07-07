@@ -21,16 +21,16 @@ import (
 	iamv1 "within.website/x/gen/within/website/x/iam/v1"
 	"within.website/x/internal"
 	"within.website/x/twirp/twirpslog"
-	"within.website/x/web/middleware/sigv4"
+	"within.website/x/web/middleware/sigv4a"
 )
 
 var (
 	bind          = flag.String("bind", ":9080", "HTTP bind address")
 	dbLoc         = flag.String("db-loc", "./var/iamd.db", "SQLite database location")
 	metricsBind   = flag.String("metrics-bind", ":9081", "Prometheus bind address")
-	region        = flag.String("region", "us-east-1", "SigV4 credential-scope region all clients must sign with")
-	service       = flag.String("service", "iam", "SigV4 credential-scope service all clients must sign with")
-	maxBodySize   = flag.Int64("max-body-size", 1<<20, "max request body bytes hashed for SigV4 verification")
+	region        = flag.String("region", "us-east-1", "SigV4A X-Amz-Region-Set region all clients must sign for")
+	service       = flag.String("service", "iam", "SigV4A credential-scope service all clients must sign with")
+	maxBodySize   = flag.Int64("max-body-size", 1<<20, "max request body bytes hashed for SigV4A verification")
 	bootstrapUser = flag.String("bootstrap-username", "", "if set and the DB has no users, create an admin user and signing key with this name at startup and log the credentials")
 
 	signingKeyCacheTTL = flag.Duration("signing-key-cache-ttl", 5*time.Minute, "how long downstream verifiers may cache a derived signing key before re-fetching; bounds revocation latency")
@@ -51,16 +51,16 @@ func main() {
 	}
 }
 
-// newMux builds the HTTP mux serving the SigV4-protected IAM and signing-key
-// Twirp services. Every route runs the same pipeline — verify the SigV4
+// newMux builds the HTTP mux serving the SigV4A-protected IAM and signing-key
+// Twirp services. Every route runs the same pipeline — verify the SigV4A
 // signature, then resolve the caller to its DAO user (available downstream via
-// sigv4.User). The SigningKeyService route's callers are downstream verifiers
+// sigv4a.User). The SigningKeyService route's callers are downstream verifiers
 // authenticating with their own IAM credential.
-func newMux(lg *slog.Logger, dao *models.DAO, verifier *sigv4.Verifier, signingKeyCacheTTL time.Duration) *http.ServeMux {
+func newMux(lg *slog.Logger, dao *models.DAO, verifier *sigv4a.Verifier, signingKeyCacheTTL time.Duration) *http.ServeMux {
 	mux := http.NewServeMux()
 
 	// Verify the signature, then annotate the request with the caller's user
-	// (read downstream via sigv4.User).
+	// (read downstream via sigv4a.User).
 	stack := chain(verifier.Middleware, UserMiddleware(dao))
 
 	us := users.New(dao)
@@ -138,7 +138,7 @@ func run(ctx context.Context, lg *slog.Logger) error {
 }
 
 // bootstrap creates the first admin user and a signing key when the database is
-// empty, so the SigV4-protected routes can be reached after a fresh start. It is
+// empty, so the SigV4A-protected routes can be reached after a fresh start. It is
 // a no-op once any user exists. The generated secret is logged once at startup;
 // it is never accepted via a flag or env var, so no signing secret sits in the
 // environment.
