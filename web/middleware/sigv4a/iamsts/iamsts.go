@@ -36,6 +36,7 @@ import (
 	"golang.org/x/sync/singleflight"
 
 	stsv1 "within.website/x/gen/within/website/x/iam/sts/v1"
+	"within.website/x/web/middleware/authctx"
 	"within.website/x/web/middleware/sigv4a"
 )
 
@@ -286,23 +287,16 @@ func (v *Verifier) cacheLen() int {
 
 // Identity is the verified caller stored in the request context on success.
 // The fields come from the SigningKeyService response identity; SignedAt is
-// parsed from the request's X-Amz-Date.
-type Identity struct {
-	AccessKeyID    string
-	OrganizationID string
-	PrincipalID    string
-	DisplayName    string
-	SignedAt       time.Time
-}
-
-type ctxKey struct{}
+// parsed from the request's X-Amz-Date. It is an alias for authctx.Identity,
+// shared with the sigv4/iamsts package, so a caller stored by either package
+// is readable through either (or through authctx directly).
+type Identity = authctx.Identity
 
 func withCaller(ctx context.Context, c *Identity) context.Context {
-	return context.WithValue(ctx, ctxKey{}, c)
+	return authctx.WithCaller(ctx, c)
 }
 
 // Caller returns the verified identity stored by Middleware, if any.
 func Caller(ctx context.Context) (*Identity, bool) {
-	c, ok := ctx.Value(ctxKey{}).(*Identity)
-	return c, ok
+	return authctx.Caller(ctx)
 }

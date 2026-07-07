@@ -12,10 +12,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/twitchtv/twirp"
 	xslog "within.website/x/internal/slog"
-	"within.website/x/web/middleware/sigv4"
-	"within.website/x/web/middleware/sigv4/iamsts"
-	"within.website/x/web/middleware/sigv4a"
-	sigv4aiamsts "within.website/x/web/middleware/sigv4a/iamsts"
+	"within.website/x/web/middleware/authctx"
 )
 
 var (
@@ -65,20 +62,15 @@ func Interceptor(lg *slog.Logger) twirp.Interceptor {
 
 			// Attribute the call to the verified user, not the access key they
 			// signed with. Local verification resolves the key to its IAM user
-			// (User); services that authenticate centrally via STS carry the
-			// caller on iamsts.Caller instead. Both the sigv4a and classic
-			// middleware families populate one of these two shapes, so check
-			// each family in turn: sigv4a first, since it's what iamd and new
-			// services authenticate with, then the classic sigv4/iamsts chain,
-			// kept as a working illustration of the derived-key deployment.
+			// (authctx.User); services that authenticate centrally via STS
+			// carry the caller on authctx.Caller instead. authctx is the
+			// canonical storage shared by the sigv4 and sigv4a middleware
+			// families (and their iamsts sub-packages), so this single pair of
+			// reads sees a caller stored by any of them.
 			var userID string
-			if u, ok := sigv4a.User(ctx); ok {
+			if u, ok := authctx.User(ctx); ok {
 				userID = u.GetId()
-			} else if caller, ok := sigv4aiamsts.Caller(ctx); ok {
-				userID = caller.PrincipalID
-			} else if u, ok := sigv4.User(ctx); ok {
-				userID = u.GetId()
-			} else if caller, ok := iamsts.Caller(ctx); ok {
+			} else if caller, ok := authctx.Caller(ctx); ok {
 				userID = caller.PrincipalID
 			}
 

@@ -12,6 +12,7 @@ import (
 	"github.com/twitchtv/twirp"
 	"gorm.io/gorm"
 	"within.website/x/cmd/iamd/models"
+	"within.website/x/web/middleware/authctx"
 	"within.website/x/web/middleware/sigv4"
 	"within.website/x/web/middleware/sigv4a"
 )
@@ -108,20 +109,16 @@ func chain(mws ...func(http.Handler) http.Handler) func(http.Handler) http.Handl
 }
 
 // UserMiddleware resolves the authenticated caller (access key id) to its
-// owning DAO user and stores it in the request context via sigv4a.WithUser —
-// the canonical key all iamd services read via sigv4a.User, regardless of
-// which algorithm verified the request. It reads sigv4a.KeyID first, falling
-// back to sigv4.KeyID, since the caller may have been verified by either the
-// SigV4A or the classic SigV4 leg of the dual verifier. It must run after
-// that verifier's middleware, which populates one of the two. A key whose
-// owning user is gone or disabled is rejected as 403.
+// owning DAO user and stores it in the request context via authctx.WithUser —
+// the canonical key all iamd services read via authctx.User, regardless of
+// which algorithm verified the request. It reads authctx.KeyID, which both the
+// SigV4A and the classic SigV4 leg of the dual verifier populate through the
+// same shared storage. It must run after that verifier's middleware. A key
+// whose owning user is gone or disabled is rejected as 403.
 func UserMiddleware(dao *models.DAO) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			keyID, ok := sigv4a.KeyID(r.Context())
-			if !ok {
-				keyID, ok = sigv4.KeyID(r.Context())
-			}
+			keyID, ok := authctx.KeyID(r.Context())
 			if !ok {
 				http.Error(w, "sigv4a: no authenticated caller", http.StatusUnauthorized)
 				return
@@ -131,7 +128,7 @@ func UserMiddleware(dao *models.DAO) func(http.Handler) http.Handler {
 				http.Error(w, "sigv4a: caller has no enabled user", http.StatusForbidden)
 				return
 			}
-			next.ServeHTTP(w, r.WithContext(sigv4a.WithUser(r.Context(), u.AsProto())))
+			next.ServeHTTP(w, r.WithContext(authctx.WithUser(r.Context(), u.AsProto())))
 		})
 	}
 }
