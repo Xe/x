@@ -12,7 +12,7 @@ import (
 	"gorm.io/gorm"
 	"within.website/x/cmd/iamd/models"
 	iamv1 "within.website/x/gen/within/website/x/iam/v1"
-	"within.website/x/web/middleware/sigv4"
+	"within.website/x/web/middleware/sigv4a"
 )
 
 type Server struct {
@@ -51,7 +51,7 @@ func New(dao *models.DAO) *Server {
 // route runs after the UserMiddleware that populates it, so a missing caller is
 // reported as Unauthenticated rather than a server fault.
 func caller(ctx context.Context) (*iamv1.User, error) {
-	u, ok := sigv4.User(ctx)
+	u, ok := sigv4a.User(ctx)
 	if !ok {
 		return nil, twirp.NewError(twirp.Unauthenticated, "no authenticated caller")
 	}

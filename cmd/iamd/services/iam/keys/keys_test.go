@@ -9,7 +9,7 @@ import (
 	"github.com/twitchtv/twirp"
 	"within.website/x/cmd/iamd/models"
 	iamv1 "within.website/x/gen/within/website/x/iam/v1"
-	"within.website/x/web/middleware/sigv4"
+	"within.website/x/web/middleware/sigv4a"
 )
 
 func newTestServer(t *testing.T) (*Server, *models.DAO) {
@@ -53,7 +53,7 @@ func mustCreateKey(t *testing.T, d *models.DAO, u *models.User) *models.Key {
 // ctxWithCaller returns a context whose authenticated caller is u, mirroring
 // what UserMiddleware stashes for a real request.
 func ctxWithCaller(u *models.User) context.Context {
-	return sigv4.WithUser(context.Background(), &iamv1.User{
+	return sigv4a.WithUser(context.Background(), &iamv1.User{
 		Id:      u.UUID,
 		IsAdmin: u.IsAdmin,
 	})

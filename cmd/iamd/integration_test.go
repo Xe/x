@@ -137,6 +137,17 @@ func TestIntegration_SignedTwirpRoundTrip(t *testing.T) {
 			t.Fatalf("status = %d, want 403", resp.StatusCode)
 		}
 	})
+
+	// Regression: UserMiddleware stores the caller via sigv4a.WithUser, but
+	// KeyService historically read it back via the classic sigv4.User context
+	// key, so it never found the caller and failed closed with
+	// Unauthenticated even for a validly signed request.
+	t.Run("KeyService resolves the sigv4a-authenticated caller", func(t *testing.T) {
+		client := iamv1.NewKeyServiceProtobufClient(srv.URL, &http.Client{Transport: signedTransport(t, akid, secret)})
+		if _, err := client.ListKeys(context.Background(), &iamv1.ListKeysReq{Count: 10, Page: 0}); err != nil {
+			t.Fatalf("ListKeys: %v", err)
+		}
+	})
 }
 
 // TestUserMiddleware_resolvesCaller checks that UserMiddleware annotates the
