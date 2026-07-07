@@ -14,6 +14,8 @@ import (
 	xslog "within.website/x/internal/slog"
 	"within.website/x/web/middleware/sigv4"
 	"within.website/x/web/middleware/sigv4/iamsts"
+	"within.website/x/web/middleware/sigv4a"
+	sigv4aiamsts "within.website/x/web/middleware/sigv4a/iamsts"
 )
 
 var (
@@ -62,11 +64,19 @@ func Interceptor(lg *slog.Logger) twirp.Interceptor {
 			meth, _ := twirp.MethodName(ctx)
 
 			// Attribute the call to the verified user, not the access key they
-			// signed with. Local sigv4 verification resolves the key to its IAM
-			// user (sigv4.User); services that authenticate centrally via STS
-			// carry the caller on iamsts.Caller instead.
+			// signed with. Local verification resolves the key to its IAM user
+			// (User); services that authenticate centrally via STS carry the
+			// caller on iamsts.Caller instead. Both the sigv4a and classic
+			// middleware families populate one of these two shapes, so check
+			// each family in turn: sigv4a first, since it's what iamd and new
+			// services authenticate with, then the classic sigv4/iamsts chain,
+			// kept as a working illustration of the derived-key deployment.
 			var userID string
-			if u, ok := sigv4.User(ctx); ok {
+			if u, ok := sigv4a.User(ctx); ok {
+				userID = u.GetId()
+			} else if caller, ok := sigv4aiamsts.Caller(ctx); ok {
+				userID = caller.PrincipalID
+			} else if u, ok := sigv4.User(ctx); ok {
 				userID = u.GetId()
 			} else if caller, ok := iamsts.Caller(ctx); ok {
 				userID = caller.PrincipalID
