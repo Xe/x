@@ -204,32 +204,61 @@ func TestVerifier_IdentityThreaded(t *testing.T) {
 
 // TestVerifier_TTLSweep replaces the classic package's midnight-rollover
 // test: SigV4A keys have no date/region/service scoping, so there is no
-// day-boundary eviction to exercise. Instead this checks that inserting a
-// second credential's entry sweeps a first credential's slot once its
-// cache_until has passed.
+// day-boundary eviction to exercise. Instead this drives two sequential
+// steps against one shared harness: key1 populates the cache, then key2 is
+// fetched after key1's cache_until has passed, and its insert must sweep
+// key1's now-expired slot. Each step's expectations are the table; the steps
+// themselves are necessarily ordered because they share the harness's clock
+// and cache.
 func TestVerifier_TTLSweep(t *testing.T) {
 	h, closeSrv := newHarness(t, time.Minute)
 	defer closeSrv()
 
-	if rec := do(h, signedGET(t, h.clock())); rec.Code != http.StatusNoContent {
-		t.Fatalf("key1 request: status = %d", rec.Code)
-	}
-	if got := h.verifier.cacheLen(); got != 1 {
-		t.Fatalf("cache slots after key1 = %d, want 1", got)
+	steps := []struct {
+		name         string
+		advance      time.Duration // applied to h's clock before signing/sending
+		accessKeyID  string
+		secretKey    string
+		wantCode     int
+		wantCalls    int64
+		wantCacheLen int
+	}{
+		{
+			name:         "key1 fetch populates the cache",
+			accessKeyID:  testKey,
+			secretKey:    testSecret,
+			wantCode:     http.StatusNoContent,
+			wantCalls:    1,
+			wantCacheLen: 1,
+		},
+		{
+			name:         "key2 fetch after key1's TTL sweeps key1",
+			advance:      2 * time.Minute,
+			accessKeyID:  testKey2,
+			secretKey:    testSecret2,
+			wantCode:     http.StatusNoContent,
+			wantCalls:    2,
+			wantCacheLen: 1,
+		},
 	}
 
-	// Advance past key1's cache_until, then fetch key2: the insert must sweep
-	// key1's now-expired slot.
-	h.advance(2 * time.Minute)
-	req2 := signedGETAs(t, testKey2, testSecret2, h.clock())
-	if rec := do(h, req2); rec.Code != http.StatusNoContent {
-		t.Fatalf("key2 request: status = %d, body=%s", rec.Code, rec.Body.String())
-	}
-	if got := h.fake.calls.Load(); got != 2 {
-		t.Errorf("RPCs = %d, want 2 (one per access key id)", got)
-	}
-	if got := h.verifier.cacheLen(); got != 1 {
-		t.Errorf("cache slots = %d, want 1 (key1 evicted, key2 present)", got)
+	for _, tt := range steps {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.advance > 0 {
+				h.advance(tt.advance)
+			}
+			req := signedGETAs(t, tt.accessKeyID, tt.secretKey, h.clock())
+			rec := do(h, req)
+			if rec.Code != tt.wantCode {
+				t.Fatalf("status = %d, want %d, body=%s", rec.Code, tt.wantCode, rec.Body.String())
+			}
+			if got := h.fake.calls.Load(); got != tt.wantCalls {
+				t.Errorf("RPCs = %d, want %d", got, tt.wantCalls)
+			}
+			if got := h.verifier.cacheLen(); got != tt.wantCacheLen {
+				t.Errorf("cache slots = %d, want %d", got, tt.wantCacheLen)
+			}
+		})
 	}
 }
 
