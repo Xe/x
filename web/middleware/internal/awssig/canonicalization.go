@@ -25,25 +25,24 @@ func CanonicalHeaderValue(r *http.Request, name string) string {
 	return strings.Join(trimmed, ",")
 }
 
-// collapseSpaces folds runs of spaces down to a single space, matching the
-// canonicalization AWS applies to header values outside quoted strings. Spaces
-// inside a double-quoted token are preserved verbatim.
+// collapseSpaces folds every run of spaces down to a single space, matching
+// aws-sdk-go-v2's v4 signer (the equivalent of strings.Join(strings.Fields(v),
+// " ")) and the aws-c-auth v4a test vectors: both collapse whitespace runs
+// unconditionally, including inside double-quoted tokens. An earlier version
+// of this function preserved quoted spaces on the theory that some header
+// values (e.g. Content-Disposition) need it, but no AWS reference
+// implementation actually special-cases quotes, and the get-header-value-trim
+// vector confirms it.
 func collapseSpaces(s string) string {
 	if !strings.Contains(s, "  ") {
 		return s
 	}
 	var b strings.Builder
 	b.Grow(len(s))
-	prevSpace, inQuote := false, false
+	prevSpace := false
 	for i := 0; i < len(s); i++ {
 		c := s[i]
-		if c == '"' {
-			inQuote = !inQuote
-			prevSpace = false
-			b.WriteByte(c)
-			continue
-		}
-		if c == ' ' && !inQuote {
+		if c == ' ' {
 			if !prevSpace {
 				b.WriteByte(' ')
 			}
@@ -136,7 +135,7 @@ func BuildCanonicalRequest(r *http.Request, sortedSignedHeaders []string, payloa
 // already-encoded path is encoded a second time, as AWS mandates for every
 // non-S3 service.
 func CanonicalURI(r *http.Request, disablePathEscaping bool) string {
-	path := r.URL.EscapedPath()
+	path := wirePath(r)
 	if path == "" {
 		return "/"
 	}
@@ -144,4 +143,27 @@ func CanonicalURI(r *http.Request, disablePathEscaping bool) string {
 		return path
 	}
 	return AWSURIEncode(path, false)
+}
+
+// wirePath returns the request path exactly as it appeared on the wire,
+// truncated at the query string. For a normal request this is
+// r.RequestURI (e.g. an already percent-encoded path like "/a%20b/c"), which
+// is what the AWS SDKs sign: the second AWSURIEncode pass in CanonicalURI
+// re-escapes the literal '%' characters that path already contains,
+// reproducing AWS's double-encoding for non-S3 services. r.URL.EscapedPath()
+// cannot substitute for this in general — for wire bytes that are not a
+// valid percent-encoding (e.g. raw, unescaped UTF-8) Go's EscapedPath()
+// fabricates a fresh single-encoded path instead of returning the literal
+// wire bytes, which would then get double-encoded incorrectly. RequestURI is
+// empty for client-constructed requests (e.g. Task 5's signer building a
+// request to sign rather than parsing one off the wire), so those fall back
+// to EscapedPath().
+func wirePath(r *http.Request) string {
+	if u := r.RequestURI; u != "" && u[0] == '/' {
+		if i := strings.IndexByte(u, '?'); i >= 0 {
+			u = u[:i]
+		}
+		return u
+	}
+	return r.URL.EscapedPath()
 }
