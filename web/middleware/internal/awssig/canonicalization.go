@@ -1,4 +1,4 @@
-package sigv4
+package awssig
 
 import (
 	"net/http"
@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-func canonicalHeaderValue(r *http.Request, name string) string {
+func CanonicalHeaderValue(r *http.Request, name string) string {
 	switch name {
 	case "host":
 		return collapseSpaces(strings.TrimSpace(r.Host))
@@ -56,11 +56,11 @@ func collapseSpaces(s string) string {
 	return b.String()
 }
 
-// canonicalQuery sorts by parameter name, then by value for repeated names,
+// CanonicalQuery sorts by parameter name, then by value for repeated names,
 // matching the AWS SDKs. Sorting the joined "key=value" strings instead would
 // disagree with them whenever one name is a prefix of another whose next byte
 // sorts below '=' (e.g. "list" vs "list-type").
-func canonicalQuery(values url.Values, exclude string) string {
+func CanonicalQuery(values url.Values, exclude string) string {
 	keys := make([]string, 0, len(values))
 	for k := range values {
 		if k == exclude {
@@ -72,19 +72,19 @@ func canonicalQuery(values url.Values, exclude string) string {
 
 	pairs := make([]string, 0, len(values))
 	for _, k := range keys {
-		ek := awsURIEncode(k, true)
+		ek := AWSURIEncode(k, true)
 		vs := append([]string(nil), values[k]...)
 		sort.Strings(vs)
 		for _, val := range vs {
-			pairs = append(pairs, ek+"="+awsURIEncode(val, true))
+			pairs = append(pairs, ek+"="+AWSURIEncode(val, true))
 		}
 	}
 	return strings.Join(pairs, "&")
 }
 
-// awsURIEncode applies RFC 3986 encoding with AWS's unreserved set. When
+// AWSURIEncode applies RFC 3986 encoding with AWS's unreserved set. When
 // encodeSlash is false, '/' is left intact (used for path segments).
-func awsURIEncode(s string, encodeSlash bool) string {
+func AWSURIEncode(s string, encodeSlash bool) string {
 	const upperhex = "0123456789ABCDEF"
 	var b strings.Builder
 	b.Grow(len(s))
@@ -107,4 +107,41 @@ func awsURIEncode(s string, encodeSlash bool) string {
 		}
 	}
 	return b.String()
+}
+
+// BuildCanonicalRequest renders the canonical request over exactly the given
+// (already sorted, lowercase) signed-header names. Identical for SigV4 and
+// SigV4A.
+func BuildCanonicalRequest(r *http.Request, sortedSignedHeaders []string, payloadHash string, disablePathEscaping bool) string {
+	var ch strings.Builder
+	for _, h := range sortedSignedHeaders {
+		ch.WriteString(h)
+		ch.WriteByte(':')
+		ch.WriteString(CanonicalHeaderValue(r, h))
+		ch.WriteByte('\n')
+	}
+
+	return strings.Join([]string{
+		r.Method,
+		CanonicalURI(r, disablePathEscaping),
+		CanonicalQuery(r.URL.Query(), "X-Amz-Signature"),
+		ch.String(),
+		strings.Join(sortedSignedHeaders, ";"),
+		payloadHash,
+	}, "\n")
+}
+
+// CanonicalURI renders the canonical URI. When disablePathEscaping is true
+// (S3 style) the on-the-wire encoded path is used directly; otherwise the
+// already-encoded path is encoded a second time, as AWS mandates for every
+// non-S3 service.
+func CanonicalURI(r *http.Request, disablePathEscaping bool) string {
+	path := r.URL.EscapedPath()
+	if path == "" {
+		return "/"
+	}
+	if disablePathEscaping {
+		return path
+	}
+	return AWSURIEncode(path, false)
 }

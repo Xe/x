@@ -9,15 +9,12 @@
 package sigv4
 
 import (
-	"bytes"
 	"context"
-	"crypto/hmac"
 	"crypto/sha256"
 	"crypto/subtle"
 	"encoding/hex"
 	"errors"
 	"fmt"
-	"io"
 	"log/slog"
 	"net/http"
 	"slices"
@@ -26,22 +23,20 @@ import (
 	"time"
 
 	"github.com/twitchtv/twirp"
+	"within.website/x/web/middleware/internal/awssig"
 )
 
 const (
 	algorithm       = "AWS4-HMAC-SHA256"
-	terminator      = "aws4_request"
-	amzTimeFormat   = "20060102T150405Z"
-	shortDateFormat = "20060102"
+	terminator      = awssig.Terminator
+	amzTimeFormat   = awssig.AmzTimeFormat
+	shortDateFormat = awssig.ShortDateFormat
 )
 
-// Payload-hash sentinels defined by AWS SigV4. They are shared with the iamsts
-// middleware so both sides agree on one definition and one comparison rule:
-// UnsignedPayload matches exactly (AWS defines it case-sensitively), while
-// StreamingPayload is matched case-insensitively because it is only ever used
-// to reject requests, and rejecting more is the safe direction.
+// Payload-hash sentinels defined by AWS SigV4, re-exported from the shared
+// internals so both middlewares agree on one definition.
 const (
-	UnsignedPayload  = "UNSIGNED-PAYLOAD"
+	UnsignedPayload  = awssig.UnsignedPayload
 	StreamingPayload = "STREAMING-AWS4-HMAC-SHA256-PAYLOAD"
 )
 
@@ -53,10 +48,10 @@ var (
 	ErrUnknownKey           = errors.New("sigv4: unknown access key id")
 	ErrClockSkew            = errors.New("sigv4: request time outside allowed skew")
 	ErrScopeMismatch        = errors.New("sigv4: credential scope does not match")
-	ErrStreamingUnsupported = errors.New("sigv4: streaming payloads are not supported")
-	ErrBodyHash             = errors.New("sigv4: body does not match x-amz-content-sha256")
+	ErrStreamingUnsupported = awssig.ErrStreamingUnsupported
+	ErrBodyHash             = awssig.ErrBodyHash
 	ErrUnauthorized         = errors.New("sigv4: signature mismatch")
-	ErrBodyTooLarge         = errors.New("sigv4: request body exceeds limit")
+	ErrBodyTooLarge         = awssig.ErrBodyTooLarge
 	ErrNotConfigured        = errors.New("sigv4: neither Verifier.Lookup nor Verifier.KeyLookup is set")
 )
 
@@ -151,7 +146,7 @@ func (v *Verifier) Verify(r *http.Request) (string, error) {
 		return "", err
 	}
 
-	payloadHash, err := v.resolvePayloadHash(r)
+	payloadHash, err := awssig.ResolvePayloadHash(r, v.MaxBodySize)
 	if err != nil {
 		return "", err
 	}
@@ -234,7 +229,7 @@ func (v *Verifier) verify(r *http.Request, sr *signedRequest, payloadHash string
 		hex.EncodeToString(hashed[:]),
 	}, "\n")
 
-	want := hex.EncodeToString(hmacSHA256(key, []byte(stringToSign)))
+	want := hex.EncodeToString(awssig.HMACSHA256(key, []byte(stringToSign)))
 
 	if subtle.ConstantTimeCompare([]byte(want), []byte(sr.signature)) != 1 {
 		return "", ErrUnauthorized
@@ -242,100 +237,10 @@ func (v *Verifier) verify(r *http.Request, sr *signedRequest, payloadHash string
 	return sr.accessKeyID, nil
 }
 
-// resolvePayloadHash returns the hash string to place in the canonical
-// request. When the client sent a concrete hash in x-amz-content-sha256 we
-// also re-hash the buffered body and confirm they match, otherwise the
-// signed hash proves nothing about the bytes we actually received.
-func (v *Verifier) resolvePayloadHash(r *http.Request) (string, error) {
-	declared := r.Header.Get("X-Amz-Content-Sha256")
-
-	// Chunked streaming integrity lives in per-chunk signatures in the body
-	// framing, which this package does not verify. Reject rather than accept a
-	// payload whose integrity is unverified.
-	if strings.EqualFold(declared, StreamingPayload) {
-		return "", ErrStreamingUnsupported
-	}
-
-	// Buffer the body (capped at MaxBodySize) and always reset it so that
-	// downstream handlers — and direct Verify callers on error paths — see a
-	// re-readable stream rather than a half-consumed one.
-	body, err := v.readAndLimitBody(r)
-	if err != nil {
-		return "", err
-	}
-
-	if declared == UnsignedPayload {
-		return UnsignedPayload, nil
-	}
-
-	sum := sha256.Sum256(body)
-	computed := hex.EncodeToString(sum[:])
-
-	if declared == "" {
-		// No content hash was signed; fall back to the body hash.
-		return computed, nil
-	}
-	if subtle.ConstantTimeCompare([]byte(strings.ToLower(declared)), []byte(computed)) != 1 {
-		return "", ErrBodyHash
-	}
-	// Use the verified lowercase hash in the canonical request; AWS requires
-	// lowercase hex and some clients emit uppercase.
-	return computed, nil
-}
-
-// readAndLimitBody reads the request body, enforcing MaxBodySize when set, and
-// resets r.Body to a reader over the bytes that were read. It resets r.Body on
-// every return path so the request body is always re-readable afterwards.
-func (v *Verifier) readAndLimitBody(r *http.Request) ([]byte, error) {
-	var reader io.Reader = r.Body
-	if v.MaxBodySize > 0 {
-		reader = io.LimitReader(r.Body, v.MaxBodySize+1)
-	}
-	body, err := io.ReadAll(reader)
-	// The original stream is consumed regardless; surface whatever was read.
-	r.Body = io.NopCloser(bytes.NewReader(body))
-	if err != nil {
-		return nil, err
-	}
-	if v.MaxBodySize > 0 && int64(len(body)) > v.MaxBodySize {
-		return nil, ErrBodyTooLarge
-	}
-	return body, nil
-}
-
 func (v *Verifier) canonicalRequest(r *http.Request, sr *signedRequest, payloadHash string) string {
 	headers := append([]string(nil), sr.signedHeaders...)
 	sort.Strings(headers)
-
-	var ch strings.Builder
-	for _, h := range headers {
-		ch.WriteString(h)
-		ch.WriteByte(':')
-		ch.WriteString(canonicalHeaderValue(r, h))
-		ch.WriteByte('\n')
-	}
-
-	return strings.Join([]string{
-		r.Method,
-		v.canonicalURI(r),
-		canonicalQuery(r.URL.Query(), "X-Amz-Signature"),
-		ch.String(),
-		strings.Join(headers, ";"),
-		payloadHash,
-	}, "\n")
-}
-
-func (v *Verifier) canonicalURI(r *http.Request) string {
-	path := r.URL.EscapedPath()
-	if path == "" {
-		return "/"
-	}
-	if v.DisablePathEscaping {
-		// S3: the on-the-wire encoded path is used directly.
-		return path
-	}
-	// Everything else: encode the already-encoded path a second time.
-	return awsURIEncode(path, false)
+	return awssig.BuildCanonicalRequest(r, headers, payloadHash, v.DisablePathEscaping)
 }
 
 type credentialScope struct {
@@ -415,20 +320,14 @@ func ParseCredential(authorization string) (*Credential, error) {
 	}, nil
 }
 
-func hmacSHA256(key, data []byte) []byte {
-	h := hmac.New(sha256.New, key)
-	h.Write(data)
-	return h.Sum(nil)
-}
-
 // DeriveSigningKey computes the SigV4 derived signing key for a credential
 // scope: HMAC(HMAC(HMAC(HMAC("AWS4"+secret, date), region), service),
 // "aws4_request"). The derived key can only validate requests whose scope
 // matches (date, region, service) exactly, so exposure is bounded to one UTC
 // day and one service; it never reveals the secret.
 func DeriveSigningKey(secret, date, region, service string) []byte {
-	kDate := hmacSHA256([]byte("AWS4"+secret), []byte(date))
-	kRegion := hmacSHA256(kDate, []byte(region))
-	kService := hmacSHA256(kRegion, []byte(service))
-	return hmacSHA256(kService, []byte(terminator))
+	kDate := awssig.HMACSHA256([]byte("AWS4"+secret), []byte(date))
+	kRegion := awssig.HMACSHA256(kDate, []byte(region))
+	kService := awssig.HMACSHA256(kRegion, []byte(service))
+	return awssig.HMACSHA256(kService, []byte(terminator))
 }
