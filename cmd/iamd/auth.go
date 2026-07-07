@@ -3,25 +3,16 @@ package main
 import (
 	"context"
 	"errors"
-	"log/slog"
 	"net/http"
-	"strings"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
-	"github.com/twitchtv/twirp"
 	"gorm.io/gorm"
 	"within.website/x/cmd/iamd/models"
 	"within.website/x/web/middleware/authctx"
 	"within.website/x/web/middleware/sigv4"
 	"within.website/x/web/middleware/sigv4a"
-)
-
-// Algorithm prefixes of the Authorization header, the dispatch key for
-// dual-algorithm verification.
-const (
-	algoV4  = "AWS4-HMAC-SHA256"
-	algoV4A = "AWS4-ECDSA-P256-SHA256"
+	"within.website/x/web/middleware/sigv4any"
 )
 
 var authRequests = promauto.NewCounterVec(prometheus.CounterOpts{
@@ -75,25 +66,14 @@ func newDualVerifier(dao *models.DAO, region, service string, maxBodySize int64)
 		}),
 	}
 
-	return func(next http.Handler) http.Handler {
-		v4h := v4.Middleware(next)
-		v4ah := v4a.Middleware(next)
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			auth := r.Header.Get("Authorization")
-			switch {
-			case strings.HasPrefix(auth, algoV4A):
-				authRequests.WithLabelValues("sigv4a").Inc()
-				v4ah.ServeHTTP(w, r)
-			case strings.HasPrefix(auth, algoV4):
-				authRequests.WithLabelValues("sigv4").Inc()
-				v4h.ServeHTTP(w, r)
-			default:
-				authRequests.WithLabelValues("none").Inc()
-				slog.DebugContext(r.Context(), "cannot serve request", "err", "no recognized signature algorithm", "method", r.Method, "path", r.URL.Path)
-				twirp.WriteError(w, sigv4a.TwirpError(r.Context(), sigv4a.ErrMissingAuth))
-			}
-		})
+	dual := &sigv4any.Verifier{
+		V4:  v4,
+		V4A: v4a,
+		Observe: func(algorithm string) {
+			authRequests.WithLabelValues(algorithm).Inc()
+		},
 	}
+	return dual.Middleware
 }
 
 // chain composes middlewares so the first listed runs first (outermost):
