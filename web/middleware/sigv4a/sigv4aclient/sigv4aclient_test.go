@@ -101,6 +101,68 @@ func TestRoundTrip(t *testing.T) {
 	}
 }
 
+// roundTripFunc adapts a function to http.RoundTripper for stubbing next.
+type roundTripFunc func(*http.Request) (*http.Response, error)
+
+func (f roundTripFunc) RoundTrip(r *http.Request) (*http.Response, error) { return f(r) }
+
+// TestRoundTrip_SetsGetBody checks that the request handed to next has
+// GetBody set to rewind to the exact buffered body. net/http's Transport
+// consults GetBody (on the request it was actually given, i.e. our clone) to
+// retry a request transparently after a broken keep-alive connection, and
+// http.Client consults it to resend a body on a 307/308 redirect when the
+// caller's own request didn't already supply one (e.g. a non-seekable
+// io.Reader). Without this, our clone silently loses both.
+func TestRoundTrip_SetsGetBody(t *testing.T) {
+	const body = `{"x":1}`
+	var captured *http.Request
+	next := roundTripFunc(func(r *http.Request) (*http.Response, error) {
+		captured = r
+		return &http.Response{StatusCode: http.StatusOK, Body: io.NopCloser(strings.NewReader("")), Header: make(http.Header)}, nil
+	})
+
+	rt, err := NewSigV4ARoundTripper(validConfig(), next)
+	if err != nil {
+		t.Fatalf("NewSigV4ARoundTripper: %v", err)
+	}
+
+	// Built without passing the body to http.NewRequest, so the standard
+	// library does not auto-populate GetBody on the request itself: any
+	// GetBody the clone ends up with must come from our own RoundTrip.
+	req, _ := http.NewRequest(http.MethodPost, "https://example.com/things", nil)
+	req.Body = io.NopCloser(strings.NewReader(body))
+	req.ContentLength = int64(len(body))
+	if req.GetBody != nil {
+		t.Fatal("test setup invalid: req.GetBody unexpectedly non-nil before RoundTrip")
+	}
+	if _, err := rt.RoundTrip(req); err != nil {
+		t.Fatalf("RoundTrip: %v", err)
+	}
+
+	if captured.GetBody == nil {
+		t.Fatal("GetBody is nil; redirects and transport retries cannot rewind the body")
+	}
+	rc, err := captured.GetBody()
+	if err != nil {
+		t.Fatalf("GetBody(): %v", err)
+	}
+	got, err := io.ReadAll(rc)
+	if err != nil {
+		t.Fatalf("read GetBody() result: %v", err)
+	}
+	if string(got) != body {
+		t.Fatalf("GetBody() = %q, want %q", got, body)
+	}
+
+	// GetBody must be independently rewindable (callable more than once) and
+	// must not be the same reader driving the request that's already in
+	// flight.
+	rest, _ := io.ReadAll(captured.Body)
+	if string(rest) != body {
+		t.Fatalf("captured.Body = %q, want %q", rest, body)
+	}
+}
+
 func TestInvalidConfigRejected(t *testing.T) {
 	cfg := validConfig()
 	cfg.SecretKey = ""
