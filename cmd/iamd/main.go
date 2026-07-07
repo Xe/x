@@ -21,15 +21,14 @@ import (
 	iamv1 "within.website/x/gen/within/website/x/iam/v1"
 	"within.website/x/internal"
 	"within.website/x/twirp/twirpslog"
-	"within.website/x/web/middleware/sigv4a"
 )
 
 var (
 	bind          = flag.String("bind", ":9080", "HTTP bind address")
 	dbLoc         = flag.String("db-loc", "./var/iamd.db", "SQLite database location")
 	metricsBind   = flag.String("metrics-bind", ":9081", "Prometheus bind address")
-	region        = flag.String("region", "us-east-1", "SigV4A X-Amz-Region-Set region all clients must sign for")
-	service       = flag.String("service", "iam", "SigV4A credential-scope service all clients must sign with")
+	region        = flag.String("region", "us-east-1", "region all clients must sign for: the classic SigV4 credential-scope region and the SigV4A X-Amz-Region-Set target")
+	service       = flag.String("service", "iam", "credential-scope service all clients must sign with (both algorithms)")
 	maxBodySize   = flag.Int64("max-body-size", 1<<20, "max request body bytes hashed for SigV4A verification")
 	bootstrapUser = flag.String("bootstrap-username", "", "if set and the DB has no users, create an admin user and signing key with this name at startup and log the credentials")
 
@@ -51,17 +50,18 @@ func main() {
 	}
 }
 
-// newMux builds the HTTP mux serving the SigV4A-protected IAM and signing-key
-// Twirp services. Every route runs the same pipeline — verify the SigV4A
-// signature, then resolve the caller to its DAO user (available downstream via
-// sigv4a.User). The SigningKeyService route's callers are downstream verifiers
-// authenticating with their own IAM credential.
-func newMux(lg *slog.Logger, dao *models.DAO, verifier *sigv4a.Verifier, signingKeyCacheTTL time.Duration) *http.ServeMux {
+// newMux builds the HTTP mux serving the dual-algorithm-protected IAM and
+// signing-key Twirp services. Every route runs the same pipeline — verify the
+// request's signature under either classic SigV4 or SigV4A (dispatched by
+// authMW per request), then resolve the caller to its DAO user (available
+// downstream via sigv4a.User). The SigningKeyService route's callers are
+// downstream verifiers authenticating with their own IAM credential.
+func newMux(lg *slog.Logger, dao *models.DAO, authMW func(http.Handler) http.Handler, signingKeyCacheTTL time.Duration) *http.ServeMux {
 	mux := http.NewServeMux()
 
 	// Verify the signature, then annotate the request with the caller's user
 	// (read downstream via sigv4a.User).
-	stack := chain(verifier.Middleware, UserMiddleware(dao))
+	stack := chain(authMW, UserMiddleware(dao))
 
 	us := users.New(dao)
 	mux.Handle(iamv1.UserServicePathPrefix, stack(iamv1.NewUserServiceServer(us, twirp.WithServerInterceptors(twirpslog.Interceptor(lg)))))
@@ -108,10 +108,10 @@ func run(ctx context.Context, lg *slog.Logger) error {
 
 	http.Handle("/metrics", promhttp.Handler())
 
-	// The route middleware is the verifier's only consumer: it authenticates
-	// every caller to iamd, including SigningKeyService.
-	verifier := newVerifier(dao, *region, *service, *maxBodySize)
-	mux := newMux(lg, dao, verifier, *signingKeyCacheTTL)
+	// The route middleware is the dual verifier's only consumer: it
+	// authenticates every caller to iamd, including SigningKeyService.
+	authMW := newDualVerifier(dao, *region, *service, *maxBodySize)
+	mux := newMux(lg, dao, authMW, *signingKeyCacheTTL)
 
 	g, ctx := errgroup.WithContext(ctx)
 

@@ -72,8 +72,9 @@ func signedTransport(t *testing.T, akid, secret string) http.RoundTripper {
 
 // classicSignedTransport builds a sigv4client round tripper that signs
 // requests with the given credentials for the test region/service. It is
-// used only by the retained classic sigv4/iamsts downstream leg, which
-// verifies classic SigV4 rather than SigV4A.
+// used both for the classic leg of iamd's own dual verifier and by the
+// retained classic sigv4/iamsts downstream leg, which verifies classic SigV4
+// rather than SigV4A.
 func classicSignedTransport(t *testing.T, akid, secret string) http.RoundTripper {
 	t.Helper()
 	rt, err := sigv4client.NewSigV4RoundTripper(&sigv4client.Config{
@@ -88,8 +89,25 @@ func classicSignedTransport(t *testing.T, akid, secret string) http.RoundTripper
 	return rt
 }
 
+// transportFor picks signedTransport (SigV4A) or classicSignedTransport
+// (classic SigV4) by name, so table-driven tests can cover both algorithms
+// with the same case bodies.
+func transportFor(t *testing.T, algorithm, akid, secret string) http.RoundTripper {
+	t.Helper()
+	switch algorithm {
+	case "sigv4a":
+		return signedTransport(t, akid, secret)
+	case "sigv4":
+		return classicSignedTransport(t, akid, secret)
+	default:
+		t.Fatalf("transportFor: unknown algorithm %q", algorithm)
+		return nil
+	}
+}
+
 // TestIntegration_SignedTwirpRoundTrip drives a full signed Twirp call through
-// the real iamd mux and rejects unsigned / wrong-key calls at the middleware.
+// the real iamd mux under both signature algorithms, and rejects unsigned /
+// malformed / wrong-key calls at the middleware.
 func TestIntegration_SignedTwirpRoundTrip(t *testing.T) {
 	dao := newDAO(t)
 	akid, secret := bootstrapCreds(t, dao)
@@ -102,19 +120,48 @@ func TestIntegration_SignedTwirpRoundTrip(t *testing.T) {
 		t.Fatalf("after 2nd bootstrap, users = %d, want 1", len(again))
 	}
 
-	verifier := newVerifier(dao, intRegion, intService, 1<<20)
-	mux := newMux(quietLogger(), dao, verifier, 5*time.Minute)
+	authMW := newDualVerifier(dao, intRegion, intService, 1<<20)
+	mux := newMux(quietLogger(), dao, authMW, 5*time.Minute)
 	srv := httptest.NewServer(mux)
 	defer srv.Close()
 
 	listURL := srv.URL + iamv1.UserServicePathPrefix + "ListUsers"
 
-	t.Run("signed call reaches handler", func(t *testing.T) {
-		client := iamv1.NewUserServiceProtobufClient(srv.URL, &http.Client{Transport: signedTransport(t, akid, secret)})
-		if _, err := client.ListUsers(context.Background(), &iamv1.ListUsersReq{Count: 10, Page: 1}); err != nil {
-			t.Fatalf("ListUsers: %v", err)
-		}
-	})
+	for _, algorithm := range []string{"sigv4a", "sigv4"} {
+		t.Run(algorithm, func(t *testing.T) {
+			t.Run("valid signed call succeeds", func(t *testing.T) {
+				client := iamv1.NewUserServiceProtobufClient(srv.URL, &http.Client{Transport: transportFor(t, algorithm, akid, secret)})
+				if _, err := client.ListUsers(context.Background(), &iamv1.ListUsersReq{Count: 10, Page: 1}); err != nil {
+					t.Fatalf("ListUsers: %v", err)
+				}
+			})
+
+			t.Run("wrong key is rejected", func(t *testing.T) {
+				resp, err := (&http.Client{Transport: transportFor(t, algorithm, "AKIDNOPE", secret)}).Post(listURL, "application/json", nil)
+				if err != nil {
+					t.Fatalf("POST: %v", err)
+				}
+				defer resp.Body.Close()
+				if resp.StatusCode != http.StatusForbidden {
+					t.Fatalf("status = %d, want 403", resp.StatusCode)
+				}
+			})
+
+			// Regression: UserMiddleware stores the caller via sigv4a.WithUser,
+			// but KeyService historically read it back via the classic
+			// sigv4.User context key, so it never found the caller and failed
+			// closed with Unauthenticated even for a validly signed request.
+			// Running this under both algorithms proves the normalization in
+			// UserMiddleware resolves the caller regardless of which leg of
+			// the dual verifier authenticated the request.
+			t.Run("KeyService resolves the authenticated caller", func(t *testing.T) {
+				client := iamv1.NewKeyServiceProtobufClient(srv.URL, &http.Client{Transport: transportFor(t, algorithm, akid, secret)})
+				if _, err := client.ListKeys(context.Background(), &iamv1.ListKeysReq{Count: 10, Page: 0}); err != nil {
+					t.Fatalf("ListKeys: %v", err)
+				}
+			})
+		})
+	}
 
 	t.Run("unsigned call is rejected", func(t *testing.T) {
 		resp, err := http.Post(listURL, "application/json", nil)
@@ -127,62 +174,61 @@ func TestIntegration_SignedTwirpRoundTrip(t *testing.T) {
 		}
 	})
 
-	t.Run("wrong key is rejected", func(t *testing.T) {
-		resp, err := (&http.Client{Transport: signedTransport(t, "AKIDNOPE", secret)}).Post(listURL, "application/json", nil)
+	t.Run("malformed authorization header is rejected", func(t *testing.T) {
+		req, err := http.NewRequest(http.MethodPost, listURL, nil)
+		if err != nil {
+			t.Fatalf("NewRequest: %v", err)
+		}
+		req.Header.Set("Authorization", "Bearer nope")
+		resp, err := http.DefaultClient.Do(req)
 		if err != nil {
 			t.Fatalf("POST: %v", err)
 		}
 		defer resp.Body.Close()
-		if resp.StatusCode != http.StatusForbidden {
-			t.Fatalf("status = %d, want 403", resp.StatusCode)
-		}
-	})
-
-	// Regression: UserMiddleware stores the caller via sigv4a.WithUser, but
-	// KeyService historically read it back via the classic sigv4.User context
-	// key, so it never found the caller and failed closed with
-	// Unauthenticated even for a validly signed request.
-	t.Run("KeyService resolves the sigv4a-authenticated caller", func(t *testing.T) {
-		client := iamv1.NewKeyServiceProtobufClient(srv.URL, &http.Client{Transport: signedTransport(t, akid, secret)})
-		if _, err := client.ListKeys(context.Background(), &iamv1.ListKeysReq{Count: 10, Page: 0}); err != nil {
-			t.Fatalf("ListKeys: %v", err)
+		if resp.StatusCode != http.StatusUnauthorized {
+			t.Fatalf("status = %d, want 401", resp.StatusCode)
 		}
 	})
 }
 
 // TestUserMiddleware_resolvesCaller checks that UserMiddleware annotates the
 // request context with the authenticated caller's DAO user, mirroring
-// iamsts.Caller.
+// iamsts.Caller, regardless of which algorithm's verifier authenticated the
+// request.
 func TestUserMiddleware_resolvesCaller(t *testing.T) {
-	dao := newDAO(t)
-	akid, secret := bootstrapCreds(t, dao)
-	verifier := newVerifier(dao, intRegion, intService, 1<<20)
+	for _, algorithm := range []string{"sigv4a", "sigv4"} {
+		t.Run(algorithm, func(t *testing.T) {
+			dao := newDAO(t)
+			akid, secret := bootstrapCreds(t, dao)
+			authMW := newDualVerifier(dao, intRegion, intService, 1<<20)
 
-	var gotUUID string
-	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if u, ok := sigv4a.User(r.Context()); ok {
-			gotUUID = u.GetId()
-		}
-		w.WriteHeader(http.StatusNoContent)
-	})
+			var gotUUID string
+			handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				if u, ok := sigv4a.User(r.Context()); ok {
+					gotUUID = u.GetId()
+				}
+				w.WriteHeader(http.StatusNoContent)
+			})
 
-	// Verify the signature, then resolve the caller to its user.
-	stack := chain(verifier.Middleware, UserMiddleware(dao))
-	srv := httptest.NewServer(stack(handler))
-	defer srv.Close()
+			// Verify the signature, then resolve the caller to its user.
+			stack := chain(authMW, UserMiddleware(dao))
+			srv := httptest.NewServer(stack(handler))
+			defer srv.Close()
 
-	resp, err := (&http.Client{Transport: signedTransport(t, akid, secret)}).Get(srv.URL + "/anything")
-	if err != nil {
-		t.Fatalf("GET: %v", err)
-	}
-	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusNoContent {
-		t.Fatalf("status = %d, want 204", resp.StatusCode)
-	}
+			resp, err := (&http.Client{Transport: transportFor(t, algorithm, akid, secret)}).Get(srv.URL + "/anything")
+			if err != nil {
+				t.Fatalf("GET: %v", err)
+			}
+			defer resp.Body.Close()
+			if resp.StatusCode != http.StatusNoContent {
+				t.Fatalf("status = %d, want 204", resp.StatusCode)
+			}
 
-	us, _ := dao.ListUsers(context.Background(), 10, 0)
-	if gotUUID != us[0].UUID {
-		t.Errorf("context user = %q, want %q", gotUUID, us[0].UUID)
+			us, _ := dao.ListUsers(context.Background(), 10, 0)
+			if gotUUID != us[0].UUID {
+				t.Errorf("context user = %q, want %q", gotUUID, us[0].UUID)
+			}
+		})
 	}
 }
 
@@ -205,8 +251,8 @@ func TestIntegration_SigningKeyVerifierChain(t *testing.T) {
 		t.Fatalf("CreateKey: %v", err)
 	}
 
-	verifier := newVerifier(dao, intRegion, intService, 1<<20)
-	iamd := httptest.NewServer(newMux(quietLogger(), dao, verifier, 5*time.Minute))
+	authMW := newDualVerifier(dao, intRegion, intService, 1<<20)
+	iamd := httptest.NewServer(newMux(quietLogger(), dao, authMW, 5*time.Minute))
 	defer iamd.Close()
 
 	// The downstream service: fetches signing keys from iamd (signing those
