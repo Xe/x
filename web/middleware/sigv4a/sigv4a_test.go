@@ -3,6 +3,8 @@ package sigv4a
 import (
 	"bufio"
 	"bytes"
+	"context"
+	"crypto/ecdsa"
 	"errors"
 	"io"
 	"net/http"
@@ -171,6 +173,39 @@ func TestNilLookuper(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "https://api.example.com/", nil)
 	if _, err := v.Verify(req); err != ErrNotConfigured {
 		t.Fatalf("err = %v, want ErrNotConfigured", err)
+	}
+}
+
+// A PublicKeyLookuper that returns no key and no error must be treated as an
+// unknown key, not reach ecdsa.VerifyASN1 with a nil key (which panics,
+// since it dereferences pub.Curve unconditionally). This also gives the
+// KeyLookup branch its first coverage.
+func TestNilPublicKeyTreatedAsUnknownKey(t *testing.T) {
+	vc := loadVectorContext(t, "get-vanilla")
+	req, _ := parseVectorRequest(t, readVectorFile(t, "get-vanilla", "header-signed-request.txt"))
+	v := &Verifier{
+		Region:  vc.Region,
+		Service: vc.Service,
+		KeyLookup: PublicKeyLookuperFunc(func(context.Context, string) (*ecdsa.PublicKey, error) {
+			return nil, nil
+		}),
+		Now: func() time.Time { return vc.signingTime(t).Add(5 * time.Second) },
+	}
+	if _, err := v.Verify(req); !errors.Is(err, ErrUnknownKey) {
+		t.Fatalf("err = %v, want ErrUnknownKey", err)
+	}
+}
+
+// A malformed (non-hex) signature must be rejected as ErrUnauthorized rather
+// than bubbling up a raw hex-decode error.
+func TestMalformedHexSignatureRejected(t *testing.T) {
+	vc := loadVectorContext(t, "get-vanilla")
+	req, _ := parseVectorRequest(t, readVectorFile(t, "get-vanilla", "header-signed-request.txt"))
+	auth := req.Header.Get("Authorization")
+	sig := auth[:strings.LastIndex(auth, "Signature=")+len("Signature=")] + "zz"
+	req.Header.Set("Authorization", sig)
+	if _, err := vectorVerifier(t, vc).Verify(req); !errors.Is(err, ErrUnauthorized) {
+		t.Fatalf("err = %v, want ErrUnauthorized", err)
 	}
 }
 

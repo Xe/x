@@ -226,6 +226,13 @@ func (v *Verifier) verify(r *http.Request, sr *signedRequest, payloadHash string
 	if err != nil {
 		return "", err
 	}
+	if pub == nil {
+		// A lookuper that returns no key and no error must read as
+		// unknown-key, never reach VerifyASN1: it dereferences pub.Curve
+		// unconditionally and would panic on a nil key, turning a lookuper
+		// bug into a DoS of this auth middleware.
+		return "", ErrUnknownKey
+	}
 
 	canonReq := v.canonicalRequest(r, sr, payloadHash)
 	scopeStr := strings.Join([]string{sr.scope.date, sr.scope.service, terminator}, "/")
