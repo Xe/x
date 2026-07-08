@@ -35,7 +35,6 @@ spec:
                 secretKeyRef:
                   name: aws-creds
                   key: AWS_SECRET_ACCESS_KEY
-              value: secret_here
             - name: AWS_REGION
               value: ca-central-1 # eg us-west-1
             - name: ROUTE53_HOSTED_ZONE_ID
