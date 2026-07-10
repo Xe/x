@@ -8,8 +8,8 @@ import (
 	"path"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
-	awsConfig "github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
+	storage "github.com/tigrisdata/storage-go"
 	"golang.org/x/crypto/acme/autocert"
 )
 
@@ -19,14 +19,10 @@ type Options struct {
 }
 
 func New(ctx context.Context, opts Options) (autocert.Cache, error) {
-	cfg, err := awsConfig.LoadDefaultConfig(ctx)
+	s3c, err := storage.New(ctx, storage.WithGlobalEndpoint(), storage.WithPathStyle(true))
 	if err != nil {
 		return nil, err
 	}
-
-	s3c := s3.NewFromConfig(cfg, func(o *s3.Options) {
-		o.UsePathStyle = true
-	})
 
 	return &impl{
 		cli:    s3c,
@@ -36,7 +32,7 @@ func New(ctx context.Context, opts Options) (autocert.Cache, error) {
 }
 
 type impl struct {
-	cli            *s3.Client
+	cli            *storage.Client
 	bucket, prefix string
 }
 

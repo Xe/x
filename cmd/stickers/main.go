@@ -15,10 +15,7 @@ import (
 	"time"
 
 	"github.com/a-h/templ"
-	"github.com/aws/aws-sdk-go-v2/aws"
-	v4 "github.com/aws/aws-sdk-go-v2/aws/signer/v4"
-	awsConfig "github.com/aws/aws-sdk-go-v2/config"
-	"github.com/aws/aws-sdk-go-v2/service/s3"
+	simplestorage "github.com/tigrisdata/storage-go/simplestorage"
 	"within.website/x/htmx"
 	"within.website/x/internal"
 	"within.website/x/xess"
@@ -44,17 +41,13 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	cfg, err := awsConfig.LoadDefaultConfig(ctx)
+	sc, err := simplestorage.New(ctx,
+		simplestorage.WithBucket(*bucketName),
+		simplestorage.WithFlyEndpoint(),
+	)
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	s3c := s3.NewFromConfig(cfg, func(o *s3.Options) {
-		o.UsePathStyle = false
-	})
-
-	presigner := Presigner{s3.NewPresignClient(s3c)}
-	_ = presigner
 
 	mux := http.NewServeMux()
 	htmx.Mount(mux)
@@ -91,10 +84,7 @@ func main() {
 		key := fmt.Sprintf("%s/%s/%s.%s", *folderName, name, mood, format)
 
 		if !inCache(name, mood) {
-			_, err := s3c.HeadObject(r.Context(), &s3.HeadObjectInput{
-				Bucket: aws.String(*bucketName),
-				Key:    aws.String(key),
-			})
+			_, err := sc.Head(r.Context(), key)
 			if err != nil {
 				slog.Error("can't head key", "format", format, "bucket", *bucketName, "key", key, "err", err)
 
@@ -123,7 +113,7 @@ func main() {
 			setCache(name, mood)
 		}
 
-		req, err := presigner.GetObject(r.Context(), key, 3600)
+		url, err := sc.PresignURL(r.Context(), http.MethodGet, key, time.Hour)
 		if err != nil {
 			slog.Error("can't presign get for key", "format", format, "bucket", *bucketName, "key", key, "err", err)
 
@@ -152,41 +142,13 @@ func main() {
 		w.Header().Add("Cache-Control", "max-age=3599")
 		w.Header().Add("Expires", time.Now().Add(time.Hour-time.Second).Format(http.TimeFormat))
 
-		brandedURL := strings.ReplaceAll(req.URL, "xedn.fly.storage.tigris.dev", "files.xeiaso.net")
+		brandedURL := strings.ReplaceAll(url, "xedn.fly.storage.tigris.dev", "files.xeiaso.net")
 
 		http.Redirect(w, r, brandedURL, http.StatusTemporaryRedirect)
 	})
 
 	slog.Info("listening", "bind", *bind)
 	log.Fatal(http.ListenAndServe(*bind, mux))
-}
-
-// Presigner encapsulates the Amazon Simple Storage Service (Amazon S3) presign actions
-// used in the examples.
-// It contains PresignClient, a client that is used to presign requests to Amazon S3.
-// Presigned requests contain temporary credentials and can be made from any HTTP client.
-type Presigner struct {
-	PresignClient *s3.PresignClient
-}
-
-// GetObject makes a presigned request that can be used to get an object from a bucket.
-// The presigned request is valid for the specified number of seconds.
-func (presigner Presigner) GetObject(
-	ctx context.Context,
-	objectKey string,
-	lifetimeSecs int64,
-) (*v4.PresignedHTTPRequest, error) {
-	request, err := presigner.PresignClient.PresignGetObject(ctx, &s3.GetObjectInput{
-		Bucket: aws.String(*bucketName),
-		Key:    aws.String(objectKey),
-	}, func(opts *s3.PresignOptions) {
-		opts.Expires = time.Duration(lifetimeSecs * int64(time.Second))
-	})
-	if err != nil {
-		log.Printf("Couldn't get a presigned request to get %v:%v. Here's why: %v\n",
-			bucketName, objectKey, err)
-	}
-	return request, err
 }
 
 func inCache(character, mood string) bool {
