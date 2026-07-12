@@ -54,7 +54,7 @@ func (u *UpdateService) UpdateIncident(ctx context.Context, incident *statuspage
 		Title:       fmt.Sprintf("Incident %s: %s", incident.GetId(), incident.GetName()),
 		Description: sb.String(),
 	}, discordgo.WithContext(ctx)); err != nil {
-		slog.Error("failed to send incident update", "err", err, "incident", incident)
+		slog.ErrorContext(ctx, "failed to send incident update", "err", err, "incident", incident)
 		return
 	}
 }
@@ -69,7 +69,7 @@ func (u *UpdateService) UpdateComponent(ctx context.Context, sp *statuspage.Stat
 		Title:       fmt.Sprintf("Component %s: %s", sp.GetComponent().GetId(), sp.GetComponent().GetName()),
 		Description: sb.String(),
 	}); err != nil {
-		slog.Error("failed to send component update", "err", err, "component", sp.GetComponent())
+		slog.ErrorContext(ctx, "failed to send component update", "err", err, "component", sp.GetComponent())
 		return
 	}
 }

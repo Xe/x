@@ -42,7 +42,7 @@ func New(ctx context.Context, dg *discordgo.Session) (*Module, error) {
 
 	conn.AddCallback("900", func(e *ircevent.Event) {
 		conn.Join(*ircChannel)
-		slog.Debug("joined channel", "channel", *ircChannel)
+		slog.DebugContext(ctx, "joined channel", "channel", *ircChannel)
 	})
 	if err := conn.Connect(*ircServer); err != nil {
 		return nil, fmt.Errorf("irc: error connecting to IRC server: %w", err)
@@ -59,7 +59,7 @@ func New(ctx context.Context, dg *discordgo.Session) (*Module, error) {
 			case <-ctx.Done():
 				return
 			case err := <-conn.Error:
-				slog.Error("error from IRC server", "err", err)
+				slog.ErrorContext(ctx, "error from IRC server", "err", err)
 			}
 		}
 	}()

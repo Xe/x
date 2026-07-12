@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: route53-dyndns
+  namespace: external-dns
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: route53-dyndns
+  template:
+    metadata:
+      labels:
+        app: route53-dyndns
+    spec:
+      nodeSelector:
+        role: edge
+      tolerations:
+        - key: dedicated
+          operator: Equal
+          value: edge
+          effect: NoSchedule
+      containers:
+        - name: main
+          image: sjmayotte/route53-dynamic-dns:latest
+          imagePullPolicy: Always
+          env:
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: aws-creds
+                  key: AWS_ACCESS_KEY_ID
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: aws-creds
+                  key: AWS_SECRET_ACCESS_KEY
+            - name: AWS_REGION
+              value: ca-central-1 # eg us-west-1
+            - name: ROUTE53_HOSTED_ZONE_ID
+              value: Z0728239Q0P1VCM6J5LI
+            - name: ROUTE53_DOMAIN
+              value: saga.xeserv.us
+            - name: ROUTE53_TYPE
+              value: A
+            - name: ROUTE53_TTL
+              value: "120"
+            - name: LOG_TO_STDOUT
+              value: "true"

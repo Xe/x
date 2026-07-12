@@ -51,12 +51,12 @@ type Config struct {
 func (c Config) BlueskyAgent(ctx context.Context) (*bsky.BskyAgent, error) {
 	bluesky := bsky.NewAgent(ctx, c.BlueskyPDS, c.BlueskyHandle, c.BlueskyAuthkey)
 	if err := bluesky.Connect(ctx); err != nil {
-		slog.Error("failed to connect to bluesky", "err", err)
+		slog.ErrorContext(ctx, "failed to connect to bluesky", "err", err)
 		return nil, err
 	}
 
 	if err := bluesky.Connect(ctx); err != nil {
-		slog.Error("failed to connect to bluesky", "err", err)
+		slog.ErrorContext(ctx, "failed to connect to bluesky", "err", err)
 		return nil, err
 	}
 
@@ -78,13 +78,13 @@ func New(ctx context.Context, dao *models.DAO, cfg Config) (*Server, error) {
 	})
 
 	if err != nil {
-		slog.Error("can't create twitch client", "err", err)
+		slog.ErrorContext(ctx, "can't create twitch client", "err", err)
 		return nil, err
 	}
 
 	resp, err := twitch.RequestAppAccessToken([]string{"user:read:email", "user:read:broadcast"})
 	if err != nil {
-		slog.Error("can't request app access token", "err", err)
+		slog.ErrorContext(ctx, "can't request app access token", "err", err)
 		return nil, err
 	}
 
@@ -104,7 +104,7 @@ func New(ctx context.Context, dao *models.DAO, cfg Config) (*Server, error) {
 	}
 
 	if err := s.maybeCreateWebhookSubscription(); err != nil {
-		slog.Error("cant' create subscription", "err", err)
+		slog.ErrorContext(ctx, "cant' create subscription", "err", err)
 	}
 
 	return s, nil
@@ -118,13 +118,13 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	data, err := io.ReadAll(body)
 	if err != nil {
-		slog.Error("can't read from body", "err", err)
+		slog.ErrorContext(r.Context(), "can't read from body", "err", err)
 		http.Error(w, "can't read", http.StatusBadRequest)
 		return
 	}
 
 	if !helix.VerifyEventSubNotification(s.cfg.TwitchWebhookSecret, r.Header, string(data)) {
-		slog.Error("can't verify event", "err", "invalid secret")
+		slog.ErrorContext(r.Context(), "can't verify event", "err", "invalid secret")
 		http.Error(w, "no auth", http.StatusUnauthorized)
 		return
 	}
@@ -133,7 +133,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	twitchEventsCount.WithLabelValues(messageType).Inc()
 
 	lg := slog.With("message_type", messageType)
-	lg.Debug("got message")
+	lg.DebugContext(r.Context(), "got message")
 
 	body = io.NopCloser(bytes.NewBuffer(data))
 
@@ -141,22 +141,25 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case "webhook_callback_verification":
 		err = s.handleWebhookVerification(w, body)
 	case "revocation":
+		// The resubscribe happens long after this request ends, so detach from
+		// its cancellation while keeping the request's log attributes.
+		ctx := context.WithoutCancel(r.Context())
 		go func() {
 			time.Sleep(5 * time.Minute)
 			if err := s.maybeCreateWebhookSubscription(); err != nil {
-				slog.Error("can't create new webhook subscription after the current one was revoked", "err", err)
+				slog.ErrorContext(ctx, "can't create new webhook subscription after the current one was revoked", "err", err)
 			}
 		}()
 	case "notification":
 		err = s.handleNotification(r.Context(), lg, w, data)
 	default:
-		lg.Error("unknown event", "type", messageType, "body", json.RawMessage(data))
+		lg.ErrorContext(r.Context(), "unknown event", "type", messageType, "body", json.RawMessage(data))
 		http.Error(w, "unknown event", http.StatusOK)
 	}
 
 	if err != nil {
 		twitchEventsCount.WithLabelValues(messageType).Inc()
-		lg.Error("can't handle message", "err", err)
+		lg.ErrorContext(r.Context(), "can't handle message", "err", err)
 		http.Error(w, "can't deal with this input", http.StatusInternalServerError)
 		return
 	}
@@ -235,11 +238,11 @@ func (s *Server) handleNotification(ctx context.Context, lg *slog.Logger, w http
 		}
 		err = s.handleStreamUp(ctx, lg, &ev)
 	default:
-		lg.Error("unknown event", "event", data.Subscription.Type, "data", data.Event)
+		lg.ErrorContext(ctx, "unknown event", "event", data.Subscription.Type, "data", data.Event)
 	}
 
 	if err != nil {
-		lg.Error("can't handle message", "err", err)
+		lg.ErrorContext(ctx, "can't handle message", "err", err)
 		http.Error(w, "can't deal with this event", http.StatusInternalServerError)
 		return nil
 	}
@@ -248,7 +251,7 @@ func (s *Server) handleNotification(ctx context.Context, lg *slog.Logger, w http
 }
 
 func (s *Server) handleStreamUp(ctx context.Context, lg *slog.Logger, ev *helix.EventSubStreamOnlineEvent) error {
-	lg.Info("broadcaster went online!", "username", ev.BroadcasterUserLogin)
+	lg.InfoContext(ctx, "broadcaster went online!", "username", ev.BroadcasterUserLogin)
 
 	g, gCtx := errgroup.WithContext(ctx)
 
@@ -257,10 +260,10 @@ func (s *Server) handleStreamUp(ctx context.Context, lg *slog.Logger, ev *helix.
 			Status: streamAnnouncement,
 		})
 		if err != nil {
-			slog.Error("failed to announce to mastodon", "err", err)
+			slog.ErrorContext(gCtx, "failed to announce to mastodon", "err", err)
 			return err
 		}
-		slog.Info("posted to mastodon", "mastodon_url", post.URL)
+		slog.InfoContext(gCtx, "posted to mastodon", "mastodon_url", post.URL)
 		return nil
 	})
 
@@ -299,7 +302,7 @@ func (s *Server) handleStreamUp(ctx context.Context, lg *slog.Logger, ev *helix.
 			return fmt.Errorf("can't post to feed: %w", err)
 		}
 
-		lg.Info("posted to bluesky", "bluesky_cid", cid, "bluesky_uri", uri, "body", sb.String())
+		lg.InfoContext(gCtx, "posted to bluesky", "bluesky_cid", cid, "bluesky_uri", uri, "body", sb.String())
 
 		return nil
 	})
@@ -308,11 +311,11 @@ func (s *Server) handleStreamUp(ctx context.Context, lg *slog.Logger, ev *helix.
 		if _, err := s.mimi.Post(gCtx, &announcev1.StatusUpdate{
 			Body: streamAnnouncement,
 		}); err != nil {
-			slog.Error("can't announce to Mimi", "err", err)
+			slog.ErrorContext(gCtx, "can't announce to Mimi", "err", err)
 			return nil
 		}
 
-		lg.Info("posted to Mimi")
+		lg.InfoContext(gCtx, "posted to Mimi")
 
 		return nil
 	})

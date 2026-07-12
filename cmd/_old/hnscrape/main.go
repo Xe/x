@@ -32,12 +32,12 @@ func main() {
 	ctx, cancel := ControlCContext()
 	defer cancel()
 
-	slog.Debug("starting hnscrape", "scrapeDelay", scrapeDelay.String(), "hnUser", *hnUser)
+	slog.DebugContext(ctx, "starting hnscrape", "scrapeDelay", scrapeDelay.String(), "hnUser", *hnUser)
 
 	hn := NewHNClient(*scrapeDelay)
 
 	if *cacheFolder != "" {
-		slog.Debug("caching items to", "cacheFolder", *cacheFolder)
+		slog.DebugContext(ctx, "caching items to", "cacheFolder", *cacheFolder)
 		os.MkdirAll(*cacheFolder, 0755)
 		os.MkdirAll(filepath.Join(*cacheFolder, "items"), 0755)
 		os.MkdirAll(filepath.Join(*cacheFolder, "indices"), 0755)
@@ -47,11 +47,11 @@ func main() {
 
 	u, err := hn.GetUser(ctx, *hnUser)
 	if err != nil {
-		slog.Error("failed to get user", "err", err, "user", *hnUser)
+		slog.ErrorContext(ctx, "failed to get user", "err", err, "user", *hnUser)
 		os.Exit(1)
 	}
 
-	slog.Debug("got user", "user", u.Created.String(), "karma", u.Karma, "submitted", len(u.Submitted))
+	slog.DebugContext(ctx, "got user", "user", u.Created.String(), "karma", u.Karma, "submitted", len(u.Submitted))
 
 	reverseIntSlice(u.Submitted)
 
@@ -60,7 +60,7 @@ func main() {
 	for _, itemID := range u.Submitted {
 		item, err := hn.GetItem(ctx, itemID)
 		if err != nil {
-			slog.Error("failed to get item", "err", err, "itemID", itemID)
+			slog.ErrorContext(ctx, "failed to get item", "err", err, "itemID", itemID)
 			os.Exit(1)
 		}
 
@@ -74,31 +74,31 @@ func main() {
 
 		parent, err := hn.GetItem(ctx, *item.Parent)
 		if err != nil {
-			slog.Error("failed to get parent", "err", err, "itemID", item.ID)
+			slog.ErrorContext(ctx, "failed to get parent", "err", err, "itemID", item.ID)
 			continue
 		}
 		_ = parent
 
 		pathToRoot, err := hn.PathToRoot(ctx, item.ID)
 		if err != nil {
-			slog.Error("failed to get path to root", "err", err, "itemID", item.ID)
+			slog.ErrorContext(ctx, "failed to get path to root", "err", err, "itemID", item.ID)
 			continue
 		}
 
 		conversationID, err := getConversationIDName(pathToRoot)
 		if err != nil {
-			slog.Error("failed to get conversation ID", "err", err, "itemID", item.ID)
+			slog.ErrorContext(ctx, "failed to get conversation ID", "err", err, "itemID", item.ID)
 			continue
 		}
 
-		slog.Info("got conversation ID", "itemID", item.ID, "conversationID", conversationID)
+		slog.InfoContext(ctx, "got conversation ID", "itemID", item.ID, "conversationID", conversationID)
 
 		conversations[conversationID] = pathToRoot
 	}
 
 	fout, err := os.Create(filepath.Join(*cacheFolder, *hnUser+".jsonl"))
 	if err != nil {
-		slog.Error("failed to create train file", "err", err)
+		slog.ErrorContext(ctx, "failed to create train file", "err", err)
 		os.Exit(1)
 	}
 	defer fout.Close()
@@ -109,7 +109,7 @@ func main() {
 		for _, itemID := range path {
 			item, err := hn.GetItem(ctx, itemID)
 			if err != nil {
-				slog.Error("failed to get item", "err", err, "itemID", itemID)
+				slog.ErrorContext(ctx, "failed to get item", "err", err, "itemID", itemID)
 				os.Exit(1)
 			}
 
@@ -140,7 +140,7 @@ func main() {
 
 			plainText, err := html2text.FromString(text, html2text.Options{OmitLinks: true})
 			if err != nil {
-				slog.Error("failed to convert HTML to text", "err", err, "itemID", item.ID)
+				slog.ErrorContext(ctx, "failed to convert HTML to text", "err", err, "itemID", item.ID)
 				os.Exit(1)
 			}
 
@@ -151,7 +151,7 @@ func main() {
 		}
 
 		if err := json.NewEncoder(fout).Encode(Conversation{Messages: messages}); err != nil {
-			slog.Error("failed to write conversation", "err", err, "conversationID", conversationID)
+			slog.ErrorContext(ctx, "failed to write conversation", "err", err, "conversationID", conversationID)
 			os.Exit(1)
 		}
 	}
@@ -171,18 +171,18 @@ func main() {
 				Content: "My name is Mimi, duh!",
 			},
 		}}); err != nil {
-		slog.Error("failed to write conversation", "err", err)
+		slog.ErrorContext(ctx, "failed to write conversation", "err", err)
 		os.Exit(1)
 	}
 
-	slog.Info("wrote training data to", "file", fout.Name())
+	slog.InfoContext(ctx, "wrote training data to", "file", fout.Name())
 
 	// rewind fout
 	fout.Seek(0, 0)
 
 	tokenEncoder, err := gpt3encoder.NewEncoder()
 	if err != nil {
-		slog.Error("failed to create token encoder", "err", err)
+		slog.ErrorContext(ctx, "failed to create token encoder", "err", err)
 		os.Exit(1)
 	}
 
@@ -207,7 +207,7 @@ func main() {
 		chatml := sess.ChatML()
 		tokens, err := tokenEncoder.Encode(chatml)
 		if err != nil {
-			slog.Error("failed to encode tokens", "err", err)
+			slog.ErrorContext(ctx, "failed to encode tokens", "err", err)
 			os.Exit(1)
 		}
 
@@ -216,7 +216,7 @@ func main() {
 		}
 	}
 
-	slog.Info("most tokens", "tokens", mostTokens)
+	slog.InfoContext(ctx, "most tokens", "tokens", mostTokens)
 }
 
 type Conversation struct {

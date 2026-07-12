@@ -56,7 +56,7 @@ func (s *Server) cron() {
 	var probes []Probe
 
 	if err := s.dao.db.Preload("LastResult").Find(&probes).Error; err != nil {
-		slog.Error("failed to get probes", "err", err)
+		slog.ErrorContext(ctx, "failed to get probes", "err", err)
 		return
 	}
 
@@ -69,22 +69,22 @@ func (s *Server) cron() {
 			result := checkURL(gCtx, probe)
 
 			if result.LastModified != probe.LastResult.LastModified {
-				slog.Info("probe result changed", "probe", probe.ID, "old", probe.LastResult, "new", result)
+				slog.InfoContext(gCtx, "probe result changed", "probe", probe.ID, "old", probe.LastResult, "new", result)
 
 				user, err := s.dao.GetUser(gCtx, probe.UserID)
 				if err != nil {
-					slog.Error("failed to get user", "err", err)
+					slog.ErrorContext(gCtx, "failed to get user", "err", err)
 					return err
 				}
 
 				if err := s.messageUser(user, fmt.Sprintf("*%s*:\n\nLast modified: %s\nRegion: %s\nStatus code: %d\nRemark: %s", probe.Name, result.LastModified, result.Region, result.StatusCode, result.Remark)); err != nil {
-					slog.Error("failed to message user", "err", err)
+					slog.ErrorContext(gCtx, "failed to message user", "err", err)
 					return err
 				}
 			}
 
 			if err := s.dao.CreateProbeResult(gCtx, tx, probe, result); err != nil {
-				slog.Error("failed to create probe result", "err", err, "probe", probe, "result", result)
+				slog.ErrorContext(gCtx, "failed to create probe result", "err", err, "probe", probe, "result", result)
 				return err
 			}
 
@@ -93,12 +93,12 @@ func (s *Server) cron() {
 	}
 
 	if err := g.Wait(); err != nil {
-		slog.Error("failed to check probes", "err", err)
+		slog.ErrorContext(ctx, "failed to check probes", "err", err)
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		slog.Error("failed to commit transaction", "err", err)
+		slog.ErrorContext(ctx, "failed to commit transaction", "err", err)
 	}
 
-	slog.Info("checked probes", "count", len(probes))
+	slog.InfoContext(ctx, "checked probes", "count", len(probes))
 }

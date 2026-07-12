@@ -41,7 +41,7 @@ func (i *Importer) importSwitches(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if len(row) != 4 {
-			slog.Error("invalid row", "row", row)
+			slog.ErrorContext(r.Context(), "invalid row", "row", row)
 			continue
 		}
 
@@ -52,13 +52,13 @@ func (i *Importer) importSwitches(w http.ResponseWriter, r *http.Request) {
 
 		memberID, err := strconv.Atoi(memberIDStr)
 		if err != nil {
-			slog.Error("failed to parse member ID", "err", err)
+			slog.ErrorContext(r.Context(), "failed to parse member ID", "err", err)
 			continue
 		}
 
 		startedAt, err := time.Parse(timeLayout, startedAtStr)
 		if err != nil {
-			slog.Error("failed to parse started at", "err", err)
+			slog.ErrorContext(r.Context(), "failed to parse started at", "err", err)
 			continue
 		}
 
@@ -66,7 +66,7 @@ func (i *Importer) importSwitches(w http.ResponseWriter, r *http.Request) {
 		if endedAtStr != "" {
 			endedAtTime, err := time.Parse(timeLayout, endedAtStr)
 			if err != nil {
-				slog.Error("failed to parse ended at", "err", err, "endedAtStr", endedAtStr)
+				slog.ErrorContext(r.Context(), "failed to parse ended at", "err", err, "endedAtStr", endedAtStr)
 				continue
 			}
 
@@ -75,7 +75,7 @@ func (i *Importer) importSwitches(w http.ResponseWriter, r *http.Request) {
 
 		var member models.Member
 		if err := tx.Where("id = ?", memberID).First(&member).Error; err != nil {
-			slog.Error("failed to find member", "err", err, "memberID", memberID)
+			slog.ErrorContext(r.Context(), "failed to find member", "err", err, "memberID", memberID)
 			continue
 		}
 
@@ -89,13 +89,13 @@ func (i *Importer) importSwitches(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if err := tx.Save(&sw).Error; err != nil {
-			slog.Error("failed to save switch", "err", err)
+			slog.ErrorContext(r.Context(), "failed to save switch", "err", err)
 			continue
 		}
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		slog.Error("failed to commit transaction", "err", err)
+		slog.ErrorContext(r.Context(), "failed to commit transaction", "err", err)
 		http.Error(w, "failed to commit transaction", http.StatusInternalServerError)
 		return
 	}
@@ -110,7 +110,7 @@ func (i *Importer) importMembers(w http.ResponseWriter, r *http.Request) {
 	// iterate by index and work with pointers to avoid copying the lock.
 	var members []pb.Member
 	if err := json.NewDecoder(r.Body).Decode(&members); err != nil {
-		slog.Error("failed to decode members", "err", err)
+		slog.ErrorContext(r.Context(), "failed to decode members", "err", err)
 		http.Error(w, "failed to decode members", http.StatusBadRequest)
 		return
 	}
@@ -130,14 +130,14 @@ func (i *Importer) importMembers(w http.ResponseWriter, r *http.Request) {
 			"INSERT INTO members (id, name, avatar_url) VALUES (?, ?, ?) ON CONFLICT (id) DO UPDATE SET name = ?, avatar_url = ?",
 			member.ID, member.Name, member.AvatarURL, member.Name, member.AvatarURL,
 		).Error; err != nil {
-			slog.Error("failed to save member", "err", err)
+			slog.ErrorContext(r.Context(), "failed to save member", "err", err)
 			http.Error(w, "failed to save member", http.StatusInternalServerError)
 			return
 		}
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		slog.Error("failed to commit transaction", "err", err)
+		slog.ErrorContext(r.Context(), "failed to commit transaction", "err", err)
 		http.Error(w, "failed to commit transaction", http.StatusInternalServerError)
 		return
 	}

@@ -88,7 +88,7 @@ func (s *ScaleToZeroProxy) slayLoop(ctx context.Context) {
 	for {
 		select {
 		case <-ctx.Done():
-			slog.Error("context canceled", "err", ctx.Err())
+			slog.ErrorContext(ctx, "context canceled", "err", ctx.Err())
 			return
 		case <-t.C:
 			s.lock.RLock()
@@ -102,7 +102,7 @@ func (s *ScaleToZeroProxy) slayLoop(ctx context.Context) {
 
 			if lastUsed.Add(*idleTimeout).Before(time.Now()) {
 				if err := s.slay(ctx); err != nil {
-					slog.Error("can't slay instance", "err", err)
+					slog.ErrorContext(ctx, "can't slay instance", "err", err)
 				}
 			}
 		}
@@ -116,7 +116,7 @@ func (s *ScaleToZeroProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	if !ready {
 		if err := s.mint(r.Context()); err != nil {
-			slog.Error("can't mint", "err", err)
+			slog.ErrorContext(r.Context(), "can't mint", "err", err)
 			http.Error(w, "can't mint", http.StatusInternalServerError)
 			return
 		}
@@ -128,7 +128,7 @@ func (s *ScaleToZeroProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	u, err := url.Parse(endpointURL)
 	if err != nil {
-		slog.Error("can't url parse", "err", err, "url", s.endpointURL)
+		slog.ErrorContext(r.Context(), "can't url parse", "err", err, "url", s.endpointURL)
 		http.Error(w, "can't url parse", http.StatusInternalServerError)
 		return
 	}
@@ -151,14 +151,14 @@ func (s *ScaleToZeroProxy) mint(ctx context.Context) error {
 	}
 
 	candidate := candidates[0]
-	slog.Info("found instance", "costDPH", candidate.DphTotal, "gpuName", candidate.GpuName)
+	slog.InfoContext(ctx, "found instance", "costDPH", candidate.DphTotal, "gpuName", candidate.GpuName)
 
 	instanceData, err := vastaicli.Mint(ctx, candidate.AskContractID, s.cfg)
 	if err != nil {
 		return err
 	}
 
-	slog.Info("created instance, waiting for things to settle", "id", instanceData.NewContract)
+	slog.InfoContext(ctx, "created instance, waiting for things to settle", "id", instanceData.NewContract)
 
 	instance, err := s.delayUntilRunning(ctx, instanceData.NewContract)
 	if err != nil {
@@ -179,7 +179,7 @@ func (s *ScaleToZeroProxy) mint(ctx context.Context) error {
 		return fmt.Errorf("can't do healthcheck: %w", err)
 	}
 
-	slog.Info("ready", "endpointURL", s.endpointURL, "instanceID", s.instanceID)
+	slog.InfoContext(ctx, "ready", "endpointURL", s.endpointURL, "instanceID", s.instanceID)
 
 	return nil
 }
@@ -197,7 +197,7 @@ func (s *ScaleToZeroProxy) slay(ctx context.Context) error {
 	s.lastUsed = time.Now()
 	s.instanceID = 0
 
-	slog.Info("instance slayed", "docker_image", s.cfg.DockerImage)
+	slog.InfoContext(ctx, "instance slayed", "docker_image", s.cfg.DockerImage)
 
 	return nil
 }
@@ -230,7 +230,7 @@ func (s *ScaleToZeroProxy) delayUntilReady(ctx context.Context, endpointURL stri
 
 			resp, err := http.Get(u.String())
 			if err != nil {
-				slog.Error("health check failed", "err", err)
+				slog.ErrorContext(ctx, "health check failed", "err", err)
 				continue
 			}
 
@@ -240,7 +240,7 @@ func (s *ScaleToZeroProxy) delayUntilReady(ctx context.Context, endpointURL stri
 			}
 
 			if status.Status == "READY" {
-				slog.Info("health check passed")
+				slog.InfoContext(ctx, "health check passed")
 				return nil
 			}
 		}
@@ -264,12 +264,12 @@ func (s *ScaleToZeroProxy) delayUntilRunning(ctx context.Context, instanceID int
 				return nil, err
 			}
 
-			slog.Debug("instance is cooking", "curr", instance.ActualStatus, "next", instance.NextState, "status", instance.StatusMsg)
+			slog.DebugContext(ctx, "instance is cooking", "curr", instance.ActualStatus, "next", instance.NextState, "status", instance.StatusMsg)
 
 			if instance.ActualStatus == "running" {
 				_, ok := instance.AddrFor(s.cfg.Ports[0])
 				if !ok {
-					slog.Info("no addr", "ports", s.cfg.Ports)
+					slog.InfoContext(ctx, "no addr", "ports", s.cfg.Ports)
 					continue
 				}
 

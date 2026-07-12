@@ -197,7 +197,7 @@ func (s *Server) userHandler(w http.ResponseWriter, r *http.Request) {
 
 	probeCount, err := s.dao.CountProbes(r.Context(), userData.ID)
 	if err != nil {
-		slog.Error("failed to count probes", "err", err)
+		slog.ErrorContext(r.Context(), "failed to count probes", "err", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

@@ -53,7 +53,7 @@ func (c *Client) StreamMessages(ctx context.Context, subreq ...WSSubscribeReques
 			}
 
 			if err := doWebsocket(ctx, u, result, subreq); err != nil {
-				slog.Error("websocket error, retrying", "err", err)
+				slog.ErrorContext(ctx, "websocket error, retrying", "err", err)
 			}
 			time.Sleep(time.Minute)
 		}
@@ -94,7 +94,7 @@ func doWebsocket(ctx context.Context, u *url.URL, result chan WSMessage, subreq 
 		}
 
 		if msgType != websocket.MessageText {
-			slog.Debug("got non-text message from mastodon", "data", data)
+			slog.DebugContext(ctx, "got non-text message from mastodon", "data", data)
 			continue
 		}
 

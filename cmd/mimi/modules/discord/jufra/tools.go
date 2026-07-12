@@ -57,7 +57,7 @@ func (m *Module) runPythonCode(ctx context.Context, tc ollama.ToolCall) (*ollama
 		}, nil
 	}
 
-	slog.Info("python code ran", "res", res, "args", args)
+	slog.InfoContext(ctx, "python code ran", "res", res, "args", args)
 
 	return &ollama.Message{
 		Role:    "tool",

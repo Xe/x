@@ -1,0 +1,15 @@
+version: "2"
+
+linters:
+  default: none
+  enable:
+    - sloglint
+  settings:
+    sloglint:
+      context: "scope"
+  exclusions:
+    generated: strict
+    paths:
+      - "gen/"
+      - "\\.pb\\.go$"
+      - "_templ\\.go$"

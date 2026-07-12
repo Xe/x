@@ -1,0 +1,118 @@
+syntax = "proto3";
+package within.website.x.iam.sts.v1;
+
+import "buf/validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+
+// SigningKeyService hands out SigV4 derived signing keys so that downstream
+// services can verify request signatures locally without ever holding raw
+// secret access keys.
+//
+// A derived key is HMAC(HMAC(HMAC(HMAC("AWS4"+secret, date), region),
+// service), "aws4_request"). It can only validate requests whose credential
+// scope matches (date, region, service) exactly, so a leaked response is
+// bounded to one service, one region, one UTC day.
+//
+// This API is internal-only and its responses contain key material. Callers
+// authenticate to it the same way as every other iamd route: by signing the
+// RPC with their own IAM credential (see cmd/iamd's route middleware).
+service SigningKeyService {
+  // GetSigningKey returns the derived signing key for the given access key
+  // id and credential scope, plus the identity the key belongs to.
+  //
+  // Errors:
+  //   NOT_FOUND         - no such access key id
+  //   PERMISSION_DENIED - key or owning user is disabled, or the requested
+  //                       (region, service, date) scope is outside what this
+  //                       deployment issues keys for
+  //   INVALID_ARGUMENT  - malformed access_key_id/date/region/service
+  rpc GetSigningKey(GetSigningKeyRequest) returns (GetSigningKeyResponse);
+
+  // GetPublicKey returns the SigV4A (ECDSA P-256) public verification key
+  // for an access key id, plus the identity it authenticates. Public keys
+  // are not secret: holding one lets a service verify signatures but never
+  // mint them, unlike the symmetric derived keys from GetSigningKey.
+  //
+  // Errors:
+  //   NOT_FOUND         - no such access key id
+  //   PERMISSION_DENIED - key or owning user is disabled
+  //   INVALID_ARGUMENT  - missing access_key_id
+  rpc GetPublicKey(GetPublicKeyRequest) returns (GetPublicKeyResponse);
+}
+
+message GetSigningKeyRequest {
+  // The access key id parsed from the request's Credential= component.
+  string access_key_id = 1 [(buf.validate.field).required = true];
+
+  // Remaining components of the credential scope, exactly as they will be
+  // fed into the HMAC ladder: the literal strings from
+  // "date/region/service/aws4_request", not normalized forms.
+
+  // UTC date in YYYYMMDD form, e.g. "20260706".
+  string date = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.pattern = "^[0-9]{8}$"
+  ];
+
+  // Region code, e.g. "us-east-1".
+  string region = 3 [(buf.validate.field).required = true];
+
+  // Service code, e.g. "iam".
+  string service = 4 [(buf.validate.field).required = true];
+}
+
+message GetSigningKeyResponse {
+  // The 32-byte derived signing key. Raw bytes, not hex.
+  bytes signing_key = 1;
+
+  // Who this key authenticates as. Downstream services use this for
+  // authorization and audit attribution after the signature checks out.
+  TokenIdentity identity = 2;
+
+  // Hard upper bound on validity: the scope date's UTC day plus the maximum
+  // clock skew, after which no legitimate request can carry this scope.
+  // Never cache the key past this instant.
+  google.protobuf.Timestamp not_valid_after = 3;
+
+  // How long the caller may cache this response before asking again. Bounds
+  // revocation latency: a disabled key stops verifying within one cache TTL
+  // instead of at end of day. Always <= not_valid_after.
+  google.protobuf.Timestamp cache_until = 4;
+}
+
+message GetPublicKeyRequest {
+  // The access key id parsed from the request's Credential= component.
+  string access_key_id = 1 [(buf.validate.field).required = true];
+}
+
+message GetPublicKeyResponse {
+  // PKIX, ASN.1 DER-encoded ECDSA P-256 public key, as produced by Go's
+  // x509.MarshalPKIXPublicKey and parsed by x509.ParsePKIXPublicKey.
+  bytes public_key = 1;
+
+  // Who this key authenticates as. Downstream services use this for
+  // authorization and audit attribution after the signature checks out.
+  TokenIdentity identity = 2;
+
+  // How long the caller may cache this response before asking again. Bounds
+  // revocation latency: a disabled key stops verifying within one cache TTL.
+  // A response without cache_until may be used once but never cached.
+  google.protobuf.Timestamp cache_until = 3;
+}
+
+// TokenIdentity identifies the principal a signing key belongs to.
+message TokenIdentity {
+  // The access key id the identity was resolved from.
+  string access_key_id = 1;
+
+  // The organization the credential belongs to. Reserved for multi-tenant
+  // deployments; iamd currently has no organization concept and leaves it
+  // empty.
+  string organization_id = 2;
+
+  // The principal within the organization: iamd's user UUID.
+  string principal_id = 3;
+
+  // Human-readable name for logs and error messages: iamd's user name.
+  string display_name = 4;
+}

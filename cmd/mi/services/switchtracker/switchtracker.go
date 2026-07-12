@@ -42,7 +42,7 @@ func (s *Server) Members(ctx context.Context, _ *emptypb.Empty) (*pb.MembersResp
 func (s *Server) WhoIsFront(ctx context.Context, _ *emptypb.Empty) (*pb.FrontChange, error) {
 	sw, err := s.dao.WhoIsFront(ctx)
 	if err != nil {
-		slog.Error("can't find who is front", "err", err)
+		slog.ErrorContext(ctx, "can't find who is front", "err", err)
 		switch {
 		case errors.Is(err, gorm.ErrRecordNotFound):
 			return nil, twirp.NotFoundError("can't find current switch")
@@ -51,7 +51,7 @@ func (s *Server) WhoIsFront(ctx context.Context, _ *emptypb.Empty) (*pb.FrontCha
 		}
 	}
 
-	slog.Info("current front", "sw", sw)
+	slog.InfoContext(ctx, "current front", "sw", sw)
 
 	return sw.AsFrontChange(), nil
 }
@@ -63,7 +63,7 @@ func (s *Server) Switch(ctx context.Context, req *pb.SwitchReq) (*pb.SwitchResp,
 
 	old, new, err := s.dao.SwitchFront(ctx, req.GetMemberName())
 	if err != nil {
-		slog.Error("can't switch front", "req", req, "err", err)
+		slog.ErrorContext(ctx, "can't switch front", "req", req, "err", err)
 		switch {
 		case errors.Is(err, models.ErrCantSwitchToYourself):
 			return nil, twirp.InvalidArgumentError("member_name", "cannot switch to yourself").
@@ -83,13 +83,13 @@ func (s *Server) Switch(ctx context.Context, req *pb.SwitchReq) (*pb.SwitchResp,
 
 func (s *Server) GetSwitch(ctx context.Context, req *pb.GetSwitchReq) (*pb.FrontChange, error) {
 	if err := protovalidate.Validate(req); err != nil {
-		slog.Error("can't get switch by ID", "req", req, "err", err)
+		slog.ErrorContext(ctx, "can't get switch by ID", "req", req, "err", err)
 		return nil, twirp.InvalidArgumentError("id", err.Error())
 	}
 
 	sw, err := s.dao.GetSwitch(ctx, req.GetId())
 	if err != nil {
-		slog.Error("can't get switch", "req", req, "err", err)
+		slog.ErrorContext(ctx, "can't get switch", "req", req, "err", err)
 		switch {
 		case errors.Is(err, gorm.ErrRecordNotFound):
 			return nil, twirp.NotFoundError("can't find switch").
@@ -111,7 +111,7 @@ func (s *Server) ListSwitches(ctx context.Context, req *pb.ListSwitchesReq) (*pb
 
 	switches, err := s.dao.ListSwitches(ctx, int(req.GetCount()), int(req.GetPage()))
 	if err != nil {
-		slog.Error("can't get switches", "req", req, "err", err)
+		slog.ErrorContext(ctx, "can't get switches", "req", req, "err", err)
 		switch {
 		case errors.Is(err, gorm.ErrRecordNotFound):
 			return nil, twirp.NotFoundError("can't find switch info")

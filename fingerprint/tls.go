@@ -41,7 +41,7 @@ func ApplyTLSFingerprinter(server *http.Server) {
 			if err == nil {
 				ctx = context.WithValue(ctx, tcpFingerprintKey{}, tcpFP)
 			} else {
-				slog.Debug("ja4t error", "err", err)
+				slog.DebugContext(ctx, "ja4t error", "err", err)
 			}
 		}
 

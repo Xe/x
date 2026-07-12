@@ -112,10 +112,10 @@ func main() {
 func bskyAuth(ctx context.Context, pds, handle, authkey string) (*bsky.BskyAgent, error) {
 	bluesky := bsky.NewAgent(ctx, pds, handle, authkey)
 
-	slog.Debug("connecting to bluesky server", "pds", pds, "handle", handle)
+	slog.DebugContext(ctx, "connecting to bluesky server", "pds", pds, "handle", handle)
 
 	if err := bluesky.Connect(ctx); err != nil {
-		slog.Error("failed to connect to bluesky", "err", err)
+		slog.ErrorContext(ctx, "failed to connect to bluesky", "err", err)
 		return nil, err
 	}
 

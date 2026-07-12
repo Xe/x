@@ -51,12 +51,12 @@ func (dc *Cache) Purge(w http.ResponseWriter, r *http.Request) {
 
 	defer r.Body.Close()
 	if err := json.NewDecoder(r.Body).Decode(&files); err != nil {
-		slog.Error("can't read files to be purged", "err", err)
+		slog.ErrorContext(r.Context(), "can't read files to be purged", "err", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	slog.Info("purging files", "files", files)
+	slog.InfoContext(r.Context(), "purging files", "files", files)
 
 	if err := dc.DB.Update(func(tx *bbolt.Tx) error {
 		for _, fname := range files {
@@ -72,7 +72,7 @@ func (dc *Cache) Purge(w http.ResponseWriter, r *http.Request) {
 
 		return nil
 	}); err != nil {
-		slog.Error("can't purge files", "err", err, "files", files)
+		slog.ErrorContext(r.Context(), "can't purge files", "err", err, "files", files)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}

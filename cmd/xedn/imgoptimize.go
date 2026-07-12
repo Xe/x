@@ -70,7 +70,7 @@ func (ois *OptimizedImageServer) ServeHTTP(w http.ResponseWriter, r *http.Reques
 
 	data, err := ois.ResizeTo(width, character, mood, format)
 	if err != nil {
-		slog.Error("can't convert image", "err", err)
+		slog.ErrorContext(r.Context(), "can't convert image", "err", err)
 		http.Error(w, "can't convert image", http.StatusInternalServerError)
 		return
 	}

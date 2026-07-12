@@ -125,7 +125,7 @@ func main() {
 
 func SpewMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		slog.Debug("got request", "method", r.Method, "url", r.URL.String(), "headers", r.Header)
+		slog.DebugContext(r.Context(), "got request", "method", r.Method, "url", r.URL.String(), "headers", r.Header)
 		next.ServeHTTP(w, r)
 	})
 }
@@ -158,7 +158,7 @@ func ServeStableDiffusion(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		stableDiffusionCreationErrors.Add(1)
 		http.Error(w, "Not found", http.StatusNotFound)
-		slog.Error("can't fabricate image", "err", err)
+		slog.ErrorContext(r.Context(), "can't fabricate image", "err", err)
 		return
 	}
 
@@ -168,7 +168,7 @@ func ServeStableDiffusion(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		stableDiffusionCreationErrors.Add(1)
 		http.Error(w, "can't decode image", http.StatusInternalServerError)
-		slog.Error("can't decode image", "err", err)
+		slog.ErrorContext(r.Context(), "can't decode image", "err", err)
 		return
 	}
 
@@ -177,7 +177,7 @@ func ServeStableDiffusion(w http.ResponseWriter, r *http.Request) {
 	if err := jpeg.Encode(buf, img, &jpeg.Options{Quality: 75}); err != nil {
 		stableDiffusionCreationErrors.Add(1)
 		http.Error(w, "can't encode image", http.StatusInternalServerError)
-		slog.Error("can't encode image", "err", err)
+		slog.ErrorContext(r.Context(), "can't encode image", "err", err)
 		return
 	}
 

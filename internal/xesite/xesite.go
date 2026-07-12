@@ -70,7 +70,7 @@ func (zs *ZipServer) ListGenerations(w http.ResponseWriter, r *http.Request) {
 	dirEntries, err := os.ReadDir(filepath.Join(zs.dir, "xesite"))
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		slog.Error("can't read dir", "err", err, "dir", filepath.Join(zs.dir, "xesite"))
+		slog.ErrorContext(r.Context(), "can't read dir", "err", err, "dir", filepath.Join(zs.dir, "xesite"))
 		return
 	}
 
@@ -95,33 +95,33 @@ func (zs *ZipServer) UploadNewZip(w http.ResponseWriter, r *http.Request) {
 	fout, err := os.Create(fpath)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		slog.Error("can't create file", "err", err, "fpath", fpath)
+		slog.ErrorContext(r.Context(), "can't create file", "err", err, "fpath", fpath)
 		return
 	}
 	defer fout.Close()
 
 	if _, err := io.Copy(fout, r.Body); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		slog.Error("can't write file", "err", err, "fpath", fpath)
+		slog.ErrorContext(r.Context(), "can't write file", "err", err, "fpath", fpath)
 		return
 	}
 
 	if err := fout.Close(); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		slog.Error("can't close file", "err", err, "fpath", fpath)
+		slog.ErrorContext(r.Context(), "can't close file", "err", err, "fpath", fpath)
 		return
 	}
 
 	if err := zs.Update(fpath); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		slog.Error("can't update zip", "err", err, "fpath", fpath)
+		slog.ErrorContext(r.Context(), "can't update zip", "err", err, "fpath", fpath)
 		return
 	}
 
 	os.Link(fpath, filepath.Join(zs.dir, "xesite", "latest.zip"))
 	if err := deleteOldestFileInFolder(filepath.Join(zs.dir, "xesite")); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		slog.Error("can't delete oldest file", "err", err)
+		slog.ErrorContext(r.Context(), "can't delete oldest file", "err", err)
 		return
 	}
 }

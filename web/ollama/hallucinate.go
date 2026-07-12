@@ -104,7 +104,7 @@ func Hallucinate[T valid.Interface](ctx context.Context, c *Client, opts Halluci
 			}
 
 			if err := result.Valid(); err != nil {
-				slog.Debug("error validating response", "err", err)
+				slog.DebugContext(ctx, "error validating response", "err", err)
 				continue
 			}
 

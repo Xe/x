@@ -133,13 +133,13 @@ func (f Filter) Filter(ctx context.Context, r slog.Record) bool {
 		Record: r,
 	})
 	if err != nil {
-		f.log.Error("error executing log filter", "err", err, "src", f.src)
+		f.log.ErrorContext(ctx, "error executing log filter", "err", err, "src", f.src)
 		return false
 	}
 	dur := time.Since(t0)
 	filterExecutionTime.WithLabelValues(f.name).Observe(float64(dur.Microseconds()))
 	filterInvocations.WithLabelValues(f.name).Inc()
-	f.log.Debug("filter execution", "dur", dur.Microseconds())
+	f.log.DebugContext(ctx, "filter execution", "dur", dur.Microseconds())
 
 	if val, ok := result.(types.Bool); ok {
 		return !bool(val)

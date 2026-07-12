@@ -33,9 +33,10 @@ func Init() {
 		AddSource: true,
 		Level:     leveler,
 	})
-	slog.SetDefault(slog.New(h))
+	ch := NewContextHandler(h)
+	slog.SetDefault(slog.New(ch))
 
-	Handler = h
+	Handler = ch
 
 	http.HandleFunc("/.within/debug/slog-level", func(w http.ResponseWriter, r *http.Request) {
 		var level, old slog.Level
@@ -55,7 +56,7 @@ func Init() {
 			}
 
 			leveler.Set(level)
-			slog.Info("changed level", "from", old, "to", level)
+			slog.InfoContext(r.Context(), "changed level", "from", old, "to", level)
 			fmt.Fprintln(w, level)
 		} else {
 			fmt.Fprintln(w, old)

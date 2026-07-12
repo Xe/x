@@ -47,7 +47,7 @@ func main() {
 
 	d.Open()
 
-	slog.Info("bot started", "grpcAddr", *grpcAddr, "httpAddr", *httpAddr)
+	slog.InfoContext(ctx, "bot started", "grpcAddr", *grpcAddr, "httpAddr", *httpAddr)
 
 	gs := grpc.NewServer()
 

@@ -61,7 +61,7 @@ func main() {
 
 	go func() {
 		<-ctx.Done()
-		slog.Error("timeout")
+		slog.ErrorContext(ctx, "timeout")
 		os.Exit(0)
 	}()
 
@@ -102,17 +102,17 @@ func New(ctx context.Context) (*Server, error) {
 }
 
 func (s *Server) Ping(ctx context.Context, msg *pb.Echo) (*pb.Echo, error) {
-	slog.Info("ping", "msg", msg.Nonce)
+	slog.InfoContext(ctx, "ping", "msg", msg.Nonce)
 	return msg, nil
 }
 
 func (s *Server) Upload(ctx context.Context, ur *pb.UploadReq) (*pb.UploadResp, error) {
 	img, format, err := image.Decode(bytes.NewBuffer(ur.Data))
 	if err != nil {
-		slog.Error("can't decode image", "err", err, "filename", ur.GetFileName())
+		slog.ErrorContext(ctx, "can't decode image", "err", err, "filename", ur.GetFileName())
 		return nil, err
 	}
-	slog.Debug("got image", "format", format)
+	slog.DebugContext(ctx, "got image", "format", format)
 
 	baseName := fileNameWithoutExt(ur.GetFileName())
 
@@ -130,39 +130,39 @@ func (s *Server) Upload(ctx context.Context, ur *pb.UploadReq) (*pb.UploadResp, 
 	if err := resizeSmol(img, filepath.Join(dir, name)); err != nil {
 		return nil, fmt.Errorf("failed to make smol png: %w", err)
 	}
-	slog.Debug("converted", "name", name)
+	slog.DebugContext(ctx, "converted", "name", name)
 
 	name = baseName + ".webp"
 	fnames = append(fnames, name)
 	if err := doWEBP(img, filepath.Join(dir, name)); err != nil {
 		return nil, fmt.Errorf("failed to make webp: %w", err)
 	}
-	slog.Debug("converted", "name", name)
+	slog.DebugContext(ctx, "converted", "name", name)
 
 	name = baseName + ".avif"
 	fnames = append(fnames, name)
 	if err := doAVIF(img, filepath.Join(dir, name)); err != nil {
 		return nil, fmt.Errorf("failed to make avif: %w", err)
 	}
-	slog.Debug("converted", "name", name)
+	slog.DebugContext(ctx, "converted", "name", name)
 
 	name = baseName + ".jpg"
 	fnames = append(fnames, name)
 	if err := doJPEG(img, filepath.Join(dir, name)); err != nil {
 		return nil, fmt.Errorf("failed to make jpeg: %w", err)
 	}
-	slog.Debug("converted", "name", name)
+	slog.DebugContext(ctx, "converted", "name", name)
 
 	var result []*pb.Variant
 
 	errs := []error{}
 	for _, fname := range fnames {
 		path := filepath.Join(dir, fname)
-		slog.Info("uploading", "path", path)
+		slog.InfoContext(ctx, "uploading", "path", path)
 
 		fin, err := os.Open(path)
 		if err != nil {
-			slog.Error("can't open file", "path", path, "err", err)
+			slog.ErrorContext(ctx, "can't open file", "path", path, "err", err)
 			errs = append(errs, fmt.Errorf("while uploading %s: %w", path, err))
 			continue
 		}
@@ -176,11 +176,11 @@ func (s *Server) Upload(ctx context.Context, ur *pb.UploadReq) (*pb.UploadResp, 
 			Key:         aws.String(key),
 			ContentType: aws.String(mimeTypes[filepath.Ext(fname)]),
 		}); err != nil {
-			slog.Error("can't upload", "to", "tigris", "err", err)
+			slog.ErrorContext(ctx, "can't upload", "to", "tigris", "err", err)
 			errs = append(errs, fmt.Errorf("while uploading %s to tigris: %w", path, err))
 			continue
 		}
-		slog.Debug("uploaded", "to", "tigris", "key", key)
+		slog.DebugContext(ctx, "uploaded", "to", "tigris", "key", key)
 
 		fin.Seek(0, 0)
 
@@ -190,11 +190,11 @@ func (s *Server) Upload(ctx context.Context, ur *pb.UploadReq) (*pb.UploadResp, 
 			Key:         aws.String(key),
 			ContentType: aws.String(mimeTypes[filepath.Ext(fname)]),
 		}); err != nil {
-			slog.Error("can't upload", "to", "b2", "err", err)
+			slog.ErrorContext(ctx, "can't upload", "to", "b2", "err", err)
 			errs = append(errs, fmt.Errorf("while uploading %s to b2: %w", path, err))
 			continue
 		}
-		slog.Debug("uploaded", "to", "b2", "key", key)
+		slog.DebugContext(ctx, "uploaded", "to", "b2", "key", key)
 
 		result = append(result, &pb.Variant{
 			Url:      fmt.Sprintf("https://cdn.xeiaso.net/file/christine-static/%s/%s", ur.GetFolder(), fname),
@@ -206,7 +206,7 @@ func (s *Server) Upload(ctx context.Context, ur *pb.UploadReq) (*pb.UploadResp, 
 		return nil, errors.Join(errs...)
 	}
 
-	slog.Info("uploaded", "input", ur.FileName, "result", result)
+	slog.InfoContext(ctx, "uploaded", "input", ur.FileName, "result", result)
 
 	return &pb.UploadResp{
 		Variants: result,

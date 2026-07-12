@@ -96,7 +96,7 @@ func main() {
 				Key:    aws.String(key),
 			})
 			if err != nil {
-				slog.Error("can't head key", "format", format, "bucket", *bucketName, "key", key, "err", err)
+				slog.ErrorContext(r.Context(), "can't head key", "format", format, "bucket", *bucketName, "key", key, "err", err)
 
 				st, err := fs.Stat(static, "data/not_found."+format)
 				if err != nil {
@@ -125,7 +125,7 @@ func main() {
 
 		req, err := presigner.GetObject(r.Context(), key, 3600)
 		if err != nil {
-			slog.Error("can't presign get for key", "format", format, "bucket", *bucketName, "key", key, "err", err)
+			slog.ErrorContext(r.Context(), "can't presign get for key", "format", format, "bucket", *bucketName, "key", key, "err", err)
 
 			st, err := fs.Stat(static, "data/error."+format)
 			if err != nil {

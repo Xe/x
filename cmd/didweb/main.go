@@ -255,7 +255,7 @@ func waitUntilDIDWorks(ctx context.Context, domain, wantPubkey string) error {
 		doc, err := fetchDIDWeb(ctx, domain)
 		if err != nil {
 			errCount++
-			slog.Error("can't load did doc", "domain", domain, "err", err)
+			slog.ErrorContext(ctx, "can't load did doc", "domain", domain, "err", err)
 			continue
 		}
 

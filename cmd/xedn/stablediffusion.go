@@ -39,7 +39,7 @@ type StableDiffusion struct {
 func (sd *StableDiffusion) RenderImage(ctx context.Context, w http.ResponseWriter, hash string) error {
 	prompt, seed := hallucinatePrompt(hash)
 
-	slog.Info("generating new image", "prompt", prompt)
+	slog.InfoContext(ctx, "generating new image", "prompt", prompt)
 
 	imgsVal, err, _ := sd.group.Do(hash, func() (any, error) {
 		imgs, err := sd.client.Generate(ctx, stablediffusion.SimpleImageRequest{
@@ -83,7 +83,7 @@ func (sd *StableDiffusion) RenderImage(ctx context.Context, w http.ResponseWrite
 	}
 	imgs := imgsVal.(*stablediffusion.ImageResponse)
 
-	slog.Info("done generating image", "prompt", prompt)
+	slog.InfoContext(ctx, "done generating image", "prompt", prompt)
 
 	if err := sd.db.Update(func(tx *bbolt.Tx) error {
 		bkt := tx.Bucket([]byte("avatars"))
@@ -155,7 +155,7 @@ func (sd *StableDiffusion) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	if !found {
 		if err := sd.RenderImage(r.Context(), w, hash); err != nil {
-			slog.Error("can't render image", "err", err)
+			slog.ErrorContext(r.Context(), "can't render image", "err", err)
 			http.Error(w, "cannot render image, sorry", http.StatusInternalServerError)
 			return
 		}
