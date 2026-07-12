@@ -36,6 +36,14 @@ jobs:
 
       - uses: ko-build/setup-ko@d982fec422852203cfb2053a8ec6ad302280d04d # v0.8
 
+      # docker buildx bake builds multi-platform targets (e.g. iamd on
+      # linux/amd64,linux/arm64), which the default docker driver cannot do.
+      # QEMU provides cross-arch emulation; buildx sets up a docker-container
+      # builder that supports multi-platform builds.
+      - uses: docker/setup-qemu-action@96fe6ef7f33517b61c61be40b68a1882f3264fb8 # v4.2.0
+
+      - uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c # v4.2.0
+
       - name: Log into registry
         if: github.event_name != 'pull_request'
         uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0
