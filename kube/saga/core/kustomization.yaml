@@ -1,6 +1,8 @@
 resources:
   - cert-manager
+  - eraser
   - external-dns
+  - gha
   - metallb
   - nfs-provisioner
   - tigris-cloud-disk

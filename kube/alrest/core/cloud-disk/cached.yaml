@@ -1,0 +1,12 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: cloud-disk-cached
+provisioner: csi.tigris.dev
+reclaimPolicy: Delete
+volumeBindingMode: Immediate
+parameters:
+  csi.storage.k8s.io/fstype: xfs
+  disk-cache-path: /var/mnt/rotational/0/.cloud-disk-cache
+  disk-cache-size: 10G
+  max-staging-bytes: 5G
