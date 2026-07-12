@@ -1,3 +1,315 @@
+# [1.31.0](https://github.com/Xe/x/compare/v1.30.0...v1.31.0) (2026-07-12)
+
+### Bug Fixes
+
+- kube ([af5066f](https://github.com/Xe/x/commit/af5066f760329f75d8c929218a7cdad94f3cf94e))
+- **kube:** add services lol ([523adfe](https://github.com/Xe/x/commit/523adfe94e1131d6de2d5de1a963ca680fe1ef6b))
+- **lint-staged:** remove unnecessary braces from go glob pattern ([29c1e32](https://github.com/Xe/x/commit/29c1e329774cefe93665caa882008911af17f22e))
+- **mi:** resolve multiple bugs in cmd/mi ([b8d7138](https://github.com/Xe/x/commit/b8d7138d6c37105e99fc6d5b56b236e562089e04))
+- **within.website:** use <pre><code> for go get snippet ([1344e4b](https://github.com/Xe/x/commit/1344e4bd074832fb83e7af74f13bcd8ac8df7869))
+- **xess:** drop blockquote left border ([b4536b9](https://github.com/Xe/x/commit/b4536b9baeb4a535561dcd38293c747fe24b6122))
+
+### Features
+
+- add design.within.website demo site for xess ([2331f46](https://github.com/Xe/x/commit/2331f468ca0e669821ea8551f8e32c1ffec48551))
+- **kube/alrest:** add lurker ([57e00fe](https://github.com/Xe/x/commit/57e00fe6385287ebe070db4b5988b2b97f29b16d))
+- **kube:** import base saga cluster config ([d145106](https://github.com/Xe/x/commit/d14510638a58c9cf05e0d681264dee7d0018a73c))
+- **license:** add non-ai licenses ([8ae3e94](https://github.com/Xe/x/commit/8ae3e9447f4799c7e4fb24ce55dda2b9c9861a37))
+- **mi/mcp:** add event management tools ([c0c0ef5](https://github.com/Xe/x/commit/c0c0ef585a6c6f7e12bcdb73792fd34af46cde34))
+- **mi:** add member name alias support to switch tracker ([#863](https://github.com/Xe/x/issues/863)) ([d3f7e04](https://github.com/Xe/x/commit/d3f7e046ec671a2629991ec839a1d6a213f0e1f9))
+- **mi:** add Zoe as nickname for W'zamqo ([585f90f](https://github.com/Xe/x/commit/585f90fe3b019bea930fccbbd551d5f3e7e09318))
+- **mimi:** remove falin image generation service ([a3a3e35](https://github.com/Xe/x/commit/a3a3e35fcbfc3e1aeb8cf4f527a7388d7c900929))
+- **sigv4:** add AWS SigV4 request authentication and IAM daemon ([#957](https://github.com/Xe/x/issues/957)) ([d2f2e00](https://github.com/Xe/x/commit/d2f2e00f8bddbe7b6bdd36a7354d5f96d8bbed13))
+- **skills:** xe-go-style skill added ([c79a11b](https://github.com/Xe/x/commit/c79a11b7345ad5484cb4dfcbf1a3c41fb0f18f14))
+- **web:** add alpine.js package ([c0d23b4](https://github.com/Xe/x/commit/c0d23b41d4eb77d0cb9f825b4bd9096897391d1f))
+- **xess:** adopt xe-design-system tokens and add button/card/tag components ([1c62860](https://github.com/Xe/x/commit/1c62860923602683cebe8d9eaf5e9a83aba76074))
+
+### BREAKING CHANGES
+
+- **sigv4:** iamsts.NewVerifier is replaced by iamsts.New(Config);
+  iamsts.Identity now carries TokenIdentity fields (PrincipalID) instead
+  of an iamv1.User.
+
+Signed-off-by: Xe Iaso <me@xeiaso.net>
+
+- test(iamd): cover the signing-key local-verification chain end to end
+
+Signed-off-by: Xe Iaso <me@xeiaso.net>
+
+- refactor(iam)!: delete the per-request STS verification flow
+
+Removes STSService/GetCallerIdentity (proto, generated stubs, iamd
+handler, and sigv4.VerifySignature) now that downstream services verify
+locally with cached derived signing keys.
+
+The deleted double-slash-path test guarded VerifySignature's synthetic
+request construction, which is removed with it; the local path reads
+r.URL from net/http's own parser.
+
+- **sigv4:** the STSService Twirp/gRPC/Connect APIs no longer
+  exist; downstream verifiers must upgrade to iamsts.New + SigningKeyService.
+
+Signed-off-by: Xe Iaso <me@xeiaso.net>
+
+- docs: remove stale references to the deleted central STS verify flow
+
+Signed-off-by: Xe Iaso <me@xeiaso.net>
+
+- docs(sigv4): record the move to derived signing key caching
+
+Signed-off-by: Xe Iaso <me@xeiaso.net>
+
+- fix(iamsts): detach signing-key fetch from the caller's request context
+
+The singleflight leader in entry() ran the GetSigningKey RPC on the
+first caller's request context, so a client disconnecting mid-RPC for
+an uncached scope canceled the fetch and failed every request
+collapsed onto it with a 500 — an attacker could trigger this burst
+deliberately by opening a request and dropping the connection. The
+fetch now runs on a context detached from the caller via
+context.WithoutCancel (keeping trace/log values) with its own
+10s timeout replacing the dropped deadline.
+
+Signed-off-by: Xe Iaso <me@xeiaso.net>
+
+- fix(iamd): reject non-positive -signing-key-cache-ttl at startup
+
+A zero or negative TTL makes every GetSigningKey response effectively
+use-once, silently degrading downstream verifiers from a cached
+warm-path lookup to an RPC on every request. Fail startup instead of
+letting this misconfiguration degrade quietly under load.
+
+Signed-off-by: Xe Iaso <me@xeiaso.net>
+
+- docs(sigv4): record signing-key distribution trust model and current iamd role
+
+Update the components table to reflect that iamd now serves the
+signing-key distribution server rather than a planned STS validation
+server, mark the superseded forwarded-material security-model section
+as historical, and record the trust trade-off the final review
+surfaced: any authenticated IAM principal can currently fetch any
+principal's derived signing key for the fleet scope, attributed by
+caller in logs/metrics, with a verifier allowlist noted as a follow-up
+if trust tiers diverge.
+
+Signed-off-by: Xe Iaso <me@xeiaso.net>
+
+- build(iamd): add docker bake target and Dockerfile
+
+Two-stage build matching the repo's existing service images
+(golang:1.25 build with cache mounts, debian:bookworm runtime).
+The SQLite database lives on a /data volume so state survives
+container replacement; built for amd64 and arm64 since the
+ncruces SQLite driver is CGO-free. Added to the default bake
+group.
+
+Assisted-by: Fable 5 via Claude Code
+Signed-off-by: Xe Iaso <me@xeiaso.net>
+
+- docs(iamsts): add twirp integration guide
+
+Shows how to wire the caching verifier into a Twirp API mux:
+signed transport for the key fetches, one shared verifier per
+process, per-route middleware wrapping, reading the caller
+identity, and the operational behaviors (error mapping, outage
+semantics, revocation latency, midnight rollover).
+
+Assisted-by: Fable 5 via Claude Code
+Signed-off-by: Xe Iaso <me@xeiaso.net>
+
+- chore: commit stuff
+
+Signed-off-by: Xe Iaso <me@xeiaso.net>
+
+- refactor(sigv4): extract shared signing internals into awssig
+
+Signed-off-by: Xe Iaso <me@xeiaso.net>
+
+- feat(sigv4a): add ecdsa p-256 key derivation with aws test vectors
+
+Signed-off-by: Xe Iaso <me@xeiaso.net>
+
+- feat(sigv4a): add x-amz-region-set matching
+
+Signed-off-by: Xe Iaso <me@xeiaso.net>
+
+- fix(awssig): match aws canonicalization for quoted spaces and raw utf-8 paths
+
+collapseSpaces preserved runs of spaces inside double-quoted header
+values, but neither aws-sdk-go-v2's v4 signer nor the aws-c-auth v4a
+test vectors special-case quotes; both collapse whitespace runs
+unconditionally.
+
+CanonicalURI re-percent-encoded r.URL.EscapedPath(), which reproduces
+AWS's double-encoding correctly when the wire path is already
+percent-encoded ASCII, but fabricates a fresh single-encoded path for
+raw, unescaped UTF-8 wire bytes -- encoding that a second time
+double-encodes it. Canonicalize the literal wire path (r.RequestURI)
+instead, falling back to EscapedPath() for client-constructed
+requests that never went through the wire.
+
+Caught by the sigv4a vector suite (get-header-value-trim, get-utf8);
+sigv4's SDK round-trip tests and iamd's integration tests pass
+unchanged, confirming classic SigV4 compatibility holds.
+
+Signed-off-by: Xe Iaso <me@xeiaso.net>
+
+- feat(sigv4a): add request verifier middleware
+
+Signed-off-by: Xe Iaso <me@xeiaso.net>
+
+- fix(sigv4a): treat nil public key from lookup as unknown key
+
+A PublicKeyLookuper returning (nil, nil) left pub == nil, err == nil,
+reaching ecdsa.VerifyASN1(nil, ...), which panics because it
+dereferences pub.Curve unconditionally -- a DoS of this auth
+middleware once a real KeyLookup is wired in. Treat a nil key as
+ErrUnknownKey instead.
+
+Adds coverage for the KeyLookup branch (previously untested) and for
+a malformed-hex Signature= value.
+
+Signed-off-by: Xe Iaso <me@xeiaso.net>
+
+- feat(sigv4a): add request signer and sigv4aclient transport
+
+Signed-off-by: Xe Iaso <me@xeiaso.net>
+
+- feat(iamd): serve sigv4a public verification keys via GetPublicKey
+
+Signed-off-by: Xe Iaso <me@xeiaso.net>
+
+- chore: exempt sigv4a test vectors from prettier
+
+npm run format was reformatting the aws-c-auth vector fixtures, which
+must stay byte-identical to upstream.
+
+Signed-off-by: Xe Iaso <me@xeiaso.net>
+
+- feat(sigv4a): add iamsts public-key caching verifier
+
+Signed-off-by: Xe Iaso <me@xeiaso.net>
+
+- test(sigv4a/iamsts): make TTL-sweep test table-driven
+
+Restructure the fresh (non-ported) TTL-expiry sweep test into a
+table of ordered steps per the repo's go-table-driven-tests
+conventions, since it wasn't inherited from the classic package.
+
+Signed-off-by: Xe Iaso <me@xeiaso.net>
+
+- feat(iamd)!: authenticate callers with sigv4a
+- **sigv4:** iamd's middleware now accepts only
+  AWS4-ECDSA-P256-SHA256 signatures; clients must sign with sigv4aclient
+  (or sigv4a.Signer) instead of sigv4client.
+
+Signed-off-by: Xe Iaso <me@xeiaso.net>
+
+- docs(sigv4a): record public-key trust model and add iamsts guide
+
+Signed-off-by: Xe Iaso <me@xeiaso.net>
+
+- fix(twirpslog): restore caller attribution for sigv4a-authenticated services
+
+iamd's UserMiddleware now stores the verified caller via
+sigv4a.WithUser, a different context key than the classic
+sigv4.WithUser the interceptor checked. Twirp logs and the per-user
+billing counter silently lost attribution for every sigv4a-verified
+call. Check the sigv4a sources first, falling back to the classic
+sigv4/sigv4a.iamsts pair kept for the retained classic chain.
+
+Signed-off-by: Xe Iaso <me@xeiaso.net>
+
+- docs(sigv4a): note twirpslog attribution works for sigv4a callers
+
+Signed-off-by: Xe Iaso <me@xeiaso.net>
+
+- fix(sigv4aclient): set GetBody so redirects and retries can rewind the body
+
+Signed-off-by: Xe Iaso <me@xeiaso.net>
+
+- fix(iamd): read the caller from the sigv4a context in KeyService
+
+The SigV4A cutover left KeyService reading the caller from the classic
+sigv4 context key that UserMiddleware no longer populates, so every
+KeyService RPC failed closed with an unauthenticated caller.
+
+Signed-off-by: Xe Iaso <me@xeiaso.net>
+
+- feat(iamd): accept both sigv4 and sigv4a signatures
+
+Dispatch on the Authorization header's algorithm token so classic
+SigV4 and SigV4A callers both authenticate through the same DAO-backed
+credentials; classic traffic stays observable via
+iamd_auth_requests_total while it drains.
+
+Signed-off-by: Xe Iaso <me@xeiaso.net>
+
+- refactor(middleware): unify caller identity context in authctx
+
+Two real bugs (a KeyService handler failing closed on the wrong family's key, and a twirpslog attribution regression) came from sigv4 and sigv4a each keeping their own unexported context keys for the same caller identity; this introduces web/middleware/authctx as the single canonical storage that all four packages delegate to, with no exported API changes.
+
+Signed-off-by: Xe Iaso <me@xeiaso.net>
+
+- feat(sigv4any): add dual-algorithm dispatch middleware
+
+Lift the Authorization-header dispatch pattern (classic SigV4 vs SigV4A)
+into a reusable middleware so any service can accept either algorithm
+without hand-rolling the switch, while keeping metric wiring pluggable
+via an Observe hook instead of a hard prometheus dependency.
+
+Signed-off-by: Xe Iaso <me@xeiaso.net>
+
+- refactor(iamd): use sigv4any for dual-algorithm auth
+
+Replace iamd's hand-rolled Authorization-header dispatch with the new
+sigv4any.Verifier, keeping the iamd_auth_requests_total counter wired
+through Observe. cmd/iamd/integration_test.go is the equivalence proof
+and passes unchanged.
+
+Signed-off-by: Xe Iaso <me@xeiaso.net>
+
+- fix(iam): wrap errors from DisableKey and ListKeys
+
+The disable command returned the raw DisableKey error and had a
+duplicated dead err check left over from a copy-paste; the list
+command never checked the ListKeys error at all. Wrap both so
+failures surface a descriptive message.
+
+Assisted-by: Claude Opus 4.8 via Claude Code
+Signed-off-by: Xe Iaso <me@xeiaso.net>
+
+- fix(iam): wrap error from ListUsers
+
+The user list command ignored the ListUsers error and proceeded
+to render an empty result. Check and wrap it so failures surface
+a descriptive message, matching the keys command.
+
+Assisted-by: Claude Opus 4.8 via Claude Code
+Signed-off-by: Xe Iaso <me@xeiaso.net>
+
+- chore(saga): add iamd and route53 dyndns manifests plus sigv4a plan
+
+Deploy iamd to the saga cluster with sigv4a signing-key cache
+config, add a route53 dynamic DNS deployment, and check in the
+sigv4a migration plan doc.
+
+Assisted-by: Claude Opus 4.8 via Claude Code
+Signed-off-by: Xe Iaso <me@xeiaso.net>
+
+- fix(saga): remove invalid value on AWS_SECRET_ACCESS_KEY env var
+
+The env var set both valueFrom.secretKeyRef and a literal
+value, which Kubernetes rejects. Drop the leftover placeholder
+value so the manifest applies.
+
+Assisted-by: Claude Opus 4.8 via Claude Code
+Signed-off-by: Xe Iaso <me@xeiaso.net>
+
+- chore: nuke sins
+
+Signed-off-by: Xe Iaso <me@xeiaso.net>
+
 # [1.30.0](https://github.com/Xe/x/compare/v1.29.0...v1.30.0) (2026-02-16)
 
 ### Bug Fixes
