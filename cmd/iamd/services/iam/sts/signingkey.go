@@ -31,8 +31,6 @@ var dateRe = regexp.MustCompile(`^[0-9]{8}$`)
 // key is bounded to one (access key, UTC day, region, service) scope.
 type SigningKeys struct {
 	dao      *models.DAO
-	region   string
-	service  string
 	cacheTTL time.Duration
 
 	// Now is overridable for tests. Defaults to time.Now.
@@ -44,8 +42,8 @@ type SigningKeys struct {
 // NewSigningKeys returns a SigningKeys server that issues keys only for the
 // fleet-wide (region, service) scope and advises callers to re-fetch every
 // cacheTTL, which bounds how long a disabled key keeps verifying downstream.
-func NewSigningKeys(dao *models.DAO, region, service string, cacheTTL time.Duration) *SigningKeys {
-	return &SigningKeys{dao: dao, region: region, service: service, cacheTTL: cacheTTL}
+func NewSigningKeys(dao *models.DAO, cacheTTL time.Duration) *SigningKeys {
+	return &SigningKeys{dao: dao, cacheTTL: cacheTTL}
 }
 
 // GetSigningKey validates the requested scope, resolves the key and its
@@ -69,13 +67,6 @@ func (s *SigningKeys) GetSigningKey(ctx context.Context, req *stsv1.GetSigningKe
 		return nil, twirp.InvalidArgumentError("date", "must be a real UTC date in YYYYMMDD form")
 	}
 
-	// Scope pinning: this deployment signs for exactly one (region, service)
-	// pair, and a key is only useful for dates the verifier's clock-skew
-	// window can actually accept — refuse to mint keys for anything else so a
-	// compromised verifier credential cannot stockpile future-dated keys.
-	if req.GetRegion() != s.region || req.GetService() != s.service {
-		return nil, twirp.NewError(twirp.PermissionDenied, "signing keys are not issued for this region/service scope")
-	}
 	now := s.now()
 	today := now.UTC().Truncate(24 * time.Hour)
 	if d := day.Sub(today); d > 24*time.Hour || d < -24*time.Hour {

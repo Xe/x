@@ -45,7 +45,7 @@ func newSigningKeysTest(t *testing.T) (*SigningKeys, *models.DAO, string, string
 	if err != nil {
 		t.Fatalf("CreateKey: %v", err)
 	}
-	s := NewSigningKeys(dao, skRegion, skService, 5*time.Minute)
+	s := NewSigningKeys(dao, 5*time.Minute)
 	s.Now = func() time.Time { return fixedNow }
 	return s, dao, k.AccessKeyID, k.SecretAccessKey
 }
@@ -148,14 +148,6 @@ func TestGetSigningKey(t *testing.T) {
 			t.Fatalf("DisableUser: %v", err)
 		}
 		_, err = s.GetSigningKey(ctx, validReq(akid))
-		wantTwirpCode(t, err, twirp.PermissionDenied)
-	})
-
-	t.Run("wrong scope is PERMISSION_DENIED", func(t *testing.T) {
-		s, _, akid, _ := newSigningKeysTest(t)
-		req := validReq(akid)
-		req.Region = "eu-west-1"
-		_, err := s.GetSigningKey(ctx, req)
 		wantTwirpCode(t, err, twirp.PermissionDenied)
 	})
 

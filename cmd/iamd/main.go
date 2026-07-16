@@ -69,7 +69,7 @@ func newMux(lg *slog.Logger, dao *models.DAO, authMW func(http.Handler) http.Han
 	ks := keys.New(dao)
 	mux.Handle(iamv1.KeyServicePathPrefix, stack(iamv1.NewKeyServiceServer(ks, twirp.WithServerInterceptors(twirpslog.Interceptor(lg)))))
 
-	sk := sts.NewSigningKeys(dao, *region, *service, signingKeyCacheTTL)
+	sk := sts.NewSigningKeys(dao, signingKeyCacheTTL)
 	mux.Handle(stsv1.SigningKeyServicePathPrefix, stack(stsv1.NewSigningKeyServiceServer(sk, twirp.WithServerInterceptors(twirpslog.Interceptor(lg)))))
 
 	return mux
