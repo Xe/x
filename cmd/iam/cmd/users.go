@@ -130,7 +130,7 @@ var (
 			tw := tabwriter.NewWriter(os.Stdout, 0, 0, 3, ' ', tabwriter.StripEscape|tabwriter.TabIndent)
 			fmt.Fprintln(tw, "ID\tName\tCreated\tUpdated\t")
 			for _, u := range list.Users {
-				fmt.Fprintf(tw, "%s\t%s\t%s\t%s\t", u.GetId(), u.GetName(), u.GetCreatedAt().AsTime().Format(time.RFC3339), u.GetUpdatedAt().AsTime().Format(time.RFC3339))
+				fmt.Fprintf(tw, "%s\t%s\t%s\t%s\t\n", u.GetId(), u.GetName(), u.GetCreatedAt().AsTime().Format(time.RFC3339), u.GetUpdatedAt().AsTime().Format(time.RFC3339))
 			}
 			tw.Flush()
 			fmt.Fprintln(os.Stdout)

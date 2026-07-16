@@ -142,7 +142,7 @@ var (
 				if d := k.GetDisabledAt(); d != nil {
 					disabled = d.AsTime().Format(time.RFC3339)
 				}
-				fmt.Fprintf(tw, "%s\t%s\t%s\t%s\t%s\t", k.GetAccessKeyId(), k.GetComment(), created, updated, disabled)
+				fmt.Fprintf(tw, "%s\t%s\t%s\t%s\t%s\t\n", k.GetAccessKeyId(), k.GetComment(), created, updated, disabled)
 			}
 			tw.Flush()
 			fmt.Fprintln(os.Stdout)
