@@ -5,5 +5,6 @@ resources:
   - clusterrolebinding.yaml
   - crd.yaml
   - deployment.yaml
+  - dyndns.yaml
   - namespace.yaml
   - serviceaccount.yaml

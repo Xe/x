@@ -30,7 +30,10 @@ spec:
             - --crd-source-apiversion=externaldns.k8s.io/v1alpha1
             - --crd-source-kind=DNSEndpoint
             - --source=ingress
-            - --default-targets=192.168.2.245
+            - --default-targets=saga.xeserv.us
+            - --force-default-targets
+            # - --source=gateway-httproute
+            # - --source=gateway-grpcroute
             - --provider=aws
             - --registry=dynamodb
             - --dynamodb-region=ca-central-1
