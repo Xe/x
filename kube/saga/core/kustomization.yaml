@@ -1,5 +1,6 @@
 resources:
   - cert-manager
+  - envoy-gateway
   - eraser
   - external-dns
   - gha

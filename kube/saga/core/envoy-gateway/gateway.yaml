@@ -1,0 +1,42 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: eg
+  namespace: envoy-gateway-system
+spec:
+  gatewayClassName: envoy-gateway-class
+  listeners:
+    # HTTP listener, used for the HTTP->HTTPS redirect below.
+    - name: http
+      protocol: HTTP
+      port: 80
+      allowedRoutes:
+        namespaces:
+          from: All
+    # No services are migrated to this cluster yet, so there are no HTTPS
+    # listeners. Add one wildcard HTTPS listener per apex domain the first
+    # time a service under that domain lands here - see
+    # kube/alrest/core/envoy-gateway/gateway.yaml and wildcard-certs.yaml
+    # for the pattern (one Certificate + one listener per domain, nested
+    # subdomains get their own wildcard too since "*." only matches one
+    # label deep).
+---
+# HTTP to HTTPS redirect
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: http-to-https-redirect
+  namespace: default
+spec:
+  parentRefs:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: eg
+      namespace: envoy-gateway-system
+      sectionName: http
+  rules:
+    - filters:
+        - type: RequestRedirect
+          requestRedirect:
+            scheme: https
+            statusCode: 301

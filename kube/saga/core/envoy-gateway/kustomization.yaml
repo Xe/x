@@ -1,0 +1,5 @@
+resources:
+  - envoy-gateway.yaml
+  - envoyproxy.yaml
+  - gatewayclass.yaml
+  - gateway.yaml
