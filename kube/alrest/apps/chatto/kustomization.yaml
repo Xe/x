@@ -1,0 +1,7 @@
+namespace: chatto
+resources:
+  - 1password.yaml
+  - chatto.yaml
+  - ingress.yaml
+  - namespace.yaml
+  - nats.yaml

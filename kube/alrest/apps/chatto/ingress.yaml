@@ -1,0 +1,28 @@
+# Requires an Ingress controller and cert-manager (see README)
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: chatto
+  namespace: chatto
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/proxy-buffers-number: "4"
+    nginx.ingress.kubernetes.io/proxy-buffer-size: "256k"
+    nginx.ingress.kubernetes.io/proxy-busy-buffers-size: "512k"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - chat.xeserv.us # Change to your domain
+      secretName: chat-xeserv-us-public-tls
+  rules:
+    - host: chat.xeserv.us # Change to your domain
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: chatto
+                port:
+                  number: 4000

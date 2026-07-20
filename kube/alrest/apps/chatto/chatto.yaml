@@ -1,0 +1,75 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: chatto
+  namespace: chatto
+spec:
+  selector:
+    app: chatto
+  ports:
+    - port: 4000
+      targetPort: 4000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chatto
+  namespace: chatto
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: chatto
+  template:
+    metadata:
+      labels:
+        app: chatto
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: chatto
+          image: ghcr.io/chattocorp/chatto:latest
+          ports:
+            - containerPort: 4000
+          envFrom:
+            - secretRef:
+                name: chatto-config
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              memory: 512Mi
+          startupProbe:
+            httpGet:
+              path: /readyz
+              port: 4000
+            initialDelaySeconds: 5
+            periodSeconds: 2
+            failureThreshold: 15 # 5s + (15 * 2s) = 35s max startup time
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: 4000
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 4000
+            periodSeconds: 10
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
