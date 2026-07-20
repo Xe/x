@@ -4,6 +4,7 @@ resources:
   - certificate.yaml
   - deployment.yaml
   - external-dns.yaml
+  - httproute.yaml
   - ingress.yaml
   - service.yaml
   - pull-through/dockerhub

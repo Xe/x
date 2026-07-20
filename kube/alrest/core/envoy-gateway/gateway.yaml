@@ -1,39 +1,155 @@
 apiVersion: gateway.networking.k8s.io/v1
-kind: GatewayClass
-metadata:
-  name: eg
-spec:
-  controllerName: gateway.envoyproxy.io/gatewayclass-controller
----
-apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
   name: eg
-  namespace: envoy-gateway
+  namespace: envoy-gateway-system
 spec:
-  gatewayClassName: eg
+  gatewayClassName: envoy-gateway-class
   listeners:
-    # HTTP listener for port 80
+    # HTTP listener, used for the HTTP->HTTPS redirect below.
     - name: http
       protocol: HTTP
       port: 80
       allowedRoutes:
         namespaces:
           from: All
-    # HTTPS listener for port 443
-    - name: https
+    # One wildcard HTTPS listener per apex domain actually in use in this
+    # cluster (cross-checked against every Ingress host), each with its own
+    # wildcard cert in wildcard-certs.yaml. New hosts under an existing
+    # domain need no changes here - only add a listener (and a matching
+    # Certificate) when a brand new apex domain gets its first service.
+    - name: cetacean-club
       protocol: HTTPS
       port: 443
+      hostname: "*.cetacean.club"
       tls:
         mode: Terminate
         certificateRefs:
           - group: ""
             kind: Secret
-            name: juhu-tls-cert # This will be created by cert-manager
+            name: wildcard-cetacean-club-tls
       allowedRoutes:
         namespaces:
           from: All
-
+    - name: christine-website
+      protocol: HTTPS
+      port: 443
+      hostname: "*.christine.website"
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - group: ""
+            kind: Secret
+            name: wildcard-christine-website-tls
+      allowedRoutes:
+        namespaces:
+          from: All
+    - name: techaro-lol
+      protocol: HTTPS
+      port: 443
+      hostname: "*.techaro.lol"
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - group: ""
+            kind: Secret
+            name: wildcard-techaro-lol-tls
+      allowedRoutes:
+        namespaces:
+          from: All
+    - name: within-lgbt
+      protocol: HTTPS
+      port: 443
+      hostname: "*.within.lgbt"
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - group: ""
+            kind: Secret
+            name: wildcard-within-lgbt-tls
+      allowedRoutes:
+        namespaces:
+          from: All
+    - name: within-website
+      protocol: HTTPS
+      port: 443
+      hostname: "*.within.website"
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - group: ""
+            kind: Secret
+            name: wildcard-within-website-tls
+      allowedRoutes:
+        namespaces:
+          from: All
+    - name: xeiaso-net
+      protocol: HTTPS
+      port: 443
+      hostname: "*.xeiaso.net"
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - group: ""
+            kind: Secret
+            name: wildcard-xeiaso-net-tls
+      allowedRoutes:
+        namespaces:
+          from: All
+    - name: xelaso-net
+      protocol: HTTPS
+      port: 443
+      hostname: "*.xelaso.net"
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - group: ""
+            kind: Secret
+            name: wildcard-xelaso-net-tls
+      allowedRoutes:
+        namespaces:
+          from: All
+    - name: xeserv-us
+      protocol: HTTPS
+      port: 443
+      hostname: "*.xeserv.us"
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - group: ""
+            kind: Secret
+            name: wildcard-xeserv-us-tls
+      allowedRoutes:
+        namespaces:
+          from: All
+    - name: xn--u7hz981o-ws
+      protocol: HTTPS
+      port: 443
+      hostname: "*.xn--u7hz981o.ws"
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - group: ""
+            kind: Secret
+            name: wildcard-xn--u7hz981o-ws-tls
+      allowedRoutes:
+        namespaces:
+          from: All
+    # Nested subdomain under xeserv.us - the *.xeserv.us wildcard above only
+    # matches one label deep.
+    - name: greedo-xeserv-us
+      protocol: HTTPS
+      port: 443
+      hostname: "*.greedo.xeserv.us"
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - group: ""
+            kind: Secret
+            name: wildcard-xeserv-us-tls
+      allowedRoutes:
+        namespaces:
+          from: All
 ---
 # HTTP to HTTPS redirect
 apiVersion: gateway.networking.k8s.io/v1
@@ -46,6 +162,7 @@ spec:
     - group: gateway.networking.k8s.io
       kind: Gateway
       name: eg
+      namespace: envoy-gateway-system
       sectionName: http
   rules:
     - filters:

@@ -1,0 +1,209 @@
+# One wildcard cert per apex domain actually in use in this cluster
+# (cross-checked against every Ingress host), each backed by its own
+# cert-manager Certificate/secret and served by the matching listener in
+# gateway.yaml. Domains we own in Route53 but don't yet serve anything from
+# are intentionally left out - add a Certificate + listener together when a
+# domain gets its first service.
+#
+# Wildcards only match one label deep, so a nested subdomain (e.g.
+# xena.greedo.xeserv.us, two labels under xeserv.us) needs its own "*."
+# SAN/listener/cert at that level too - the parent domain's wildcard won't
+# cover it.
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: wildcard-cetacean-club
+  namespace: envoy-gateway-system
+spec:
+  secretName: wildcard-cetacean-club-tls
+
+  duration: 2160h # 90d
+  renewBefore: 360h # 15d
+
+  usages:
+    - digital signature
+    - key encipherment
+  dnsNames:
+    - cetacean.club
+    - "*.cetacean.club"
+  issuerRef:
+    name: "letsencrypt-prod"
+    kind: ClusterIssuer
+    group: cert-manager.io
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: wildcard-christine-website
+  namespace: envoy-gateway-system
+spec:
+  secretName: wildcard-christine-website-tls
+
+  duration: 2160h # 90d
+  renewBefore: 360h # 15d
+
+  usages:
+    - digital signature
+    - key encipherment
+  dnsNames:
+    - christine.website
+    - "*.christine.website"
+  issuerRef:
+    name: "letsencrypt-prod"
+    kind: ClusterIssuer
+    group: cert-manager.io
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: wildcard-techaro-lol
+  namespace: envoy-gateway-system
+spec:
+  secretName: wildcard-techaro-lol-tls
+
+  duration: 2160h # 90d
+  renewBefore: 360h # 15d
+
+  usages:
+    - digital signature
+    - key encipherment
+  dnsNames:
+    - techaro.lol
+    - "*.techaro.lol"
+  issuerRef:
+    name: "letsencrypt-prod"
+    kind: ClusterIssuer
+    group: cert-manager.io
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: wildcard-within-lgbt
+  namespace: envoy-gateway-system
+spec:
+  secretName: wildcard-within-lgbt-tls
+
+  duration: 2160h # 90d
+  renewBefore: 360h # 15d
+
+  usages:
+    - digital signature
+    - key encipherment
+  dnsNames:
+    - within.lgbt
+    - "*.within.lgbt"
+  issuerRef:
+    name: "letsencrypt-prod"
+    kind: ClusterIssuer
+    group: cert-manager.io
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: wildcard-within-website
+  namespace: envoy-gateway-system
+spec:
+  secretName: wildcard-within-website-tls
+
+  duration: 2160h # 90d
+  renewBefore: 360h # 15d
+
+  usages:
+    - digital signature
+    - key encipherment
+  dnsNames:
+    - within.website
+    - "*.within.website"
+  issuerRef:
+    name: "letsencrypt-prod"
+    kind: ClusterIssuer
+    group: cert-manager.io
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: wildcard-xeiaso-net
+  namespace: envoy-gateway-system
+spec:
+  secretName: wildcard-xeiaso-net-tls
+
+  duration: 2160h # 90d
+  renewBefore: 360h # 15d
+
+  usages:
+    - digital signature
+    - key encipherment
+  dnsNames:
+    - xeiaso.net
+    - "*.xeiaso.net"
+  issuerRef:
+    name: "letsencrypt-prod"
+    kind: ClusterIssuer
+    group: cert-manager.io
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: wildcard-xelaso-net
+  namespace: envoy-gateway-system
+spec:
+  secretName: wildcard-xelaso-net-tls
+
+  duration: 2160h # 90d
+  renewBefore: 360h # 15d
+
+  usages:
+    - digital signature
+    - key encipherment
+  dnsNames:
+    - xelaso.net
+    - "*.xelaso.net"
+  issuerRef:
+    name: "letsencrypt-prod"
+    kind: ClusterIssuer
+    group: cert-manager.io
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: wildcard-xeserv-us
+  namespace: envoy-gateway-system
+spec:
+  secretName: wildcard-xeserv-us-tls
+
+  duration: 2160h # 90d
+  renewBefore: 360h # 15d
+
+  usages:
+    - digital signature
+    - key encipherment
+  dnsNames:
+    - xeserv.us
+    - "*.xeserv.us"
+    - "*.greedo.xeserv.us"
+  issuerRef:
+    name: "letsencrypt-prod"
+    kind: ClusterIssuer
+    group: cert-manager.io
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: wildcard-xn--u7hz981o-ws
+  namespace: envoy-gateway-system
+spec:
+  secretName: wildcard-xn--u7hz981o-ws-tls
+
+  duration: 2160h # 90d
+  renewBefore: 360h # 15d
+
+  usages:
+    - digital signature
+    - key encipherment
+  dnsNames:
+    - xn--u7hz981o.ws
+    - "*.xn--u7hz981o.ws"
+  issuerRef:
+    name: "letsencrypt-prod"
+    kind: ClusterIssuer
+    group: cert-manager.io

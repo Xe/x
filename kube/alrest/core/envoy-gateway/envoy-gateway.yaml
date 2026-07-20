@@ -1,0 +1,11 @@
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: eg
+  namespace: kube-system
+spec:
+  chart: oci://docker.io/envoyproxy/gateway-helm
+  version: v0.0.0-latest
+  targetNamespace: envoy-gateway-system
+  createNamespace: true
+  takeOwnership: true
