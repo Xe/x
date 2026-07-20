@@ -1,0 +1,27 @@
+apiVersion: x.within.website/v1
+kind: App
+metadata:
+  name: iamd
+
+spec:
+  image: ghcr.io/xe/x/iamd:latest
+  autoUpdate: true
+  logLevel: debug
+
+  env:
+    # - name: BOOTSTRAP_USERNAME
+    #   value: "Xe Iaso"
+    - name: REGION
+      value: yow
+    - name: SIGNING_KEY_CACHE_TTL
+      value: 15m
+
+  ingress:
+    enabled: true
+    host: iamd.xeserv.us
+
+  storage:
+    enabled: true
+    path: /data
+    size: 4Gi
+    storageClass: itsuki
