@@ -6,14 +6,14 @@ import (
 )
 
 func Next() (string, string) {
-	ak := "WTHNXA_" + randomKey()
-	sk := "WTHNXS_" + randomKey()
+	ak := "WTHNXA_" + rand.Text()
+	sk := "WTHNXS_" + randomSecretAccessKey()
 
 	return ak, sk
 }
 
-func randomKey() string {
-	secret := make([]byte, 32)
-	rand.Read(secret)
-	return base64.RawURLEncoding.EncodeToString(secret)
+func randomSecretAccessKey() string {
+	src := make([]byte, 42)
+	rand.Read(src)
+	return base64.RawURLEncoding.EncodeToString(src)
 }

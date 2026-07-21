@@ -1,28 +1,22 @@
 package main
 
 import (
-	"crypto/hmac"
-	"crypto/sha256"
+	"crypto/rand"
 	"encoding/base64"
 	"flag"
 	"fmt"
-	"math/rand"
 	"os"
-	"time"
 )
-
-var r *rand.Rand
 
 func main() {
 	accessKeySwitch := flag.Bool("a", false, "Gen a fake AWS style access key")
 	secretKeySwitch := flag.Bool("s", false, "Gen a fake AWS style secret key")
 	flag.Parse()
 
-	r = rand.New(rand.NewSource(time.Now().UnixNano()))
-	accessKey := randomAccessKey(20)
+	accessKey := rand.Text()
 
 	formattedAccessKey := mergePrefixWithKey("AKIA", accessKey)
-	secretKey := computeHmac256(string(time.Now().String()), accessKey)
+	secretKey := randomSecretAccessKey()
 
 	if *accessKeySwitch == true {
 		fmt.Printf("%v", formattedAccessKey)
@@ -38,18 +32,8 @@ func main() {
 }
 
 func printEverything(accessKey string, secretKey string) {
-	fmt.Printf("ACCESS KEY: %s\n", accessKey)
-	fmt.Printf("SECRET KEY: %s\n", secretKey)
-}
-
-func randomAccessKey(length int) string {
-	const chars string = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-
-	buffer := make([]byte, length)
-	for i := range buffer {
-		buffer[i] = chars[r.Intn(len(chars))]
-	}
-	return string(buffer)
+	fmt.Printf("ACCESS KEY ID:     %s\n", accessKey)
+	fmt.Printf("SECRET ACCESS KEY: %s\n", secretKey)
 }
 
 func mergePrefixWithKey(prefix string, key string) string {
@@ -65,9 +49,8 @@ func mergePrefixWithKey(prefix string, key string) string {
 	return string(built)
 }
 
-func computeHmac256(message string, secret string) string {
-	key := []byte(secret)
-	h := hmac.New(sha256.New, key)
-	h.Write([]byte(message))
-	return base64.StdEncoding.EncodeToString(h.Sum(nil))
+func randomSecretAccessKey() string {
+	src := make([]byte, 42)
+	rand.Read(src)
+	return base64.StdEncoding.EncodeToString(src)
 }
