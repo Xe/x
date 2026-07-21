@@ -56,6 +56,17 @@ var (
 const DefaultMaxBodySize int64 = 10 << 20 // 10 MiB
 
 // Verifier validates SigV4A-signed requests for a single region/service.
+//
+// SigV4A authenticates the sender by proving possession of the signing key:
+// every request carries an ECDSA signature over a canonical view of the
+// request that the verifier recomputes locally. That is enough to stop an
+// attacker from forging new requests, but it does NOT prevent replay. A
+// captured request verifies a second time as long as its X-Amz-Date is within
+// MaxClockSkew (15 minutes by default), so an eavesdropper who sniffs one
+// valid request can replay it for the duration of the window. Callers that
+// require request freshness must layer their own nonce, sequence number, or
+// single-use challenge on top of this verifier, and reject request ids they
+// have already seen within the window.
 type Verifier struct {
 	// Region must be covered by the request's signed X-Amz-Region-Set;
 	// Service must match the credential scope.

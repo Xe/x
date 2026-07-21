@@ -128,3 +128,13 @@ attribution comes for free.
 - The request body is buffered (up to `MaxBodySize`) to check
   `x-amz-content-sha256`, then reset, so downstream handlers read it
   normally.
+
+## Replay protection
+
+SigV4A authenticates the sender by proving possession of the signing key,
+but it does NOT prevent replay. Any request whose `X-Amz-Date` is within
+`MaxClockSkew` (15 minutes by default) verifies a second time, so an
+eavesdropper who sniffs a single valid request can replay it for the
+duration of the window. If your API needs request freshness, layer your own
+nonce, sequence number, or single-use challenge on top of this middleware
+and reject ids you have already seen within the window.
