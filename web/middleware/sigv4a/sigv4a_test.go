@@ -12,6 +12,8 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/twitchtv/twirp"
 )
 
 // parseVectorRequest builds an *http.Request from a vector's request.txt or
@@ -229,7 +231,37 @@ func TestParseCredential(t *testing.T) {
 	if _, err := ParseCredential("Bearer nope"); !errors.Is(err, ErrMissingAuth) {
 		t.Errorf("bad header err = %v, want ErrMissingAuth", err)
 	}
-	if _, err := ParseCredential("AWS4-ECDSA-P256-SHA256 Credential=AKID/20150830/us-east-1/iam/aws4_request, SignedHeaders=host, Signature=00"); !errors.Is(err, ErrMissingAuth) {
-		t.Errorf("5-part (SigV4-style) scope err = %v, want ErrMissingAuth", err)
+	if _, err := ParseCredential("AWS4-ECDSA-P256-SHA256 Credential=AKID/20150830/us-east-1/iam/aws4_request, SignedHeaders=host, Signature=00"); !errors.Is(err, ErrMalformedAuth) {
+		t.Errorf("5-part (SigV4-style) scope err = %v, want ErrMalformedAuth", err)
+	}
+}
+
+// TestTwirpErrorMapping pins the twirp code each sentinel lands on. A
+// malformed Authorization header is the caller's fault and maps to
+// InvalidArgument (400); a missing header or an unknown/unsigned caller maps
+// to an authentication-failure code so a probe cannot tell the cases apart.
+func TestTwirpErrorMapping(t *testing.T) {
+	cases := []struct {
+		name     string
+		err      error
+		wantCode twirp.ErrorCode
+	}{
+		{name: "missing auth", err: ErrMissingAuth, wantCode: twirp.Unauthenticated},
+		{name: "malformed auth", err: ErrMalformedAuth, wantCode: twirp.InvalidArgument},
+		{name: "unknown key", err: ErrUnknownKey, wantCode: twirp.PermissionDenied},
+		{name: "unauthorized", err: ErrUnauthorized, wantCode: twirp.PermissionDenied},
+		{name: "scope mismatch", err: ErrScopeMismatch, wantCode: twirp.InvalidArgument},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			tErr := TwirpError(context.Background(), tc.err)
+			tw, ok := tErr.(twirp.Error)
+			if !ok {
+				t.Fatalf("TwirpError returned non-twirp error: %v", tErr)
+			}
+			if tw.Code() != tc.wantCode {
+				t.Fatalf("code = %q, want %q (msg=%q)", tw.Code(), tc.wantCode, tw.Msg())
+			}
+		})
 	}
 }

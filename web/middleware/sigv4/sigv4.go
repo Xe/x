@@ -44,6 +44,7 @@ const (
 // ErrUnknownKey to 403 and the rest to 400.
 var (
 	ErrMissingAuth          = errors.New("sigv4: missing or malformed Authorization")
+	ErrMalformedAuth        = errors.New("sigv4: malformed authentication header")
 	ErrMissingSignedHost    = errors.New("sigv4: host must appear in SignedHeaders")
 	ErrUnknownKey           = errors.New("sigv4: unknown access key id")
 	ErrClockSkew            = errors.New("sigv4: request time outside allowed skew")
@@ -121,6 +122,8 @@ func TwirpError(ctx context.Context, err error) error {
 	switch {
 	case errors.Is(err, ErrMissingAuth):
 		return twirp.WrapError(twirp.Unauthenticated.Error("no authentication header present"), err)
+	case errors.Is(err, ErrMalformedAuth):
+		return twirp.WrapError(twirp.InvalidArgument.Error("malformed authentication header"), err)
 	case errors.Is(err, ErrScopeMismatch),
 		errors.Is(err, ErrClockSkew), errors.Is(err, ErrBodyTooLarge),
 		errors.Is(err, ErrStreamingUnsupported), errors.Is(err, ErrMissingSignedHost):
@@ -276,26 +279,35 @@ func parseAuthHeader(h string) (*signedRequest, error) {
 	for _, part := range strings.Split(rest, ",") {
 		kv := strings.SplitN(strings.TrimSpace(part), "=", 2)
 		if len(kv) != 2 || kv[0] == "" || kv[1] == "" {
-			return nil, ErrMissingAuth
+			return nil, ErrMalformedAuth
 		}
 		switch kv[0] {
 		case "Credential":
+			if cred != "" {
+				return nil, ErrMalformedAuth
+			}
 			cred = kv[1]
 		case "SignedHeaders":
+			if signed != "" {
+				return nil, ErrMalformedAuth
+			}
 			signed = kv[1]
 		case "Signature":
+			if sig != "" {
+				return nil, ErrMalformedAuth
+			}
 			sig = kv[1]
 		default:
-			return nil, ErrMissingAuth
+			return nil, ErrMalformedAuth
 		}
 	}
 	if cred == "" || signed == "" || sig == "" {
-		return nil, ErrMissingAuth
+		return nil, ErrMalformedAuth
 	}
 
 	cp := strings.Split(cred, "/")
 	if len(cp) != 5 || cp[4] != terminator {
-		return nil, fmt.Errorf("%w: bad credential scope", ErrMissingAuth)
+		return nil, fmt.Errorf("%w: bad credential scope", ErrMalformedAuth)
 	}
 	return &signedRequest{
 		accessKeyID:   cp[0],
