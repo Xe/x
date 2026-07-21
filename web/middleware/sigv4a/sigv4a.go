@@ -48,6 +48,12 @@ var (
 	ErrNotConfigured        = errors.New("sigv4a: neither Verifier.Lookup nor Verifier.KeyLookup is set")
 )
 
+// DefaultMaxBodySize is the byte cap applied to request bodies when
+// Verifier.MaxBodySize is left zero. 10 MiB is large enough for the
+// control-plane requests this middleware protects while bounding the
+// memory an attacker can force it to allocate.
+const DefaultMaxBodySize int64 = 10 << 20 // 10 MiB
+
 // Verifier validates SigV4A-signed requests for a single region/service.
 type Verifier struct {
 	// Region must be covered by the request's signed X-Amz-Region-Set;
@@ -76,8 +82,8 @@ type Verifier struct {
 	DisablePathEscaping bool
 
 	// MaxBodySize caps how many bytes of the body will be buffered to verify
-	// the payload hash. Zero means unlimited. Requests that exceed it are
-	// rejected with ErrBodyTooLarge.
+	// the payload hash. Zero means DefaultMaxBodySize (10 MiB). Requests that
+	// exceed it are rejected with ErrBodyTooLarge.
 	MaxBodySize int64
 
 	// Now is overridable for tests. Defaults to time.Now.
@@ -141,7 +147,11 @@ func (v *Verifier) Verify(r *http.Request) (string, error) {
 		return "", err
 	}
 
-	payloadHash, err := awssig.ResolvePayloadHash(r, v.MaxBodySize)
+	maxBodySize := v.MaxBodySize
+	if maxBodySize == 0 {
+		maxBodySize = DefaultMaxBodySize
+	}
+	payloadHash, err := awssig.ResolvePayloadHash(r, maxBodySize)
 	if err != nil {
 		return "", err
 	}

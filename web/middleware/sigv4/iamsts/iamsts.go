@@ -62,7 +62,7 @@ type Config struct {
 	Service string
 
 	// MaxBodySize caps the bytes buffered to verify the payload hash. Zero
-	// means unlimited.
+	// means DefaultMaxBodySize (10 MiB) inside the inner Verifier.
 	MaxBodySize int64
 
 	// NegativeTTL is how long a refusal is cached. Defaults to 30s.
