@@ -34,25 +34,10 @@ func CanonicalHeaderValue(r *http.Request, name string) string {
 // implementation actually special-cases quotes, and the get-header-value-trim
 // vector confirms it.
 func collapseSpaces(s string) string {
-	if !strings.Contains(s, "  ") {
+	if s == "" {
 		return s
 	}
-	var b strings.Builder
-	b.Grow(len(s))
-	prevSpace := false
-	for i := 0; i < len(s); i++ {
-		c := s[i]
-		if c == ' ' {
-			if !prevSpace {
-				b.WriteByte(' ')
-			}
-			prevSpace = true
-			continue
-		}
-		b.WriteByte(c)
-		prevSpace = false
-	}
-	return b.String()
+	return strings.Join(strings.Fields(s), " ")
 }
 
 // CanonicalQuery sorts by parameter name, then by value for repeated names,
