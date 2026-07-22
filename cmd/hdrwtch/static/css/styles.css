@@ -1,4 +1,4 @@
-/*! tailwindcss v4.3.2 | MIT License | https://tailwindcss.com */
+/*! tailwindcss v4.1.18 | MIT License | https://tailwindcss.com */
 @import url("https://cdn.xeiaso.net/static/pkg/iosevka/family.css");
 @import url("https://cdn.xeiaso.net/static/pkg/podkova/family.css");
 @layer properties;
@@ -257,7 +257,7 @@
     margin-inline: calc(var(--spacing) * -4);
   }
   .mx-1 {
-    margin-inline: var(--spacing);
+    margin-inline: calc(var(--spacing) * 1);
   }
   .mx-auto {
     margin-inline: auto;
@@ -272,10 +272,10 @@
     margin-block: calc(var(--spacing) * 4);
   }
   .ms-1 {
-    margin-inline-start: var(--spacing);
+    margin-inline-start: calc(var(--spacing) * 1);
   }
   .me-1 {
-    margin-inline-end: var(--spacing);
+    margin-inline-end: calc(var(--spacing) * 1);
   }
   .me-2 {
     margin-inline-end: calc(var(--spacing) * 2);
@@ -284,10 +284,10 @@
     margin-inline-end: calc(var(--spacing) * 2.5);
   }
   .mt-0 {
-    margin-top: 0;
+    margin-top: calc(var(--spacing) * 0);
   }
   .mt-1 {
-    margin-top: var(--spacing);
+    margin-top: calc(var(--spacing) * 1);
   }
   .mt-2 {
     margin-top: calc(var(--spacing) * 2);
@@ -314,7 +314,7 @@
     margin-bottom: calc(var(--spacing) * -6);
   }
   .mb-0 {
-    margin-bottom: 0;
+    margin-bottom: calc(var(--spacing) * 0);
   }
   .mb-2 {
     margin-bottom: calc(var(--spacing) * 2);
@@ -467,8 +467,8 @@
   .space-x-1 {
     :where(& > :not(:last-child)) {
       --tw-space-x-reverse: 0;
-      margin-inline-start: calc(var(--spacing) * var(--tw-space-x-reverse));
-      margin-inline-end: calc(var(--spacing) * calc(1 - var(--tw-space-x-reverse)));
+      margin-inline-start: calc(calc(var(--spacing) * 1) * var(--tw-space-x-reverse));
+      margin-inline-end: calc(calc(var(--spacing) * 1) * calc(1 - var(--tw-space-x-reverse)));
     }
   }
   .space-x-10 {
@@ -651,7 +651,7 @@
     padding-bottom: calc(var(--spacing) * 12);
   }
   .pl-1 {
-    padding-left: var(--spacing);
+    padding-left: calc(var(--spacing) * 1);
   }
   .pl-2 {
     padding-left: calc(var(--spacing) * 2);
@@ -1009,7 +1009,7 @@
   }
   .sm\:pl-0 {
     @media (width >= 40rem) {
-      padding-left: 0;
+      padding-left: calc(var(--spacing) * 0);
     }
   }
   .sm\:text-sm {
@@ -1031,17 +1031,17 @@
   }
   .md\:inset-y-0 {
     @media (width >= 48rem) {
-      inset-block: 0;
+      inset-block: calc(var(--spacing) * 0);
     }
   }
   .md\:right-0 {
     @media (width >= 48rem) {
-      right: 0;
+      right: calc(var(--spacing) * 0);
     }
   }
   .md\:left-0 {
     @media (width >= 48rem) {
-      left: 0;
+      left: calc(var(--spacing) * 0);
     }
   }
   .md\:ms-2 {
