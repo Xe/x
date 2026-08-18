@@ -4,11 +4,11 @@ go 1.25.7
 
 require (
 	al.essio.dev/pkg/shellescape v1.6.0
-	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.6-20250603165357-b52ab10f4468.1
-	buf.build/go/protovalidate v0.12.0
+	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.11-20260209202127-80ab13bee0bf.1
+	buf.build/go/protovalidate v1.1.2
 	cirello.io/goherokuname v0.0.0-20190914093443-b436bae8c2c5
 	codeberg.org/readeck/go-readability/v2 v2.1.0
-	connectrpc.com/connect v1.18.1
+	connectrpc.com/connect v1.20.0
 	github.com/Marcel-ICMC/graw v0.0.0-20230411090719-e24cd8592d25
 	github.com/McKael/madon/v2 v2.4.0
 	github.com/NYTimes/gziphandler v1.1.1
@@ -72,7 +72,7 @@ require (
 	github.com/sebest/xff v0.0.0-20210106013422-671bd2870b3a
 	github.com/speps/go-hashids v2.0.0+incompatible
 	github.com/spf13/cobra v1.10.2
-	github.com/stoewer/go-strcase v1.3.0
+	github.com/stoewer/go-strcase v1.3.1
 	github.com/tetratelabs/wazero v1.9.0
 	github.com/thoj/go-ircevent v0.0.0-20210723090443-73e444401d64
 	github.com/tmc/scp v0.0.0-20170824174625-f7b48647feef
@@ -118,7 +118,9 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.13.7 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/checksum v1.9.13 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.19.21 // indirect
+	github.com/bahlo/generic-list-go v0.2.0 // indirect
 	github.com/blakesmith/ar v0.0.0-20190502131153-809d4375e1fb // indirect
+	github.com/buger/jsonparser v1.1.1 // indirect
 	github.com/bytedance/sonic v1.12.6 // indirect
 	github.com/bytedance/sonic/loader v0.2.0 // indirect
 	github.com/caarlos0/log v0.5.3 // indirect
@@ -164,6 +166,8 @@ require (
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/gogs/chardet v0.0.0-20211120154057-b7413eaefb8f // indirect
 	github.com/golang-jwt/jwt/v4 v4.5.2 // indirect
+	github.com/google/gnostic v0.7.1 // indirect
+	github.com/google/gnostic-models v0.7.0 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
 	github.com/google/jsonschema-go v0.4.2 // indirect
 	github.com/google/pprof v0.0.0-20250317173921-a4b03ec1a45e // indirect
@@ -205,6 +209,7 @@ require (
 	github.com/lestrrat-go/iter v1.0.2 // indirect
 	github.com/lestrrat-go/jwx/v2 v2.0.12 // indirect
 	github.com/lestrrat-go/option v1.0.1 // indirect
+	github.com/lmittmann/tint v1.1.3 // indirect
 	github.com/lucasb-eyer/go-colorful v1.3.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
@@ -230,6 +235,9 @@ require (
 	github.com/ncruces/julianday v1.0.0 // indirect
 	github.com/opentracing/opentracing-go v1.2.0 // indirect
 	github.com/otiai10/mint v1.6.3 // indirect
+	github.com/pb33f/jsonpath v0.8.1 // indirect
+	github.com/pb33f/libopenapi v0.33.11 // indirect
+	github.com/pb33f/ordered-map/v2 v2.3.0 // indirect
 	github.com/petar/GoLLRB v0.0.0-20210522233825-ae3b015fd3e9 // indirect
 	github.com/pjbgf/sha1cd v0.6.0 // indirect
 	github.com/pkg/term v1.2.0-beta.2 // indirect
@@ -244,6 +252,7 @@ require (
 	github.com/spaolacci/murmur3 v1.1.0 // indirect
 	github.com/spf13/cast v1.7.1 // indirect
 	github.com/spf13/pflag v1.0.10 // indirect
+	github.com/sudorandom/protoc-gen-connect-openapi v0.25.7 // indirect
 	github.com/tidwall/gjson v1.18.0 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.1 // indirect
@@ -272,6 +281,7 @@ require (
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
+	go.yaml.in/yaml/v4 v4.0.0-rc.4 // indirect
 	golang.org/x/arch v0.6.0 // indirect
 	golang.org/x/exp/typeparams v0.0.0-20231108232855-2478ac86f678 // indirect
 	golang.org/x/telemetry v0.0.0-20260625142307-59b4966ccb57 // indirect
@@ -279,6 +289,7 @@ require (
 	golang.org/x/xerrors v0.0.0-20240716161551-93cc26a95ae9 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20260414002931-afd174a4e478 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20260414002931-afd174a4e478 // indirect
+	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.6.2 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
@@ -340,10 +351,15 @@ require (
 )
 
 tool (
+	connectrpc.com/connect/cmd/protoc-gen-connect-go
 	github.com/TecharoHQ/yeet/cmd/yeet
 	github.com/a-h/templ/cmd/templ
 	github.com/caarlos0/pinata
+	github.com/sudorandom/protoc-gen-connect-openapi
+	github.com/twitchtv/twirp/protoc-gen-twirp
 	golang.org/x/tools/cmd/goimports
 	golang.org/x/tools/cmd/stringer
+	google.golang.org/grpc/cmd/protoc-gen-go-grpc
+	google.golang.org/protobuf/cmd/protoc-gen-go
 	honnef.co/go/tools/cmd/staticcheck
 )
