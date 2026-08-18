@@ -128,7 +128,7 @@
       });
   }
   function rr(t) {
-    for (t._x_effects?.forEach(Ke); t._x_cleanups?.length; )
+    for (t._x_effects?.forEach(Ke); t._x_cleanups?.length;)
       t._x_cleanups.pop()();
   }
   var le = new MutationObserver(pe),
@@ -151,7 +151,7 @@
     lt.push(() => t.length > 0 && pe(t));
     let e = lt.length;
     queueMicrotask(() => {
-      if (lt.length === e) for (; lt.length > 0; ) lt.shift()();
+      if (lt.length === e) for (; lt.length > 0;) lt.shift()();
     });
   }
   function m(t) {
@@ -591,7 +591,7 @@ ${
     let e = Symbol();
     ((yr = e), dt.set(e, []));
     let r = () => {
-        for (; dt.get(e).length; ) dt.get(e).shift()();
+        for (; dt.get(e).length;) dt.get(e).shift()();
         dt.delete(e);
       },
       n = () => {
@@ -713,7 +713,7 @@ ${
     let r = !1;
     if ((e(t, () => (r = !0)), r)) return;
     let n = t.firstElementChild;
-    for (; n; ) (D(n, e, !1), (n = n.nextElementSibling));
+    for (; n;) (D(n, e, !1), (n = n.nextElementSibling));
   }
   function E(t, ...e) {
     console.warn(`Alpine Warning: ${t}`, ...e);
@@ -832,7 +832,7 @@ ${
     );
   }
   function kt() {
-    for (Se = !1; Ee.length; ) Ee.shift()();
+    for (Se = !1; Ee.length;) Ee.shift()();
   }
   function Dr() {
     Se = !0;
@@ -1141,7 +1141,7 @@ ${
         this.beforeCancels.push(s);
       },
       cancel: ht(function () {
-        for (; this.beforeCancels.length; ) this.beforeCancels.shift()();
+        for (; this.beforeCancels.length;) this.beforeCancels.shift()();
         o();
       }),
       finish: o,
@@ -1485,7 +1485,7 @@ ${
   }
   function Oe(t, e, r) {
     let n = [];
-    for (; n.length; ) n.pop()();
+    for (; n.length;) n.pop()();
     let i = Object.entries(e).map(([s, a]) => ({ name: s, value: a })),
       o = be(i);
     return (
@@ -1498,7 +1498,7 @@ ${
         (n.push(s.runCleanups), s());
       }),
       () => {
-        for (; n.length; ) n.pop()();
+        for (; n.length;) n.pop()();
       }
     );
   }
