@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"encoding/binary"
 	"encoding/json"
 	"image/color"
 	"image/png"
@@ -35,6 +36,26 @@ func encodeBMP(t *testing.T) []byte {
 		t.Fatal(err)
 	}
 	return buf.Bytes()
+}
+
+// encodeHugeGIF hand-builds a minimal GIF whose logical screen descriptor
+// declares the given width and height. image.DecodeConfig for GIF only
+// reads the 13-byte header (plus an optional global color table, which is
+// omitted here), so this never needs real pixel data and stays tiny on
+// disk even when it declares a huge image.
+func encodeHugeGIF(t *testing.T, w, h int) []byte {
+	t.Helper()
+	if w > 0xffff || h > 0xffff {
+		t.Fatalf("encodeHugeGIF: %dx%d does not fit in a GIF header", w, h)
+	}
+	buf := make([]byte, 13)
+	copy(buf, "GIF87a")
+	binary.LittleEndian.PutUint16(buf[6:8], uint16(w))
+	binary.LittleEndian.PutUint16(buf[8:10], uint16(h))
+	// buf[10] packed fields: no global color table.
+	// buf[11] background color index: unused.
+	// buf[12] pixel aspect ratio: unused.
+	return buf
 }
 
 type upload struct {
@@ -143,6 +164,13 @@ func TestCreate(t *testing.T) {
 			files:      withFile("new-friend-pic", encodeBMP(t)),
 			wantStatus: http.StatusBadRequest,
 			wantBody:   "isn&#39;t a GIF, JPEG, or PNG",
+		},
+		{
+			name:       "too many pixels",
+			fields:     goodNames,
+			files:      withFile("new-friend-pic", encodeHugeGIF(t, 7000, 7000)),
+			wantStatus: http.StatusBadRequest,
+			wantBody:   "too many pixels",
 		},
 		{
 			name:       "file too big",
