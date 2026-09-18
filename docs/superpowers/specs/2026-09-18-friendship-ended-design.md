@@ -44,10 +44,10 @@ Binaries use `internal.HandleStartup()` and do not call `flag.Parse()`.
 
 - `x1.png`, `x2.png`, `treasure.gif` are copied from the original and marked
   GPL-2.0 via `assets/LICENSE` and `assets/README.md`.
-- `comicbd.ttf` is extracted with `cabextract` from `comic32.exe` in the
-  corefonts SourceForge mirror and embedded with `go:embed`. The user has
-  confirmed permission to use it. `FONT.md` records the source URL and
-  SHA-256.
+- `comicbd.ttf` is extracted with `7z e comic32.exe comicbd.ttf` from
+  `comic32.exe` in the corefonts SourceForge mirror and embedded with
+  `go:embed`. The user has confirmed permission to use it. `FONT.md` records
+  the source URL and SHA-256.
 
 ## Rendering
 
@@ -56,13 +56,22 @@ Binaries use `internal.HandleStartup()` and do not call `flag.Parse()`.
 does no I/O. Steps:
 
 1. Resize `newPic` to exactly 800x600 (Lanczos, aspect not preserved) via
-   `disintegration/imaging`.
+   `disintegration/imaging`, then flatten it onto an opaque white background
+   (`draw.Draw` with `image.White`, then the resized image with `draw.Over`).
+   Transparent uploads (for example a PNG with an alpha channel) would
+   otherwise render as a black rectangle, since the final JPEG has no alpha
+   channel of its own; flattening onto white first keeps transparent areas
+   looking like blank paper.
 2. Resize `old1` to 172x259, draw `x1.png` over it at (0,0). Resize `old2` to
    221x242, draw `x2.png` over it at (0,0). Overlays are clipped to the photo
-   bounds, matching `COMPOSITE_ATOP`.
+   bounds, matching `COMPOSITE_ATOP`. Both resized photos are flattened onto
+   white the same way as `newPic` before the overlay is drawn.
 3. Draw text. Font: Comic Sans MS Bold. Stroke: 1px `#006488`, drawn as the
    text offset in 8 directions under the fill. Names are trimmed and
-   uppercased; the fixed words keep the original casing.
+   uppercased; the fixed words keep the original casing. The gradient title's
+   clip mask is reset with `dc.ResetClip()` after drawing, since gg's `Pop`
+   deliberately leaves the mask in place and it would otherwise leak into
+   later text draws on the same context.
 
    | Text                          | Size | Scale    | Position  | Fill                         |
    | ----------------------------- | ---- | -------- | --------- | ---------------------------- |
@@ -110,7 +119,7 @@ Implemented by an S3 client (aws-sdk-go-v2) and an in-memory fake for tests.
 | `GET /`                 | Form page.                                                                 |
 | `POST /`                | Validate, render, store, `303` to `/f/<id>`.                               |
 | `GET /f/{id}`           | Load `meta.json` (404 if missing), render result page with OpenGraph tags. |
-| `GET /f/{id}/image.jpg` | `302` to presigned URL for `result.jpg`.                                   |
+| `GET /f/{id}/image.jpg` | `302` to presigned URL for `result.jpg`, with a bounded `Cache-Control`.   |
 | `GET /static/...`       | Embedded design-system CSS and fonts.                                      |
 | `GET /treasure.gif`     | Embedded `assets/treasure.gif`.                                            |
 
@@ -120,23 +129,56 @@ Result page: "Bless Your New Friendship With <NEW>", the image, `treasure.gif`,
 Validation on `POST /`:
 
 - `http.MaxBytesReader` at 32 MB total; each file at most 10 MB.
-- Both names required and non-empty after trimming. Max 64 runes each.
-- Each file decoded by content sniffing (`image.Decode` with GIF/JPEG/PNG
-  registered). Client MIME type is ignored.
+- Both names required and non-empty after trimming, max 64 runes each, and
+  every rune must be printable (`unicode.IsPrint`); this rejects control
+  characters such as newlines or tabs while still allowing spaces.
+- Each file decoded by content sniffing (`imaging.Decode` with
+  `imaging.AutoOrientation(true)`, over GIF/JPEG/PNG registered via the
+  standard library). Client MIME type is ignored. Auto-orientation applies
+  the image's EXIF orientation tag, if present, so photos taken sideways or
+  upside down on a phone come out upright.
 - Each image is at most 40 megapixels (checked with `image.DecodeConfig`
   before decoding).
 - `id` in `/f/{id}` must parse as a UUID, else 404.
 - The four image objects upload in parallel; `meta.json` is written only
   after they all succeed, so a result page never points at a missing image.
 
+Render concurrency: decoding, rendering, and JPEG-encoding an upload holds
+several full-size pixel buffers in memory at once. `Server` holds a
+`chan struct{}` semaphore with `maxConcurrentRenders` (2) slots; `POST /`
+acquires a slot after names are validated and before reading uploads, and
+releases it right after the JPEG is encoded, before the storage puts (the
+decoded images are also dereferenced at that point so they can be
+collected). Acquiring uses `select` against the request context, so a
+client that disconnects while waiting gives up immediately instead of
+holding the connection open; that case is logged at debug level and the
+handler returns without further work.
+
 ## Config
 
-Flags: `--bind` (default `:3000`), `--bucket` (default `friendship-ended`),
-`--base-url` (default `http://localhost:3000`, used for absolute OpenGraph
-URLs), `--presign-expiry` (default `1h`). The S3 client comes from the
-existing `within.website/x/tigris.Client` helper, which sets the Tigris
-endpoint and region. Credentials come from the standard `AWS_ACCESS_KEY_ID`
-and `AWS_SECRET_ACCESS_KEY` env vars. No secrets in the repo.
+Flags: `--bind` (default `:3000`), `--bucket` (default
+`xe-friendship-ended`), `--base-url` (default `http://localhost:3000`, used
+for absolute OpenGraph URLs), `--presign-expiry` (default `1h`). The S3
+client comes from the existing `within.website/x/tigris.Client` helper,
+which sets the Tigris endpoint and region. Credentials come from the
+standard AWS environment variables (`AWS_ACCESS_KEY_ID` /
+`AWS_SECRET_ACCESS_KEY`, or `AWS_PROFILE`). No secrets in the repo. For
+local development, put `AWS_PROFILE=tigris` in `cmd/friendship-ended/.env`
+and run the binary from that directory; `internal.HandleStartup()` loads
+`.env` from the process's working directory, not the source tree.
+
+`newServer(store Store, rend *renderer, baseURL string, presignExpiry time.Duration) *Server`
+takes the presign expiry directly so the `image` handler can size its
+`Cache-Control` header off of it (see HTTP above): `max-age` is
+`min(300s, presignExpiry/2)` in whole seconds, never negative, so a cached
+redirect can never outlive the presigned URL it points to.
+
+The `http.Server` sets `ReadHeaderTimeout: 10s`, `ReadTimeout: 60s`,
+`WriteTimeout: 90s`, and `IdleTimeout: 120s`. `main` listens for
+`SIGINT`/`SIGTERM` via `signal.NotifyContext`, runs `ListenAndServe` in a
+goroutine, and on signal calls `hs.Shutdown` with a 30s timeout context;
+`http.ErrServerClosed` from `ListenAndServe` is treated as a normal
+shutdown, not an error.
 
 ## Errors
 
@@ -146,12 +188,19 @@ and `AWS_SECRET_ACCESS_KEY` env vars. No secrets in the repo.
 ## Testing
 
 - `render_test.go`: table-driven. Output bounds are 800x600 for tiny (1x1),
-  large, and GIF inputs. Empty and long names do not panic.
+  large, and GIF inputs. Empty and long names do not panic. A fully
+  transparent new-friend picture renders as white, not black, in an area
+  with no text or photo.
 - `handlers_test.go`: table-driven against the in-memory store. Missing
-  names, non-image file, oversized upload, happy path (303 plus all five
-  keys stored), unknown id (404), bad id (404), image redirect (302).
+  names, control characters in a name, non-image file, oversized upload,
+  happy path (303 plus all five keys stored), unknown id (404), bad id
+  (404), image redirect (302) with a `Cache-Control` bounded by the presign
+  expiry, a storage failure that only fails one image key (meta.json must
+  still not be stored), and the render semaphore fully released after a
+  sequence of successful and failing requests.
 - Golden smoke test writes `testdata/out.png` when `-update` is set, for
-  visual inspection.
+  visual inspection. `testdata/.gitignore` keeps it from being committed by
+  accident.
 
 ## Out of scope
 
