@@ -27,6 +27,7 @@ require (
 	github.com/eaburns/peggy v1.0.2
 	github.com/facebookgo/ensure v0.0.0-20160127193407-b4ab57deab51
 	github.com/felixge/httpsnoop v1.0.4
+	github.com/fogleman/gg v1.3.0
 	github.com/gen2brain/avif v0.4.4
 	github.com/gen2brain/heic v0.4.4
 	github.com/gen2brain/jpegxl v0.4.5
@@ -166,6 +167,7 @@ require (
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/gogs/chardet v0.0.0-20211120154057-b7413eaefb8f // indirect
 	github.com/golang-jwt/jwt/v4 v4.5.2 // indirect
+	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
 	github.com/google/gnostic v0.7.1 // indirect
 	github.com/google/gnostic-models v0.7.0 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
