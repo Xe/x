@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"image"
 	"image/color"
+	"image/draw"
 	"image/png"
 	"strings"
 
@@ -36,8 +37,9 @@ type renderer struct {
 }
 
 // textLine is one piece of text in the image. Positions are in the
-// coordinate space after scaling, matching ImageMagick's annotation after
-// scale in the original PHP. An empty fill means the title gradient.
+// pre-scale (user space) coordinate space, as passed to DrawString after
+// Scale, matching ImageMagick's annotation after scale in the original PHP.
+// An empty fill means the title gradient.
 type textLine struct {
 	text           string
 	size           float64
@@ -90,7 +92,7 @@ func (r *renderer) Render(oldName, newName string, newPic, old1, old2 image.Imag
 	oldName = strings.ToUpper(strings.TrimSpace(oldName))
 	newName = strings.ToUpper(strings.TrimSpace(newName))
 
-	dc := gg.NewContextForImage(imaging.Resize(newPic, canvasWidth, canvasHeight, imaging.Lanczos))
+	dc := gg.NewContextForImage(flattenWhite(imaging.Resize(newPic, canvasWidth, canvasHeight, imaging.Lanczos)))
 
 	lines := []textLine{
 		{text: "Friendship ended with " + oldName, size: 58, scaleX: 0.8, scaleY: 2, x: 0, y: 40},
@@ -166,13 +168,7 @@ func (r *renderer) drawLine(dc *gg.Context, l textLine) error {
 	// mask in place (see fogleman/gg Context.Pop), so the clip set above
 	// would otherwise leak into every later drawLine call on this
 	// context. Reset it to fully opaque (no clipping) before returning.
-	full := image.NewAlpha(image.Rect(0, 0, dc.Width(), dc.Height()))
-	for i := range full.Pix {
-		full.Pix[i] = 0xff
-	}
-	if err := dc.SetMask(full); err != nil {
-		return fmt.Errorf("can't clear gradient mask: %w", err)
-	}
+	dc.ResetClip()
 
 	return nil
 }
@@ -180,9 +176,23 @@ func (r *renderer) drawLine(dc *gg.Context, l textLine) error {
 // crossOut resizes pic to w x h and draws overlay on top, clipped to the
 // photo like ImageMagick's COMPOSITE_ATOP.
 func crossOut(pic image.Image, w, h int, overlay image.Image) image.Image {
-	c := gg.NewContextForImage(imaging.Resize(pic, w, h, imaging.Lanczos))
+	c := gg.NewContextForImage(flattenWhite(imaging.Resize(pic, w, h, imaging.Lanczos)))
 	c.DrawImage(overlay, 0, 0)
 	return c.Image()
+}
+
+// flattenWhite draws img over an opaque white background. gg composites
+// onto whatever background color the source image carries, and a fully
+// transparent upload (RGBA zero value) is transparent black, which would
+// otherwise render as a black rectangle in the final JPEG (which has no
+// alpha channel of its own). Flattening onto white first keeps transparent
+// areas looking like blank paper instead.
+func flattenWhite(img image.Image) image.Image {
+	b := img.Bounds()
+	dst := image.NewRGBA(b)
+	draw.Draw(dst, b, image.White, image.Point{}, draw.Src)
+	draw.Draw(dst, b, img, b.Min, draw.Over)
+	return dst
 }
 
 // hexColor parses #RRGGBB. It panics on bad input because it is only

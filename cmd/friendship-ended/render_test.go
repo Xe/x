@@ -122,6 +122,26 @@ func TestRenderDrawsText(t *testing.T) {
 	}
 }
 
+// TestRenderFlattensTransparency checks that a fully transparent new-friend
+// picture renders as white background instead of gg's default black, in a
+// spot with no text or old-friend photo.
+func TestRenderFlattensTransparency(t *testing.T) {
+	r := testRenderer(t)
+
+	transparent := image.NewRGBA(image.Rect(0, 0, 800, 600)) // zero value: fully transparent
+	white := color.White
+
+	got, err := r.Render("mudasir", "salman", transparent, solid(10, 10, white), solid(10, 10, white))
+	if err != nil {
+		t.Fatalf("Render: %v", err)
+	}
+
+	pr, pg, pb, _ := got.At(150, 250).RGBA()
+	if pr < 0xf000 || pg < 0xf000 || pb < 0xf000 {
+		t.Fatalf("pixel at (150,250) = (%d,%d,%d), want white", pr, pg, pb)
+	}
+}
+
 func countNonWhite(img image.Image, area image.Rectangle) int {
 	n := 0
 	for y := area.Min.Y; y < area.Max.Y; y++ {
