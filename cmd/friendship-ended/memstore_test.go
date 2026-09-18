@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"errors"
+	"strings"
 	"sync"
 )
 
@@ -12,11 +13,13 @@ type memObject struct {
 }
 
 // memStore is an in-memory Store for tests. Set failPut to make every Put
-// fail.
+// fail, or failSuffix to make only Puts whose key ends with that suffix
+// fail (for example "old2.png" to fail one specific upload).
 type memStore struct {
-	mu      sync.Mutex
-	objects map[string]memObject
-	failPut bool
+	mu         sync.Mutex
+	objects    map[string]memObject
+	failPut    bool
+	failSuffix string
 }
 
 func newMemStore() *memStore {
@@ -27,7 +30,7 @@ func (m *memStore) Put(_ context.Context, key, contentType string, data []byte) 
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
-	if m.failPut {
+	if m.failPut || (m.failSuffix != "" && strings.HasSuffix(key, m.failSuffix)) {
 		return errors.New("memstore: put failed on purpose")
 	}
 

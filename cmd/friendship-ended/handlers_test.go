@@ -20,6 +20,10 @@ import (
 
 const testBaseURL = "https://friends.example"
 
+// testPresignExpiry is deliberately not a multiple of 600s so halving it
+// (60s) is distinguishable from the 300s cap in Cache-Control assertions.
+const testPresignExpiry = 2 * time.Minute
+
 func encodePNG(t *testing.T, w, h int) []byte {
 	t.Helper()
 	var buf bytes.Buffer
@@ -90,7 +94,7 @@ func multipartBody(t *testing.T, fields map[string]string, files []upload) (io.R
 func testServer(t *testing.T) (*Server, *memStore) {
 	t.Helper()
 	store := newMemStore()
-	return newServer(store, testRenderer(t), testBaseURL), store
+	return newServer(store, testRenderer(t), testBaseURL, testPresignExpiry), store
 }
 
 var locationRE = regexp.MustCompile(`^/f/([0-9a-f-]{36})$`)
@@ -119,10 +123,18 @@ func TestCreate(t *testing.T) {
 		fields     map[string]string
 		files      []upload
 		failPut    bool
+		failSuffix string
 		wantStatus int
 		wantBody   string
 	}{
 		{name: "happy path", fields: goodNames, files: goodFiles, wantStatus: http.StatusSeeOther},
+		{
+			name:       "control characters in name",
+			fields:     map[string]string{"old-friend-name": "mudasir\nevil", "new-friend-name": "salman"},
+			files:      goodFiles,
+			wantStatus: http.StatusBadRequest,
+			wantBody:   "old friend needs a name",
+		},
 		{
 			name:       "missing old name",
 			fields:     map[string]string{"new-friend-name": "salman"},
@@ -186,10 +198,18 @@ func TestCreate(t *testing.T) {
 			failPut:    true,
 			wantStatus: http.StatusInternalServerError,
 		},
+		{
+			name:       "storage failure on one image leaves meta.json unwritten",
+			fields:     goodNames,
+			files:      goodFiles,
+			failSuffix: "old2.png",
+			wantStatus: http.StatusInternalServerError,
+		},
 	} {
 		t.Run(tt.name, func(t *testing.T) {
 			srv, store := testServer(t)
 			store.failPut = tt.failPut
+			store.failSuffix = tt.failSuffix
 
 			body, ct := multipartBody(t, tt.fields, tt.files)
 			req := httptest.NewRequest(http.MethodPost, "/", body)
@@ -205,7 +225,15 @@ func TestCreate(t *testing.T) {
 				t.Fatalf("body does not contain %q:\n%s", tt.wantBody, rec.Body.String())
 			}
 			if tt.wantStatus != http.StatusSeeOther {
-				if len(store.objects) != 0 {
+				for key := range store.objects {
+					if strings.HasSuffix(key, "meta.json") {
+						t.Fatalf("meta.json was stored despite failure: %s", key)
+					}
+				}
+				// Without a partial-failure suffix, nothing at all should
+				// have been stored. With one, some images may have made it
+				// through before the failing put; only meta.json matters.
+				if tt.failSuffix == "" && len(store.objects) != 0 {
 					t.Fatalf("stored %d objects on failure, want 0", len(store.objects))
 				}
 				return
@@ -248,17 +276,54 @@ func TestCreate(t *testing.T) {
 	}
 }
 
+// TestCreateReleasesRenderSemaphore runs a happy request, a failing request,
+// and another happy request in sequence and checks the render semaphore is
+// back to fully released afterward, proving the slot is freed on both
+// success and failure paths.
+func TestCreateReleasesRenderSemaphore(t *testing.T) {
+	srv, _ := testServer(t)
+	pic := encodePNG(t, 64, 48)
+	goodFiles := []upload{{"new-friend-pic", pic}, {"old-friend-1", pic}, {"old-friend-2", pic}}
+	badFiles := []upload{{"new-friend-pic", []byte("not an image")}, {"old-friend-1", pic}, {"old-friend-2", pic}}
+	names := map[string]string{"old-friend-name": "mudasir", "new-friend-name": "salman"}
+
+	for i, run := range []struct {
+		files      []upload
+		wantStatus int
+	}{
+		{goodFiles, http.StatusSeeOther},
+		{badFiles, http.StatusBadRequest},
+		{goodFiles, http.StatusSeeOther},
+	} {
+		body, ct := multipartBody(t, names, run.files)
+		req := httptest.NewRequest(http.MethodPost, "/", body)
+		req.Header.Set("Content-Type", ct)
+		rec := httptest.NewRecorder()
+
+		srv.Handler().ServeHTTP(rec, req)
+
+		if rec.Code != run.wantStatus {
+			t.Fatalf("run %d: status = %d, want %d; body: %s", i, rec.Code, run.wantStatus, rec.Body.String())
+		}
+	}
+
+	if n := len(srv.sem); n != 0 {
+		t.Fatalf("render semaphore holds %d slots after sequential requests, want 0", n)
+	}
+}
+
 func TestRead(t *testing.T) {
 	const id = "0192f0c1-8a2b-7c3d-9e4f-5a6b7c8d9e0f"
 	const unknown = "0192f0c1-8a2b-7c3d-9e4f-000000000000"
 
 	for _, tt := range []struct {
-		name         string
-		path         string
-		wantStatus   int
-		wantBody     []string
-		wantLocation string
-		wantType     string
+		name             string
+		path             string
+		wantStatus       int
+		wantBody         []string
+		wantLocation     string
+		wantType         string
+		wantCacheControl string
 	}{
 		{name: "form", path: "/", wantStatus: http.StatusOK, wantBody: []string{`name="old-friend-name"`, "FRIEND"}},
 		{
@@ -274,10 +339,11 @@ func TestRead(t *testing.T) {
 		{name: "unknown id", path: "/f/" + unknown, wantStatus: http.StatusNotFound},
 		{name: "bad id", path: "/f/not-a-uuid", wantStatus: http.StatusNotFound},
 		{
-			name:         "image redirect",
-			path:         "/f/" + id + "/image.jpg",
-			wantStatus:   http.StatusFound,
-			wantLocation: "https://tigris.example/friendships/" + id + "/result.jpg?X-Amz-Signature=fake",
+			name:             "image redirect",
+			path:             "/f/" + id + "/image.jpg",
+			wantStatus:       http.StatusFound,
+			wantLocation:     "https://tigris.example/friendships/" + id + "/result.jpg?X-Amz-Signature=fake",
+			wantCacheControl: "private, max-age=60",
 		},
 		{name: "image bad id", path: "/f/nope/image.jpg", wantStatus: http.StatusNotFound},
 		{name: "treasure", path: "/treasure.gif", wantStatus: http.StatusOK, wantType: "image/gif"},
@@ -307,6 +373,9 @@ func TestRead(t *testing.T) {
 			}
 			if tt.wantType != "" && rec.Header().Get("Content-Type") != tt.wantType {
 				t.Errorf("Content-Type = %q, want %q", rec.Header().Get("Content-Type"), tt.wantType)
+			}
+			if tt.wantCacheControl != "" && rec.Header().Get("Cache-Control") != tt.wantCacheControl {
+				t.Errorf("Cache-Control = %q, want %q", rec.Header().Get("Cache-Control"), tt.wantCacheControl)
 			}
 		})
 	}

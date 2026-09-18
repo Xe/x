@@ -14,10 +14,13 @@ import (
 	"log/slog"
 	"net/http"
 	"strings"
+	"sync"
 	"time"
+	"unicode"
 	"unicode/utf8"
 
 	"github.com/a-h/templ"
+	"github.com/disintegration/imaging"
 	"github.com/google/uuid"
 	"golang.org/x/sync/errgroup"
 )
@@ -27,6 +30,12 @@ const (
 	maxFileSize    = 10 << 20
 	maxImagePixels = 40_000_000
 	maxNameRunes   = 64
+
+	// maxConcurrentRenders bounds how many uploads can be decoded,
+	// rendered, and JPEG-encoded at once. Each of those steps holds
+	// decoded pixel buffers in memory, so this keeps worst-case memory
+	// use bounded regardless of how many requests arrive at once.
+	maxConcurrentRenders = 2
 )
 
 // User-facing upload errors. Their text is shown on the form.
@@ -46,16 +55,23 @@ type meta struct {
 
 // Server serves the friendship ended web app.
 type Server struct {
-	store    Store
-	renderer *renderer
-	baseURL  string
+	store         Store
+	renderer      *renderer
+	baseURL       string
+	presignExpiry time.Duration
+
+	// sem bounds concurrent render work (decode + render + JPEG encode).
+	// See maxConcurrentRenders.
+	sem chan struct{}
 }
 
-func newServer(store Store, rend *renderer, baseURL string) *Server {
+func newServer(store Store, rend *renderer, baseURL string, presignExpiry time.Duration) *Server {
 	return &Server{
-		store:    store,
-		renderer: rend,
-		baseURL:  strings.TrimSuffix(baseURL, "/"),
+		store:         store,
+		renderer:      rend,
+		baseURL:       strings.TrimSuffix(baseURL, "/"),
+		presignExpiry: presignExpiry,
+		sem:           make(chan struct{}, maxConcurrentRenders),
 	}
 }
 
@@ -127,6 +143,15 @@ func (s *Server) create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	select {
+	case s.sem <- struct{}{}:
+	case <-r.Context().Done():
+		slog.DebugContext(r.Context(), "client gave up waiting for a render slot")
+		return
+	}
+	releaseOnce := sync.OnceFunc(func() { <-s.sem })
+	defer releaseOnce()
+
 	uploads := map[string]*imageUpload{}
 	for _, field := range []struct{ name, label string }{
 		{"new-friend-pic", "New friend picture"},
@@ -153,6 +178,15 @@ func (s *Server) create(w http.ResponseWriter, r *http.Request) {
 	if err := jpeg.Encode(&result, img, &jpeg.Options{Quality: 90}); err != nil {
 		s.internalError(w, r, "can't encode jpeg", err)
 		return
+	}
+
+	// The render slot is only needed for decode + render + encode; drop
+	// it and the decoded images before the storage puts so memory use
+	// does not stay high for the rest of the request.
+	releaseOnce()
+	img = nil
+	for _, up := range uploads {
+		up.img = nil
 	}
 
 	id, err := uuid.NewV7()
@@ -200,7 +234,15 @@ func (s *Server) create(w http.ResponseWriter, r *http.Request) {
 
 func validName(name string) bool {
 	n := utf8.RuneCountInString(name)
-	return n > 0 && n <= maxNameRunes
+	if n == 0 || n > maxNameRunes {
+		return false
+	}
+	for _, r := range name {
+		if !unicode.IsPrint(r) {
+			return false
+		}
+	}
+	return true
 }
 
 type imageUpload struct {
@@ -250,7 +292,10 @@ func readUpload(r *http.Request, field string) (*imageUpload, error) {
 		return nil, errImageTooLarge
 	}
 
-	img, _, err := image.Decode(bytes.NewReader(data))
+	// imaging.Decode calls image.Decode internally (gif/jpeg/png are
+	// registered above and by the jpeg encoder import), then applies the
+	// EXIF orientation tag so rotated phone photos come out upright.
+	img, err := imaging.Decode(bytes.NewReader(data), imaging.AutoOrientation(true))
 	if err != nil {
 		return nil, errNotImage
 	}
@@ -305,6 +350,13 @@ func (s *Server) image(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Cache-Control", "private, max-age=300")
+	// max-age must never outlive the presigned URL, so cap it at half the
+	// presign expiry (rounded down to whole seconds); a client caching
+	// right up to expiry could otherwise reuse a URL that just died.
+	maxAge := min(300*time.Second, s.presignExpiry/2)
+	if maxAge < 0 {
+		maxAge = 0
+	}
+	w.Header().Set("Cache-Control", fmt.Sprintf("private, max-age=%d", int64(maxAge/time.Second)))
 	http.Redirect(w, r, u, http.StatusFound)
 }
