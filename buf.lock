@@ -4,3 +4,9 @@ deps:
   - name: buf.build/bufbuild/protovalidate
     commit: ec0af4932e5e42e291a427263db78154
     digest: b5:f01fb1231000c8e4eba05b915c5fc8721e1a743e8c76ef7994389c75b21ceed386ee1e3a900b442202ae336bec31021aecc9db62f2d0cbf3901cb3417f9662aa
+  - name: buf.build/gnostic/gnostic
+    commit: 087bc8072ce44e339f213209e4d57bf0
+    digest: b5:c4eebcd04bc2fdd5dd0b8d695eb419682a650b600cdb56ff2ed61208a24603e0eb1b8ae0d467925c69a24bde6d322f3c4112bd2b8efdd682d8c3128384cdac9a
+  - name: buf.build/googleapis/googleapis
+    commit: c17df5b2beca46928cc87d5656bd5343
+    digest: b5:648a01e0170d4512dea7d564016165decd1ed6e34bef79fe54753e51ad7e27545709ad9157d7551270147d551155c595a2fb0bf5bb33b1c83040ddbce915c604

@@ -45,12 +45,11 @@ type SigningKeyServiceClient interface {
 	// id and credential scope, plus the identity the key belongs to.
 	//
 	// Errors:
-	//
-	//	NOT_FOUND         - no such access key id
-	//	PERMISSION_DENIED - key or owning user is disabled, or the requested
-	//	                    (region, service, date) scope is outside what this
-	//	                    deployment issues keys for
-	//	INVALID_ARGUMENT  - malformed access_key_id/date/region/service
+	//   NOT_FOUND         - no such access key id
+	//   PERMISSION_DENIED - key or owning user is disabled, or the requested
+	//                       (region, service, date) scope is outside what this
+	//                       deployment issues keys for
+	//   INVALID_ARGUMENT  - malformed access_key_id/date/region/service
 	GetSigningKey(ctx context.Context, in *GetSigningKeyRequest, opts ...grpc.CallOption) (*GetSigningKeyResponse, error)
 	// GetPublicKey returns the SigV4A (ECDSA P-256) public verification key
 	// for an access key id, plus the identity it authenticates. Public keys
@@ -58,10 +57,9 @@ type SigningKeyServiceClient interface {
 	// mint them, unlike the symmetric derived keys from GetSigningKey.
 	//
 	// Errors:
-	//
-	//	NOT_FOUND         - no such access key id
-	//	PERMISSION_DENIED - key or owning user is disabled
-	//	INVALID_ARGUMENT  - missing access_key_id
+	//   NOT_FOUND         - no such access key id
+	//   PERMISSION_DENIED - key or owning user is disabled
+	//   INVALID_ARGUMENT  - missing access_key_id
 	GetPublicKey(ctx context.Context, in *GetPublicKeyRequest, opts ...grpc.CallOption) (*GetPublicKeyResponse, error)
 }
 
@@ -114,12 +112,11 @@ type SigningKeyServiceServer interface {
 	// id and credential scope, plus the identity the key belongs to.
 	//
 	// Errors:
-	//
-	//	NOT_FOUND         - no such access key id
-	//	PERMISSION_DENIED - key or owning user is disabled, or the requested
-	//	                    (region, service, date) scope is outside what this
-	//	                    deployment issues keys for
-	//	INVALID_ARGUMENT  - malformed access_key_id/date/region/service
+	//   NOT_FOUND         - no such access key id
+	//   PERMISSION_DENIED - key or owning user is disabled, or the requested
+	//                       (region, service, date) scope is outside what this
+	//                       deployment issues keys for
+	//   INVALID_ARGUMENT  - malformed access_key_id/date/region/service
 	GetSigningKey(context.Context, *GetSigningKeyRequest) (*GetSigningKeyResponse, error)
 	// GetPublicKey returns the SigV4A (ECDSA P-256) public verification key
 	// for an access key id, plus the identity it authenticates. Public keys
@@ -127,10 +124,9 @@ type SigningKeyServiceServer interface {
 	// mint them, unlike the symmetric derived keys from GetSigningKey.
 	//
 	// Errors:
-	//
-	//	NOT_FOUND         - no such access key id
-	//	PERMISSION_DENIED - key or owning user is disabled
-	//	INVALID_ARGUMENT  - missing access_key_id
+	//   NOT_FOUND         - no such access key id
+	//   PERMISSION_DENIED - key or owning user is disabled
+	//   INVALID_ARGUMENT  - missing access_key_id
 	GetPublicKey(context.Context, *GetPublicKeyRequest) (*GetPublicKeyResponse, error)
 	mustEmbedUnimplementedSigningKeyServiceServer()
 }
