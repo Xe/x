@@ -1,0 +1,40 @@
+{
+  "model": "laya:en",
+  "answers": {
+    "department": {
+      "type": "choice",
+      "choice": "billing",
+      "confidence": 0.7781,
+      "probabilities": {
+        "billing": 0.8521,
+        "technical": 0.0611,
+        "account": 0.0868
+      }
+    },
+    "urgency": {
+      "type": "score",
+      "score": 1.1982,
+      "confidence": 0.3418,
+      "legend": {
+        "0": "Can wait",
+        "1": "Needs attention this week",
+        "2": "Needs attention today"
+      },
+      "probabilities": { "0": 0.1203, "1": 0.5612, "2": 0.3185 }
+    },
+    "refund": { "type": "noul", "noul": 0.9127 }
+  },
+  "usage": { "input_tokens": 118, "output_tokens": 0 },
+  "routing": {
+    "router": "laya:latest",
+    "model": "laya:en",
+    "route": "english",
+    "reason": "English Latin text"
+  },
+  "state_truncated": false,
+  "done_reason": "decide",
+  "created_at": "2026-09-24T09:30:12.418Z",
+  "total_duration": 18734512,
+  "load_duration": 0,
+  "eval_duration": 16302117
+}

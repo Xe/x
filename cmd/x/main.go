@@ -10,6 +10,7 @@ import (
 	"within.website/x/cmd/x/cmd/importer/chatgpt"
 	"within.website/x/cmd/x/cmd/importer/deepseek"
 	"within.website/x/cmd/x/cmd/mi"
+	"within.website/x/cmd/x/cmd/xev"
 	"within.website/x/internal"
 )
 
@@ -29,6 +30,10 @@ func main() {
 	subcommands.Register(&mi.ListSwitches{}, "switch-tracker")
 	subcommands.Register(&mi.Switch{}, "switch-tracker")
 	subcommands.Register(&mi.WhoIsFront{}, "switch-tracker")
+
+	// Xev decision API
+	subcommands.Register(&xev.Pick{}, "xev")
+	subcommands.Register(&xev.Noul{}, "xev")
 
 	// // Events
 	// subcommands.Register(&miListEvents{}, "events")

@@ -1,0 +1,78 @@
+syntax = "proto3";
+
+package xeiaso.net.xev.v1;
+
+import "buf/validate/validate.proto";
+import "gnostic/openapi/v3/annotations.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/duration.proto";
+
+option (gnostic.openapi.v3.document) = {
+  info: {
+    title: "Xev Decision API"
+    version: "v1"
+    description: "Score decision options with a local language model."
+  }
+};
+
+service DecisionService {
+  rpc Pick(PickRequest) returns (PickResponse) {
+    option (google.api.http) = {
+      post: "/v1/xev/decision"
+      body: "*"
+    };
+    option (gnostic.openapi.v3.operation) = {
+      summary: "Score decision options"
+      operation_id: "pickDecision"
+      tags: "Decision"
+    };
+  }
+  rpc Noul(NoulRequest) returns (NoulResponse) {
+    option (google.api.http) = {
+      post: "/v1/xev/noul"
+      body: "*"
+    };
+    option (gnostic.openapi.v3.operation) = {
+      summary: "Score yes or no"
+      operation_id: "noulDecision"
+      tags: "Decision"
+    };
+  }
+}
+
+enum Model {
+  MODEL_UNSPECIFIED = 0;
+  MODEL_QWEN3_600M = 1;
+}
+
+message PickRequest {
+  string context = 1 [(buf.validate.field).string.min_len = 1];
+  string question = 2 [(buf.validate.field).string.pattern = "(?s).*\\S.*"];
+  repeated string options = 3 [
+    (buf.validate.field).repeated.min_items = 2,
+    (buf.validate.field).repeated.max_items = 26,
+    (buf.validate.field).repeated.unique = true,
+    (buf.validate.field).repeated.items.string.pattern = "(?s).*\\S.*"
+  ];
+  Model model = 4 [(buf.validate.field).enum.defined_only = true];
+}
+
+message NoulRequest {
+  string context = 1 [(buf.validate.field).string.min_len = 1];
+  string question = 2 [(buf.validate.field).string.pattern = "(?s).*\\S.*"];
+  Model model = 3 [(buf.validate.field).enum.defined_only = true];
+}
+
+message PickResponse {
+  google.protobuf.Duration execution_time = 1;
+  map<string, float> logits = 2;
+  map<string, float> log_probabilities = 3;
+  map<string, float> confidence = 4;
+}
+
+message NoulResponse {
+  google.protobuf.Duration execution_time = 1;
+  map<string, float> logits = 2;
+  map<string, float> log_probabilities = 3;
+  map<string, float> confidence = 4;
+}

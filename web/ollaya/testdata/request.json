@@ -1,0 +1,28 @@
+{
+  "model": "laya",
+  "state": "I was charged twice for my subscription this month. Please refund the second charge.",
+  "questions": {
+    "department": {
+      "type": "choice",
+      "instructions": "Which team should handle this ticket?",
+      "criteria": {
+        "billing": "Payments, invoices and refunds",
+        "technical": "Bugs, errors and outages",
+        "account": "Login, profile and settings"
+      }
+    },
+    "urgency": {
+      "type": "score",
+      "instructions": "How urgent is this ticket?",
+      "criteria": [
+        "Can wait",
+        "Needs attention this week",
+        "Needs attention today"
+      ]
+    },
+    "refund": {
+      "type": "noul",
+      "instructions": "The customer asks for money back."
+    }
+  }
+}
