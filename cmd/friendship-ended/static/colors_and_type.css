@@ -1,0 +1,321 @@
+/* Xe Iaso Design System — Colors & Type
+ * Rooted in Gruvbox (Pale, by Morhetz) with Schibsted Grotesk + Podkova.
+ * Source: github.com/Xe/site — lume/tailwind.config.js, lume/src/styles.css
+ */
+
+/* ---------- Fonts ---------- */
+@font-face {
+  font-family: "Schibsted Grotesk";
+  font-style: normal;
+  font-weight: 400 900;
+  font-display: swap;
+  src: url("fonts/SchibstedGrotesk-VariableFont_wght.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Schibsted Grotesk";
+  font-style: italic;
+  font-weight: 400 900;
+  font-display: swap;
+  src: url("fonts/SchibstedGrotesk-Italic-VariableFont_wght.woff2")
+    format("woff2");
+}
+@font-face {
+  font-family: "Podkova";
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url("fonts/Podkova-VariableFont_wght.woff2") format("woff2");
+}
+
+/* ---------- Color tokens (Gruvbox) ---------- */
+:root {
+  /* Surfaces — light (gruvbox light) */
+  --bg-hard: #f9f5d7;
+  --bg-soft: #f2e5bc;
+  --bg-0: #fbf1c7;
+  --bg-1: #ebdbb2;
+  --bg-2: #d5c4a1;
+  --bg-3: #bdae93;
+  --bg-4: #a89984;
+
+  /* Foreground — light */
+  --fg-0: #282828;
+  --fg-1: #3c3836;
+  --fg-2: #504945;
+  --fg-3: #665c54;
+  --fg-4: #7c6f64;
+
+  /* Accents — light (muted / "dark" variant of each hue) */
+  --red: #9d0006;
+  --red-bright: #cc241d;
+  --green: #79740e;
+  --green-bright: #98971a;
+  --yellow: #b57614;
+  --yellow-bright: #d79921;
+  --blue: #076678;
+  --blue-bright: #458588;
+  --purple: #8f3f71;
+  --purple-bright: #b16286;
+  --aqua: #427b58;
+  --aqua-bright: #689d6a;
+  --orange: #af3a03;
+  --orange-bright: #d65d0e;
+  --gray: #7c6f64;
+
+  /* Links — light */
+  --link: #b80050;
+  --link-hover-bg: #9e0045;
+  --link-hover: #fdf4c1;
+  --link-visited: #53493c;
+  --link-visited-hover-bg: #282828;
+  --link-visited-hover: #fff;
+
+  /* Semantic */
+  --surface: var(--bg-hard);
+  --surface-raised: var(--bg-soft);
+  --surface-sunken: var(--bg-1);
+  --text: var(--fg-1);
+  --text-muted: var(--fg-3);
+  --border: var(--bg-3);
+
+  /* Type */
+  --font-sans: "Schibsted Grotesk", "Iosevka Aile Iaso", system-ui, sans-serif;
+  --font-serif: "Podkova", "Iosevka Etoile Iaso", Georgia, serif;
+  --font-mono:
+    "Iosevka Curly Iaso", ui-monospace, "SF Mono", Consolas, monospace;
+
+  /* Scale */
+  --step--1: 0.875rem; /* 14 */
+  --step-0: 1rem; /* 16 */
+  --step-1: 1.125rem; /* 18 */
+  --step-2: 1.25rem; /* 20 h4 */
+  --step-3: 1.5rem; /* 24 h3 */
+  --step-4: 1.875rem; /* 30 h2 */
+  --step-5: 2.25rem; /* 36 h1 */
+  --step-6: 3rem; /* 48 display */
+
+  /* Radius / shadows / spacing */
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+
+  --shadow-sm: 0 1px 2px rgba(40, 40, 40, 0.08);
+  --shadow-md: 0 2px 6px rgba(40, 40, 40, 0.12);
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-hard: #1d2021;
+    --bg-soft: #32302f;
+    --bg-0: #282828;
+    --bg-1: #3c3836;
+    --bg-2: #504945;
+    --bg-3: #665c54;
+    --bg-4: #7c6f64;
+
+    --fg-0: #fbf1c7;
+    --fg-1: #ebdbb2;
+    --fg-2: #d5c4a1;
+    --fg-3: #bdae93;
+    --fg-4: #a89984;
+
+    --red: #fb4934;
+    --red-bright: #cc241d;
+    --green: #b8bb26;
+    --green-bright: #98971a;
+    --yellow: #fabd2f;
+    --yellow-bright: #d79921;
+    --blue: #83a598;
+    --blue-bright: #458588;
+    --purple: #d3869b;
+    --purple-bright: #b16286;
+    --aqua: #8ec07c;
+    --aqua-bright: #689d6a;
+    --orange: #fe8019;
+    --orange-bright: #d65d0e;
+    --gray: #a89984;
+
+    --link: #ffa8ce;
+    --link-hover-bg: #b3004d;
+    --link-hover: #fff;
+    --link-visited: #c1b7a9;
+    --link-visited-hover-bg: #282828;
+    --link-visited-hover: #fdf4c1;
+  }
+}
+
+/* ---------- Semantic type + primitives ---------- */
+html {
+  color-scheme: light dark;
+}
+body {
+  font-family: var(--font-sans);
+  color: var(--text);
+  background: var(--surface);
+  font-size: var(--step-0);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--fg-0);
+  margin: 0 0 0.5em;
+}
+h1 {
+  font-size: var(--step-5);
+}
+h2 {
+  font-size: var(--step-4);
+}
+h3 {
+  font-size: var(--step-3);
+}
+h4 {
+  font-size: var(--step-2);
+}
+h5 {
+  font-size: var(--step-1);
+}
+h6 {
+  font-size: var(--step-0);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+p {
+  margin: 0 0 1em;
+  text-wrap: pretty;
+}
+code,
+pre,
+kbd,
+samp {
+  font-family: var(--font-mono);
+  font-size: 0.95em;
+}
+:not(pre) > code {
+  background: var(--bg-1);
+  padding: 0.1em 0.3em;
+  border-radius: var(--radius-sm);
+}
+pre {
+  background: #1d2021;
+  color: #ebdbb2;
+  padding: 1em;
+  border-radius: var(--radius-md);
+  overflow: auto;
+}
+
+a {
+  color: var(--link);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+a:hover {
+  color: var(--link-hover);
+  background: var(--link-hover-bg);
+}
+a:visited {
+  color: var(--link-visited);
+}
+a:visited:hover {
+  color: var(--link-visited-hover);
+  background: var(--link-visited-hover-bg);
+}
+
+details {
+  padding: var(--space-4);
+  background: var(--bg-soft);
+  border-radius: var(--radius-md);
+}
+hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: var(--space-6) 0;
+}
+
+/* buttons */
+.xe-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: var(--radius-xl);
+  border: 0;
+  text-decoration: none;
+  box-shadow: var(--shadow-sm);
+  transition:
+    transform 0.15s ease,
+    background 0.15s ease,
+    box-shadow 0.15s ease;
+  cursor: pointer;
+}
+.xe-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+  text-decoration: none;
+}
+.xe-btn--primary {
+  background: var(--orange-bright);
+  color: #fff;
+}
+.xe-btn--primary:hover {
+  background: var(--orange);
+  color: #fff;
+}
+.xe-btn--secondary {
+  background: var(--fg-0);
+  color: var(--bg-hard);
+}
+.xe-btn--accent {
+  background: var(--purple-bright);
+  color: #fff;
+}
+.xe-btn--ghost {
+  background: transparent;
+  color: var(--fg-1);
+  border: 1px solid var(--border);
+  box-shadow: none;
+}
+
+/* card + tag primitives used throughout site */
+.xe-card {
+  background: var(--bg-2);
+  border: 1px solid var(--bg-4);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+}
+@media (prefers-color-scheme: dark) {
+  .xe-card {
+    background: var(--bg-2);
+    border-color: var(--bg-4);
+  }
+}
+.xe-tag {
+  display: inline-block;
+  background: var(--bg-1);
+  color: var(--fg-1);
+  padding: 6px 10px;
+  border-radius: var(--radius-lg);
+  font-size: var(--step--1);
+  margin: 4px;
+}
