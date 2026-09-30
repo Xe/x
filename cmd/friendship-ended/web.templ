@@ -1,0 +1,102 @@
+package main
+
+import "strings"
+
+type formState struct {
+	OldName string
+	NewName string
+	Error   string
+}
+
+templ base(title string, head templ.Component) {
+	<!DOCTYPE html>
+	<html lang="en">
+		<head>
+			<meta charset="utf-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1"/>
+			<title>{ title }</title>
+			<meta name="description" content="Your friendship has ended and I am so sorry."/>
+			<link rel="stylesheet" href="/static/colors_and_type.css"/>
+			<link rel="stylesheet" href="/static/site.css"/>
+			if head != nil {
+				@head
+			}
+		</head>
+		<body>
+			<main class="page">
+				{ children... }
+			</main>
+			<footer class="page-footer">
+				<p>
+					A port of <a href="https://github.com/lmaucoin/friendship-ended">friendship-ended</a> by Leigh Aucoin.
+					The overlay and treasure images are GPL-2.0.
+				</p>
+			</footer>
+		</body>
+	</html>
+}
+
+templ indexPage(f formState) {
+	@base("Friendship Ended Generator", nil) {
+		<h1>Friendship Ended Generator</h1>
+		<p class="lead">
+			Dedicated to the <a href="http://internet.gawker.com/facebook-user-asif-ends-friendship-with-mudasir-welc-1731160013">new friendship of ASIF and SALMAN</a>.
+		</p>
+		<p><em>All fields are required. Just like in <strong>friendship</strong>...</em></p>
+		if f.Error != "" {
+			<div class="adm adm--warn" role="alert">
+				<div class="bar"></div>
+				<div class="body">
+					<h4>That didn't work</h4>
+					<p>{ f.Error }</p>
+				</div>
+			</div>
+		}
+		<form class="xe-card friend-form" method="post" action="/" enctype="multipart/form-data">
+			<label for="old-friend-name">BYE</label>
+			<input type="text" id="old-friend-name" name="old-friend-name" placeholder="Old friend's name" maxlength="64" value={ f.OldName } required/>
+			<label for="new-friend-name">HI</label>
+			<input type="text" id="new-friend-name" name="new-friend-name" placeholder="New friend's name" maxlength="64" value={ f.NewName } required/>
+			<label for="new-friend-pic">A picture of your new friend</label>
+			<input type="file" id="new-friend-pic" name="new-friend-pic" accept="image/gif,image/jpeg,image/png" required/>
+			<p class="help">You can be in it but you don't have to be.</p>
+			<label for="old-friend-1">A picture of your old friend</label>
+			<input type="file" id="old-friend-1" name="old-friend-1" accept="image/gif,image/jpeg,image/png" required/>
+			<p class="help">Hopefully, an unflattering one.</p>
+			<label for="old-friend-2">Another picture of your old friend</label>
+			<input type="file" id="old-friend-2" name="old-friend-2" accept="image/gif,image/jpeg,image/png" required/>
+			<p class="help">They are no longer your friend.</p>
+			<button type="submit" class="xe-btn xe-btn--primary">FRIEND</button>
+		</form>
+	}
+}
+
+templ resultHead(baseURL, id string, m meta) {
+	<meta property="og:type" content="website"/>
+	<meta property="og:title" content={ "Friendship ended with " + strings.ToUpper(m.OldName) }/>
+	<meta property="og:description" content={ "Now " + strings.ToUpper(m.NewName) + " is my best friend." }/>
+	<meta property="og:url" content={ baseURL + "/f/" + id }/>
+	<meta property="og:image" content={ baseURL + "/f/" + id + "/image.jpg" }/>
+	<meta property="og:image:width" content="800"/>
+	<meta property="og:image:height" content="600"/>
+	<meta name="twitter:card" content="summary_large_image"/>
+}
+
+templ resultPage(baseURL, id string, m meta) {
+	@base("Friendship Ended Generator", resultHead(baseURL, id, m)) {
+		<h1>Bless your new friendship with <em>{ strings.ToUpper(m.NewName) }</em></h1>
+		<figure class="xe-card result">
+			<img src={ "/f/" + id + "/image.jpg" } width="800" height="600" alt={ "Friendship ended with " + strings.ToUpper(m.OldName) + ". Now " + strings.ToUpper(m.NewName) + " is my best friend." }/>
+		</figure>
+		<img class="treasure" src="/treasure.gif" width="350" height="350" alt="An animated treasure chest full of gold coins"/>
+		<p><em><a href="/">Do you have another new friend...........</a></em></p>
+	}
+}
+
+templ errorPage(title, message string) {
+	@base(title, nil) {
+		<h1>{ title }</h1>
+		<p>{ message }</p>
+		<p><a href="/">Go back and make a new friend</a></p>
+	}
+}
