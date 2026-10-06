@@ -1,9 +1,15 @@
 package systemone
 
 import (
+	"bytes"
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
+	"image"
+	"image/color"
+	"image/draw"
+	"image/png"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -17,6 +23,21 @@ var (
 	_ valid.Interface = (*Request)(nil)
 	_ valid.Interface = Question{}
 )
+
+func solidImage(width, height int, fill color.Color) image.Image {
+	img := image.NewRGBA(image.Rect(0, 0, width, height))
+	draw.Draw(img, img.Bounds(), image.NewUniform(fill), image.Point{}, draw.Src)
+	return img
+}
+
+func pngBase64(t *testing.T, img image.Image) string {
+	t.Helper()
+	var buf bytes.Buffer
+	if err := png.Encode(&buf, img); err != nil {
+		t.Fatal(err)
+	}
+	return base64.StdEncoding.EncodeToString(buf.Bytes())
+}
 
 func TestClientEvaluate(t *testing.T) {
 	t.Parallel()
@@ -35,32 +56,60 @@ func TestClientEvaluate(t *testing.T) {
 		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 			t.Errorf("decode request: %v", err)
 		}
-		if got := body["model"]; got != "clef" {
-			t.Errorf("model = %v, want clef", got)
+		if got := body["model"]; got != "clef-flash" {
+			t.Errorf("model = %v, want clef-flash", got)
 		}
 		state, ok := body["state"].(map[string]any)
 		if !ok || state["message"] != "Checkout failed" {
 			t.Errorf("state = %v, want structured message", body["state"])
 		}
 		images, ok := body["images"].([]any)
-		if !ok || len(images) != 2 || images[0] != "aGVsbG8=" || images[1] != "d29ybGQ=" {
-			t.Errorf("images = %v, want two base64 images in order", body["images"])
+		if !ok || len(images) != 3 {
+			t.Fatalf("images = %v, want three encoded images", body["images"])
+		}
+		for i, want := range []struct {
+			width, height int
+			red           bool
+		}{{1280, 720, true}, {640, 480, false}, {360, 720, true}} {
+			encoded, ok := images[i].(string)
+			if !ok {
+				t.Fatalf("image %d = %T, want base64 string", i, images[i])
+			}
+			data, err := base64.StdEncoding.DecodeString(encoded)
+			if err != nil {
+				t.Fatalf("decode image %d base64: %v", i, err)
+			}
+			img, format, err := image.Decode(bytes.NewReader(data))
+			if err != nil {
+				t.Fatalf("decode image %d: %v", i, err)
+			}
+			if format != "jpeg" || img.Bounds().Dx() != want.width || img.Bounds().Dy() != want.height {
+				t.Errorf("image %d: format %q, bounds %v; want jpeg %dx%d", i, format, img.Bounds(), want.width, want.height)
+			}
+			red, _, blue, _ := img.At(img.Bounds().Min.X, img.Bounds().Min.Y).RGBA()
+			if (red > blue) != want.red {
+				t.Errorf("image %d color order incorrect: red %d, blue %d", i, red, blue)
+			}
 		}
 		questions, ok := body["questions"].(map[string]any)
 		if !ok || len(questions) != 3 {
 			t.Errorf("questions = %v, want three", body["questions"])
 		}
 		w.Header().Set("Content-Type", "application/json")
-		_, _ = io.WriteString(w, `{"model":"clef","answers":{"urgent":{"type":"noul","noul":0},"team":{"type":"choice","choice":"technical","probabilities":{"technical":1},"confidence":0},"severity":{"type":"score","score":0,"legend":{"0":"No impact","1":"Critical"},"probabilities":{"0":1,"1":0},"confidence":0}},"usage":{"input_tokens":346,"output_tokens":0}}`)
+		_, _ = io.WriteString(w, `{"model":"clef-flash","answers":{"urgent":{"type":"noul","noul":0},"team":{"type":"choice","choice":"technical","probabilities":{"technical":1},"confidence":0},"severity":{"type":"score","score":0,"legend":{"0":"No impact","1":"Critical"},"probabilities":{"0":1,"1":0},"confidence":0}},"usage":{"input_tokens":346,"output_tokens":0}}`)
 	}))
 	defer server.Close()
 
 	client := NewClient(server.URL + "/")
 	client.APIKey = "secret"
 	input := &Request{
-		Model:  "clef",
-		State:  map[string]any{"message": "Checkout failed"},
-		Images: []string{"aGVsbG8=", "d29ybGQ="},
+		Model: "clef-flash",
+		State: map[string]any{"message": "Checkout failed"},
+		Images: []image.Image{
+			solidImage(1600, 900, color.RGBA{R: 255, A: 255}),
+			solidImage(640, 480, color.RGBA{B: 255, A: 255}),
+			solidImage(600, 1200, color.RGBA{R: 255, A: 255}),
+		},
 		Questions: map[string]Question{
 			"urgent":   {Type: Noul, Instructions: "Is it urgent?", Criteria: map[string]any{"true": "Needs action now", "false": nil}},
 			"team":     {Type: Choice, Instructions: map[string]any{"question": "Which team?"}, Criteria: map[string]any{"billing": nil, "technical": "Outages"}},
@@ -110,6 +159,7 @@ func TestRequestValid(t *testing.T) {
 		{name: "score too short", change: func(r *Request) { r.Questions["q"] = Question{Type: Score, Criteria: []string{"one"}} }, wantErr: "2 to 10 levels"},
 		{name: "score too long", change: func(r *Request) { r.Questions["q"] = Question{Type: Score, Criteria: make([]string, 11)} }, wantErr: "2 to 10 levels"},
 		{name: "invalid instructions", change: func(r *Request) { r.Questions["q"] = Question{Type: Noul, Instructions: 3} }, wantErr: "instructions"},
+		{name: "nil image", change: func(r *Request) { r.Images = []image.Image{nil} }, wantErr: "image 0: is nil"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -129,19 +179,25 @@ func TestRequestValid(t *testing.T) {
 
 func TestHandler(t *testing.T) {
 	t.Parallel()
+	first := pngBase64(t, solidImage(8, 4, color.RGBA{R: 255, A: 255}))
+	second := pngBase64(t, solidImage(4, 8, color.RGBA{B: 255, A: 255}))
 	called := false
 	handler := NewHandler(EvaluatorFunc(func(_ context.Context, input *Request) (*Response, error) {
 		called = true
 		if input.Model != "clef" || input.Questions["urgent"].Type != Noul {
 			t.Errorf("request = %+v, want clef with urgent noul", input)
 		}
-		if len(input.Images) != 2 || input.Images[0] != "aGVsbG8=" || input.Images[1] != "d29ybGQ=" {
-			t.Errorf("images = %v, want two base64 images in order", input.Images)
+		if len(input.Images) != 2 || input.Images[0].Bounds().Size() != image.Pt(8, 4) || input.Images[1].Bounds().Size() != image.Pt(4, 8) {
+			t.Errorf("images = %v, want two decoded images in order", input.Images)
 		}
 		zero := 0.0
 		return &Response{Model: "clef", Answers: map[string]Answer{"urgent": {Type: Noul, Noul: &zero}}}, nil
 	}))
-	req := httptest.NewRequest(http.MethodPost, "/v1/systemone", strings.NewReader(`{"model":"clef","state":"Checkout failed","images":["aGVsbG8=","d29ybGQ="],"questions":{"urgent":{"type":"noul","instructions":"Urgent?"}}}`))
+	body, err := json.Marshal(wireRequest{Model: "clef", State: "Checkout failed", Images: []string{first, second}, Questions: map[string]Question{"urgent": {Type: Noul, Instructions: "Urgent?"}}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	req := httptest.NewRequest(http.MethodPost, "/v1/systemone", bytes.NewReader(body))
 	w := httptest.NewRecorder()
 	handler.ServeHTTP(w, req)
 	if w.Code != http.StatusOK || !called {
@@ -169,6 +225,7 @@ func TestHandlerErrors(t *testing.T) {
 		{name: "invalid JSON", method: http.MethodPost, body: `{`, wantStatus: http.StatusUnprocessableEntity},
 		{name: "multiple JSON objects", method: http.MethodPost, body: `{} {}`, wantStatus: http.StatusUnprocessableEntity},
 		{name: "invalid question", method: http.MethodPost, body: `{"model":"clef","state":"text","questions":{"q":{"type":"score","criteria":["one"]}}}`, wantStatus: http.StatusUnprocessableEntity},
+		{name: "invalid image", method: http.MethodPost, body: `{"model":"clef","state":"text","images":["not base64"],"questions":{"q":{"type":"noul"}}}`, wantStatus: http.StatusUnprocessableEntity},
 		{name: "evaluator failure", method: http.MethodPost, body: `{"model":"clef","state":"text","questions":{"q":{"type":"noul"}}}`, evaluator: EvaluatorFunc(func(context.Context, *Request) (*Response, error) { return nil, errors.New("backend failed") }), wantStatus: http.StatusBadGateway},
 	}
 	for _, tt := range tests {

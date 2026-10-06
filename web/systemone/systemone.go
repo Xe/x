@@ -4,14 +4,26 @@ package systemone
 import (
 	"bytes"
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"image"
+	"image/color"
+	"image/draw"
 	"io"
 	"net/http"
+	"reflect"
 	"strings"
 
+	"github.com/disintegration/imaging"
+	_ "golang.org/x/image/webp" // Register WebP for Ollama image requests.
 	"within.website/x/web"
+)
+
+const (
+	maxImageWidth  = 1280
+	maxImageHeight = 720
 )
 
 // QuestionType identifies one of the three System One primitives.
@@ -34,12 +46,78 @@ type Question struct {
 
 // Request evaluates one state against one or more named questions. State may
 // be a string, JSON object, or JSON array. Images is an Ollama extension:
-// base64-encoded images are shared by all questions in their listed order.
+// images are resized to fit within 1280x720 pixels and sent as base64 JPEGs
+// in their listed order, shared by all questions.
 type Request struct {
+	Model     string              `json:"model"`
+	State     any                 `json:"state"`
+	Images    []image.Image       `json:"-"`
+	Questions map[string]Question `json:"questions"`
+}
+
+type wireRequest struct {
 	Model     string              `json:"model"`
 	State     any                 `json:"state"`
 	Images    []string            `json:"images,omitempty"`
 	Questions map[string]Question `json:"questions"`
+}
+
+// MarshalJSON converts images to base64 JPEGs for the Ollama wire format.
+func (r Request) MarshalJSON() ([]byte, error) {
+	wire := wireRequest{Model: r.Model, State: r.State, Questions: r.Questions}
+	for i, img := range r.Images {
+		if err := validImage(img); err != nil {
+			return nil, fmt.Errorf("systemone: image %d: %w", i, err)
+		}
+		if img.Bounds().Dx() > maxImageWidth || img.Bounds().Dy() > maxImageHeight {
+			img = imaging.Fit(img, maxImageWidth, maxImageHeight, imaging.Lanczos)
+		}
+		bounds := img.Bounds()
+		canvas := imaging.New(bounds.Dx(), bounds.Dy(), color.NRGBA{R: 255, G: 255, B: 255, A: 255})
+		draw.Draw(canvas, canvas.Bounds(), img, bounds.Min, draw.Over)
+		var encoded bytes.Buffer
+		if err := imaging.Encode(&encoded, canvas, imaging.JPEG); err != nil {
+			return nil, fmt.Errorf("systemone: encode image %d: %w", i, err)
+		}
+		wire.Images = append(wire.Images, base64.StdEncoding.EncodeToString(encoded.Bytes()))
+	}
+	return json.Marshal(wire)
+}
+
+// UnmarshalJSON decodes Ollama's base64 images for use by an evaluator.
+func (r *Request) UnmarshalJSON(data []byte) error {
+	var wire wireRequest
+	if err := json.Unmarshal(data, &wire); err != nil {
+		return err
+	}
+	images := make([]image.Image, 0, len(wire.Images))
+	for i, encoded := range wire.Images {
+		data, err := base64.StdEncoding.DecodeString(encoded)
+		if err != nil {
+			return fmt.Errorf("systemone: decode image %d base64: %w", i, err)
+		}
+		img, err := imaging.Decode(bytes.NewReader(data))
+		if err != nil {
+			return fmt.Errorf("systemone: decode image %d: %w", i, err)
+		}
+		images = append(images, img)
+	}
+	*r = Request{Model: wire.Model, State: wire.State, Images: images, Questions: wire.Questions}
+	return nil
+}
+
+func validImage(img image.Image) error {
+	if img == nil {
+		return errors.New("is nil")
+	}
+	value := reflect.ValueOf(img)
+	if value.Kind() == reflect.Pointer && value.IsNil() {
+		return errors.New("is nil")
+	}
+	if bounds := img.Bounds(); bounds.Dx() <= 0 || bounds.Dy() <= 0 {
+		return errors.New("has empty bounds")
+	}
+	return nil
 }
 
 // Answer holds the fields for one of the three response types. The pointer
@@ -146,6 +224,11 @@ func (r *Request) Valid() error {
 	}
 	if len(r.Questions) == 0 {
 		return errors.New("systemone: at least one question is required")
+	}
+	for i, img := range r.Images {
+		if err := validImage(img); err != nil {
+			return fmt.Errorf("systemone: image %d: %w", i, err)
+		}
 	}
 	for name, question := range r.Questions {
 		if name == "" {
