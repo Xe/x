@@ -9,6 +9,13 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+
+	"within.website/x/valid"
+)
+
+var (
+	_ valid.Interface = (*Request)(nil)
+	_ valid.Interface = Question{}
 )
 
 func TestClientEvaluate(t *testing.T) {
@@ -79,7 +86,7 @@ func TestClientEvaluate(t *testing.T) {
 	}
 }
 
-func TestRequestValidate(t *testing.T) {
+func TestRequestValid(t *testing.T) {
 	t.Parallel()
 	base := func() Request {
 		return Request{Model: "clef", State: "text", Questions: map[string]Question{"q": {Type: Noul, Instructions: "True?"}}}
@@ -104,12 +111,12 @@ func TestRequestValidate(t *testing.T) {
 			t.Parallel()
 			input := base()
 			tt.change(&input)
-			err := input.Validate()
+			err := input.Valid()
 			if tt.wantErr == "" && err != nil {
-				t.Errorf("Validate() error = %v, want nil", err)
+				t.Errorf("Valid() error = %v, want nil", err)
 			}
 			if tt.wantErr != "" && (err == nil || !strings.Contains(err.Error(), tt.wantErr)) {
-				t.Errorf("Validate() error = %v, want %q", err, tt.wantErr)
+				t.Errorf("Valid() error = %v, want %q", err, tt.wantErr)
 			}
 		})
 	}

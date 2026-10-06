@@ -85,7 +85,7 @@ func (c *Client) Evaluate(ctx context.Context, input *Request) (*Response, error
 	if input == nil {
 		return nil, errors.New("systemone: nil request")
 	}
-	if err := input.Validate(); err != nil {
+	if err := input.Valid(); err != nil {
 		return nil, err
 	}
 	if c == nil || c.BaseURL == "" {
@@ -126,9 +126,9 @@ func (c *Client) Evaluate(ctx context.Context, input *Request) (*Response, error
 	return &result, nil
 }
 
-// Validate checks the request fields and question criteria before a call or
+// Valid checks the request fields and question criteria before a call or
 // before invoking a handler's evaluator.
-func (r *Request) Validate() error {
+func (r *Request) Valid() error {
 	if r == nil {
 		return errors.New("systemone: nil request")
 	}
@@ -149,14 +149,15 @@ func (r *Request) Validate() error {
 		if name == "" {
 			return errors.New("systemone: question name is empty")
 		}
-		if err := question.validate(); err != nil {
+		if err := question.Valid(); err != nil {
 			return fmt.Errorf("systemone: question %q: %w", name, err)
 		}
 	}
 	return nil
 }
 
-func (q Question) validate() error {
+// Valid checks that the question type, instructions, and criteria are well-formed.
+func (q Question) Valid() error {
 	if q.Instructions != nil {
 		if err := validateEntry(q.Instructions, false); err != nil {
 			return fmt.Errorf("instructions: %w", err)
@@ -271,7 +272,7 @@ func NewHandler(evaluator Evaluator) http.Handler {
 			writeError(w, http.StatusUnprocessableEntity, "request must contain one JSON object")
 			return
 		}
-		if err := input.Validate(); err != nil {
+		if err := input.Valid(); err != nil {
 			writeError(w, http.StatusUnprocessableEntity, err.Error())
 			return
 		}
