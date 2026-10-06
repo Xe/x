@@ -33,10 +33,12 @@ type Question struct {
 }
 
 // Request evaluates one state against one or more named questions. State may
-// be a string, JSON object, or JSON array.
+// be a string, JSON object, or JSON array. Images is an Ollama extension:
+// base64-encoded images are shared by all questions in their listed order.
 type Request struct {
 	Model     string              `json:"model"`
 	State     any                 `json:"state"`
+	Images    []string            `json:"images,omitempty"`
 	Questions map[string]Question `json:"questions"`
 }
 

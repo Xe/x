@@ -42,6 +42,10 @@ func TestClientEvaluate(t *testing.T) {
 		if !ok || state["message"] != "Checkout failed" {
 			t.Errorf("state = %v, want structured message", body["state"])
 		}
+		images, ok := body["images"].([]any)
+		if !ok || len(images) != 2 || images[0] != "aGVsbG8=" || images[1] != "d29ybGQ=" {
+			t.Errorf("images = %v, want two base64 images in order", body["images"])
+		}
 		questions, ok := body["questions"].(map[string]any)
 		if !ok || len(questions) != 3 {
 			t.Errorf("questions = %v, want three", body["questions"])
@@ -54,8 +58,9 @@ func TestClientEvaluate(t *testing.T) {
 	client := NewClient(server.URL + "/")
 	client.APIKey = "secret"
 	input := &Request{
-		Model: "clef",
-		State: map[string]any{"message": "Checkout failed"},
+		Model:  "clef",
+		State:  map[string]any{"message": "Checkout failed"},
+		Images: []string{"aGVsbG8=", "d29ybGQ="},
 		Questions: map[string]Question{
 			"urgent":   {Type: Noul, Instructions: "Is it urgent?", Criteria: map[string]any{"true": "Needs action now", "false": nil}},
 			"team":     {Type: Choice, Instructions: map[string]any{"question": "Which team?"}, Criteria: map[string]any{"billing": nil, "technical": "Outages"}},
@@ -130,10 +135,13 @@ func TestHandler(t *testing.T) {
 		if input.Model != "clef" || input.Questions["urgent"].Type != Noul {
 			t.Errorf("request = %+v, want clef with urgent noul", input)
 		}
+		if len(input.Images) != 2 || input.Images[0] != "aGVsbG8=" || input.Images[1] != "d29ybGQ=" {
+			t.Errorf("images = %v, want two base64 images in order", input.Images)
+		}
 		zero := 0.0
 		return &Response{Model: "clef", Answers: map[string]Answer{"urgent": {Type: Noul, Noul: &zero}}}, nil
 	}))
-	req := httptest.NewRequest(http.MethodPost, "/v1/systemone", strings.NewReader(`{"model":"clef","state":"Checkout failed","questions":{"urgent":{"type":"noul","instructions":"Urgent?"}}}`))
+	req := httptest.NewRequest(http.MethodPost, "/v1/systemone", strings.NewReader(`{"model":"clef","state":"Checkout failed","images":["aGVsbG8=","d29ybGQ="],"questions":{"urgent":{"type":"noul","instructions":"Urgent?"}}}`))
 	w := httptest.NewRecorder()
 	handler.ServeHTTP(w, req)
 	if w.Code != http.StatusOK || !called {

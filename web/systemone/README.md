@@ -4,6 +4,8 @@ Go request and response types, a client, and an HTTP handler for the [System One
 
 The wire request has `model`, `state`, and named `questions`. State and instructions can be text or structured JSON. Noul questions can describe the `true` and `false` outcomes. Choice criteria is a map of up to 255 options. Score criteria is an ordered slice of 2 to 10 levels. Each answer is returned under its question name.
 
+Ollama also accepts an optional `images` array for vision-capable Clef models. Supply base64-encoded image data without a URL or data URL prefix; images are shared by all questions in order. For example, set `Images: []string{base64.StdEncoding.EncodeToString(imageBytes)}` on the request below.
+
 ```go
 client := systemone.NewClient("http://kadonomy.local:11434")
 // Set client.APIKey when calling the hosted TypeSafe API.
