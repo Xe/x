@@ -5,6 +5,7 @@
 - Format with `go fmt` / `goimports`
 - Tabs for indentation
 - `camelCase` for unexported, `PascalCase` for exported identifiers
+- Name logger variables and parameters `lg`.
 - Follow standard library style
 - Prefer table-driven tests using the `testing` package
 - Test files (`*_test.go`) live alongside source
