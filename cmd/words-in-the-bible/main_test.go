@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"io/fs"
 	"os"
 	"reflect"
 	"strings"
@@ -47,26 +48,74 @@ func TestScanWords(t *testing.T) {
 
 func TestCountWords(t *testing.T) {
 	t.Parallel()
-	bibleWords := loadBibleWords()
-	for _, tt := range []struct {
-		name         string
-		input        string
-		found, total int
-	}{
-		{name: "empty"},
-		{name: "partial", input: "GOD\tlove\u2003peace qzxvnonword", found: 3, total: 4},
-		{name: "full", input: "God,God!", found: 2, total: 2},
-		{name: "no matches", input: "qzxvnonword", total: 1},
-	} {
-		t.Run(tt.name, func(t *testing.T) {
-			found, total, err := countWords(strings.NewReader(tt.input), bibleWords)
+	for _, text := range []string{"bible", "hpmor", "quran"} {
+		t.Run(text, func(t *testing.T) {
+			t.Parallel()
+			words, err := loadWords(text)
 			if err != nil {
 				t.Fatal(err)
 			}
-			if found != tt.found || total != tt.total {
-				t.Fatalf("got %d/%d, want %d/%d", found, total, tt.found, tt.total)
+			for _, tt := range []struct {
+				name         string
+				input        string
+				found, total int
+			}{
+				{name: "empty"},
+				{name: "partial", input: "GOD\tlove\u2003peace qzxvnonword", found: 3, total: 4},
+				{name: "full", input: "God,God!", found: 2, total: 2},
+				{name: "no matches", input: "qzxvnonword", total: 1},
+			} {
+				t.Run(tt.name, func(t *testing.T) {
+					found, total, err := countWords(strings.NewReader(tt.input), words)
+					if err != nil {
+						t.Fatal(err)
+					}
+					if found != tt.found || total != tt.total {
+						t.Fatalf("got %d/%d, want %d/%d", found, total, tt.found, tt.total)
+					}
+				})
 			}
 		})
+	}
+}
+
+func TestSelectedText(t *testing.T) {
+	t.Parallel()
+	for _, tt := range []struct {
+		text, input string
+		found       int
+	}{
+		{text: "bible", input: "Harry", found: 0},
+		{text: "bible", input: "Allah", found: 0},
+		{text: "hpmor", input: "Harry", found: 1},
+		{text: "hpmor", input: "Allah", found: 0},
+		{text: "quran", input: "Harry", found: 0},
+		{text: "quran", input: "Allah", found: 1},
+	} {
+		t.Run(tt.text+"/"+tt.input, func(t *testing.T) {
+			words, err := loadWords(tt.text)
+			if err != nil {
+				t.Fatal(err)
+			}
+			found, total, err := countWords(strings.NewReader(tt.input), words)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if found != tt.found || total != 1 {
+				t.Fatalf("got %d/%d, want %d/1", found, total, tt.found)
+			}
+		})
+	}
+}
+
+func TestLoadWordsUnknownText(t *testing.T) {
+	t.Parallel()
+	words, err := loadWords("unknown")
+	if !errors.Is(err, fs.ErrNotExist) {
+		t.Fatalf("got %v, want file-not-found error", err)
+	}
+	if words != nil {
+		t.Fatal("failed load returned a vocabulary")
 	}
 }
 
@@ -83,18 +132,33 @@ func TestCountWordsReadError(t *testing.T) {
 	}
 }
 
-func TestBibleVocabulary(t *testing.T) {
+func TestTextVocabularies(t *testing.T) {
 	t.Parallel()
-	data, err := os.ReadFile("data/bible/kjv.txt")
-	if err != nil {
-		t.Fatal(err)
-	}
-	want := map[string]struct{}{}
-	for _, word := range strings.FieldsFunc(string(data), isWordSeparator) {
-		want[strings.ToLower(word)] = struct{}{}
-	}
-	if got := loadBibleWords(); !reflect.DeepEqual(got, want) {
-		t.Fatal("embedded vocabulary differs from source; run go generate")
+	for _, tt := range []struct {
+		text, source string
+	}{
+		{text: "bible", source: "data/bible/kjv.txt"},
+		{text: "hpmor", source: "data/hpmor/hpmor.txt"},
+		{text: "quran", source: "data/quran/quran.txt"},
+	} {
+		t.Run(tt.text, func(t *testing.T) {
+			t.Parallel()
+			data, err := os.ReadFile(tt.source)
+			if err != nil {
+				t.Fatal(err)
+			}
+			want := map[string]struct{}{}
+			for _, word := range strings.FieldsFunc(string(data), isWordSeparator) {
+				want[strings.ToLower(word)] = struct{}{}
+			}
+			got, err := loadWords(tt.text)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if !reflect.DeepEqual(got, want) {
+				t.Fatal("embedded vocabulary differs from source; run go generate")
+			}
+		})
 	}
 }
 

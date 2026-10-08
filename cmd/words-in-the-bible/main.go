@@ -1,7 +1,7 @@
 package main
 
 import (
-	_ "embed"
+	"embed"
 	"flag"
 	"fmt"
 	"io"
@@ -15,18 +15,26 @@ import (
 //go:generate go run generate.go words.go
 
 var (
-	dataDir = flag.String("data-dir", "./var", "data directory for cached views of words in the bible")
+	dataDir  = flag.String("data-dir", "./var", "data directory for cached views of words in the bible")
+	holyText = flag.String("holy-text", "bible", "which holy text to use (bible, hpmor, quran)")
 
-	//go:embed bible_words.txt
-	bibleVocabulary string
+	//go:embed data/words/*.txt
+	holyTexts embed.FS
 )
 
-func loadBibleWords() map[string]struct{} {
-	words := make(map[string]struct{}, strings.Count(bibleVocabulary, "\n"))
-	for word := range strings.SplitSeq(strings.TrimSuffix(bibleVocabulary, "\n"), "\n") {
+func loadWords(fname string) (map[string]struct{}, error) {
+	fname = fmt.Sprintf("data/words/%s.txt", fname)
+	data, err := holyTexts.ReadFile(fname)
+	if err != nil {
+		return nil, fmt.Errorf("read vocabulary %q: %w", fname, err)
+	}
+
+	vocabulary := string(data)
+	words := make(map[string]struct{}, strings.Count(vocabulary, "\n"))
+	for word := range strings.SplitSeq(strings.TrimSuffix(vocabulary, "\n"), "\n") {
 		words[word] = struct{}{}
 	}
-	return words
+	return words, nil
 }
 
 func countWords(input io.Reader, bibleWords map[string]struct{}) (found, total int, err error) {
@@ -43,7 +51,13 @@ func countWords(input io.Reader, bibleWords map[string]struct{}) (found, total i
 func main() {
 	internal.HandleStartup()
 
-	foundWords, totalWords, err := countWords(os.Stdin, loadBibleWords())
+	words, err := loadWords(*holyText)
+	if err != nil {
+		slog.Error("failed to read words", "err", err, "holy-text", *holyText)
+		os.Exit(1)
+	}
+
+	foundWords, totalWords, err := countWords(os.Stdin, words)
 	if err != nil {
 		slog.Error("failed to read input", "err", err)
 		os.Exit(1)
@@ -53,5 +67,5 @@ func main() {
 	if totalWords > 0 {
 		percentage = float64(foundWords) / float64(totalWords) * 100
 	}
-	fmt.Printf("%d of %d of those words are in the bible (%.2f%%)\n", foundWords, totalWords, percentage)
+	fmt.Printf("%d of %d of those words are in the %s (%.2f%%)\n", foundWords, totalWords, *holyText, percentage)
 }

@@ -13,8 +13,8 @@ import (
 	"within.website/x/internal"
 )
 
-func generateVocabulary() error {
-	input, err := os.Open("data/bible/kjv.txt")
+func generateVocabulary(finName, foutName string) error {
+	input, err := os.Open(finName)
 	if err != nil {
 		return fmt.Errorf("open Bible text: %w", err)
 	}
@@ -34,7 +34,7 @@ func generateVocabulary() error {
 		words = append(words, word)
 	}
 	slices.Sort(words)
-	if err := os.WriteFile("bible_words.txt", []byte(strings.Join(words, "\n")+"\n"), 0644); err != nil {
+	if err := os.WriteFile(foutName, []byte(strings.Join(words, "\n")+"\n"), 0644); err != nil {
 		return fmt.Errorf("write Bible vocabulary: %w", err)
 	}
 	return nil
@@ -42,7 +42,15 @@ func generateVocabulary() error {
 
 func main() {
 	internal.HandleStartup()
-	if err := generateVocabulary(); err != nil {
+	if err := generateVocabulary("data/bible/kjv.txt", "data/words/bible.txt"); err != nil {
+		slog.Error("failed to generate Bible vocabulary", "err", err)
+		os.Exit(1)
+	}
+	if err := generateVocabulary("data/hpmor/hpmor.txt", "data/words/hpmor.txt"); err != nil {
+		slog.Error("failed to generate Bible vocabulary", "err", err)
+		os.Exit(1)
+	}
+	if err := generateVocabulary("data/quran/quran.txt", "data/words/quran.txt"); err != nil {
 		slog.Error("failed to generate Bible vocabulary", "err", err)
 		os.Exit(1)
 	}
