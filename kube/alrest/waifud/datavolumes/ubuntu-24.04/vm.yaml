@@ -1,35 +1,32 @@
-apiVersion: cdi.kubevirt.io/v1beta1
-kind: DataVolume
-metadata:
-  name: "zeromus"
-  namespace: waifud
-spec:
-  storage:
-    storageClassName: longhorn
-    volumeMode: Filesystem # or filesystem
-    accessModes:
-      - ReadWriteOnce # Necessary as it's no longer has a default
-    resources:
-      requests:
-        storage: 32Gi
-  source:
-    http:
-      url: "https://geo.mirror.pkgbuild.com/images/latest/Arch-Linux-x86_64-cloudimg.qcow2"
----
 apiVersion: kubevirt.io/v1
 kind: VirtualMachine
 metadata:
   labels:
     kubevirt.io/os: linux
-  name: "zeromus"
+  name: "vm"
   namespace: waifud
 spec:
-  running: true
+  runStrategy: Always
+  dataVolumeTemplates:
+    - metadata:
+        name: "vm"
+      spec:
+        source:
+          http:
+            url: "https://cloud-images.ubuntu.com/daily/server/noble/current/noble-server-cloudimg-amd64.img"
+        storage:
+          storageClassName: longhorn
+          volumeMode: Filesystem # or filesystem
+          accessModes:
+            - ReadWriteOnce # Necessary as it's no longer has a default
+          resources:
+            requests:
+              storage: 32Gi
   template:
     metadata:
       creationTimestamp: null
       labels:
-        kubevirt.io/domain: "zeromus"
+        kubevirt.io/domain: "vm"
     spec:
       domain:
         cpu:
@@ -50,14 +47,21 @@ spec:
             memory: 1024M
       volumes:
         - name: disk0
-          persistentVolumeClaim:
-            claimName: "zeromus"
+          dataVolume:
+            name: "vm"
         - cloudInitNoCloud:
             userData: |
               #cloud-config
-              hostname: zeromus
+              hostname: vm
               ssh_pwauth: True
               disable_root: false
+
+              write_files:
+                -   encoding: b64
+                    content: bmV0d29yazoKICB2ZXJzaW9uOiAyCiAgZXRoZXJuZXRzOgogICAgaWQwOgogICAgICBkaGNwNDogdHJ1ZQogICAgICBtYXRjaDoKICAgICAgICBuYW1lOiBlbnAqCg==
+                    owner: root:root
+                    path: /etc/netplan/99-net-fix.yaml
+                    permissions: '0644'
 
               users:
                 - name: xe

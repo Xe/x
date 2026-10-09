@@ -1,0 +1,36 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../datavolumes/rocky-10
+  - service.yaml
+
+patches:
+  - target:
+      group: kubevirt.io
+      version: v1
+      kind: VirtualMachine
+      name: vm
+    path: patch.yaml
+
+replacements:
+  - source:
+      group: kubevirt.io
+      version: v1
+      kind: VirtualMachine
+      fieldPath: metadata.name
+    targets:
+      - select:
+          group: kubevirt.io
+          version: v1
+          kind: VirtualMachine
+        fieldPaths:
+          - spec.dataVolumeTemplates.0.metadata.name
+          - spec.template.metadata.labels.[kubevirt.io/domain]
+          - spec.template.spec.volumes.[name=disk0].dataVolume.name
+      - select:
+          version: v1
+          kind: Service
+        fieldPaths:
+          - metadata.name
+          - spec.selector.[kubevirt.io/domain]

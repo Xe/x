@@ -1,0 +1,67 @@
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  labels:
+    kubevirt.io/os: linux
+  name: "vm"
+  namespace: waifud
+spec:
+  runStrategy: Always
+  dataVolumeTemplates:
+    - metadata:
+        name: "vm"
+      spec:
+        source:
+          http:
+            url: "https://dl-cdn.alpinelinux.org/alpine/v3.24/releases/cloud/alpine-3.24.2-x86_64-cloudinit-r2.qcow2"
+        storage:
+          storageClassName: longhorn
+          volumeMode: Filesystem # or filesystem
+          accessModes:
+            - ReadWriteOnce # Necessary as it's no longer has a default
+          resources:
+            requests:
+              storage: 32Gi
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        kubevirt.io/domain: "vm"
+    spec:
+      domain:
+        cpu:
+          cores: 2
+        devices:
+          disks:
+            - disk:
+                bus: virtio
+              name: disk0
+            - cdrom:
+                bus: sata
+                readonly: true
+              name: cloudinitdisk
+        machine:
+          type: q35
+        resources:
+          requests:
+            memory: 1024M
+      volumes:
+        - name: disk0
+          dataVolume:
+            name: "vm"
+        - cloudInitNoCloud:
+            userData: |
+              #cloud-config
+              hostname: vm
+              ssh_pwauth: True
+              disable_root: false
+
+              users:
+                - name: xe
+                  groups: [ wheel ]
+                  sudo: [ "ALL=(ALL) NOPASSWD:ALL" ]
+                  shell: /bin/sh
+                  ssh-authorized-keys:
+                    - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIF6/+q2dBHEfETomAH7rvDPXHulSXnhcV/szxTAWiKZA cadey@defoko
+                    - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJIH27tCTJZwJxp+bcWRALtrk7SqnwXZ4/Ae67jIO0eF cadey@shiroko
+          name: cloudinitdisk

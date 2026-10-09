@@ -1,0 +1,6 @@
+resources:
+  - ./vms/eutrope
+  - ./vms/retsarra
+  - ./vms/yanna
+  - ./vms/zeromus
+  - ./vms/zodiark
