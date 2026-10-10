@@ -180,6 +180,25 @@ const pkgs = [];
 
     pkgs.push(
       method.build({
+        name: "vmbully",
+        description: "Run scripts against single-use Proxmox VMs",
+        homepage: "https://within.website",
+        license: "CC0",
+        goarch,
+
+        documentation: {
+          LICENSE: "LICENSE",
+          "cmd/vmbully/README.md": "README.md",
+        },
+
+        build: ({ bin }) => {
+          $`go build -o ${bin}/vmbully -ldflags '-s -w -extldflags "-static" -X "within.website/x.Version=${git.tag()}"' ./cmd/vmbully`;
+        },
+      }),
+    );
+
+    pkgs.push(
+      method.build({
         name: "x",
         description: "the universal x command",
         homepage: "https://within.website",

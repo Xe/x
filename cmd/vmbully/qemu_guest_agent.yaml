@@ -1,0 +1,11 @@
+#cloud-config
+# Cloud-init vendor snippet for Proxmox VMs.
+# Copy to /var/lib/vz/snippets/ on the Proxmox node and refer to it with
+# cicustom "vendor=local:snippets/qemu_guest_agent.yaml".
+# Ubuntu cloud images turn off SSH password logins. vmbully clone needs them.
+ssh_pwauth: true
+package_update: true
+packages:
+  - qemu-guest-agent
+runcmd:
+  - systemctl enable --now qemu-guest-agent
