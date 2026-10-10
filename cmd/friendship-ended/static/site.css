@@ -1,0 +1,98 @@
+.page {
+  max-width: 52rem;
+  margin: 0 auto;
+  padding: var(--space-7) var(--space-4) var(--space-6);
+}
+
+.lead {
+  font-size: var(--step-1);
+  color: var(--text-muted);
+}
+
+.friend-form {
+  display: grid;
+  gap: var(--space-2);
+  max-width: 36rem;
+}
+
+.friend-form label {
+  font-weight: 600;
+  margin-top: var(--space-3);
+}
+
+.friend-form input[type="text"] {
+  font: inherit;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-hard);
+  color: var(--text);
+}
+
+.friend-form .help {
+  margin: 0;
+  font-size: var(--step--1);
+  color: var(--text-muted);
+}
+
+.friend-form button {
+  justify-self: start;
+  margin-top: var(--space-4);
+}
+
+.adm {
+  display: flex;
+  margin: 0 0 var(--space-4);
+  background: var(--bg-0);
+  border: 1px solid var(--bg-3);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.adm .bar {
+  flex: 0 0 12px;
+}
+
+.adm--warn .bar {
+  background: var(--red-bright);
+}
+
+.adm .body {
+  padding: var(--space-3) var(--space-4);
+}
+
+.adm h4 {
+  font-family: var(--font-sans);
+  font-size: var(--step-0);
+  font-weight: 700;
+  margin: 0 0 var(--space-1);
+}
+
+.adm p {
+  margin: 0;
+}
+
+.result {
+  margin: 0 0 var(--space-5);
+}
+
+.result img,
+.treasure {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.treasure {
+  margin: 0 auto var(--space-5);
+}
+
+.page-footer {
+  max-width: 52rem;
+  margin: 0 auto;
+  padding: var(--space-4);
+  border-top: 1px solid var(--border);
+  font-size: var(--step--1);
+  color: var(--text-muted);
+}
