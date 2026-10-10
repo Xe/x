@@ -60,7 +60,7 @@ vmbully script ./setup.js
 
 `vmbully script` does these steps:
 
-1. It finds a VM that is in operation, has the tag `vmbully`, and does not have the tag `tainted`. If there is none, it clones a new VM from the template with the tags `vmbully` and `tainted`.
+1. It selects at random a VM that is in operation, has the tag `vmbully`, and does not have the tag `tainted`. If there is none, it clones a new VM from the template with the tags `vmbully` and `tainted`.
 2. It waits for the guest agent, then sets a random password for the user.
 3. It connects to the VM with SSH.
 4. It adds the tag `tainted` to the VM.
@@ -186,7 +186,7 @@ if (!page.includes("hello")) {
 
 ## Limits
 
-- Two `vmbully script` runs at the same time can use the same VM. There is no lock.
+- Two `vmbully script` runs at the same time can use the same VM. The random selection makes this less probable, but there is no lock.
 - `vmbully` does not check the SSH host key of the VM. Use it on a trusted network only.
 - With no free VM in the pool, `vmbully script` clones one first. That run is slower, because the VM must complete its first boot.
 - If the cleanup fails, a VM with the tag `tainted` can stay on the node. Delete it manually.

@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	mrand "math/rand/v2"
 	"os"
 	"os/exec"
 	"slices"
@@ -225,8 +226,8 @@ func (s *scriptCmd) cloneNext(ctx context.Context, n *proxmox.Node) error {
 // errNoFreeVM means that the pool has no VM that a script can use.
 var errNoFreeVM = errors.New("no running VM has the pool tag without the tainted tag")
 
-// findFreeVM returns the running VM with the lowest VMID that has the tag and
-// is not tainted. It returns errNoFreeVM when there is none.
+// findFreeVM returns a random running VM that has the tag and is not tainted.
+// It returns errNoFreeVM when there is none.
 func findFreeVM(ctx context.Context, client *proxmox.Client, tag string) (*proxmox.VirtualMachine, error) {
 	cluster, err := client.Cluster(ctx)
 	if err != nil {
@@ -237,7 +238,7 @@ func findFreeVM(ctx context.Context, client *proxmox.Client, tag string) (*proxm
 		return nil, fmt.Errorf("list cluster VMs: %w", err)
 	}
 
-	var found *proxmox.ClusterResource
+	var free []*proxmox.ClusterResource
 	for _, r := range resources {
 		if r.Type != "qemu" || r.Template != 0 || r.Status != proxmox.StatusVirtualMachineRunning {
 			continue
@@ -246,13 +247,15 @@ func findFreeVM(ctx context.Context, client *proxmox.Client, tag string) (*proxm
 		if !slices.Contains(tags, tag) || slices.Contains(tags, taintedTag) {
 			continue
 		}
-		if found == nil || r.VMID < found.VMID {
-			found = r
-		}
+		free = append(free, r)
 	}
-	if found == nil {
+	if len(free) == 0 {
 		return nil, errNoFreeVM
 	}
+
+	// A random choice makes two runs at the same time less likely to take
+	// the same VM.
+	found := free[mrand.IntN(len(free))]
 
 	n, err := client.Node(ctx, found.Node)
 	if err != nil {
