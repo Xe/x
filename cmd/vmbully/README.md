@@ -1,18 +1,22 @@
 # vmbully
 
-`vmbully` runs JavaScript files against Proxmox VMs that are used one time, then deleted.
-
-Each `vmbully script` run uses one VM from a pool. The pool is all VMs with the tag `vmbully`. After the script ends, `vmbully` deletes the VM and clones a new one for the next run.
+`vmbully` runs JavaScript files in disposable Proxmox LXC containers.
+Each script run creates a new unprivileged container from an archive, runs the script as root over SSH, then deletes the container.
+There is no pool and no replacement container after a run.
 
 ## Requirements
 
-- A Proxmox API token that can create, change, and delete VMs.
-- A network route from your machine to the VM network. `vmbully` connects to port 22 of the VM.
-- A VM template that has the QEMU guest agent and permits SSH password logins. `qemu_guest_agent.yaml` in this directory is a cloud-init vendor snippet that does both.
+- A Proxmox API token with permission to allocate, start, inspect, and delete containers and allocate storage.
+- A downloaded Proxmox container archive on the target node.
+- An archive with an SSH server and `scp` installed. Root must permit SSH public key logins.
+- DHCP on the container network bridge.
+- A route from your machine to port 22 on the container network.
+
+Containers use the host kernel. Scripts that need their own kernel require a VM.
 
 ## Configuration
 
-Set the connection flags before the subcommand name, or set them as environment variables.
+Set connection flags before the subcommand, or use environment variables.
 
 | Flag                 | Environment variable | Default  |
 | -------------------- | -------------------- | -------- |
@@ -22,75 +26,71 @@ Set the connection flags before the subcommand name, or set them as environment 
 | `--proxmox-node`     | `PROXMOX_NODE`       | `shachi` |
 
 `PROXMOX_HOST` is the API URL, for example `https://shachi:8006/api2/json`.
+Subcommand flags also have environment variables: use upper case and replace each `-` with `_`.
 
-Each subcommand flag also has an environment variable. Change the flag name to upper case and replace each `-` with `_`.
+## Choose the base image
 
-## Set up the pool
+1. In Proxmox, select storage with the `vztmpl` content type, such as `local`.
+2. Open **CT Templates**.
+3. Download the Ubuntu template you want.
+4. Use its volume ID with `--os-template`.
 
-Do these steps one time.
-
-1. Copy the vendor snippet to the Proxmox node.
-
-   ```sh
-   scp qemu_guest_agent.yaml root@shachi:/var/lib/vz/snippets/
-   ```
-
-   The `local` storage must have the `snippets` and `import` content types.
-
-2. Create the template.
-
-   ```sh
-   vmbully template --id=9010 --ssh-keys-file=$HOME/.ssh/id_ed25519.pub \
-     --ci-vendor=local:snippets/qemu_guest_agent.yaml
-   ```
-
-3. Optional: put the first VM in the pool. Without this step, the first `vmbully script` run clones its own VM.
-
-   ```sh
-   vmbully clone --template-id=9010
-   ```
-
-   The command prints the IP address and the password of the VM when the VM is ready.
-
-## Run a script
+For example, if the downloaded archive has this name:
 
 ```sh
+vmbully script \
+  --os-template=local:vztmpl/ubuntu-24.04-standard_24.04-2_amd64.tar.zst \
+  ./setup.js
+```
+
+Use the exact archive name from your storage. `--os-template` has no default.
+The archive is a container filesystem, not a VM cloud image or a container ID.
+
+You can also use an environment variable:
+
+```sh
+export OS_TEMPLATE=local:vztmpl/ubuntu-24.04-standard_24.04-2_amd64.tar.zst
 vmbully script ./setup.js
 ```
 
-`vmbully script` does these steps:
+## Run a script
 
-1. It selects at random a VM that is in operation, has the tag `vmbully`, and does not have the tag `tainted`. If there is none, it clones a new VM from the template with the tags `vmbully` and `tainted`.
-2. It waits for the guest agent, then sets a random password for the user.
-3. It connects to the VM with SSH.
-4. It adds the tag `tainted` to the VM.
-5. It runs the script.
-6. It stops the VM and deletes it with its disks.
-7. It clones a new VM from the template, tags it `vmbully`, and starts it.
+Each `vmbully script` run does these steps:
 
-Steps 6 and 7 also run when the script fails and when you press Ctrl-C.
+1. Generate a temporary SSH key.
+2. Allocate a new container ID.
+3. Create an unprivileged container from `--os-template` with DHCP and the temporary public key.
+4. Start the container and wait for its IPv4 address and SSH server.
+5. Run the JavaScript file as root.
+6. Stop the container and delete its disks.
 
-If a step before step 4 fails, a VM from the pool stays in the pool. A VM that step 1 cloned is deleted, and step 7 does not run.
+Cleanup also runs after script errors, SSH setup errors, and Ctrl-C.
+Completed Proxmox tasks with warnings continue. vmbully logs their warning status and warning messages.
+After an accepted create request, vmbully waits for the task to finish before cleanup.
+If the create task status is unknown, vmbully reports the container ID for manual inspection.
+If an API or cleanup failure prevents deletion, the error reports the container ID.
 
 ### Flags
 
-| Flag             | Default   | Function                                     |
-| ---------------- | --------- | -------------------------------------------- |
-| `--tag`          | `vmbully` | The tag of the pool.                         |
-| `--user`         | empty     | The SSH user. Empty is the cloud-init user.  |
-| `--template-id`  | `9010`    | The template that the next VM is a clone of. |
-| `--disk-storage` | `ssd`     | The storage for the disks of the next VM.    |
-| `--disk-size`    | `32G`     | The size of the `scsi0` disk of the next VM. |
+Put these flags before the script path.
 
-Put the flags before the script path.
+| Flag             | Default  | Function                                          |
+| ---------------- | -------- | ------------------------------------------------- |
+| `--os-template`  | required | Volume ID of the downloaded container archive.    |
+| `--disk-storage` | `ssd`    | Storage for the root filesystem.                  |
+| `--disk-size`    | `32`     | Root filesystem size in GiB (integer).            |
+| `--bridge`       | `vmbr0`  | Bridge for DHCP networking.                       |
+| `--memory`       | `2048`   | Memory in MiB.                                    |
+| `--cores`        | `2`      | CPU cores.                                        |
+| `--nesting`      | `true`   | Nesting for compatibility with container systemd. |
 
 ### Exit status
 
-| Status | Cause                                                                  |
-| ------ | ---------------------------------------------------------------------- |
-| `0`    | The script ended without an exception, and the cleanup was successful. |
-| `1`    | The script threw an exception, or a Proxmox or SSH step failed.        |
-| `2`    | The arguments are incorrect.                                           |
+| Status | Cause                                                       |
+| ------ | ----------------------------------------------------------- |
+| `0`    | The script and cleanup succeeded.                           |
+| `1`    | The script, configuration, Proxmox API, or SSH step failed. |
+| `2`    | The command arguments are incorrect.                        |
 
 ## Script functions
 
@@ -98,7 +98,7 @@ The script is one JavaScript file. `vmbully` evaluates it with QuickJS as a glob
 
 ### `` $`command` ``
 
-Runs `command` in the VM with the login shell of the user.
+Runs `command` in the container with the login shell of root.
 
 - The return value is the stdout of the command as a string. The string includes the last newline. Use `.trim()` to remove it.
 - The stderr of the command goes to your terminal.
@@ -115,7 +115,7 @@ Because `${value}` is always quoted, write shell syntax such as `|` and `>` in t
 
 ### `` host$`command` ``
 
-Runs `command` with `sh` on your machine, not in the VM.
+Runs `command` with `sh` on your machine, not in the container.
 
 - The return value, the stderr, the exception, and the `${value}` quoting are the same as for `$`.
 - The command starts in the directory where you started `vmbully`.
@@ -130,10 +130,10 @@ console.log(commit);
 
 ### `scp(source, dest)`
 
-Copies the local file `source` to `dest` in the VM.
+Copies the local file `source` to `dest` in the container.
 
 - `source` is a path on your machine. It must be a regular file.
-- `dest` is a file path or a directory in the VM.
+- `dest` is a file path or a directory in the container.
 - The copy keeps the permission bits of the file.
 - An error throws an exception.
 
@@ -165,9 +165,9 @@ try {
 ```js
 console.log($`uname -a`);
 
-$`sudo apt-get install -y nginx`;
+$`apt-get install -y nginx`;
 scp("./index.html", "/tmp/");
-$`sudo mv /tmp/index.html /var/www/html/index.html`;
+$`mv /tmp/index.html /var/www/html/index.html`;
 
 const page = $`curl -fsS http://localhost/`;
 if (!page.includes("hello")) {
@@ -175,18 +175,29 @@ if (!page.includes("hello")) {
 }
 ```
 
-## Other commands
+## Create a container for manual use
 
-| Command                  | Function                                             |
-| ------------------------ | ---------------------------------------------------- |
-| `vmbully template`       | Creates a VM template from a cloud image.            |
-| `vmbully clone`          | Clones a template into a new VM in the pool.         |
-| `vmbully passwd <vmid>`  | Sets a new password in a VM and prints the password. |
-| `vmbully help <command>` | Shows the flags of a command.                        |
+```sh
+vmbully create --os-template="$OS_TEMPLATE" \
+  --ssh-keys-file="$HOME/.ssh/id_ed25519.pub"
+```
+
+`create` uses the same resource flags as `script` and requires `--ssh-keys-file`.
+It prints the container ID and leaves the container in operation.
+Find the DHCP address in Proxmox, then connect as root with your SSH key.
+Delete the container manually after use.
+
+## Migration from VMs
+
+The `template`, `clone`, and `passwd` commands no longer exist.
+Use `create` for manual containers and `script` for disposable containers.
+The `--template-id`, `--tag`, `--user`, and cloud-init flags no longer exist.
+`--disk-size` now takes an integer in GiB, for example `32` instead of `32G`.
+Existing VMs and templates stay on Proxmox. vmbully does not inspect or delete them.
 
 ## Limits
 
-- Two `vmbully script` runs at the same time can use the same VM. The random selection makes this less probable, but there is no lock.
-- `vmbully` does not check the SSH host key of the VM. Use it on a trusted network only.
-- With no free VM in the pool, `vmbully script` clones one first. That run is slower, because the VM must complete its first boot.
-- If the cleanup fails, a VM with the tag `tainted` can stay on the node. Delete it manually.
+- The API connection skips TLS certificate verification, and SSH skips host key verification. Use vmbully on a trusted network.
+- The temporary SSH private key stays in memory and disappears after the process exits.
+- A forced process kill can leave a container on the node. Delete it manually.
+- If cleanup fails, delete the reported container manually.

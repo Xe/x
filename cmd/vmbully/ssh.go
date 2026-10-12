@@ -22,8 +22,8 @@ func isUsableIPv4(addr string) bool {
 	return ip != nil && ip.To4() != nil && !ip.IsLoopback() && !ip.IsLinkLocalUnicast()
 }
 
-// sshDial logs in to host with a password. The connection closes when ctx ends.
-func sshDial(ctx context.Context, host, user, password string) (*ssh.Client, error) {
+// sshDial logs in to host with an SSH key. The connection closes when ctx ends.
+func sshDial(ctx context.Context, host string, signer ssh.Signer) (*ssh.Client, error) {
 	addr := net.JoinHostPort(host, "22")
 
 	d := net.Dialer{Timeout: 10 * time.Second}
@@ -32,10 +32,14 @@ func sshDial(ctx context.Context, host, user, password string) (*ssh.Client, err
 		return nil, err
 	}
 
+	// Bound the handshake and close the socket when the context ends.
+	conn.SetDeadline(time.Now().Add(10 * time.Second))
+	stop := context.AfterFunc(ctx, func() { conn.Close() })
+	defer stop()
 	sc, chans, reqs, err := ssh.NewClientConn(conn, addr, &ssh.ClientConfig{
-		User: user,
-		Auth: []ssh.AuthMethod{ssh.Password(password)},
-		// The VM is seconds old, so there is no known host key to check. Lab only.
+		User: "root",
+		Auth: []ssh.AuthMethod{ssh.PublicKeys(signer)},
+		// The container is seconds old, so there is no known host key to check. Lab only.
 		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
 		Timeout:         10 * time.Second,
 	})
@@ -44,6 +48,7 @@ func sshDial(ctx context.Context, host, user, password string) (*ssh.Client, err
 		return nil, err
 	}
 
+	conn.SetDeadline(time.Time{})
 	client := ssh.NewClient(sc, chans, reqs)
 	context.AfterFunc(ctx, func() { client.Close() })
 

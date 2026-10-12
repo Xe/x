@@ -3,21 +3,20 @@ package main
 import (
 	"bytes"
 	"context"
+	"crypto/ed25519"
 	"crypto/rand"
 	"errors"
 	"flag"
 	"fmt"
 	"io"
 	"log/slog"
-	mrand "math/rand/v2"
 	"os"
 	"os/exec"
-	"slices"
 	"strings"
 	"time"
 
 	"github.com/google/subcommands"
-	"github.com/luthermonson/go-proxmox"
+	"golang.org/x/crypto/ssh"
 	"modernc.org/quickjs"
 	"within.website/x/internal/flagenv"
 )
@@ -39,36 +38,21 @@ const scriptPrelude = `{
 }
 `
 
-// taintedTag marks a VM that a script ran on. Such a VM is never used again.
-const taintedTag = "tainted"
-
 type scriptCmd struct {
-	user        string
-	tag         string
-	templateID  int
-	diskStorage string
-	diskSize    string
+	containerOptions
 }
 
 func (*scriptCmd) Name() string     { return "script" }
-func (*scriptCmd) Synopsis() string { return "Run a JavaScript file against a fresh VM." }
+func (*scriptCmd) Synopsis() string { return "Run JavaScript in a new LXC container, then delete it." }
 func (*scriptCmd) Usage() string {
-	return "script [--user] [--tag] [--template-id] [--disk-storage] [--disk-size] <script.js>:\n" +
-		"Find a running VM that has the tag and is not tagged \"" + taintedTag + "\".\n" +
-		"If there is none, clone a new VM from the template.\n" +
-		"Set a random password for the user in the VM, log in with SSH, and run the script.\n" +
-		"Then delete the VM and clone a new VM from the template for the next run.\n" +
-		"The script has these functions:\n" +
-		"  $`command`         run command in the VM and return its stdout, throw on a nonzero exit status\n" +
-		"  host$`command`     the same as $, but run command on this machine\n" +
-		"  scp(source, dest)  copy the local file source to dest in the VM\n"
+	return "script --os-template=<storage:vztmpl/archive> [flags] <script.js>:\n" +
+		"Create and start an LXC container, run the script as root over SSH, then delete the container.\n" +
+		"  $`command`         run command in the container and return stdout\n" +
+		"  host$`command`     run command on this machine\n" +
+		"  scp(source, dest)  copy a local file into the container\n"
 }
 func (s *scriptCmd) SetFlags(f *flag.FlagSet) {
-	f.StringVar(&s.user, "user", "", "user for the SSH login, empty for the cloud-init user of the VM")
-	f.StringVar(&s.tag, "tag", "vmbully", "tag of the VMs that scripts can use")
-	f.IntVar(&s.templateID, "template-id", 9010, "VMID of the template to clone the next VM from")
-	f.StringVar(&s.diskStorage, "disk-storage", "ssd", "storage for the disks of the next VM")
-	f.StringVar(&s.diskSize, "disk-size", "32G", "size of the scsi0 disk of the next VM")
+	s.containerOptions.setFlags(f)
 }
 
 func (s *scriptCmd) Execute(ctx context.Context, f *flag.FlagSet, _ ...any) subcommands.ExitStatus {
@@ -77,7 +61,7 @@ func (s *scriptCmd) Execute(ctx context.Context, f *flag.FlagSet, _ ...any) subc
 		return subcommands.ExitUsageError
 	}
 
-	if f.NArg() != 1 || s.tag == "" {
+	if f.NArg() != 1 {
 		fmt.Print(s.Usage())
 		return subcommands.ExitUsageError
 	}
@@ -95,214 +79,52 @@ func (s *scriptCmd) Execute(ctx context.Context, f *flag.FlagSet, _ ...any) subc
 	return subcommands.ExitSuccess
 }
 
-func (s *scriptCmd) run(ctx context.Context, scriptPath string) error {
+func (s *scriptCmd) run(ctx context.Context, scriptPath string) (err error) {
+	if err := s.containerOptions.validate(); err != nil {
+		return err
+	}
 	src, err := os.ReadFile(scriptPath)
 	if err != nil {
 		return fmt.Errorf("read script: %w", err)
 	}
-
+	_, key, err := ed25519.GenerateKey(rand.Reader)
+	if err != nil {
+		return fmt.Errorf("generate SSH key: %w", err)
+	}
+	signer, err := ssh.NewSignerFromKey(key)
+	if err != nil {
+		return err
+	}
 	client, n, err := node(ctx)
 	if err != nil {
 		return err
 	}
-
-	// created is true when this run made the VM. Such a VM is tainted from
-	// the start, so that no other run takes it.
-	created := false
-	vm, err := findFreeVM(ctx, client, s.tag)
-	if errors.Is(err, errNoFreeVM) {
-		slog.Info("no free VM, cloning a new one", "template", s.templateID)
-		created = true
-		vm, err = cloneVM(ctx, n, cloneOptions{
-			templateID:  s.templateID,
-			diskStorage: s.diskStorage,
-			diskSize:    s.diskSize,
-			tags:        []string{s.tag, taintedTag},
-			password:    rand.Text(), // evalOn sets its own password
-		})
-	}
+	ct, err := createContainer(ctx, client, n, s.containerOptions, string(ssh.MarshalAuthorizedKey(signer.PublicKey())))
 	if err != nil {
 		return err
 	}
-	slog.Info("using VM", "id", vm.VMID, "name", vm.Name)
+	defer func() {
+		cleanupCtx, cancel := context.WithTimeout(context.WithoutCancel(ctx), 10*time.Minute)
+		defer cancel()
+		err = errors.Join(err, deleteContainer(cleanupCtx, ct))
+	}()
 
-	tainted, err := s.evalOn(ctx, vm, string(src))
-	if !tainted && !created {
-		// The VM is not used, so it stays in the pool.
+	sshClient, err := connectContainer(ctx, ct, signer)
+	if err != nil {
 		return err
-	}
-
-	// Clean up even after an interrupt, so that no tainted VM stays behind.
-	cleanupCtx, cancel := context.WithTimeout(context.WithoutCancel(ctx), 15*time.Minute)
-	defer cancel()
-
-	if !tainted {
-		// The script did not start. Delete the VM that this run made, but
-		// do not put a VM in the pool for a setup that does not work.
-		return errors.Join(err, deleteVM(cleanupCtx, vm))
-	}
-
-	return errors.Join(err, deleteVM(cleanupCtx, vm), s.cloneNext(cleanupCtx, n))
-}
-
-// evalOn logs in to vm and evaluates the script src. tainted reports if vm got
-// the tainted tag, which happens immediately before the script starts.
-func (s *scriptCmd) evalOn(ctx context.Context, vm *proxmox.VirtualMachine, src string) (tainted bool, err error) {
-	user := s.user
-	if user == "" && vm.VirtualMachineConfig != nil {
-		user = vm.VirtualMachineConfig.CIUser
-	}
-	if user == "" {
-		return false, fmt.Errorf("VM %d has no cloud-init user, set --user", vm.VMID)
-	}
-
-	// A new VM can still be in its first boot.
-	ifaces, err := waitForAgent(ctx, vm)
-	if err != nil {
-		return false, err
-	}
-
-	var ip string
-	for _, iface := range ifaces {
-		for _, addr := range iface.IPAddresses {
-			if ip == "" && isUsableIPv4(addr.IPAddress) {
-				ip = addr.IPAddress
-			}
-		}
-	}
-	if ip == "" {
-		return false, fmt.Errorf("VM %d has no usable IPv4 address", vm.VMID)
-	}
-
-	password := rand.Text()
-	if err := vm.AgentSetUserPassword(ctx, password, user); err != nil {
-		return false, fmt.Errorf("set password for %s on VM %d: %w", user, vm.VMID, err)
-	}
-
-	sshClient, err := sshDial(ctx, ip, user, password)
-	if err != nil {
-		return false, fmt.Errorf("ssh to %s@%s: %w", user, ip, err)
 	}
 	defer sshClient.Close()
-	slog.Info("connected to VM", "id", vm.VMID, "user", user, "ip", ip)
-
 	js, err := newScriptVM(
 		func(cmd string) (string, error) { return sshRun(sshClient, cmd) },
 		func(cmd string) (string, error) { return hostRun(ctx, cmd) },
 		func(source, dest string) error { return sshCopy(sshClient, source, dest) },
 	)
 	if err != nil {
-		return false, err
+		return err
 	}
 	defer js.Close()
-
-	// From here the VM is used. It gets no second script, even when this
-	// script fails.
-	if err := addTag(ctx, vm, taintedTag); err != nil {
-		return false, err
-	}
-
-	_, err = js.Eval(src, quickjs.EvalGlobal)
-	return true, err
-}
-
-// cloneNext clones and starts the VM for the next script run.
-func (s *scriptCmd) cloneNext(ctx context.Context, n *proxmox.Node) error {
-	next, err := cloneVM(ctx, n, cloneOptions{
-		templateID:  s.templateID,
-		diskStorage: s.diskStorage,
-		diskSize:    s.diskSize,
-		tags:        []string{s.tag},
-		password:    rand.Text(), // the next run sets its own password
-	})
-	if err != nil {
-		return fmt.Errorf("clone next VM: %w", err)
-	}
-	slog.Info("next VM ready", "id", next.VMID, "name", next.Name)
-
-	return nil
-}
-
-// errNoFreeVM means that the pool has no VM that a script can use.
-var errNoFreeVM = errors.New("no running VM has the pool tag without the tainted tag")
-
-// findFreeVM returns a random running VM that has the tag and is not tainted.
-// It returns errNoFreeVM when there is none.
-func findFreeVM(ctx context.Context, client *proxmox.Client, tag string) (*proxmox.VirtualMachine, error) {
-	cluster, err := client.Cluster(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("get cluster: %w", err)
-	}
-	resources, err := cluster.Resources(ctx, "vm")
-	if err != nil {
-		return nil, fmt.Errorf("list cluster VMs: %w", err)
-	}
-
-	var free []*proxmox.ClusterResource
-	for _, r := range resources {
-		if r.Type != "qemu" || r.Template != 0 || r.Status != proxmox.StatusVirtualMachineRunning {
-			continue
-		}
-		tags := splitTags(r.Tags)
-		if !slices.Contains(tags, tag) || slices.Contains(tags, taintedTag) {
-			continue
-		}
-		free = append(free, r)
-	}
-	if len(free) == 0 {
-		return nil, errNoFreeVM
-	}
-
-	// A random choice makes two runs at the same time less likely to take
-	// the same VM.
-	found := free[mrand.IntN(len(free))]
-
-	n, err := client.Node(ctx, found.Node)
-	if err != nil {
-		return nil, fmt.Errorf("get node %s: %w", found.Node, err)
-	}
-
-	vm, err := n.VirtualMachine(ctx, int(found.VMID))
-	if err != nil {
-		return nil, fmt.Errorf("get VM %d: %w", found.VMID, err)
-	}
-
-	return vm, nil
-}
-
-// splitTags splits the tag list that the cluster resource API returns.
-func splitTags(tags string) []string {
-	return strings.FieldsFunc(tags, func(r rune) bool { return r == ';' || r == ',' || r == ' ' })
-}
-
-// deleteVM stops vm and deletes it with its disks. It refuses a VM that is not
-// tainted.
-func deleteVM(ctx context.Context, vm *proxmox.VirtualMachine) error {
-	if !vm.HasTag(taintedTag) {
-		return fmt.Errorf("VM %d is not tagged %q, refusing to delete it", vm.VMID, taintedTag)
-	}
-
-	task, err := vm.Stop(ctx)
-	if err != nil {
-		return fmt.Errorf("stop VM %d: %w", vm.VMID, err)
-	}
-	if err := waitTask(ctx, task, time.Second, 5*time.Minute); err != nil {
-		return fmt.Errorf("stop VM %d: %w", vm.VMID, err)
-	}
-
-	task, err = vm.Delete(ctx, &proxmox.VirtualMachineDeleteOptions{
-		Purge:                    proxmox.IntOrBool(true),
-		DestroyUnreferencedDisks: proxmox.IntOrBool(true),
-	})
-	if err != nil {
-		return fmt.Errorf("delete VM %d: %w", vm.VMID, err)
-	}
-	if err := waitTask(ctx, task, time.Second, 5*time.Minute); err != nil {
-		return fmt.Errorf("delete VM %d: %w", vm.VMID, err)
-	}
-	slog.Info("VM deleted", "id", vm.VMID)
-
-	return nil
+	_, err = js.Eval(string(src), quickjs.EvalGlobal)
+	return err
 }
 
 // hostRun runs cmd with sh on this machine and returns its stdout. The stderr
