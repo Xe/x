@@ -5,10 +5,8 @@ import (
 	"flag"
 	"fmt"
 
-	"buf.build/go/protovalidate"
 	"github.com/google/subcommands"
-
-	xevv1 "within.website/x/gen/xeiaso/net/xev/v1"
+	"within.website/x/web/systemone"
 )
 
 // Pick implements the "pick" subcommand. It scores a list of options.
@@ -20,54 +18,66 @@ type Pick struct {
 }
 
 func (*Pick) Name() string     { return "pick" }
-func (*Pick) Synopsis() string { return "Score decision options with xev." }
+func (*Pick) Synopsis() string { return "Score decision options with System One." }
 func (*Pick) Usage() string {
 	return `pick [--context] [--question] [--model] [--all] [--json] <option> <option> [option...]:
-Score decision options with xev. Pass two to 26 options as arguments.
-By default this prints the option with the highest confidence.
+Score decision options with System One. Pass 2 to 255 options as arguments.
+By default this command prints the option with the highest probability.
 `
 }
 
 func (p *Pick) SetFlags(f *flag.FlagSet) {
 	f.StringVar(&p.promptContext, "context", "", "Background information for the decision.")
 	f.StringVar(&p.question, "question", "", "Question to answer.")
-	f.StringVar(&p.model, "model", "", "Model to use. Leave empty to let xev decide.")
+	f.StringVar(&p.model, "model", defaultModel, "Model to use.")
 	p.output.setFlags(f)
 }
 
 func (p *Pick) Execute(ctx context.Context, f *flag.FlagSet, _ ...any) subcommands.ExitStatus {
-	model, err := parseModel(p.model)
-	if err != nil {
+	if err := validateQuestion(p.question); err != nil {
 		fmt.Printf("error: %v\n", err)
 		return subcommands.ExitUsageError
 	}
 
-	req := &xevv1.PickRequest{
-		Context:  p.promptContext,
-		Question: p.question,
-		Options:  f.Args(),
-		Model:    model,
+	options := f.Args()
+	if len(options) < 2 {
+		fmt.Println("error: pick requires at least two options")
+		return subcommands.ExitUsageError
 	}
 
-	if err := protovalidate.Validate(req); err != nil {
+	criteria := make(map[string]any, len(options))
+	for _, opt := range options {
+		if _, exists := criteria[opt]; exists {
+			fmt.Printf("error: duplicate option %q\n", opt)
+			return subcommands.ExitUsageError
+		}
+		criteria[opt] = nil
+	}
+
+	req := &systemone.Request{
+		Model: p.model,
+		State: p.promptContext,
+		Questions: map[string]systemone.Question{
+			"pick": {
+				Type:         systemone.Choice,
+				Instructions: p.question,
+				Criteria:     criteria,
+			},
+		},
+	}
+
+	if err := req.Valid(); err != nil {
 		fmt.Printf("error: %v\n", err)
 		return subcommands.ExitUsageError
 	}
 
-	cli, err := New()
-	if err != nil {
-		fmt.Printf("can't connect to xev: %v\n", err)
-		return subcommands.ExitFailure
-	}
-	defer cli.Close()
-
-	resp, err := cli.Decision.Pick(ctx, req)
+	resp, err := New().Evaluate(ctx, req)
 	if err != nil {
 		fmt.Printf("error: %v\n", err)
 		return subcommands.ExitFailure
 	}
 
-	if err := p.output.print(resp); err != nil {
+	if err := p.output.print(resp, "pick"); err != nil {
 		fmt.Printf("error: %v\n", err)
 		return subcommands.ExitFailure
 	}
