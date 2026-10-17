@@ -12,9 +12,11 @@ import (
 )
 
 type DAO struct {
-	db    *gorm.DB
-	keys  gorm.Interface[Key]
-	users gorm.Interface[User]
+	db           *gorm.DB
+	keys         gorm.Interface[Key]
+	users        gorm.Interface[User]
+	policies     gorm.Interface[Policy]
+	userPolicies gorm.Interface[UserPolicy]
 }
 
 func (d *DAO) DB() *gorm.DB {
@@ -63,13 +65,17 @@ func Open(dbLoc string) (*DAO, error) {
 	if err := db.AutoMigrate(
 		&User{},
 		&Key{},
+		&Policy{},
+		&UserPolicy{},
 	); err != nil {
 		return nil, fmt.Errorf("failed to migrate schema: %w", err)
 	}
 
 	return &DAO{
-		db:    db,
-		keys:  gorm.G[Key](db),
-		users: gorm.G[User](db),
+		db:           db,
+		keys:         gorm.G[Key](db),
+		users:        gorm.G[User](db),
+		policies:     gorm.G[Policy](db),
+		userPolicies: gorm.G[UserPolicy](db),
 	}, nil
 }

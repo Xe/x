@@ -6,6 +6,7 @@ require (
 	al.essio.dev/pkg/shellescape v1.6.0
 	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.11-20260209202127-80ab13bee0bf.1
 	buf.build/go/protovalidate v1.1.2
+	cel.dev/cel-go v0.32.0
 	cirello.io/goherokuname v0.0.0-20190914093443-b436bae8c2c5
 	codeberg.org/readeck/go-readability/v2 v2.1.0
 	connectrpc.com/connect v1.20.0
@@ -36,7 +37,6 @@ require (
 	github.com/goccy/go-json v0.10.5
 	github.com/golang-jwt/jwt/v5 v5.3.0
 	github.com/gomarkdown/markdown v0.0.0-20240328165702-4d01890c35c0
-	github.com/google/cel-go v0.29.0
 	github.com/google/gnostic v0.7.1
 	github.com/google/go-github v17.0.0+incompatible
 	github.com/google/go-github/v81 v81.0.0
@@ -91,6 +91,7 @@ require (
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 	gorm.io/gorm v1.31.2
 	gorm.io/plugin/prometheus v0.1.0
+	modernc.org/quickjs v0.25.0
 	modernc.org/sqlite v1.37.0
 	nhooyr.io/websocket v1.8.17
 	rsc.io/gitfs v1.0.0
@@ -172,6 +173,7 @@ require (
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/gogs/chardet v0.0.0-20211120154057-b7413eaefb8f // indirect
 	github.com/golang-jwt/jwt/v4 v4.5.2 // indirect
+	github.com/google/cel-go v0.26.1 // indirect
 	github.com/google/gnostic-models v0.7.0 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
 	github.com/google/jsonschema-go v0.4.2 // indirect
@@ -305,7 +307,6 @@ require (
 	modernc.org/libquickjs v0.13.1 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.12.1 // indirect
-	modernc.org/quickjs v0.25.0 // indirect
 	mvdan.cc/sh/v3 v3.12.0 // indirect
 )
 

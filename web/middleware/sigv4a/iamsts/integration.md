@@ -10,6 +10,12 @@ Unlike the classic SigV4 `iamsts` this guide is modeled on, the cache holds
 only public material: even a full compromise of this service's cache lets an
 attacker verify signatures, never mint them.
 
+This page covers signature authentication only. To enforce IAM policies,
+also install the authorization interceptor described in
+[Integrating a service with iamd policies](../../../../docs/iam-service-integration.md).
+The verifier's backend credential needs a `GetPublicKey` policy grant;
+authentication alone does not authorize callers' application RPCs.
+
 ## Prerequisites
 
 - An IAM credential for your service (the "verifier credential"), used only to

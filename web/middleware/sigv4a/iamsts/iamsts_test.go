@@ -11,9 +11,12 @@ import (
 	"time"
 
 	"github.com/twitchtv/twirp"
+	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	stsv1 "within.website/x/gen/within/website/x/iam/sts/v1"
+	iamv1 "within.website/x/gen/within/website/x/iam/v1"
+	"within.website/x/web/middleware/authctx"
 	"within.website/x/web/middleware/sigv4a"
 )
 
@@ -48,6 +51,8 @@ type fakeKeys struct {
 	calls      atomic.Int64
 	refuseCode twirp.ErrorCode // when non-empty, refuse with this code
 	cacheTTL   time.Duration
+	isAdmin    bool
+	policies   []*iamv1.Policy
 	now        func() time.Time
 }
 
@@ -87,7 +92,9 @@ func (f *fakeKeys) GetPublicKey(_ context.Context, req *stsv1.GetPublicKeyReques
 			AccessKeyId: req.GetAccessKeyId(),
 			PrincipalId: "u1",
 			DisplayName: "tester",
+			IsAdmin:     f.isAdmin,
 		},
+		Policies:   f.policies,
 		CacheUntil: timestamppb.New(f.now().Add(f.cacheTTL)),
 	}, nil
 }
@@ -388,5 +395,55 @@ func TestVerifier_FetchSurvivesCallerCancel(t *testing.T) {
 	}
 	if got := h.fake.calls.Load(); got != 1 {
 		t.Errorf("RPCs = %d, want 1", got)
+	}
+}
+
+func TestVerifier_PolicyMetadataSurvivesCache(t *testing.T) {
+	for _, tt := range []struct {
+		name     string
+		admin    bool
+		policies []*iamv1.Policy
+	}{
+		{name: "admin", admin: true},
+		{name: "policy", policies: []*iamv1.Policy{{Id: "p1", Name: "own-things", Statements: []*iamv1.PolicyStatement{{Effect: iamv1.Effect_EFFECT_ALLOW, Methods: []string{"example.Things/Get"}, Filter: "req.id == principal.principal_id"}}}}},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			h, closeSrv := newHarness(t, 5*time.Minute)
+			defer closeSrv()
+			h.fake.isAdmin = tt.admin
+			h.fake.policies = tt.policies
+			handled := 0
+			h.handler = h.verifier.Middleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				handled++
+				id, ok := authctx.Caller(r.Context())
+				if !ok || id.IsAdmin != tt.admin {
+					t.Errorf("caller = %+v, want is_admin %v", id, tt.admin)
+				}
+				ps, ok := authctx.PrincipalPolicies(r.Context())
+				if !ok || len(ps) != len(tt.policies) {
+					t.Errorf("policy metadata = %v (present %v), want %v", ps, ok, tt.policies)
+				} else {
+					for i, p := range ps {
+						if !proto.Equal(p, tt.policies[i]) {
+							t.Errorf("policy = %v, want %v", p, tt.policies[i])
+						}
+					}
+				}
+				w.WriteHeader(http.StatusNoContent)
+			}))
+			// The first verified request fetches metadata; the second restores it
+			// from the credential cache without another STS request.
+			for range 2 {
+				if rec := do(h, signedGET(t, h.clock())); rec.Code != http.StatusNoContent {
+					t.Fatalf("status = %d, body=%s", rec.Code, rec.Body.String())
+				}
+			}
+			if handled != 2 {
+				t.Errorf("handled %d requests, want 2", handled)
+			}
+			if got := h.fake.calls.Load(); got != 1 {
+				t.Errorf("STS RPCs = %d, want 1", got)
+			}
+		})
 	}
 }

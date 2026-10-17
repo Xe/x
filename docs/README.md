@@ -1,5 +1,10 @@
 # x
 
+## Service authorization
+
+- [Integrating a service with iamd policies](iam-service-integration.md) — service credentials, signed clients, Twirp authentication and policy enforcement, and resource-ownership boundaries.
+- [IAM policies](iam-policies.md) — policy semantics, CLI management, and built-in templates.
+
 ## Commands
 
 - almarid - a mastodon bot mocking IRC spambots.
