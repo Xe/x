@@ -91,6 +91,7 @@ require (
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 	gorm.io/gorm v1.31.2
 	gorm.io/plugin/prometheus v0.1.0
+	modernc.org/quickjs v0.25.0
 	modernc.org/sqlite v1.37.0
 	nhooyr.io/websocket v1.8.17
 	rsc.io/gitfs v1.0.0
@@ -305,7 +306,6 @@ require (
 	modernc.org/libquickjs v0.13.1 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.12.1 // indirect
-	modernc.org/quickjs v0.25.0 // indirect
 	mvdan.cc/sh/v3 v3.12.0 // indirect
 )
 
@@ -336,7 +336,7 @@ require (
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 // indirect
-	github.com/klauspost/compress v1.18.5 // indirect
+	github.com/klauspost/compress v1.18.7 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/oklog/ulid/v2 v2.1.0
 	github.com/prometheus/client_golang v1.22.0
