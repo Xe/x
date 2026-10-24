@@ -9,6 +9,12 @@ derived signing key for each credential scope from iamd's `SigningKeyService`
 once, caches it for the server-advised TTL, and recomputes signatures itself.
 When the cache is warm there are **zero** IAM RPCs on the request path.
 
+This page covers signature authentication only. Application policy
+enforcement also requires the authorization integration in
+[Integrating a service with iamd policies](../../../../docs/iam-service-integration.md).
+For this classic chain, the backend credential needs a scoped
+`GetSigningKey` grant rather than the guide's SigV4A `GetPublicKey` grant.
+
 ## Prerequisites
 
 - An IAM credential for your service (the "verifier credential"), used only to

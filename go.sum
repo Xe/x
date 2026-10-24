@@ -4,6 +4,8 @@ buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.11-202602092021
 buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.11-20260209202127-80ab13bee0bf.1/go.mod h1:tvtbpgaVXZX4g6Pn+AnzFycuRK3MOz5HJfEGeEllXYM=
 buf.build/go/protovalidate v1.1.2 h1:83vYHoY8f34hB8MeitGaYE3CGVPFxwdEUuskh5qQpA0=
 buf.build/go/protovalidate v1.1.2/go.mod h1:Ez3z+w4c+wG+EpW8ovgZaZPnPl2XVF6kaxgcv1NG/QE=
+cel.dev/cel-go v0.32.0 h1:irvpFKr5EuGPyxeME03ERh0rii1TX+BDAnB9eL3IvNk=
+cel.dev/cel-go v0.32.0/go.mod h1:DnVip7tpJSsgZymwfT+m1tnEVy3ivAjSMXPx12YrMkU=
 cel.dev/expr v0.25.2 h1:K6j46C81hXtZQfuX60cVWQFBJahKSE2gfRbNuvr5bFs=
 cel.dev/expr v0.25.2/go.mod h1:hrXvqGP6G6gyx8UAHSHJ5RGk//1Oj5nXQ2NI02Nrsg4=
 charm.land/lipgloss/v2 v2.0.0-beta.3.0.20251120230642-dcccabe2cd63 h1:KgI+p678truaonNOQek4i+aJdWAtdpvFzz5lqHBaDeI=
@@ -480,8 +482,8 @@ github.com/gomarkdown/markdown v0.0.0-20240328165702-4d01890c35c0 h1:4gjrh/PN2Mu
 github.com/gomarkdown/markdown v0.0.0-20240328165702-4d01890c35c0/go.mod h1:JDGcbDT52eL4fju3sZ4TeHGsQwhG9nbDV21aMyhwPoA=
 github.com/google/btree v0.0.0-20180813153112-4030bb1f1f0c/go.mod h1:lNA+9X1NB3Zf8V7Ke586lFgjr2dZNuvo3lPJSGZ5JPQ=
 github.com/google/btree v1.0.0/go.mod h1:lNA+9X1NB3Zf8V7Ke586lFgjr2dZNuvo3lPJSGZ5JPQ=
-github.com/google/cel-go v0.29.0 h1:fEG+Ja3YRwNOqnQxTyJwoByAUAvTuxUGiro/jhrm4F4=
-github.com/google/cel-go v0.29.0/go.mod h1:X0bD6iVNR8pkROSOoHVdgTkzmRcosof7WQqCD6wcMc8=
+github.com/google/cel-go v0.26.1 h1:iPbVVEdkhTX++hpe3lzSk7D3G3QSYqLGoHOcEio+UXQ=
+github.com/google/cel-go v0.26.1/go.mod h1:A9O8OU9rdvrK5MQyrqfIxo1a0u4g3sF8KB6PUIaryMM=
 github.com/google/gnostic v0.7.1 h1:t5Kc7j/8kYr8t2u11rykRrPPovlEMG4+xdc/SpekATs=
 github.com/google/gnostic v0.7.1/go.mod h1:KSw6sxnxEBFM8jLPfJd46xZP+yQcfE8XkiqfZx5zR28=
 github.com/google/gnostic-models v0.7.0 h1:qwTtogB15McXDaNqTZdzPJRHvaVJlAl+HVQnLmJEJxo=

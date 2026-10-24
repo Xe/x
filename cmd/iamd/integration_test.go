@@ -121,7 +121,11 @@ func TestIntegration_SignedTwirpRoundTrip(t *testing.T) {
 	}
 
 	authMW := newDualVerifier(dao, intRegion, intService, 1<<20)
-	mux := newMux(quietLogger(), dao, authMW, 5*time.Minute)
+	eval, err := newAuthorizer()
+	if err != nil {
+		t.Fatalf("newAuthorizer: %v", err)
+	}
+	mux := newMux(quietLogger(), dao, authMW, eval, 5*time.Minute)
 	srv := httptest.NewServer(mux)
 	defer srv.Close()
 
@@ -252,9 +256,12 @@ func TestIntegration_SigningKeyVerifierChain(t *testing.T) {
 	}
 
 	authMW := newDualVerifier(dao, intRegion, intService, 1<<20)
-	iamd := httptest.NewServer(newMux(quietLogger(), dao, authMW, 5*time.Minute))
+	eval, err := newAuthorizer()
+	if err != nil {
+		t.Fatalf("newAuthorizer: %v", err)
+	}
+	iamd := httptest.NewServer(newMux(quietLogger(), dao, authMW, eval, 5*time.Minute))
 	defer iamd.Close()
-
 	// The downstream service: fetches signing keys from iamd (signing those
 	// fetches with its own credential) and verifies end-user requests locally.
 	downstreamVerifier := iamsts.New(iamsts.Config{

@@ -1,0 +1,9 @@
+{
+  "name": "sts-sigv4a-verifier",
+  "statements": [
+    {
+      "effect": "EFFECT_ALLOW",
+      "methods": ["within.website.x.iam.sts.v1.SigningKeyService/GetPublicKey"]
+    }
+  ]
+}
