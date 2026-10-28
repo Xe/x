@@ -49,13 +49,15 @@ func (s *SigningKeys) GetPublicKey(ctx context.Context, req *stsv1.GetPublicKeyR
 		return nil, twirp.InternalErrorWith(err)
 	}
 
+	id, policies, err := s.identityAndPolicies(ctx, k)
+	if err != nil {
+		return nil, twirp.InternalErrorf("can't load identity policies")
+	}
+
 	return &stsv1.GetPublicKeyResponse{
-		PublicKey: der,
-		Identity: &stsv1.TokenIdentity{
-			AccessKeyId: k.AccessKeyID,
-			PrincipalId: k.User.UUID,
-			DisplayName: k.User.Name,
-		},
+		PublicKey:  der,
+		Identity:   id,
+		Policies:   policies,
 		CacheUntil: timestamppb.New(s.now().Add(s.cacheTTL)),
 	}, nil
 }
