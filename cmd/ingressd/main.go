@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"io"
@@ -8,6 +9,7 @@ import (
 	"log/slog"
 	"net"
 	"sync"
+	"time"
 
 	proxyproto "github.com/pires/go-proxyproto"
 	"google.golang.org/grpc"
@@ -36,62 +38,108 @@ func main() {
 
 	grpcLn, err := net.Listen("tcp", fmt.Sprintf(":%d", *grpcPort))
 	if err != nil {
-		log.Fatalf("can't listen to gRPC port %d: %v", *httpPort, err)
-		return
+		log.Fatalf("can't listen to gRPC port %d: %v", *grpcPort, err)
 	}
 
 	httpLn, err := net.Listen("tcp", fmt.Sprintf(":%d", *httpPort))
 	if err != nil {
 		log.Fatalf("can't listen to HTTP port %d: %v", *httpPort, err)
-		return
 	}
 
 	httpsLn, err := net.Listen("tcp", fmt.Sprintf(":%d", *httpsPort))
 	if err != nil {
 		log.Fatalf("can't listen to HTTPS port %d: %v", *httpsPort, err)
-		return
 	}
 
 	srv := grpc.NewServer()
 	healthpb.RegisterHealthServer(srv, healthSrv)
 	reflection.Register(srv)
 
-	go s.Handle(httpsLn, *httpsTarget, "https")
-	go s.Handle(httpLn, *httpTarget, "http")
-
 	healthSrv.SetServingStatus("grpc", healthpb.HealthCheckResponse_SERVING)
+	healthSrv.SetServingStatus("http", healthpb.HealthCheckResponse_NOT_SERVING)
+	healthSrv.SetServingStatus("https", healthpb.HealthCheckResponse_NOT_SERVING)
 
-	log.Fatal(srv.Serve(grpcLn))
+	errCh := make(chan error, 3)
+	go func() { errCh <- s.Handle(httpsLn, *httpsTarget, "https") }()
+	go func() { errCh <- s.Handle(httpLn, *httpTarget, "http") }()
+	go func() { errCh <- srv.Serve(grpcLn) }()
+
+	go s.Probe(*httpTarget, "http")
+	go s.Probe(*httpsTarget, "https")
+
+	if err := <-errCh; err != nil {
+		log.Fatal(err)
+	}
 }
 
 type Server struct{}
 
-func (s *Server) Handle(l net.Listener, dest, service string) {
+const (
+	probeInterval = 10 * time.Second
+	probeTimeout  = 3 * time.Second
+)
+
+func (s *Server) Handle(l net.Listener, dest, service string) error {
 	defer l.Close()
 
-	healthSrv.SetServingStatus(service, healthpb.HealthCheckResponse_SERVING)
-
+	backoff := 100 * time.Millisecond
 	for {
 		conn, err := l.Accept()
 		if err != nil {
-			slog.Error("can't accept connection", "localAddr", l.Addr().String(), "err", err)
-			return
+			if errors.Is(err, net.ErrClosed) {
+				return err
+			}
+
+			slog.Error("can't accept connection; retrying",
+				"localAddr", l.Addr().String(),
+				"service", service,
+				"err", err,
+				"retryIn", backoff)
+			time.Sleep(backoff)
+			backoff = min(backoff*2, 5*time.Second)
+			continue
 		}
+		backoff = 100 * time.Millisecond
 
 		slog.Debug("accepted connection", "service", service, "addr", conn.RemoteAddr().String())
-
-		go s.HandleConn(conn, dest, service)
+		go s.HandleConn(conn, dest)
 	}
 }
 
-func (s *Server) HandleConn(conn net.Conn, dest, service string) {
+// Probe dials dest every probeInterval and mirrors its reachability into the
+// gRPC health status for service. It logs only on status transitions.
+func (s *Server) Probe(dest, service string) {
+	ticker := time.NewTicker(probeInterval)
+	defer ticker.Stop()
+
+	status := healthpb.HealthCheckResponse_NOT_SERVING
+	for {
+		conn, err := net.DialTimeout("tcp", dest, probeTimeout)
+		if err != nil {
+			if status == healthpb.HealthCheckResponse_SERVING {
+				slog.Error("downstream probe failed", "service", service, "dest", dest, "err", err)
+			}
+			status = healthpb.HealthCheckResponse_NOT_SERVING
+		} else {
+			conn.Close()
+			if status != healthpb.HealthCheckResponse_SERVING {
+				slog.Info("downstream probe recovered", "service", service, "dest", dest)
+			}
+			status = healthpb.HealthCheckResponse_SERVING
+		}
+		healthSrv.SetServingStatus(service, status)
+
+		<-ticker.C
+	}
+}
+
+func (s *Server) HandleConn(conn net.Conn, dest string) {
 	defer conn.Close()
 
 	slog.Debug("dialing remote host", "remoteHost", dest)
 
 	destConn, err := net.Dial("tcp", dest)
 	if err != nil {
-		healthSrv.SetServingStatus(service, healthpb.HealthCheckResponse_SERVICE_UNKNOWN)
 		slog.Error("can't dial downstream", "err", err)
 		return
 	}
@@ -99,9 +147,8 @@ func (s *Server) HandleConn(conn net.Conn, dest, service string) {
 
 	slog.Debug("dialed remote host", "remoteAddr", conn.RemoteAddr().String(), "destAddr", destConn.RemoteAddr().String())
 
-	header := proxyproto.HeaderProxyFromAddrs(2, conn.RemoteAddr(), destConn.RemoteAddr())
+	header := proxyproto.HeaderProxyFromAddrs(2, conn.RemoteAddr(), conn.LocalAddr())
 	if _, err := header.WriteTo(destConn); err != nil {
-		healthSrv.SetServingStatus(service, healthpb.HealthCheckResponse_SERVICE_UNKNOWN)
 		slog.Error("can't write haproxy header to downstream", "header", header, "err", err)
 		return
 	}
@@ -116,7 +163,7 @@ func (s *Server) HandleConn(conn net.Conn, dest, service string) {
 		defer wg.Done()
 		io.Copy(conn, destConn)
 		// Signal peer that no more data is coming.
-		conn.(*net.TCPConn).CloseWrite()
+		closeWrite(conn)
 		slog.Debug("done copying from dest to src")
 	}()
 	go func() {
@@ -124,10 +171,22 @@ func (s *Server) HandleConn(conn net.Conn, dest, service string) {
 		defer wg.Done()
 		io.Copy(destConn, conn)
 		// Signal peer that no more data is coming.
-		destConn.(*net.TCPConn).CloseWrite()
+		closeWrite(destConn)
 		slog.Debug("done copying from src to dest")
 	}()
 
 	wg.Wait()
 	slog.Debug("done")
+}
+
+// closeWrite half-closes conn when it supports it. net.TCPConn does; test
+// doubles and future wrappers may not.
+func closeWrite(conn net.Conn) {
+	cw, ok := conn.(interface{ CloseWrite() error })
+	if !ok {
+		return
+	}
+	if err := cw.CloseWrite(); err != nil {
+		slog.Debug("can't half-close connection", "err", err)
+	}
 }
