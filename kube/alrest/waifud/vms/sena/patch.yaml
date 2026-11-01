@@ -1,0 +1,19 @@
+- op: replace
+  path: /metadata/name
+  value: sena
+- op: replace
+  path: /spec/template/spec/volumes/1/cloudInitNoCloud/userData
+  value: |
+    #cloud-config
+    hostname: sena
+    ssh_pwauth: True
+    disable_root: false
+
+    users:
+      - name: xe
+        groups: [ wheel ]
+        sudo: [ "ALL=(ALL) NOPASSWD:ALL" ]
+        shell: /bin/sh
+        ssh-authorized-keys:
+          - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIF6/+q2dBHEfETomAH7rvDPXHulSXnhcV/szxTAWiKZA cadey@defoko
+          - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJIH27tCTJZwJxp+bcWRALtrk7SqnwXZ4/Ae67jIO0eF cadey@shiroko

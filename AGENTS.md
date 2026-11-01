@@ -8,12 +8,8 @@ Go monorepo for within.website services. JS tooling via npm.
 - `internal.HandleStartup()` calls `flag.Parse()` — binaries must **not** call `flag.Parse()` themselves.
 - All git commits require `--signoff`.
 
-## Commit Messages
-
-Follow **Conventional Commits** — see the `conventional-commits` skill.
-
 ## Guidelines
 
-- [Code Style](.claude/code-style.md)
-- [Git Workflow](.claude/git-workflow.md)
-- [Project Info](.claude/project-info.md)
+- [Code Style](.agents/code-style.md) -- `xe-go-style` and `go-table-driven-tests` skills.
+- [Git Workflow](.agents/git-workflow.md) -- `conventional-commits` skill
+- [Project Info](.agents/project-info.md)

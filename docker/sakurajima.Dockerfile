@@ -1,13 +1,13 @@
 ARG ALPINE_VERSION=3.22
-FROM --platform=${BUILDPLATFORM} alpine:${ALPINE_VERSION} AS build
+FROM --platform=${BUILDPLATFORM} golang:alpine AS build
 
-RUN apk add --no-cache go git build-base bash
+RUN apk add --no-cache git build-base bash
 
 WORKDIR /app
 
 COPY go.mod go.sum ./
 RUN --mount=type=cache,target=/root/.cache \
-  --mount=type=cache,target=/root/go \
+  --mount=type=cache,target=/go/pkg/mod \
   go mod download
 
 ARG TARGETOS
@@ -16,7 +16,7 @@ ARG VERSION=devel-docker
 
 COPY . .
 RUN --mount=type=cache,target=/root/.cache \
-  --mount=type=cache,target=/root/go \
+  --mount=type=cache,target=/go/pkg/mod \
   GOOS=${TARGETOS} \
   GOARCH=${TARGETARCH} \
   CGO_ENABLED=0 \

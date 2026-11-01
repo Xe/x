@@ -1,4 +1,4 @@
-FROM golang:1.25 AS build
+FROM golang:latest AS build
 WORKDIR /app
 
 # Cache module download

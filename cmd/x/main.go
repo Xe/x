@@ -34,6 +34,7 @@ func main() {
 	// Xev decision API
 	subcommands.Register(&xev.Pick{}, "xev")
 	subcommands.Register(&xev.Noul{}, "xev")
+	subcommands.Register(&xev.Score{}, "xev")
 
 	// // Events
 	// subcommands.Register(&miListEvents{}, "events")
