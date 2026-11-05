@@ -15,6 +15,7 @@ import (
 
 	"within.website/x/cmd/iamd/models"
 	stsv1 "within.website/x/gen/within/website/x/iam/sts/v1"
+	iamv1 "within.website/x/gen/within/website/x/iam/v1"
 	"within.website/x/web/middleware/sigv4"
 )
 
@@ -96,16 +97,39 @@ func (s *SigningKeys) GetSigningKey(ctx context.Context, req *stsv1.GetSigningKe
 		cacheUntil = notValidAfter
 	}
 
+	id, policies, err := s.identityAndPolicies(ctx, k)
+	if err != nil {
+		return nil, twirp.InternalErrorf("can't load identity policies")
+	}
+
 	return &stsv1.GetSigningKeyResponse{
-		SigningKey: sigv4.DeriveSigningKey(k.SecretAccessKey, req.GetDate(), req.GetRegion(), req.GetService()),
-		Identity: &stsv1.TokenIdentity{
-			AccessKeyId: k.AccessKeyID,
-			PrincipalId: k.User.UUID,
-			DisplayName: k.User.Name,
-		},
+		SigningKey:    sigv4.DeriveSigningKey(k.SecretAccessKey, req.GetDate(), req.GetRegion(), req.GetService()),
+		Identity:      id,
+		Policies:      policies,
 		NotValidAfter: timestamppb.New(notValidAfter),
 		CacheUntil:    timestamppb.New(cacheUntil),
 	}, nil
+}
+
+// identityAndPolicies builds the TokenIdentity for the key's owning user and
+// that user's effective policy set. Admin identities carry an empty policy
+// list: they bypass evaluation, so there is nothing for a verifier to fetch.
+// The key is pre-checked (user present, not disabled) by both callers.
+func (s *SigningKeys) identityAndPolicies(ctx context.Context, k *models.Key) (*stsv1.TokenIdentity, []*iamv1.Policy, error) {
+	id := &stsv1.TokenIdentity{
+		AccessKeyId: k.AccessKeyID,
+		PrincipalId: k.User.UUID,
+		DisplayName: k.User.Name,
+		IsAdmin:     k.User.IsAdmin,
+	}
+	if k.User.IsAdmin {
+		return id, nil, nil
+	}
+	ps, err := s.dao.PoliciesForUser(ctx, k.User.UUID)
+	if err != nil {
+		return nil, nil, err
+	}
+	return id, ps, nil
 }
 
 func (s *SigningKeys) now() time.Time {

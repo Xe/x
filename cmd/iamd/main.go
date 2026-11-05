@@ -15,10 +15,12 @@ import (
 	"within.website/x"
 	"within.website/x/cmd/iamd/models"
 	"within.website/x/cmd/iamd/services/iam/keys"
+	"within.website/x/cmd/iamd/services/iam/policies"
 	"within.website/x/cmd/iamd/services/iam/sts"
 	"within.website/x/cmd/iamd/services/iam/users"
 	stsv1 "within.website/x/gen/within/website/x/iam/sts/v1"
 	iamv1 "within.website/x/gen/within/website/x/iam/v1"
+	"within.website/x/iam/authz"
 	"within.website/x/internal"
 	"within.website/x/twirp/twirpslog"
 )
@@ -56,21 +58,33 @@ func main() {
 // authMW per request), then resolve the caller to its DAO user (available
 // downstream via sigv4a.User). The SigningKeyService route's callers are
 // downstream verifiers authenticating with their own IAM credential.
-func newMux(lg *slog.Logger, dao *models.DAO, authMW func(http.Handler) http.Handler, signingKeyCacheTTL time.Duration) *http.ServeMux {
+func newMux(lg *slog.Logger, dao *models.DAO, authMW func(http.Handler) http.Handler, eval *authz.Evaluator, signingKeyCacheTTL time.Duration) *http.ServeMux {
 	mux := http.NewServeMux()
 
 	// Verify the signature, then annotate the request with the caller's user
 	// (read downstream via sigv4a.User).
 	stack := chain(authMW, UserMiddleware(dao))
 
+	// Authorization runs inside each Twirp server as an interceptor, where
+	// the decoded request message is available: policy filters evaluate
+	// over (method, req, principal). The logging interceptor is outermost
+	// so denials are logged with their outcome.
+	withAuthz := twirp.WithServerInterceptors(
+		twirpslog.Interceptor(lg),
+		policyInterceptor(lg, dao, eval),
+	)
+
 	us := users.New(dao)
-	mux.Handle(iamv1.UserServicePathPrefix, stack(iamv1.NewUserServiceServer(us, twirp.WithServerInterceptors(twirpslog.Interceptor(lg)))))
+	mux.Handle(iamv1.UserServicePathPrefix, stack(iamv1.NewUserServiceServer(us, withAuthz)))
 
 	ks := keys.New(dao)
-	mux.Handle(iamv1.KeyServicePathPrefix, stack(iamv1.NewKeyServiceServer(ks, twirp.WithServerInterceptors(twirpslog.Interceptor(lg)))))
+	mux.Handle(iamv1.KeyServicePathPrefix, stack(iamv1.NewKeyServiceServer(ks, withAuthz)))
+
+	ps := policies.New(dao)
+	mux.Handle(iamv1.PolicyServicePathPrefix, stack(iamv1.NewPolicyServiceServer(ps, withAuthz)))
 
 	sk := sts.NewSigningKeys(dao, signingKeyCacheTTL)
-	mux.Handle(stsv1.SigningKeyServicePathPrefix, stack(stsv1.NewSigningKeyServiceServer(sk, twirp.WithServerInterceptors(twirpslog.Interceptor(lg)))))
+	mux.Handle(stsv1.SigningKeyServicePathPrefix, stack(stsv1.NewSigningKeyServiceServer(sk, withAuthz)))
 
 	return mux
 }
@@ -111,7 +125,12 @@ func run(ctx context.Context, lg *slog.Logger) error {
 	// The route middleware is the dual verifier's only consumer: it
 	// authenticates every caller to iamd, including SigningKeyService.
 	authMW := newDualVerifier(dao, *region, *service, *maxBodySize)
-	mux := newMux(lg, dao, authMW, *signingKeyCacheTTL)
+
+	eval, err := newAuthorizer()
+	if err != nil {
+		return fmt.Errorf("can't build policy evaluator: %w", err)
+	}
+	mux := newMux(lg, dao, authMW, eval, *signingKeyCacheTTL)
 
 	g, ctx := errgroup.WithContext(ctx)
 

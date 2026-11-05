@@ -36,6 +36,7 @@ import (
 	"golang.org/x/sync/singleflight"
 
 	stsv1 "within.website/x/gen/within/website/x/iam/sts/v1"
+	iamv1 "within.website/x/gen/within/website/x/iam/v1"
 	"within.website/x/web/middleware/authctx"
 	"within.website/x/web/middleware/sigv4a"
 )
@@ -93,6 +94,7 @@ type Verifier struct {
 type entry struct {
 	pub       *ecdsa.PublicKey
 	identity  *stsv1.TokenIdentity
+	policies  []*iamv1.Policy
 	err       error
 	expiresAt time.Time
 }
@@ -122,17 +124,20 @@ func New(cfg Config) *Verifier {
 }
 
 // Middleware wraps next so every request is verified locally against a cached
-// public key. On success the caller identity is stored in the request
-// context (see Caller). Error mapping matches the local sigv4a middleware.
+// public key. On success the caller identity and its effective policy set
+// are stored in the request context (see Caller and authctx.PrincipalPolicies).
+// Error mapping matches the local sigv4a middleware.
 func (v *Verifier) Middleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		id, err := v.Verify(r)
+		id, e, err := v.verify(r)
 		if err != nil {
 			slog.DebugContext(r.Context(), "iamsts: cannot verify request", "err", err, "method", r.Method, "path", r.URL.Path)
 			twirp.WriteError(w, sigv4a.TwirpError(r.Context(), err))
 			return
 		}
-		next.ServeHTTP(w, r.WithContext(withCaller(r.Context(), id)))
+		ctx := withCaller(r.Context(), id)
+		ctx = authctx.WithPrincipalPolicies(ctx, e.policies)
+		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
 
@@ -142,9 +147,16 @@ func (v *Verifier) Middleware(next http.Handler) http.Handler {
 // cache. The request body is buffered and reset so downstream handlers can
 // read it. On success it returns the caller identity.
 func (v *Verifier) Verify(r *http.Request) (*Identity, error) {
+	id, _, err := v.verify(r)
+	return id, err
+}
+
+// verify is Verify's implementation, also returning the cache entry used so
+// Middleware can surface the caller's policies without a second lookup.
+func (v *Verifier) verify(r *http.Request) (*Identity, *entry, error) {
 	keyID, err := v.inner.Verify(r)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	// The signature checked out, so this entry was just used; re-read it for
@@ -152,7 +164,7 @@ func (v *Verifier) Verify(r *http.Request) (*Identity, error) {
 	// refetches — still off the hot path.
 	e, err := v.entry(r.Context(), keyID)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	id := &Identity{
@@ -160,11 +172,12 @@ func (v *Verifier) Verify(r *http.Request) (*Identity, error) {
 		OrganizationID: e.identity.GetOrganizationId(),
 		PrincipalID:    e.identity.GetPrincipalId(),
 		DisplayName:    e.identity.GetDisplayName(),
+		IsAdmin:        e.identity.GetIsAdmin(),
 	}
 	if t, terr := time.Parse(amzTimeFormat, r.Header.Get("X-Amz-Date")); terr == nil {
 		id.SignedAt = t
 	}
-	return id, nil
+	return id, e, nil
 }
 
 // LookupPublicKey implements sigv4a.PublicKeyLookuper through the cache. The
@@ -251,7 +264,7 @@ func (v *Verifier) fetch(ctx context.Context, accessKeyID string) (*entry, error
 		return nil, fmt.Errorf("iamsts: response public key is %T, want ECDSA P-256", parsed)
 	}
 
-	e := &entry{pub: pub, identity: resp.GetIdentity()}
+	e := &entry{pub: pub, identity: resp.GetIdentity(), policies: resp.GetPolicies()}
 	// Honor the server's caching bound exactly: a response without
 	// cache_until is used for this request but never cached — the server
 	// declined to grant a TTL and we do not invent one.

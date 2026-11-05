@@ -3,6 +3,7 @@ package within.website.x.iam.sts.v1;
 
 import "buf/validate/validate.proto";
 import "google/protobuf/timestamp.proto";
+import "within/website/x/iam/v1/policy.proto";
 
 // SigningKeyService hands out SigV4 derived signing keys so that downstream
 // services can verify request signatures locally without ever holding raw
@@ -73,11 +74,16 @@ message GetSigningKeyResponse {
   // clock skew, after which no legitimate request can carry this scope.
   // Never cache the key past this instant.
   google.protobuf.Timestamp not_valid_after = 3;
-
   // How long the caller may cache this response before asking again. Bounds
   // revocation latency: a disabled key stops verifying within one cache TTL
   // instead of at end of day. Always <= not_valid_after.
   google.protobuf.Timestamp cache_until = 4;
+
+  // The caller's effective policy set: every document attached to the
+  // identity's user. Downstream verifiers evaluate these locally (see
+  // within.website/x/iam/authz) instead of calling back per request. Empty
+  // for an admin identity, which bypasses policy evaluation.
+  repeated within.website.x.iam.v1.Policy policies = 5;
 }
 
 message GetPublicKeyRequest {
@@ -98,6 +104,9 @@ message GetPublicKeyResponse {
   // revocation latency: a disabled key stops verifying within one cache TTL.
   // A response without cache_until may be used once but never cached.
   google.protobuf.Timestamp cache_until = 3;
+
+  // The caller's effective policy set, mirroring GetSigningKeyResponse.
+  repeated within.website.x.iam.v1.Policy policies = 4;
 }
 
 // TokenIdentity identifies the principal a signing key belongs to.
@@ -115,4 +124,8 @@ message TokenIdentity {
 
   // Human-readable name for logs and error messages: iamd's user name.
   string display_name = 4;
+
+  // Whether the principal is an iamd admin. Admin bypasses policy
+  // evaluation (allow-all); verifiers must honor it exactly as iamd does.
+  bool is_admin = 5;
 }

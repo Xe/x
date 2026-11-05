@@ -1,0 +1,209 @@
+syntax = "proto3";
+package within.website.x.iam.v1;
+
+import "buf/validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+
+// The policy engine grants and denies RPC calls the way AWS IAM policies
+// grant and deny API actions, with one substitution: where AWS matches on
+// action + resource + condition operators, here a statement matches on the
+// RPC's full method name and an optional CEL filter evaluated over the typed
+// request message.
+//
+// Evaluation, per call, over every policy attached to the caller:
+//
+//  1. A statement applies when one of its methods matches the RPC's full
+//     method name and, when filter is set, the filter evaluates to true.
+//  2. Any applying DENY statement denies the call. Explicit deny wins.
+//  3. Otherwise any applying ALLOW statement allows the call.
+//  4. Otherwise the call is implicitly denied.
+//
+// A user flagged is_admin bypasses policy evaluation entirely (allow-all);
+// that flag is the bootstrap credential that can mint and attach policies.
+//
+// Method names are "<proto package>.<Service>/<Method>", e.g.
+// "within.website.x.iam.v1.KeyService/ListKeys". Patterns are anchored
+// full-string matches where "*" spans any characters including "/" and "?"
+// matches exactly one character:
+//
+//   "*"                                          - every method
+//   "within.website.x.iam.v1.KeyService/*"       - one whole service
+//   "within.website.x.iam.v1.*/List*"            - listers across services
+//
+// Filters are CEL expressions evaluated with three bindings:
+//
+//   method    string  - the full method name being called
+//   req       message - the decoded request proto for that method
+//   principal message - within.website.x.iam.sts.v1.TokenIdentity for the
+//                       caller; principal.principal_id is the user UUID
+//
+// Example filters:
+//
+//   ""                                            - no condition
+//   "req.user_id == principal.principal_id"       - own resources only
+//   "has(req.comment) && req.comment != ''"       - field inspection
+//
+// An empty filter is always true. A filter that fails to compile against the
+// method's request type, or errors at evaluation, fails closed: the
+// statement is treated as not applying and the reason is logged. Policies
+// are syntax-checked when written; only services that know a method's
+// request type can type-check its filters.
+
+// Effect is what a statement does when it applies.
+enum Effect {
+  EFFECT_UNSPECIFIED = 0;
+  EFFECT_ALLOW = 1;
+  EFFECT_DENY = 2;
+}
+
+// PolicyStatement is one allow or deny rule.
+message PolicyStatement {
+  Effect effect = 1 [(buf.validate.field).enum = {
+    defined_only: true
+    not_in: [0]
+  }];
+
+  // Anchored glob patterns against full method names; at least one required.
+  repeated string methods = 2 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.unique = true,
+    (buf.validate.field).repeated.items.string.min_len = 1
+  ];
+
+  // Optional CEL filter over (method, req, principal). Empty means true.
+  string filter = 3;
+}
+
+// Policy is a named, reusable document. Users reference policies by id;
+// editing a policy document is not supported after creation (attach a new
+// one and detach the old), so a compiled snapshot always matches what an
+// enforcing service fetched.
+message Policy {
+  // UUID version 7 (time-ordered), like User.id.
+  string id = 1;
+
+  // Human-readable name, unique across the deployment.
+  string name = 2 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 128
+  }];
+
+  repeated PolicyStatement statements = 3 [(buf.validate.field).repeated.min_items = 1];
+
+  google.protobuf.Timestamp created_at = 4;
+  google.protobuf.Timestamp updated_at = 5;
+}
+
+// PolicyService manages policy documents and their attachment to users.
+// Every method requires an admin caller; policy administration is itself
+// gated by is_admin, never by policies, so there is no way to lock yourself
+// out of the management surface.
+service PolicyService {
+  // CreatePolicy stores a new document. The statements' filters are
+  // syntax-checked; INVALID_ARGUMENT reports the first failure.
+  //
+  // Errors:
+  //   PERMISSION_DENIED - caller is not an admin
+  //   INVALID_ARGUMENT  - validation failure, including CEL syntax
+  //   ALREADY_EXISTS    - name already in use
+  rpc CreatePolicy(CreatePolicyReq) returns (CreatePolicyResp);
+
+  // DeletePolicy removes a document. It is refused while any user still has
+  // it attached, so an enforcement snapshot never references a missing doc.
+  //
+  // Errors:
+  //   PERMISSION_DENIED - caller is not an admin
+  //   FAILED_PRECONDITION - policy still attached to at least one user
+  //   NOT_FOUND         - no such policy id
+  rpc DeletePolicy(DeletePolicyReq) returns (DeletePolicyResp);
+
+  // GetPolicy returns one document by id.
+  //
+  // Errors:
+  //   PERMISSION_DENIED - caller is not an admin
+  //   NOT_FOUND         - no such policy id
+  rpc GetPolicy(GetPolicyReq) returns (GetPolicyResp);
+
+  // ListPolicies enumerates documents, newest first, paginated.
+  //
+  // Errors:
+  //   PERMISSION_DENIED - caller is not an admin
+  rpc ListPolicies(ListPoliciesReq) returns (ListPoliciesResp);
+
+  // AttachPolicy binds a document to a user. Takes effect on the caller's
+  // next authenticated RPC (or when a downstream verifier's policy cache
+  // expires, bounded by the signing-key cache TTL).
+  //
+  // Errors:
+  //   PERMISSION_DENIED - caller is not an admin
+  //   NOT_FOUND         - no such policy id or user id
+  //   ALREADY_EXISTS    - user already has this policy attached
+  rpc AttachPolicy(AttachPolicyReq) returns (AttachPolicyResp);
+
+  // DetachPolicy unbinds a document from a user.
+  //
+  // Errors:
+  //   PERMISSION_DENIED - caller is not an admin
+  //   NOT_FOUND         - no such attachment
+  rpc DetachPolicy(DetachPolicyReq) returns (DetachPolicyResp);
+
+  // ListPoliciesForUser returns every document attached to a user.
+  //
+  // Errors:
+  //   PERMISSION_DENIED - caller is not an admin
+  //   NOT_FOUND         - no such user id
+  rpc ListPoliciesForUser(ListPoliciesForUserReq) returns (ListPoliciesForUserResp);
+}
+
+message CreatePolicyReq {
+  Policy policy = 1 [(buf.validate.field).required = true];
+}
+
+message CreatePolicyResp {
+  Policy policy = 1;
+}
+
+message DeletePolicyReq {
+  string policy_id = 1 [(buf.validate.field).required = true];
+}
+
+message DeletePolicyResp {}
+
+message GetPolicyReq {
+  string policy_id = 1 [(buf.validate.field).required = true];
+}
+
+message GetPolicyResp {
+  Policy policy = 1;
+}
+
+message ListPoliciesReq {
+  int32 count = 1 [(buf.validate.field).required = true];
+  int32 page = 2;
+}
+
+message ListPoliciesResp {
+  repeated Policy policies = 1;
+}
+
+message AttachPolicyReq {
+  string policy_id = 1 [(buf.validate.field).required = true];
+  string user_id = 2 [(buf.validate.field).required = true];
+}
+
+message AttachPolicyResp {}
+
+message DetachPolicyReq {
+  string policy_id = 1 [(buf.validate.field).required = true];
+  string user_id = 2 [(buf.validate.field).required = true];
+}
+
+message DetachPolicyResp {}
+
+message ListPoliciesForUserReq {
+  string user_id = 1 [(buf.validate.field).required = true];
+}
+
+message ListPoliciesForUserResp {
+  repeated Policy policies = 1;
+}

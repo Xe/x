@@ -34,6 +34,7 @@ import (
 	"golang.org/x/sync/singleflight"
 
 	stsv1 "within.website/x/gen/within/website/x/iam/sts/v1"
+	iamv1 "within.website/x/gen/within/website/x/iam/v1"
 	"within.website/x/web/middleware/authctx"
 	"within.website/x/web/middleware/sigv4"
 )
@@ -104,6 +105,7 @@ func (k scopeKey) String() string {
 type entry struct {
 	signingKey []byte
 	identity   *stsv1.TokenIdentity
+	policies   []*iamv1.Policy
 	err        error
 	expiresAt  time.Time
 }
@@ -133,17 +135,20 @@ func New(cfg Config) *Verifier {
 }
 
 // Middleware wraps next so every request is verified locally against a cached
-// signing key. On success the caller identity is stored in the request
-// context (see Caller). Error mapping matches the local sigv4 middleware.
+// signing key. On success the caller identity and its effective policy set
+// are stored in the request context (see Caller and authctx.PrincipalPolicies).
+// Error mapping matches the local sigv4 middleware.
 func (v *Verifier) Middleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		id, err := v.Verify(r)
+		id, e, err := v.verify(r)
 		if err != nil {
 			slog.DebugContext(r.Context(), "iamsts: cannot verify request", "err", err, "method", r.Method, "path", r.URL.Path)
 			twirp.WriteError(w, sigv4.TwirpError(r.Context(), err))
 			return
 		}
-		next.ServeHTTP(w, r.WithContext(withCaller(r.Context(), id)))
+		ctx := withCaller(r.Context(), id)
+		ctx = authctx.WithPrincipalPolicies(ctx, e.policies)
+		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
 
@@ -153,9 +158,16 @@ func (v *Verifier) Middleware(next http.Handler) http.Handler {
 // Verifier's cache. The request body is buffered and reset so downstream
 // handlers can read it. On success it returns the caller identity.
 func (v *Verifier) Verify(r *http.Request) (*Identity, error) {
+	id, _, err := v.verify(r)
+	return id, err
+}
+
+// verify is Verify's implementation, also returning the cache entry used so
+// Middleware can surface the caller's policies without a second lookup.
+func (v *Verifier) verify(r *http.Request) (*Identity, *entry, error) {
 	keyID, err := v.inner.Verify(r)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	// The signature checked out, so the credential parses and its scope
@@ -163,11 +175,11 @@ func (v *Verifier) Verify(r *http.Request) (*Identity, error) {
 	// it expired in between, this refetches — still off the hot path.
 	cred, err := sigv4.ParseCredential(r.Header.Get("Authorization"))
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	e, err := v.entry(r.Context(), scopeKey{cred.AccessKeyID, cred.Date, cred.Region, cred.Service})
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	id := &Identity{
@@ -175,11 +187,12 @@ func (v *Verifier) Verify(r *http.Request) (*Identity, error) {
 		OrganizationID: e.identity.GetOrganizationId(),
 		PrincipalID:    e.identity.GetPrincipalId(),
 		DisplayName:    e.identity.GetDisplayName(),
+		IsAdmin:        e.identity.GetIsAdmin(),
 	}
 	if t, terr := time.Parse(amzTimeFormat, r.Header.Get("X-Amz-Date")); terr == nil {
 		id.SignedAt = t
 	}
-	return id, nil
+	return id, e, nil
 }
 
 // LookupSigningKey implements sigv4.SigningKeyLookuper through the cache. The
@@ -266,6 +279,7 @@ func (v *Verifier) fetch(ctx context.Context, k scopeKey) (*entry, error) {
 	e := &entry{
 		signingKey: resp.GetSigningKey(),
 		identity:   resp.GetIdentity(),
+		policies:   resp.GetPolicies(),
 	}
 	// Honor the server's caching bounds exactly: cache_until is the TTL,
 	// clamped by not_valid_after. A response without cache_until is used for

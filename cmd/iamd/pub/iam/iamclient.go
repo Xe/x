@@ -10,8 +10,9 @@ import (
 )
 
 type Client struct {
-	Keys  iamv1.KeyService
-	Users iamv1.UserService
+	Keys     iamv1.KeyService
+	Users    iamv1.UserService
+	Policies iamv1.PolicyService
 }
 
 func New(ctx context.Context, endpoint, region, accessKeyID, secretAccessKey string) (*Client, error) {
@@ -33,9 +34,11 @@ func New(ctx context.Context, endpoint, region, accessKeyID, secretAccessKey str
 
 	keys := iamv1.NewKeyServiceProtobufClient(endpoint, hc)
 	users := iamv1.NewUserServiceProtobufClient(endpoint, hc)
+	policies := iamv1.NewPolicyServiceProtobufClient(endpoint, hc)
 
 	return &Client{
-		Keys:  keys,
-		Users: users,
+		Keys:     keys,
+		Users:    users,
+		Policies: policies,
 	}, nil
 }
