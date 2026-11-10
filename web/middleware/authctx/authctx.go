@@ -50,7 +50,28 @@ type Identity struct {
 	OrganizationID string
 	PrincipalID    string
 	DisplayName    string
-	SignedAt       time.Time
+	// IsAdmin propagates iamd's admin flag: admin callers bypass policy
+	// evaluation everywhere, exactly as they do inside iamd.
+	IsAdmin  bool
+	SignedAt time.Time
+}
+
+type principalPoliciesKey struct{}
+
+// WithPrincipalPolicies stores the caller's effective policy set in ctx. It
+// is populated by the iamsts verifiers from the SigningKeyService response
+// alongside WithCaller, so downstream services can authorize calls locally
+// (see within.website/x/iam/authz) without a per-request IAM RPC.
+func WithPrincipalPolicies(ctx context.Context, policies []*iamv1.Policy) context.Context {
+	return context.WithValue(ctx, principalPoliciesKey{}, policies)
+}
+
+// PrincipalPolicies returns the caller's policy set stored in ctx, if any.
+// The bool is false when nothing populated it (for example an admin caller,
+// which carries no policies because it bypasses evaluation).
+func PrincipalPolicies(ctx context.Context) ([]*iamv1.Policy, bool) {
+	p, ok := ctx.Value(principalPoliciesKey{}).([]*iamv1.Policy)
+	return p, ok
 }
 
 type callerKey struct{}
