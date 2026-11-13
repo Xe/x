@@ -7,6 +7,10 @@ managed:
   disable:
     - file_option: go_package
       module: buf.build/bufbuild/protovalidate
+    - file_option: go_package
+      module: buf.build/googleapis/googleapis
+    - file_option: go_package
+      module: buf.build/gnostic/gnostic
 plugins:
   - local: [go, tool, protoc-gen-go]
     out: gen

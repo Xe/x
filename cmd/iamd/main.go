@@ -14,6 +14,7 @@ import (
 	"golang.org/x/sync/errgroup"
 	"within.website/x"
 	"within.website/x/cmd/iamd/models"
+	"within.website/x/cmd/iamd/oidc"
 	"within.website/x/cmd/iamd/services/iam/keys"
 	"within.website/x/cmd/iamd/services/iam/policies"
 	"within.website/x/cmd/iamd/services/iam/sts"
@@ -33,6 +34,11 @@ var (
 	service       = flag.String("service", "iam", "credential-scope service all clients must sign with (both algorithms)")
 	maxBodySize   = flag.Int64("max-body-size", 1<<20, "max request body bytes hashed for SigV4A verification")
 	bootstrapUser = flag.String("bootstrap-username", "", "if set and the DB has no users, create an admin user and signing key with this name at startup and log the credentials")
+
+	oidcEnabled            = flag.Bool("oidc-enabled", false, "enable the OIDC provider (requires upstream client configuration)")
+	oidcIssuer             = flag.String("oidc-issuer", "https://iamd.xeserv.us", "public HTTPS origin used as OIDC issuer")
+	oidcUpstreamClientID   = flag.String("oidc-upstream-client-id", "", "pre-provisioned idp.xeserv.us client ID")
+	oidcUpstreamSecretFile = flag.String("oidc-upstream-client-secret-file", "", "file containing the upstream OIDC client secret")
 
 	signingKeyCacheTTL = flag.Duration("signing-key-cache-ttl", 5*time.Minute, "how long downstream verifiers may cache a derived signing key before re-fetching; bounds revocation latency")
 )
@@ -109,6 +115,11 @@ func run(ctx context.Context, lg *slog.Logger) error {
 		return fmt.Errorf("-signing-key-cache-ttl must be positive, got %s", *signingKeyCacheTTL)
 	}
 
+	oidcCfg, err := loadOIDCConfig(*oidcEnabled, *oidcIssuer, *oidcUpstreamClientID, *oidcUpstreamSecretFile)
+	if err != nil {
+		return err
+	}
+
 	dao, err := models.New(*dbLoc)
 	if err != nil {
 		return err
@@ -131,6 +142,20 @@ func run(ctx context.Context, lg *slog.Logger) error {
 		return fmt.Errorf("can't build policy evaluator: %w", err)
 	}
 	mux := newMux(lg, dao, authMW, eval, *signingKeyCacheTTL)
+	if *oidcEnabled {
+		initCtx, cancel := context.WithTimeout(ctx, 15*time.Second)
+		provider, err := oidc.New(initCtx, dao, oidcCfg)
+		cancel()
+		if err != nil {
+			return fmt.Errorf("initialize OIDC: %w", err)
+		}
+		handler, err := newOIDCTransport(provider, chain(authMW, UserMiddleware(dao)))
+		if err != nil {
+			return err
+		}
+		mux.Handle("/", handler)
+		lg.InfoContext(ctx, "OIDC enabled", "issuer", oidcCfg.Issuer)
+	}
 
 	g, ctx := errgroup.WithContext(ctx)
 

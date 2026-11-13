@@ -26,7 +26,7 @@ COPY --from=build /app/bin/iamd /app/bin/iamd
 # SQLite database lives on /data so it survives container replacement.
 VOLUME /data
 
-# 9080: IAM/STS Twirp API, 9081: Prometheus metrics
+# 9080: IAM/STS and optional OIDC Connect/HTTP APIs; 9081: Prometheus metrics
 EXPOSE 9080 9081
 
 CMD ["/app/bin/iamd", "-db-loc", "/data/iamd.db"]

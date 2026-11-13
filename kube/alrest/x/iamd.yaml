@@ -9,6 +9,12 @@ spec:
   logLevel: debug
 
   env:
+    # Enable after provisioning the upstream client and mounting its secret file.
+    # See docs/iamd-oidc.md for callbacks and the complete configuration.
+    - name: OIDC_ENABLED
+      value: "false"
+    - name: OIDC_ISSUER
+      value: "https://iamd.xeserv.us"
     # - name: BOOTSTRAP_USERNAME
     #   value: "Xe Iaso"
     - name: REGION

@@ -1,0 +1,233 @@
+syntax = "proto3";
+package within.website.x.iam.oidc.v1;
+
+import "gnostic/openapi/v3/annotations.proto";
+import "google/api/annotations.proto";
+import "google/api/httpbody.proto";
+import "google/protobuf/struct.proto";
+
+option (gnostic.openapi.v3.document) = {
+  info: {
+    title: "iamd OIDC and Connect API"
+    version: "v1"
+    description: "OIDC browser and form routes and their Connect equivalents. OAuth protocol failures are ProtocolResponse results on Connect. Standard HTTP endpoints use OAuth status, body and redirect semantics. Administration requires SigV4 or SigV4A."
+  }
+};
+
+// ProtocolRequest carries standard OAuth parameters. Credentials and browser
+// cookies travel in request headers, never in administrative identity fields.
+message ProtocolRequest {
+  string response_type = 1;
+  string client_id = 2;
+  string redirect_uri = 3;
+  string scope = 4;
+  string state = 5;
+  string nonce = 6;
+  string code_challenge = 7;
+  string code_challenge_method = 8;
+  string resource = 9;
+  string prompt = 10;
+  string max_age = 11;
+  string grant_type = 12;
+  string code = 13;
+  string refresh_token = 14;
+  string code_verifier = 15;
+  string client_assertion = 16;
+  string client_assertion_type = 17;
+  string error = 18;
+  string error_description = 19;
+  string iss = 20;
+  string token = 21;
+  string token_type_hint = 22;
+  string logout_token = 23;
+  string csrf = 24;
+  string decision = 25;
+  string transaction = 26;
+  string session_id = 27;
+  string grant_id = 28;
+  // Used by browser forms for narrowly scoped account/session actions.
+  string action = 29;
+  string id = 30;
+  // Retain unsupported extensions so the protocol engine can reject them;
+  // dropping these would silently change requested security semantics.
+  string response_mode = 31;
+  string request = 32;
+  string request_uri = 33;
+  string client_secret = 34;
+}
+
+message DocumentRequest {
+  google.protobuf.Struct document = 1;
+}
+
+// Native RPC clients get structured JSON and the protocol status. HTTP routes
+// return body verbatim (including HTML), with status/headers set by the bridge.
+// Protocol failures are responses here; transport failures use Connect errors.
+message ProtocolResponse {
+  google.api.HttpBody body = 1;
+  google.protobuf.Struct result = 2;
+  int32 http_status = 3;
+}
+
+service ProviderService {
+  rpc Discovery(ProtocolRequest) returns (ProtocolResponse) {
+    option (google.api.http) = {
+      get: "/.well-known/openid-configuration"
+      response_body: "body"
+    };
+  }
+  rpc AuthorizationServerMetadata(ProtocolRequest) returns (ProtocolResponse) {
+    option (google.api.http) = {
+      get: "/.well-known/oauth-authorization-server"
+      response_body: "body"
+    };
+  }
+  rpc Keys(ProtocolRequest) returns (ProtocolResponse) {
+    option (google.api.http) = {
+      get: "/jwks.json"
+      response_body: "body"
+    };
+  }
+  rpc Authorize(ProtocolRequest) returns (ProtocolResponse) {
+    option (google.api.http) = {
+      get: "/authorize"
+      response_body: "body"
+      additional_bindings: {
+        post: "/authorize"
+        body: "*"
+        response_body: "body"
+      }
+    };
+  }
+  rpc Token(ProtocolRequest) returns (ProtocolResponse) {
+    option (google.api.http) = {
+      post: "/token"
+      body: "*"
+      response_body: "body"
+    };
+  }
+  rpc UserInfo(ProtocolRequest) returns (ProtocolResponse) {
+    option (google.api.http) = {
+      get: "/userinfo"
+      response_body: "body"
+      additional_bindings: {
+        post: "/userinfo"
+        body: "*"
+        response_body: "body"
+      }
+    };
+  }
+  rpc Register(DocumentRequest) returns (ProtocolResponse) {
+    option (google.api.http) = {
+      post: "/register"
+      body: "document"
+      response_body: "body"
+    };
+  }
+  rpc Revoke(ProtocolRequest) returns (ProtocolResponse) {
+    option (google.api.http) = {
+      post: "/revoke"
+      body: "*"
+      response_body: "body"
+    };
+  }
+}
+
+service BrowserService {
+  rpc Login(ProtocolRequest) returns (ProtocolResponse) {
+    option (google.api.http) = {
+      get: "/login"
+      response_body: "body"
+    };
+  }
+  rpc UpstreamCallback(ProtocolRequest) returns (ProtocolResponse) {
+    option (google.api.http) = {
+      get: "/upstream/callback"
+      response_body: "body"
+    };
+  }
+  rpc BackchannelLogout(ProtocolRequest) returns (ProtocolResponse) {
+    option (google.api.http) = {
+      post: "/upstream/backchannel-logout"
+      body: "*"
+      response_body: "body"
+    };
+  }
+  rpc Consent(ProtocolRequest) returns (ProtocolResponse) {
+    option (google.api.http) = {
+      get: "/consent"
+      response_body: "body"
+      additional_bindings: {
+        post: "/consent"
+        body: "*"
+        response_body: "body"
+      }
+    };
+  }
+  rpc Account(ProtocolRequest) returns (ProtocolResponse) {
+    option (google.api.http) = {
+      get: "/account"
+      response_body: "body"
+      additional_bindings: {
+        post: "/account"
+        body: "*"
+        response_body: "body"
+      }
+    };
+  }
+  rpc Logout(ProtocolRequest) returns (ProtocolResponse) {
+    option (google.api.http) = {
+      get: "/logout"
+      response_body: "body"
+      additional_bindings: {
+        post: "/logout"
+        body: "*"
+        response_body: "body"
+      }
+    };
+  }
+}
+
+// All administrative operations require an existing SigV4/SigV4A admin.
+service AdministrationService {
+  rpc ListResources(ProtocolRequest) returns (ProtocolResponse) {
+    option (google.api.http) = {
+      get: "/admin/resources"
+      response_body: "body"
+    };
+  }
+  rpc PutResource(DocumentRequest) returns (ProtocolResponse) {
+    option (google.api.http) = {
+      post: "/admin/resources"
+      body: "document"
+      response_body: "body"
+    };
+  }
+  rpc ListClients(ProtocolRequest) returns (ProtocolResponse) {
+    option (google.api.http) = {
+      get: "/admin/clients"
+      response_body: "body"
+    };
+  }
+  rpc DisableClient(DocumentRequest) returns (ProtocolResponse) {
+    option (google.api.http) = {
+      post: "/admin/clients"
+      body: "document"
+      response_body: "body"
+    };
+  }
+  rpc LinkIdentity(DocumentRequest) returns (ProtocolResponse) {
+    option (google.api.http) = {
+      post: "/admin/identities"
+      body: "document"
+      response_body: "body"
+    };
+  }
+  rpc RotateKeys(ProtocolRequest) returns (ProtocolResponse) {
+    option (google.api.http) = {
+      post: "/admin/keys/rotate"
+      body: "*"
+      response_body: "body"
+    };
+  }
+}
