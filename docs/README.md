@@ -39,3 +39,5 @@ All of these are Go libraries.
 - [github.com/Xe/x/web/discordwebhook](https://godoc.org/github.com/Xe/x/web/discordwebhook) - Discord webhooks.
 - [github.com/Xe/x/web/switchcounter](https://godoc.org/github.com/Xe/x/web/switchcounter) - a simple interface to the https://www.switchcounter.science/ API.
 - [github.com/Xe/x/web/tokiponatokens](https://godoc.org/github.com/Xe/x/web/tokiponatokens) - a wrapper to a Toki Poka tokenizer.
+
+- [OIDC in iamd](iamd-oidc.md) — upstream login, Connect routes, registration, resources, tokens, and rollout.
