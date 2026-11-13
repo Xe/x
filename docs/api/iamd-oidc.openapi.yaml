@@ -1,0 +1,3450 @@
+components:
+  schemas:
+    connect-protocol-version:
+      const: 1
+      description: Define the version of the Connect protocol
+      enum:
+        - 1
+      title: Connect-Protocol-Version
+      type: number
+    connect-timeout-header:
+      description: Define the timeout, in ms
+      title: Connect-Timeout-Ms
+      type: number
+    connect.error:
+      additionalProperties: true
+      description: "Error type returned by Connect: https://connectrpc.com/docs/go/errors/#http-representation"
+      properties:
+        code:
+          description: The status code, which should be an enum value of [google.rpc.Code][google.rpc.Code].
+          enum:
+            - canceled
+            - unknown
+            - invalid_argument
+            - deadline_exceeded
+            - not_found
+            - already_exists
+            - permission_denied
+            - resource_exhausted
+            - failed_precondition
+            - aborted
+            - out_of_range
+            - unimplemented
+            - internal
+            - unavailable
+            - data_loss
+            - unauthenticated
+          examples:
+            - not_found
+          type: string
+        details:
+          description: A list of messages that carry the error details. There is no limit on the number of messages.
+          items:
+            $ref: "#/components/schemas/connect.error_details.Any"
+          type: array
+        message:
+          description: A developer-facing error message, which should be in English. Any user-facing error message should be localized and sent in the [google.rpc.Status.details][google.rpc.Status.details] field, or localized by the client.
+          type: string
+      title: Connect Error
+      type: object
+    connect.error_details.Any:
+      additionalProperties: true
+      description: Contains an arbitrary serialized message along with a @type that describes the type of the serialized message, with an additional debug field for ConnectRPC error details.
+      properties:
+        debug:
+          description: Deserialized error detail payload. The 'type' field indicates the schema. This field is for easier debugging and should not be relied upon for application logic.
+          discriminator:
+            propertyName: type
+          oneOf:
+            - additionalProperties: true
+              description: Detailed error information.
+              title: Any
+              type: object
+          title: Debug
+        type:
+          description: "A URL that acts as a globally unique identifier for the type of the serialized message. For example: `type.googleapis.com/google.rpc.ErrorInfo`. This is used to determine the schema of the data in the `value` field and is the discriminator for the `debug` field."
+          type: string
+        value:
+          description: The Protobuf message, serialized as bytes and base64-encoded. The specific message type is identified by the `type` field.
+          format: binary
+          type: string
+      type: object
+    google.api.HttpBody:
+      additionalProperties: false
+      description: |-
+        Message that represents an arbitrary HTTP body. It should only be used for
+         payload formats that can't be represented as JSON, such as raw binary or
+         an HTML page.
+
+
+         This message can be used both in streaming and non-streaming API methods in
+         the request as well as the response.
+
+         It can be used as a top-level request field, which is convenient if one
+         wants to extract parameters from either the URL or HTTP template into the
+         request fields and also want access to the raw HTTP body.
+
+         Example:
+
+             message GetResourceRequest {
+               // A unique request id.
+               string request_id = 1;
+
+               // The raw HTTP body is bound to this field.
+               google.api.HttpBody http_body = 2;
+
+             }
+
+             service ResourceService {
+               rpc GetResource(GetResourceRequest)
+                 returns (google.api.HttpBody);
+               rpc UpdateResource(google.api.HttpBody)
+                 returns (google.protobuf.Empty);
+
+             }
+
+         Example with streaming methods:
+
+             service CaldavService {
+               rpc GetCalendar(stream google.api.HttpBody)
+                 returns (stream google.api.HttpBody);
+               rpc UpdateCalendar(stream google.api.HttpBody)
+                 returns (stream google.api.HttpBody);
+
+             }
+
+         Use of this type only changes how the request and response bodies are
+         handled, all other features will continue to work unchanged.
+      properties:
+        content_type:
+          description: The HTTP Content-Type header value specifying the content type of the body.
+          title: content_type
+          type: string
+        data:
+          description: The HTTP request/response body as raw binary.
+          format: byte
+          title: data
+          type: string
+        extensions:
+          description: |-
+            Application specific response metadata. Must be set in the first response
+             for streaming APIs.
+          items:
+            $ref: "#/components/schemas/google.protobuf.Any"
+          title: extensions
+          type: array
+      title: HttpBody
+      type: object
+    google.protobuf.Any:
+      additionalProperties: true
+      description: Contains an arbitrary serialized message along with a @type that describes the type of the serialized message.
+      properties:
+        type:
+          type: string
+        value:
+          format: binary
+          type: string
+      type: object
+    google.protobuf.ListValue:
+      additionalProperties: false
+      description: |-
+        `ListValue` is a wrapper around a repeated field of values.
+
+         The JSON representation for `ListValue` is JSON array.
+      properties:
+        values:
+          description: Repeated field of dynamically typed values.
+          items:
+            $ref: "#/components/schemas/google.protobuf.Value"
+          title: values
+          type: array
+      title: ListValue
+      type: object
+    google.protobuf.NullValue:
+      description: |-
+        `NullValue` is a singleton enumeration to represent the null value for the
+         `Value` type union.
+
+         The JSON representation for `NullValue` is JSON `null`.
+      enum:
+        - NULL_VALUE
+      title: NullValue
+      type: string
+    google.protobuf.Struct:
+      additionalProperties:
+        $ref: "#/components/schemas/google.protobuf.Value"
+      description: |-
+        `Struct` represents a structured data value, consisting of fields
+         which map to dynamically typed values. In some languages, `Struct`
+         might be supported by a native representation. For example, in
+         scripting languages like JS a struct is represented as an
+         object. The details of that representation are described together
+         with the proto support for the language.
+
+         The JSON representation for `Struct` is JSON object.
+      type: object
+    google.protobuf.Struct.FieldsEntry:
+      additionalProperties: false
+      properties:
+        key:
+          title: key
+          type: string
+        value:
+          $ref: "#/components/schemas/google.protobuf.Value"
+          title: value
+      title: FieldsEntry
+      type: object
+    google.protobuf.Value:
+      description: |-
+        `Value` represents a dynamically typed value which can be either
+         null, a number, a string, a boolean, a recursive struct value, or a
+         list of values. A producer of value is expected to set one of these
+         variants. Absence of any variant indicates an error.
+
+         The JSON representation for `Value` is JSON value.
+      oneOf:
+        - type: "null"
+        - type: number
+        - type: string
+        - type: boolean
+        - type: array
+        - additionalProperties: true
+          type: object
+    within.website.x.iam.oidc.v1.DocumentRequest:
+      additionalProperties: false
+      properties:
+        document:
+          $ref: "#/components/schemas/google.protobuf.Struct"
+          title: document
+      title: DocumentRequest
+      type: object
+    within.website.x.iam.oidc.v1.ProtocolRequest:
+      additionalProperties: false
+      description: |-
+        ProtocolRequest carries standard OAuth parameters. Credentials and browser
+         cookies travel in request headers, never in administrative identity fields.
+      properties:
+        action:
+          description: Used by browser forms for narrowly scoped account/session actions.
+          title: action
+          type: string
+        client_assertion:
+          title: client_assertion
+          type: string
+        client_assertion_type:
+          title: client_assertion_type
+          type: string
+        client_id:
+          title: client_id
+          type: string
+        client_secret:
+          title: client_secret
+          type: string
+        code:
+          title: code
+          type: string
+        code_challenge:
+          title: code_challenge
+          type: string
+        code_challenge_method:
+          title: code_challenge_method
+          type: string
+        code_verifier:
+          title: code_verifier
+          type: string
+        csrf:
+          title: csrf
+          type: string
+        decision:
+          title: decision
+          type: string
+        error:
+          title: error
+          type: string
+        error_description:
+          title: error_description
+          type: string
+        grant_id:
+          title: grant_id
+          type: string
+        grant_type:
+          title: grant_type
+          type: string
+        id:
+          title: id
+          type: string
+        iss:
+          title: iss
+          type: string
+        logout_token:
+          title: logout_token
+          type: string
+        max_age:
+          title: max_age
+          type: string
+        nonce:
+          title: nonce
+          type: string
+        prompt:
+          title: prompt
+          type: string
+        redirect_uri:
+          title: redirect_uri
+          type: string
+        refresh_token:
+          title: refresh_token
+          type: string
+        request:
+          title: request
+          type: string
+        request_uri:
+          title: request_uri
+          type: string
+        resource:
+          title: resource
+          type: string
+        response_mode:
+          description: |-
+            Retain unsupported extensions so the protocol engine can reject them;
+             dropping these would silently change requested security semantics.
+          title: response_mode
+          type: string
+        response_type:
+          title: response_type
+          type: string
+        scope:
+          title: scope
+          type: string
+        session_id:
+          title: session_id
+          type: string
+        state:
+          title: state
+          type: string
+        token:
+          title: token
+          type: string
+        token_type_hint:
+          title: token_type_hint
+          type: string
+        transaction:
+          title: transaction
+          type: string
+      title: ProtocolRequest
+      type: object
+    within.website.x.iam.oidc.v1.ProtocolResponse:
+      additionalProperties: false
+      description: |-
+        Native RPC clients get structured JSON and the protocol status. HTTP routes
+         return body verbatim (including HTML), with status/headers set by the bridge.
+         Protocol failures are responses here; transport failures use Connect errors.
+      properties:
+        body:
+          $ref: "#/components/schemas/google.api.HttpBody"
+          title: body
+        http_status:
+          format: int32
+          title: http_status
+          type: integer
+        result:
+          $ref: "#/components/schemas/google.protobuf.Struct"
+          title: result
+      title: ProtocolResponse
+      type: object
+info:
+  description: OIDC browser and form routes and their Connect equivalents. OAuth protocol failures are ProtocolResponse results on Connect. Standard HTTP endpoints use OAuth status, body and redirect semantics. Administration requires SigV4 or SigV4A.
+  title: iamd OIDC and Connect API
+  version: v1
+openapi: 3.1.0
+paths:
+  /.well-known/oauth-authorization-server:
+    get:
+      operationId: within_website_x_iam_oidc_v1_ProviderService_AuthorizationServerMetadata_get
+      parameters:
+        - in: query
+          name: response_type
+          schema:
+            type: string
+        - in: query
+          name: client_id
+          schema:
+            type: string
+        - in: query
+          name: redirect_uri
+          schema:
+            type: string
+        - in: query
+          name: scope
+          schema:
+            type: string
+        - in: query
+          name: state
+          schema:
+            type: string
+        - in: query
+          name: nonce
+          schema:
+            type: string
+        - in: query
+          name: code_challenge
+          schema:
+            type: string
+        - in: query
+          name: code_challenge_method
+          schema:
+            type: string
+        - in: query
+          name: resource
+          schema:
+            type: string
+        - in: query
+          name: prompt
+          schema:
+            type: string
+        - in: query
+          name: max_age
+          schema:
+            type: string
+        - in: query
+          name: grant_type
+          schema:
+            type: string
+        - in: query
+          name: code
+          schema:
+            type: string
+        - in: query
+          name: refresh_token
+          schema:
+            type: string
+        - in: query
+          name: code_verifier
+          schema:
+            type: string
+        - in: query
+          name: client_assertion
+          schema:
+            type: string
+        - in: query
+          name: client_assertion_type
+          schema:
+            type: string
+        - in: query
+          name: error
+          schema:
+            type: string
+        - in: query
+          name: error_description
+          schema:
+            type: string
+        - in: query
+          name: iss
+          schema:
+            type: string
+        - in: query
+          name: token
+          schema:
+            type: string
+        - in: query
+          name: token_type_hint
+          schema:
+            type: string
+        - in: query
+          name: logout_token
+          schema:
+            type: string
+        - in: query
+          name: csrf
+          schema:
+            type: string
+        - in: query
+          name: decision
+          schema:
+            type: string
+        - in: query
+          name: transaction
+          schema:
+            type: string
+        - in: query
+          name: session_id
+          schema:
+            type: string
+        - in: query
+          name: grant_id
+          schema:
+            type: string
+        - in: query
+          name: action
+          schema:
+            type: string
+        - in: query
+          name: id
+          schema:
+            type: string
+        - in: query
+          name: response_mode
+          schema:
+            type: string
+        - in: query
+          name: request
+          schema:
+            type: string
+        - in: query
+          name: request_uri
+          schema:
+            type: string
+        - in: query
+          name: client_secret
+          schema:
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                additionalProperties: true
+                type: object
+          description: Protocol response
+        "400":
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                  error_description:
+                    type: string
+                required:
+                  - error
+                type: object
+          description: OAuth protocol error
+        "500":
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                  error_description:
+                    type: string
+                required:
+                  - error
+                type: object
+          description: Server error
+      summary: AuthorizationServerMetadata
+      tags:
+        - ProviderService
+  /.well-known/openid-configuration:
+    get:
+      operationId: within_website_x_iam_oidc_v1_ProviderService_Discovery_get
+      parameters:
+        - in: query
+          name: response_type
+          schema:
+            type: string
+        - in: query
+          name: client_id
+          schema:
+            type: string
+        - in: query
+          name: redirect_uri
+          schema:
+            type: string
+        - in: query
+          name: scope
+          schema:
+            type: string
+        - in: query
+          name: state
+          schema:
+            type: string
+        - in: query
+          name: nonce
+          schema:
+            type: string
+        - in: query
+          name: code_challenge
+          schema:
+            type: string
+        - in: query
+          name: code_challenge_method
+          schema:
+            type: string
+        - in: query
+          name: resource
+          schema:
+            type: string
+        - in: query
+          name: prompt
+          schema:
+            type: string
+        - in: query
+          name: max_age
+          schema:
+            type: string
+        - in: query
+          name: grant_type
+          schema:
+            type: string
+        - in: query
+          name: code
+          schema:
+            type: string
+        - in: query
+          name: refresh_token
+          schema:
+            type: string
+        - in: query
+          name: code_verifier
+          schema:
+            type: string
+        - in: query
+          name: client_assertion
+          schema:
+            type: string
+        - in: query
+          name: client_assertion_type
+          schema:
+            type: string
+        - in: query
+          name: error
+          schema:
+            type: string
+        - in: query
+          name: error_description
+          schema:
+            type: string
+        - in: query
+          name: iss
+          schema:
+            type: string
+        - in: query
+          name: token
+          schema:
+            type: string
+        - in: query
+          name: token_type_hint
+          schema:
+            type: string
+        - in: query
+          name: logout_token
+          schema:
+            type: string
+        - in: query
+          name: csrf
+          schema:
+            type: string
+        - in: query
+          name: decision
+          schema:
+            type: string
+        - in: query
+          name: transaction
+          schema:
+            type: string
+        - in: query
+          name: session_id
+          schema:
+            type: string
+        - in: query
+          name: grant_id
+          schema:
+            type: string
+        - in: query
+          name: action
+          schema:
+            type: string
+        - in: query
+          name: id
+          schema:
+            type: string
+        - in: query
+          name: response_mode
+          schema:
+            type: string
+        - in: query
+          name: request
+          schema:
+            type: string
+        - in: query
+          name: request_uri
+          schema:
+            type: string
+        - in: query
+          name: client_secret
+          schema:
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                additionalProperties: true
+                type: object
+          description: Protocol response
+        "400":
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                  error_description:
+                    type: string
+                required:
+                  - error
+                type: object
+          description: OAuth protocol error
+        "500":
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                  error_description:
+                    type: string
+                required:
+                  - error
+                type: object
+          description: Server error
+      summary: Discovery
+      tags:
+        - ProviderService
+  /account:
+    get:
+      operationId: within_website_x_iam_oidc_v1_BrowserService_Account_get
+      parameters:
+        - in: query
+          name: response_type
+          schema:
+            type: string
+        - in: query
+          name: client_id
+          schema:
+            type: string
+        - in: query
+          name: redirect_uri
+          schema:
+            type: string
+        - in: query
+          name: scope
+          schema:
+            type: string
+        - in: query
+          name: state
+          schema:
+            type: string
+        - in: query
+          name: nonce
+          schema:
+            type: string
+        - in: query
+          name: code_challenge
+          schema:
+            type: string
+        - in: query
+          name: code_challenge_method
+          schema:
+            type: string
+        - in: query
+          name: resource
+          schema:
+            type: string
+        - in: query
+          name: prompt
+          schema:
+            type: string
+        - in: query
+          name: max_age
+          schema:
+            type: string
+        - in: query
+          name: grant_type
+          schema:
+            type: string
+        - in: query
+          name: code
+          schema:
+            type: string
+        - in: query
+          name: refresh_token
+          schema:
+            type: string
+        - in: query
+          name: code_verifier
+          schema:
+            type: string
+        - in: query
+          name: client_assertion
+          schema:
+            type: string
+        - in: query
+          name: client_assertion_type
+          schema:
+            type: string
+        - in: query
+          name: error
+          schema:
+            type: string
+        - in: query
+          name: error_description
+          schema:
+            type: string
+        - in: query
+          name: iss
+          schema:
+            type: string
+        - in: query
+          name: token
+          schema:
+            type: string
+        - in: query
+          name: token_type_hint
+          schema:
+            type: string
+        - in: query
+          name: logout_token
+          schema:
+            type: string
+        - in: query
+          name: csrf
+          schema:
+            type: string
+        - in: query
+          name: decision
+          schema:
+            type: string
+        - in: query
+          name: transaction
+          schema:
+            type: string
+        - in: query
+          name: session_id
+          schema:
+            type: string
+        - in: query
+          name: grant_id
+          schema:
+            type: string
+        - in: query
+          name: action
+          schema:
+            type: string
+        - in: query
+          name: id
+          schema:
+            type: string
+        - in: query
+          name: response_mode
+          schema:
+            type: string
+        - in: query
+          name: request
+          schema:
+            type: string
+        - in: query
+          name: request_uri
+          schema:
+            type: string
+        - in: query
+          name: client_secret
+          schema:
+            type: string
+      responses:
+        "200":
+          content:
+            text/html:
+              schema:
+                type: string
+          description: Browser page (Connect callers receive structured JSON)
+        "302":
+          description: Browser redirect
+          headers:
+            Location:
+              schema:
+                format: uri-reference
+                type: string
+        "303":
+          description: Browser redirect
+          headers:
+            Location:
+              schema:
+                format: uri-reference
+                type: string
+        "400":
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                  error_description:
+                    type: string
+                required:
+                  - error
+                type: object
+          description: OAuth protocol error
+        "500":
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                  error_description:
+                    type: string
+                required:
+                  - error
+                type: object
+          description: Server error
+      summary: Account
+      tags:
+        - BrowserService
+    post:
+      operationId: within_website_x_iam_oidc_v1_BrowserService_Account_post
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/within.website.x.iam.oidc.v1.ProtocolRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            text/html:
+              schema:
+                type: string
+          description: Browser page (Connect callers receive structured JSON)
+        "302":
+          description: Browser redirect
+          headers:
+            Location:
+              schema:
+                format: uri-reference
+                type: string
+        "303":
+          description: Browser redirect
+          headers:
+            Location:
+              schema:
+                format: uri-reference
+                type: string
+        "400":
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                  error_description:
+                    type: string
+                required:
+                  - error
+                type: object
+          description: OAuth protocol error
+        "500":
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                  error_description:
+                    type: string
+                required:
+                  - error
+                type: object
+          description: Server error
+      summary: Account
+      tags:
+        - BrowserService
+  /admin/clients:
+    get:
+      operationId: within_website_x_iam_oidc_v1_AdministrationService_ListClients_get
+      parameters:
+        - in: query
+          name: response_type
+          schema:
+            type: string
+        - in: query
+          name: client_id
+          schema:
+            type: string
+        - in: query
+          name: redirect_uri
+          schema:
+            type: string
+        - in: query
+          name: scope
+          schema:
+            type: string
+        - in: query
+          name: state
+          schema:
+            type: string
+        - in: query
+          name: nonce
+          schema:
+            type: string
+        - in: query
+          name: code_challenge
+          schema:
+            type: string
+        - in: query
+          name: code_challenge_method
+          schema:
+            type: string
+        - in: query
+          name: resource
+          schema:
+            type: string
+        - in: query
+          name: prompt
+          schema:
+            type: string
+        - in: query
+          name: max_age
+          schema:
+            type: string
+        - in: query
+          name: grant_type
+          schema:
+            type: string
+        - in: query
+          name: code
+          schema:
+            type: string
+        - in: query
+          name: refresh_token
+          schema:
+            type: string
+        - in: query
+          name: code_verifier
+          schema:
+            type: string
+        - in: query
+          name: client_assertion
+          schema:
+            type: string
+        - in: query
+          name: client_assertion_type
+          schema:
+            type: string
+        - in: query
+          name: error
+          schema:
+            type: string
+        - in: query
+          name: error_description
+          schema:
+            type: string
+        - in: query
+          name: iss
+          schema:
+            type: string
+        - in: query
+          name: token
+          schema:
+            type: string
+        - in: query
+          name: token_type_hint
+          schema:
+            type: string
+        - in: query
+          name: logout_token
+          schema:
+            type: string
+        - in: query
+          name: csrf
+          schema:
+            type: string
+        - in: query
+          name: decision
+          schema:
+            type: string
+        - in: query
+          name: transaction
+          schema:
+            type: string
+        - in: query
+          name: session_id
+          schema:
+            type: string
+        - in: query
+          name: grant_id
+          schema:
+            type: string
+        - in: query
+          name: action
+          schema:
+            type: string
+        - in: query
+          name: id
+          schema:
+            type: string
+        - in: query
+          name: response_mode
+          schema:
+            type: string
+        - in: query
+          name: request
+          schema:
+            type: string
+        - in: query
+          name: request_uri
+          schema:
+            type: string
+        - in: query
+          name: client_secret
+          schema:
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                additionalProperties: true
+                type: object
+          description: Protocol response
+        "400":
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                  error_description:
+                    type: string
+                required:
+                  - error
+                type: object
+          description: OAuth protocol error
+        "401":
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                  error_description:
+                    type: string
+                required:
+                  - error
+                type: object
+          description: Authentication required
+        "403":
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                  error_description:
+                    type: string
+                required:
+                  - error
+                type: object
+          description: Access denied
+        "500":
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                  error_description:
+                    type: string
+                required:
+                  - error
+                type: object
+          description: Server error
+      summary: ListClients
+      tags:
+        - AdministrationService
+    post:
+      operationId: within_website_x_iam_oidc_v1_AdministrationService_DisableClient_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              additionalProperties: true
+              type: object
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                additionalProperties: true
+                type: object
+          description: Protocol response
+        "400":
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                  error_description:
+                    type: string
+                required:
+                  - error
+                type: object
+          description: OAuth protocol error
+        "401":
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                  error_description:
+                    type: string
+                required:
+                  - error
+                type: object
+          description: Authentication required
+        "403":
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                  error_description:
+                    type: string
+                required:
+                  - error
+                type: object
+          description: Access denied
+        "500":
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                  error_description:
+                    type: string
+                required:
+                  - error
+                type: object
+          description: Server error
+      summary: DisableClient
+      tags:
+        - AdministrationService
+  /admin/identities:
+    post:
+      operationId: within_website_x_iam_oidc_v1_AdministrationService_LinkIdentity_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              additionalProperties: true
+              type: object
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                additionalProperties: true
+                type: object
+          description: Protocol response
+        "400":
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                  error_description:
+                    type: string
+                required:
+                  - error
+                type: object
+          description: OAuth protocol error
+        "401":
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                  error_description:
+                    type: string
+                required:
+                  - error
+                type: object
+          description: Authentication required
+        "403":
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                  error_description:
+                    type: string
+                required:
+                  - error
+                type: object
+          description: Access denied
+        "500":
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                  error_description:
+                    type: string
+                required:
+                  - error
+                type: object
+          description: Server error
+      summary: LinkIdentity
+      tags:
+        - AdministrationService
+  /admin/keys/rotate:
+    post:
+      operationId: within_website_x_iam_oidc_v1_AdministrationService_RotateKeys_post
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/within.website.x.iam.oidc.v1.ProtocolRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                additionalProperties: true
+                type: object
+          description: Protocol response
+        "400":
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                  error_description:
+                    type: string
+                required:
+                  - error
+                type: object
+          description: OAuth protocol error
+        "401":
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                  error_description:
+                    type: string
+                required:
+                  - error
+                type: object
+          description: Authentication required
+        "403":
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                  error_description:
+                    type: string
+                required:
+                  - error
+                type: object
+          description: Access denied
+        "500":
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                  error_description:
+                    type: string
+                required:
+                  - error
+                type: object
+          description: Server error
+      summary: RotateKeys
+      tags:
+        - AdministrationService
+  /admin/resources:
+    get:
+      operationId: within_website_x_iam_oidc_v1_AdministrationService_ListResources_get
+      parameters:
+        - in: query
+          name: response_type
+          schema:
+            type: string
+        - in: query
+          name: client_id
+          schema:
+            type: string
+        - in: query
+          name: redirect_uri
+          schema:
+            type: string
+        - in: query
+          name: scope
+          schema:
+            type: string
+        - in: query
+          name: state
+          schema:
+            type: string
+        - in: query
+          name: nonce
+          schema:
+            type: string
+        - in: query
+          name: code_challenge
+          schema:
+            type: string
+        - in: query
+          name: code_challenge_method
+          schema:
+            type: string
+        - in: query
+          name: resource
+          schema:
+            type: string
+        - in: query
+          name: prompt
+          schema:
+            type: string
+        - in: query
+          name: max_age
+          schema:
+            type: string
+        - in: query
+          name: grant_type
+          schema:
+            type: string
+        - in: query
+          name: code
+          schema:
+            type: string
+        - in: query
+          name: refresh_token
+          schema:
+            type: string
+        - in: query
+          name: code_verifier
+          schema:
+            type: string
+        - in: query
+          name: client_assertion
+          schema:
+            type: string
+        - in: query
+          name: client_assertion_type
+          schema:
+            type: string
+        - in: query
+          name: error
+          schema:
+            type: string
+        - in: query
+          name: error_description
+          schema:
+            type: string
+        - in: query
+          name: iss
+          schema:
+            type: string
+        - in: query
+          name: token
+          schema:
+            type: string
+        - in: query
+          name: token_type_hint
+          schema:
+            type: string
+        - in: query
+          name: logout_token
+          schema:
+            type: string
+        - in: query
+          name: csrf
+          schema:
+            type: string
+        - in: query
+          name: decision
+          schema:
+            type: string
+        - in: query
+          name: transaction
+          schema:
+            type: string
+        - in: query
+          name: session_id
+          schema:
+            type: string
+        - in: query
+          name: grant_id
+          schema:
+            type: string
+        - in: query
+          name: action
+          schema:
+            type: string
+        - in: query
+          name: id
+          schema:
+            type: string
+        - in: query
+          name: response_mode
+          schema:
+            type: string
+        - in: query
+          name: request
+          schema:
+            type: string
+        - in: query
+          name: request_uri
+          schema:
+            type: string
+        - in: query
+          name: client_secret
+          schema:
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                additionalProperties: true
+                type: object
+          description: Protocol response
+        "400":
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                  error_description:
+                    type: string
+                required:
+                  - error
+                type: object
+          description: OAuth protocol error
+        "401":
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                  error_description:
+                    type: string
+                required:
+                  - error
+                type: object
+          description: Authentication required
+        "403":
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                  error_description:
+                    type: string
+                required:
+                  - error
+                type: object
+          description: Access denied
+        "500":
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                  error_description:
+                    type: string
+                required:
+                  - error
+                type: object
+          description: Server error
+      summary: ListResources
+      tags:
+        - AdministrationService
+    post:
+      operationId: within_website_x_iam_oidc_v1_AdministrationService_PutResource_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              additionalProperties: true
+              type: object
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                additionalProperties: true
+                type: object
+          description: Protocol response
+        "400":
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                  error_description:
+                    type: string
+                required:
+                  - error
+                type: object
+          description: OAuth protocol error
+        "401":
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                  error_description:
+                    type: string
+                required:
+                  - error
+                type: object
+          description: Authentication required
+        "403":
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                  error_description:
+                    type: string
+                required:
+                  - error
+                type: object
+          description: Access denied
+        "500":
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                  error_description:
+                    type: string
+                required:
+                  - error
+                type: object
+          description: Server error
+      summary: PutResource
+      tags:
+        - AdministrationService
+  /authorize:
+    get:
+      operationId: within_website_x_iam_oidc_v1_ProviderService_Authorize_get
+      parameters:
+        - in: query
+          name: response_type
+          schema:
+            type: string
+        - in: query
+          name: client_id
+          schema:
+            type: string
+        - in: query
+          name: redirect_uri
+          schema:
+            type: string
+        - in: query
+          name: scope
+          schema:
+            type: string
+        - in: query
+          name: state
+          schema:
+            type: string
+        - in: query
+          name: nonce
+          schema:
+            type: string
+        - in: query
+          name: code_challenge
+          schema:
+            type: string
+        - in: query
+          name: code_challenge_method
+          schema:
+            type: string
+        - in: query
+          name: resource
+          schema:
+            type: string
+        - in: query
+          name: prompt
+          schema:
+            type: string
+        - in: query
+          name: max_age
+          schema:
+            type: string
+        - in: query
+          name: grant_type
+          schema:
+            type: string
+        - in: query
+          name: code
+          schema:
+            type: string
+        - in: query
+          name: refresh_token
+          schema:
+            type: string
+        - in: query
+          name: code_verifier
+          schema:
+            type: string
+        - in: query
+          name: client_assertion
+          schema:
+            type: string
+        - in: query
+          name: client_assertion_type
+          schema:
+            type: string
+        - in: query
+          name: error
+          schema:
+            type: string
+        - in: query
+          name: error_description
+          schema:
+            type: string
+        - in: query
+          name: iss
+          schema:
+            type: string
+        - in: query
+          name: token
+          schema:
+            type: string
+        - in: query
+          name: token_type_hint
+          schema:
+            type: string
+        - in: query
+          name: logout_token
+          schema:
+            type: string
+        - in: query
+          name: csrf
+          schema:
+            type: string
+        - in: query
+          name: decision
+          schema:
+            type: string
+        - in: query
+          name: transaction
+          schema:
+            type: string
+        - in: query
+          name: session_id
+          schema:
+            type: string
+        - in: query
+          name: grant_id
+          schema:
+            type: string
+        - in: query
+          name: action
+          schema:
+            type: string
+        - in: query
+          name: id
+          schema:
+            type: string
+        - in: query
+          name: response_mode
+          schema:
+            type: string
+        - in: query
+          name: request
+          schema:
+            type: string
+        - in: query
+          name: request_uri
+          schema:
+            type: string
+        - in: query
+          name: client_secret
+          schema:
+            type: string
+      responses:
+        "200":
+          content:
+            text/html:
+              schema:
+                type: string
+          description: Browser page (Connect callers receive structured JSON)
+        "302":
+          description: Browser redirect
+          headers:
+            Location:
+              schema:
+                format: uri-reference
+                type: string
+        "303":
+          description: Browser redirect
+          headers:
+            Location:
+              schema:
+                format: uri-reference
+                type: string
+        "400":
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                  error_description:
+                    type: string
+                required:
+                  - error
+                type: object
+          description: OAuth protocol error
+        "500":
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                  error_description:
+                    type: string
+                required:
+                  - error
+                type: object
+          description: Server error
+      summary: Authorize
+      tags:
+        - ProviderService
+    post:
+      operationId: within_website_x_iam_oidc_v1_ProviderService_Authorize_post
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/within.website.x.iam.oidc.v1.ProtocolRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            text/html:
+              schema:
+                type: string
+          description: Browser page (Connect callers receive structured JSON)
+        "302":
+          description: Browser redirect
+          headers:
+            Location:
+              schema:
+                format: uri-reference
+                type: string
+        "303":
+          description: Browser redirect
+          headers:
+            Location:
+              schema:
+                format: uri-reference
+                type: string
+        "400":
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                  error_description:
+                    type: string
+                required:
+                  - error
+                type: object
+          description: OAuth protocol error
+        "500":
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                  error_description:
+                    type: string
+                required:
+                  - error
+                type: object
+          description: Server error
+      summary: Authorize
+      tags:
+        - ProviderService
+  /consent:
+    get:
+      operationId: within_website_x_iam_oidc_v1_BrowserService_Consent_get
+      parameters:
+        - in: query
+          name: response_type
+          schema:
+            type: string
+        - in: query
+          name: client_id
+          schema:
+            type: string
+        - in: query
+          name: redirect_uri
+          schema:
+            type: string
+        - in: query
+          name: scope
+          schema:
+            type: string
+        - in: query
+          name: state
+          schema:
+            type: string
+        - in: query
+          name: nonce
+          schema:
+            type: string
+        - in: query
+          name: code_challenge
+          schema:
+            type: string
+        - in: query
+          name: code_challenge_method
+          schema:
+            type: string
+        - in: query
+          name: resource
+          schema:
+            type: string
+        - in: query
+          name: prompt
+          schema:
+            type: string
+        - in: query
+          name: max_age
+          schema:
+            type: string
+        - in: query
+          name: grant_type
+          schema:
+            type: string
+        - in: query
+          name: code
+          schema:
+            type: string
+        - in: query
+          name: refresh_token
+          schema:
+            type: string
+        - in: query
+          name: code_verifier
+          schema:
+            type: string
+        - in: query
+          name: client_assertion
+          schema:
+            type: string
+        - in: query
+          name: client_assertion_type
+          schema:
+            type: string
+        - in: query
+          name: error
+          schema:
+            type: string
+        - in: query
+          name: error_description
+          schema:
+            type: string
+        - in: query
+          name: iss
+          schema:
+            type: string
+        - in: query
+          name: token
+          schema:
+            type: string
+        - in: query
+          name: token_type_hint
+          schema:
+            type: string
+        - in: query
+          name: logout_token
+          schema:
+            type: string
+        - in: query
+          name: csrf
+          schema:
+            type: string
+        - in: query
+          name: decision
+          schema:
+            type: string
+        - in: query
+          name: transaction
+          schema:
+            type: string
+        - in: query
+          name: session_id
+          schema:
+            type: string
+        - in: query
+          name: grant_id
+          schema:
+            type: string
+        - in: query
+          name: action
+          schema:
+            type: string
+        - in: query
+          name: id
+          schema:
+            type: string
+        - in: query
+          name: response_mode
+          schema:
+            type: string
+        - in: query
+          name: request
+          schema:
+            type: string
+        - in: query
+          name: request_uri
+          schema:
+            type: string
+        - in: query
+          name: client_secret
+          schema:
+            type: string
+      responses:
+        "200":
+          content:
+            text/html:
+              schema:
+                type: string
+          description: Browser page (Connect callers receive structured JSON)
+        "302":
+          description: Browser redirect
+          headers:
+            Location:
+              schema:
+                format: uri-reference
+                type: string
+        "303":
+          description: Browser redirect
+          headers:
+            Location:
+              schema:
+                format: uri-reference
+                type: string
+        "400":
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                  error_description:
+                    type: string
+                required:
+                  - error
+                type: object
+          description: OAuth protocol error
+        "500":
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                  error_description:
+                    type: string
+                required:
+                  - error
+                type: object
+          description: Server error
+      summary: Consent
+      tags:
+        - BrowserService
+    post:
+      operationId: within_website_x_iam_oidc_v1_BrowserService_Consent_post
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/within.website.x.iam.oidc.v1.ProtocolRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            text/html:
+              schema:
+                type: string
+          description: Browser page (Connect callers receive structured JSON)
+        "302":
+          description: Browser redirect
+          headers:
+            Location:
+              schema:
+                format: uri-reference
+                type: string
+        "303":
+          description: Browser redirect
+          headers:
+            Location:
+              schema:
+                format: uri-reference
+                type: string
+        "400":
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                  error_description:
+                    type: string
+                required:
+                  - error
+                type: object
+          description: OAuth protocol error
+        "500":
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                  error_description:
+                    type: string
+                required:
+                  - error
+                type: object
+          description: Server error
+      summary: Consent
+      tags:
+        - BrowserService
+  /jwks.json:
+    get:
+      operationId: within_website_x_iam_oidc_v1_ProviderService_Keys_get
+      parameters:
+        - in: query
+          name: response_type
+          schema:
+            type: string
+        - in: query
+          name: client_id
+          schema:
+            type: string
+        - in: query
+          name: redirect_uri
+          schema:
+            type: string
+        - in: query
+          name: scope
+          schema:
+            type: string
+        - in: query
+          name: state
+          schema:
+            type: string
+        - in: query
+          name: nonce
+          schema:
+            type: string
+        - in: query
+          name: code_challenge
+          schema:
+            type: string
+        - in: query
+          name: code_challenge_method
+          schema:
+            type: string
+        - in: query
+          name: resource
+          schema:
+            type: string
+        - in: query
+          name: prompt
+          schema:
+            type: string
+        - in: query
+          name: max_age
+          schema:
+            type: string
+        - in: query
+          name: grant_type
+          schema:
+            type: string
+        - in: query
+          name: code
+          schema:
+            type: string
+        - in: query
+          name: refresh_token
+          schema:
+            type: string
+        - in: query
+          name: code_verifier
+          schema:
+            type: string
+        - in: query
+          name: client_assertion
+          schema:
+            type: string
+        - in: query
+          name: client_assertion_type
+          schema:
+            type: string
+        - in: query
+          name: error
+          schema:
+            type: string
+        - in: query
+          name: error_description
+          schema:
+            type: string
+        - in: query
+          name: iss
+          schema:
+            type: string
+        - in: query
+          name: token
+          schema:
+            type: string
+        - in: query
+          name: token_type_hint
+          schema:
+            type: string
+        - in: query
+          name: logout_token
+          schema:
+            type: string
+        - in: query
+          name: csrf
+          schema:
+            type: string
+        - in: query
+          name: decision
+          schema:
+            type: string
+        - in: query
+          name: transaction
+          schema:
+            type: string
+        - in: query
+          name: session_id
+          schema:
+            type: string
+        - in: query
+          name: grant_id
+          schema:
+            type: string
+        - in: query
+          name: action
+          schema:
+            type: string
+        - in: query
+          name: id
+          schema:
+            type: string
+        - in: query
+          name: response_mode
+          schema:
+            type: string
+        - in: query
+          name: request
+          schema:
+            type: string
+        - in: query
+          name: request_uri
+          schema:
+            type: string
+        - in: query
+          name: client_secret
+          schema:
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                additionalProperties: true
+                type: object
+          description: Protocol response
+        "400":
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                  error_description:
+                    type: string
+                required:
+                  - error
+                type: object
+          description: OAuth protocol error
+        "500":
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                  error_description:
+                    type: string
+                required:
+                  - error
+                type: object
+          description: Server error
+      summary: Keys
+      tags:
+        - ProviderService
+  /login:
+    get:
+      operationId: within_website_x_iam_oidc_v1_BrowserService_Login_get
+      parameters:
+        - in: query
+          name: response_type
+          schema:
+            type: string
+        - in: query
+          name: client_id
+          schema:
+            type: string
+        - in: query
+          name: redirect_uri
+          schema:
+            type: string
+        - in: query
+          name: scope
+          schema:
+            type: string
+        - in: query
+          name: state
+          schema:
+            type: string
+        - in: query
+          name: nonce
+          schema:
+            type: string
+        - in: query
+          name: code_challenge
+          schema:
+            type: string
+        - in: query
+          name: code_challenge_method
+          schema:
+            type: string
+        - in: query
+          name: resource
+          schema:
+            type: string
+        - in: query
+          name: prompt
+          schema:
+            type: string
+        - in: query
+          name: max_age
+          schema:
+            type: string
+        - in: query
+          name: grant_type
+          schema:
+            type: string
+        - in: query
+          name: code
+          schema:
+            type: string
+        - in: query
+          name: refresh_token
+          schema:
+            type: string
+        - in: query
+          name: code_verifier
+          schema:
+            type: string
+        - in: query
+          name: client_assertion
+          schema:
+            type: string
+        - in: query
+          name: client_assertion_type
+          schema:
+            type: string
+        - in: query
+          name: error
+          schema:
+            type: string
+        - in: query
+          name: error_description
+          schema:
+            type: string
+        - in: query
+          name: iss
+          schema:
+            type: string
+        - in: query
+          name: token
+          schema:
+            type: string
+        - in: query
+          name: token_type_hint
+          schema:
+            type: string
+        - in: query
+          name: logout_token
+          schema:
+            type: string
+        - in: query
+          name: csrf
+          schema:
+            type: string
+        - in: query
+          name: decision
+          schema:
+            type: string
+        - in: query
+          name: transaction
+          schema:
+            type: string
+        - in: query
+          name: session_id
+          schema:
+            type: string
+        - in: query
+          name: grant_id
+          schema:
+            type: string
+        - in: query
+          name: action
+          schema:
+            type: string
+        - in: query
+          name: id
+          schema:
+            type: string
+        - in: query
+          name: response_mode
+          schema:
+            type: string
+        - in: query
+          name: request
+          schema:
+            type: string
+        - in: query
+          name: request_uri
+          schema:
+            type: string
+        - in: query
+          name: client_secret
+          schema:
+            type: string
+      responses:
+        "200":
+          content:
+            text/html:
+              schema:
+                type: string
+          description: Browser page (Connect callers receive structured JSON)
+        "302":
+          description: Browser redirect
+          headers:
+            Location:
+              schema:
+                format: uri-reference
+                type: string
+        "303":
+          description: Browser redirect
+          headers:
+            Location:
+              schema:
+                format: uri-reference
+                type: string
+        "400":
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                  error_description:
+                    type: string
+                required:
+                  - error
+                type: object
+          description: OAuth protocol error
+        "500":
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                  error_description:
+                    type: string
+                required:
+                  - error
+                type: object
+          description: Server error
+      summary: Login
+      tags:
+        - BrowserService
+  /logout:
+    get:
+      operationId: within_website_x_iam_oidc_v1_BrowserService_Logout_get
+      parameters:
+        - in: query
+          name: response_type
+          schema:
+            type: string
+        - in: query
+          name: client_id
+          schema:
+            type: string
+        - in: query
+          name: redirect_uri
+          schema:
+            type: string
+        - in: query
+          name: scope
+          schema:
+            type: string
+        - in: query
+          name: state
+          schema:
+            type: string
+        - in: query
+          name: nonce
+          schema:
+            type: string
+        - in: query
+          name: code_challenge
+          schema:
+            type: string
+        - in: query
+          name: code_challenge_method
+          schema:
+            type: string
+        - in: query
+          name: resource
+          schema:
+            type: string
+        - in: query
+          name: prompt
+          schema:
+            type: string
+        - in: query
+          name: max_age
+          schema:
+            type: string
+        - in: query
+          name: grant_type
+          schema:
+            type: string
+        - in: query
+          name: code
+          schema:
+            type: string
+        - in: query
+          name: refresh_token
+          schema:
+            type: string
+        - in: query
+          name: code_verifier
+          schema:
+            type: string
+        - in: query
+          name: client_assertion
+          schema:
+            type: string
+        - in: query
+          name: client_assertion_type
+          schema:
+            type: string
+        - in: query
+          name: error
+          schema:
+            type: string
+        - in: query
+          name: error_description
+          schema:
+            type: string
+        - in: query
+          name: iss
+          schema:
+            type: string
+        - in: query
+          name: token
+          schema:
+            type: string
+        - in: query
+          name: token_type_hint
+          schema:
+            type: string
+        - in: query
+          name: logout_token
+          schema:
+            type: string
+        - in: query
+          name: csrf
+          schema:
+            type: string
+        - in: query
+          name: decision
+          schema:
+            type: string
+        - in: query
+          name: transaction
+          schema:
+            type: string
+        - in: query
+          name: session_id
+          schema:
+            type: string
+        - in: query
+          name: grant_id
+          schema:
+            type: string
+        - in: query
+          name: action
+          schema:
+            type: string
+        - in: query
+          name: id
+          schema:
+            type: string
+        - in: query
+          name: response_mode
+          schema:
+            type: string
+        - in: query
+          name: request
+          schema:
+            type: string
+        - in: query
+          name: request_uri
+          schema:
+            type: string
+        - in: query
+          name: client_secret
+          schema:
+            type: string
+      responses:
+        "200":
+          content:
+            text/html:
+              schema:
+                type: string
+          description: Browser page (Connect callers receive structured JSON)
+        "302":
+          description: Browser redirect
+          headers:
+            Location:
+              schema:
+                format: uri-reference
+                type: string
+        "303":
+          description: Browser redirect
+          headers:
+            Location:
+              schema:
+                format: uri-reference
+                type: string
+        "400":
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                  error_description:
+                    type: string
+                required:
+                  - error
+                type: object
+          description: OAuth protocol error
+        "500":
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                  error_description:
+                    type: string
+                required:
+                  - error
+                type: object
+          description: Server error
+      summary: Logout
+      tags:
+        - BrowserService
+    post:
+      operationId: within_website_x_iam_oidc_v1_BrowserService_Logout_post
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/within.website.x.iam.oidc.v1.ProtocolRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            text/html:
+              schema:
+                type: string
+          description: Browser page (Connect callers receive structured JSON)
+        "302":
+          description: Browser redirect
+          headers:
+            Location:
+              schema:
+                format: uri-reference
+                type: string
+        "303":
+          description: Browser redirect
+          headers:
+            Location:
+              schema:
+                format: uri-reference
+                type: string
+        "400":
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                  error_description:
+                    type: string
+                required:
+                  - error
+                type: object
+          description: OAuth protocol error
+        "500":
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                  error_description:
+                    type: string
+                required:
+                  - error
+                type: object
+          description: Server error
+      summary: Logout
+      tags:
+        - BrowserService
+  /register:
+    post:
+      operationId: within_website_x_iam_oidc_v1_ProviderService_Register_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              additionalProperties: true
+              type: object
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                additionalProperties: true
+                type: object
+          description: Protocol response
+        "400":
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                  error_description:
+                    type: string
+                required:
+                  - error
+                type: object
+          description: OAuth protocol error
+        "429":
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                  error_description:
+                    type: string
+                required:
+                  - error
+                type: object
+          description: Registration rate limit
+        "500":
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                  error_description:
+                    type: string
+                required:
+                  - error
+                type: object
+          description: Server error
+      summary: Register
+      tags:
+        - ProviderService
+  /revoke:
+    post:
+      operationId: within_website_x_iam_oidc_v1_ProviderService_Revoke_post
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/within.website.x.iam.oidc.v1.ProtocolRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                additionalProperties: true
+                type: object
+          description: Protocol response
+        "400":
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                  error_description:
+                    type: string
+                required:
+                  - error
+                type: object
+          description: OAuth protocol error
+        "500":
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                  error_description:
+                    type: string
+                required:
+                  - error
+                type: object
+          description: Server error
+      summary: Revoke
+      tags:
+        - ProviderService
+  /token:
+    post:
+      operationId: within_website_x_iam_oidc_v1_ProviderService_Token_post
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/within.website.x.iam.oidc.v1.ProtocolRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                additionalProperties: true
+                type: object
+          description: Protocol response
+        "400":
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                  error_description:
+                    type: string
+                required:
+                  - error
+                type: object
+          description: OAuth protocol error
+        "401":
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                  error_description:
+                    type: string
+                required:
+                  - error
+                type: object
+          description: Client authentication failed
+        "500":
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                  error_description:
+                    type: string
+                required:
+                  - error
+                type: object
+          description: Server error
+      summary: Token
+      tags:
+        - ProviderService
+  /upstream/backchannel-logout:
+    post:
+      operationId: within_website_x_iam_oidc_v1_BrowserService_BackchannelLogout_post
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/within.website.x.iam.oidc.v1.ProtocolRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                additionalProperties: true
+                type: object
+          description: Protocol response
+        "400":
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                  error_description:
+                    type: string
+                required:
+                  - error
+                type: object
+          description: OAuth protocol error
+        "500":
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                  error_description:
+                    type: string
+                required:
+                  - error
+                type: object
+          description: Server error
+      summary: BackchannelLogout
+      tags:
+        - BrowserService
+  /upstream/callback:
+    get:
+      operationId: within_website_x_iam_oidc_v1_BrowserService_UpstreamCallback_get
+      parameters:
+        - in: query
+          name: response_type
+          schema:
+            type: string
+        - in: query
+          name: client_id
+          schema:
+            type: string
+        - in: query
+          name: redirect_uri
+          schema:
+            type: string
+        - in: query
+          name: scope
+          schema:
+            type: string
+        - in: query
+          name: state
+          schema:
+            type: string
+        - in: query
+          name: nonce
+          schema:
+            type: string
+        - in: query
+          name: code_challenge
+          schema:
+            type: string
+        - in: query
+          name: code_challenge_method
+          schema:
+            type: string
+        - in: query
+          name: resource
+          schema:
+            type: string
+        - in: query
+          name: prompt
+          schema:
+            type: string
+        - in: query
+          name: max_age
+          schema:
+            type: string
+        - in: query
+          name: grant_type
+          schema:
+            type: string
+        - in: query
+          name: code
+          schema:
+            type: string
+        - in: query
+          name: refresh_token
+          schema:
+            type: string
+        - in: query
+          name: code_verifier
+          schema:
+            type: string
+        - in: query
+          name: client_assertion
+          schema:
+            type: string
+        - in: query
+          name: client_assertion_type
+          schema:
+            type: string
+        - in: query
+          name: error
+          schema:
+            type: string
+        - in: query
+          name: error_description
+          schema:
+            type: string
+        - in: query
+          name: iss
+          schema:
+            type: string
+        - in: query
+          name: token
+          schema:
+            type: string
+        - in: query
+          name: token_type_hint
+          schema:
+            type: string
+        - in: query
+          name: logout_token
+          schema:
+            type: string
+        - in: query
+          name: csrf
+          schema:
+            type: string
+        - in: query
+          name: decision
+          schema:
+            type: string
+        - in: query
+          name: transaction
+          schema:
+            type: string
+        - in: query
+          name: session_id
+          schema:
+            type: string
+        - in: query
+          name: grant_id
+          schema:
+            type: string
+        - in: query
+          name: action
+          schema:
+            type: string
+        - in: query
+          name: id
+          schema:
+            type: string
+        - in: query
+          name: response_mode
+          schema:
+            type: string
+        - in: query
+          name: request
+          schema:
+            type: string
+        - in: query
+          name: request_uri
+          schema:
+            type: string
+        - in: query
+          name: client_secret
+          schema:
+            type: string
+      responses:
+        "200":
+          content:
+            text/html:
+              schema:
+                type: string
+          description: Browser page (Connect callers receive structured JSON)
+        "302":
+          description: Browser redirect
+          headers:
+            Location:
+              schema:
+                format: uri-reference
+                type: string
+        "303":
+          description: Browser redirect
+          headers:
+            Location:
+              schema:
+                format: uri-reference
+                type: string
+        "400":
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                  error_description:
+                    type: string
+                required:
+                  - error
+                type: object
+          description: OAuth protocol error
+        "500":
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                  error_description:
+                    type: string
+                required:
+                  - error
+                type: object
+          description: Server error
+      summary: UpstreamCallback
+      tags:
+        - BrowserService
+  /userinfo:
+    get:
+      operationId: within_website_x_iam_oidc_v1_ProviderService_UserInfo_get
+      parameters:
+        - in: query
+          name: response_type
+          schema:
+            type: string
+        - in: query
+          name: client_id
+          schema:
+            type: string
+        - in: query
+          name: redirect_uri
+          schema:
+            type: string
+        - in: query
+          name: scope
+          schema:
+            type: string
+        - in: query
+          name: state
+          schema:
+            type: string
+        - in: query
+          name: nonce
+          schema:
+            type: string
+        - in: query
+          name: code_challenge
+          schema:
+            type: string
+        - in: query
+          name: code_challenge_method
+          schema:
+            type: string
+        - in: query
+          name: resource
+          schema:
+            type: string
+        - in: query
+          name: prompt
+          schema:
+            type: string
+        - in: query
+          name: max_age
+          schema:
+            type: string
+        - in: query
+          name: grant_type
+          schema:
+            type: string
+        - in: query
+          name: code
+          schema:
+            type: string
+        - in: query
+          name: refresh_token
+          schema:
+            type: string
+        - in: query
+          name: code_verifier
+          schema:
+            type: string
+        - in: query
+          name: client_assertion
+          schema:
+            type: string
+        - in: query
+          name: client_assertion_type
+          schema:
+            type: string
+        - in: query
+          name: error
+          schema:
+            type: string
+        - in: query
+          name: error_description
+          schema:
+            type: string
+        - in: query
+          name: iss
+          schema:
+            type: string
+        - in: query
+          name: token
+          schema:
+            type: string
+        - in: query
+          name: token_type_hint
+          schema:
+            type: string
+        - in: query
+          name: logout_token
+          schema:
+            type: string
+        - in: query
+          name: csrf
+          schema:
+            type: string
+        - in: query
+          name: decision
+          schema:
+            type: string
+        - in: query
+          name: transaction
+          schema:
+            type: string
+        - in: query
+          name: session_id
+          schema:
+            type: string
+        - in: query
+          name: grant_id
+          schema:
+            type: string
+        - in: query
+          name: action
+          schema:
+            type: string
+        - in: query
+          name: id
+          schema:
+            type: string
+        - in: query
+          name: response_mode
+          schema:
+            type: string
+        - in: query
+          name: request
+          schema:
+            type: string
+        - in: query
+          name: request_uri
+          schema:
+            type: string
+        - in: query
+          name: client_secret
+          schema:
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                additionalProperties: true
+                type: object
+          description: Protocol response
+        "400":
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                  error_description:
+                    type: string
+                required:
+                  - error
+                type: object
+          description: OAuth protocol error
+        "401":
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                  error_description:
+                    type: string
+                required:
+                  - error
+                type: object
+          description: Authentication required
+        "403":
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                  error_description:
+                    type: string
+                required:
+                  - error
+                type: object
+          description: Access denied
+        "500":
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                  error_description:
+                    type: string
+                required:
+                  - error
+                type: object
+          description: Server error
+      summary: UserInfo
+      tags:
+        - ProviderService
+    post:
+      operationId: within_website_x_iam_oidc_v1_ProviderService_UserInfo_post
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/within.website.x.iam.oidc.v1.ProtocolRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                additionalProperties: true
+                type: object
+          description: Protocol response
+        "400":
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                  error_description:
+                    type: string
+                required:
+                  - error
+                type: object
+          description: OAuth protocol error
+        "401":
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                  error_description:
+                    type: string
+                required:
+                  - error
+                type: object
+          description: Authentication required
+        "403":
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                  error_description:
+                    type: string
+                required:
+                  - error
+                type: object
+          description: Access denied
+        "500":
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                  error_description:
+                    type: string
+                required:
+                  - error
+                type: object
+          description: Server error
+      summary: UserInfo
+      tags:
+        - ProviderService
+security: []
+servers:
+  - url: https://iamd.xeserv.us
+tags:
+  - name: within.website.x.iam.oidc.v1.ProviderService
+  - name: within.website.x.iam.oidc.v1.BrowserService
+  - description: All administrative operations require an existing SigV4/SigV4A admin.
+    name: within.website.x.iam.oidc.v1.AdministrationService

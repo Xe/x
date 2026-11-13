@@ -1,0 +1,10 @@
+version: v2
+plugins:
+  - local: [go, tool, protoc-gen-connect-openapi]
+    out: docs/api
+    opt:
+      - path=iamd-oidc-connect.openapi.yaml
+      - with-proto-names
+      - features=connectrpc;gnostic
+inputs:
+  - directory: pb

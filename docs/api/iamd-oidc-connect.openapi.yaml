@@ -1,0 +1,1065 @@
+openapi: 3.1.0
+info:
+  title: iamd OIDC and Connect API
+  description: OIDC browser and form routes and their Connect equivalents. OAuth protocol failures are ProtocolResponse results on Connect. Standard HTTP endpoints use OAuth status, body and redirect semantics. Administration requires SigV4 or SigV4A.
+  version: v1
+paths:
+  /within.website.x.iam.oidc.v1.AdministrationService/DisableClient:
+    post:
+      tags:
+        - within.website.x.iam.oidc.v1.AdministrationService
+      summary: DisableClient
+      operationId: within.website.x.iam.oidc.v1.AdministrationService.DisableClient
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: "#/components/schemas/connect-protocol-version"
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: "#/components/schemas/connect-timeout-header"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/within.website.x.iam.oidc.v1.DocumentRequest"
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/connect.error"
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/within.website.x.iam.oidc.v1.ProtocolResponse"
+  /within.website.x.iam.oidc.v1.AdministrationService/LinkIdentity:
+    post:
+      tags:
+        - within.website.x.iam.oidc.v1.AdministrationService
+      summary: LinkIdentity
+      operationId: within.website.x.iam.oidc.v1.AdministrationService.LinkIdentity
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: "#/components/schemas/connect-protocol-version"
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: "#/components/schemas/connect-timeout-header"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/within.website.x.iam.oidc.v1.DocumentRequest"
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/connect.error"
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/within.website.x.iam.oidc.v1.ProtocolResponse"
+  /within.website.x.iam.oidc.v1.AdministrationService/ListClients:
+    post:
+      tags:
+        - within.website.x.iam.oidc.v1.AdministrationService
+      summary: ListClients
+      operationId: within.website.x.iam.oidc.v1.AdministrationService.ListClients
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: "#/components/schemas/connect-protocol-version"
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: "#/components/schemas/connect-timeout-header"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/within.website.x.iam.oidc.v1.ProtocolRequest"
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/connect.error"
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/within.website.x.iam.oidc.v1.ProtocolResponse"
+  /within.website.x.iam.oidc.v1.AdministrationService/ListResources:
+    post:
+      tags:
+        - within.website.x.iam.oidc.v1.AdministrationService
+      summary: ListResources
+      operationId: within.website.x.iam.oidc.v1.AdministrationService.ListResources
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: "#/components/schemas/connect-protocol-version"
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: "#/components/schemas/connect-timeout-header"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/within.website.x.iam.oidc.v1.ProtocolRequest"
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/connect.error"
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/within.website.x.iam.oidc.v1.ProtocolResponse"
+  /within.website.x.iam.oidc.v1.AdministrationService/PutResource:
+    post:
+      tags:
+        - within.website.x.iam.oidc.v1.AdministrationService
+      summary: PutResource
+      operationId: within.website.x.iam.oidc.v1.AdministrationService.PutResource
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: "#/components/schemas/connect-protocol-version"
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: "#/components/schemas/connect-timeout-header"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/within.website.x.iam.oidc.v1.DocumentRequest"
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/connect.error"
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/within.website.x.iam.oidc.v1.ProtocolResponse"
+  /within.website.x.iam.oidc.v1.AdministrationService/RotateKeys:
+    post:
+      tags:
+        - within.website.x.iam.oidc.v1.AdministrationService
+      summary: RotateKeys
+      operationId: within.website.x.iam.oidc.v1.AdministrationService.RotateKeys
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: "#/components/schemas/connect-protocol-version"
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: "#/components/schemas/connect-timeout-header"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/within.website.x.iam.oidc.v1.ProtocolRequest"
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/connect.error"
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/within.website.x.iam.oidc.v1.ProtocolResponse"
+  /within.website.x.iam.oidc.v1.BrowserService/Account:
+    post:
+      tags:
+        - within.website.x.iam.oidc.v1.BrowserService
+      summary: Account
+      operationId: within.website.x.iam.oidc.v1.BrowserService.Account
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: "#/components/schemas/connect-protocol-version"
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: "#/components/schemas/connect-timeout-header"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/within.website.x.iam.oidc.v1.ProtocolRequest"
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/connect.error"
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/within.website.x.iam.oidc.v1.ProtocolResponse"
+  /within.website.x.iam.oidc.v1.BrowserService/BackchannelLogout:
+    post:
+      tags:
+        - within.website.x.iam.oidc.v1.BrowserService
+      summary: BackchannelLogout
+      operationId: within.website.x.iam.oidc.v1.BrowserService.BackchannelLogout
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: "#/components/schemas/connect-protocol-version"
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: "#/components/schemas/connect-timeout-header"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/within.website.x.iam.oidc.v1.ProtocolRequest"
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/connect.error"
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/within.website.x.iam.oidc.v1.ProtocolResponse"
+  /within.website.x.iam.oidc.v1.BrowserService/Consent:
+    post:
+      tags:
+        - within.website.x.iam.oidc.v1.BrowserService
+      summary: Consent
+      operationId: within.website.x.iam.oidc.v1.BrowserService.Consent
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: "#/components/schemas/connect-protocol-version"
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: "#/components/schemas/connect-timeout-header"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/within.website.x.iam.oidc.v1.ProtocolRequest"
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/connect.error"
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/within.website.x.iam.oidc.v1.ProtocolResponse"
+  /within.website.x.iam.oidc.v1.BrowserService/Login:
+    post:
+      tags:
+        - within.website.x.iam.oidc.v1.BrowserService
+      summary: Login
+      operationId: within.website.x.iam.oidc.v1.BrowserService.Login
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: "#/components/schemas/connect-protocol-version"
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: "#/components/schemas/connect-timeout-header"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/within.website.x.iam.oidc.v1.ProtocolRequest"
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/connect.error"
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/within.website.x.iam.oidc.v1.ProtocolResponse"
+  /within.website.x.iam.oidc.v1.BrowserService/Logout:
+    post:
+      tags:
+        - within.website.x.iam.oidc.v1.BrowserService
+      summary: Logout
+      operationId: within.website.x.iam.oidc.v1.BrowserService.Logout
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: "#/components/schemas/connect-protocol-version"
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: "#/components/schemas/connect-timeout-header"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/within.website.x.iam.oidc.v1.ProtocolRequest"
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/connect.error"
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/within.website.x.iam.oidc.v1.ProtocolResponse"
+  /within.website.x.iam.oidc.v1.BrowserService/UpstreamCallback:
+    post:
+      tags:
+        - within.website.x.iam.oidc.v1.BrowserService
+      summary: UpstreamCallback
+      operationId: within.website.x.iam.oidc.v1.BrowserService.UpstreamCallback
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: "#/components/schemas/connect-protocol-version"
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: "#/components/schemas/connect-timeout-header"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/within.website.x.iam.oidc.v1.ProtocolRequest"
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/connect.error"
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/within.website.x.iam.oidc.v1.ProtocolResponse"
+  /within.website.x.iam.oidc.v1.ProviderService/AuthorizationServerMetadata:
+    post:
+      tags:
+        - within.website.x.iam.oidc.v1.ProviderService
+      summary: AuthorizationServerMetadata
+      operationId: within.website.x.iam.oidc.v1.ProviderService.AuthorizationServerMetadata
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: "#/components/schemas/connect-protocol-version"
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: "#/components/schemas/connect-timeout-header"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/within.website.x.iam.oidc.v1.ProtocolRequest"
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/connect.error"
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/within.website.x.iam.oidc.v1.ProtocolResponse"
+  /within.website.x.iam.oidc.v1.ProviderService/Authorize:
+    post:
+      tags:
+        - within.website.x.iam.oidc.v1.ProviderService
+      summary: Authorize
+      operationId: within.website.x.iam.oidc.v1.ProviderService.Authorize
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: "#/components/schemas/connect-protocol-version"
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: "#/components/schemas/connect-timeout-header"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/within.website.x.iam.oidc.v1.ProtocolRequest"
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/connect.error"
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/within.website.x.iam.oidc.v1.ProtocolResponse"
+  /within.website.x.iam.oidc.v1.ProviderService/Discovery:
+    post:
+      tags:
+        - within.website.x.iam.oidc.v1.ProviderService
+      summary: Discovery
+      operationId: within.website.x.iam.oidc.v1.ProviderService.Discovery
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: "#/components/schemas/connect-protocol-version"
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: "#/components/schemas/connect-timeout-header"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/within.website.x.iam.oidc.v1.ProtocolRequest"
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/connect.error"
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/within.website.x.iam.oidc.v1.ProtocolResponse"
+  /within.website.x.iam.oidc.v1.ProviderService/Keys:
+    post:
+      tags:
+        - within.website.x.iam.oidc.v1.ProviderService
+      summary: Keys
+      operationId: within.website.x.iam.oidc.v1.ProviderService.Keys
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: "#/components/schemas/connect-protocol-version"
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: "#/components/schemas/connect-timeout-header"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/within.website.x.iam.oidc.v1.ProtocolRequest"
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/connect.error"
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/within.website.x.iam.oidc.v1.ProtocolResponse"
+  /within.website.x.iam.oidc.v1.ProviderService/Register:
+    post:
+      tags:
+        - within.website.x.iam.oidc.v1.ProviderService
+      summary: Register
+      operationId: within.website.x.iam.oidc.v1.ProviderService.Register
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: "#/components/schemas/connect-protocol-version"
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: "#/components/schemas/connect-timeout-header"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/within.website.x.iam.oidc.v1.DocumentRequest"
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/connect.error"
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/within.website.x.iam.oidc.v1.ProtocolResponse"
+  /within.website.x.iam.oidc.v1.ProviderService/Revoke:
+    post:
+      tags:
+        - within.website.x.iam.oidc.v1.ProviderService
+      summary: Revoke
+      operationId: within.website.x.iam.oidc.v1.ProviderService.Revoke
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: "#/components/schemas/connect-protocol-version"
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: "#/components/schemas/connect-timeout-header"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/within.website.x.iam.oidc.v1.ProtocolRequest"
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/connect.error"
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/within.website.x.iam.oidc.v1.ProtocolResponse"
+  /within.website.x.iam.oidc.v1.ProviderService/Token:
+    post:
+      tags:
+        - within.website.x.iam.oidc.v1.ProviderService
+      summary: Token
+      operationId: within.website.x.iam.oidc.v1.ProviderService.Token
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: "#/components/schemas/connect-protocol-version"
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: "#/components/schemas/connect-timeout-header"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/within.website.x.iam.oidc.v1.ProtocolRequest"
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/connect.error"
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/within.website.x.iam.oidc.v1.ProtocolResponse"
+  /within.website.x.iam.oidc.v1.ProviderService/UserInfo:
+    post:
+      tags:
+        - within.website.x.iam.oidc.v1.ProviderService
+      summary: UserInfo
+      operationId: within.website.x.iam.oidc.v1.ProviderService.UserInfo
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: "#/components/schemas/connect-protocol-version"
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: "#/components/schemas/connect-timeout-header"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/within.website.x.iam.oidc.v1.ProtocolRequest"
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/connect.error"
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/within.website.x.iam.oidc.v1.ProtocolResponse"
+components:
+  schemas:
+    connect-protocol-version:
+      type: number
+      title: Connect-Protocol-Version
+      enum:
+        - 1
+      description: Define the version of the Connect protocol
+      const: 1
+    connect-timeout-header:
+      type: number
+      title: Connect-Timeout-Ms
+      description: Define the timeout, in ms
+    connect.error:
+      type: object
+      properties:
+        code:
+          type: string
+          examples:
+            - not_found
+          enum:
+            - canceled
+            - unknown
+            - invalid_argument
+            - deadline_exceeded
+            - not_found
+            - already_exists
+            - permission_denied
+            - resource_exhausted
+            - failed_precondition
+            - aborted
+            - out_of_range
+            - unimplemented
+            - internal
+            - unavailable
+            - data_loss
+            - unauthenticated
+          description: The status code, which should be an enum value of [google.rpc.Code][google.rpc.Code].
+        message:
+          type: string
+          description: A developer-facing error message, which should be in English. Any user-facing error message should be localized and sent in the [google.rpc.Status.details][google.rpc.Status.details] field, or localized by the client.
+        details:
+          type: array
+          items:
+            $ref: "#/components/schemas/connect.error_details.Any"
+          description: A list of messages that carry the error details. There is no limit on the number of messages.
+      title: Connect Error
+      additionalProperties: true
+      description: "Error type returned by Connect: https://connectrpc.com/docs/go/errors/#http-representation"
+    connect.error_details.Any:
+      type: object
+      properties:
+        type:
+          type: string
+          description: "A URL that acts as a globally unique identifier for the type of the serialized message. For example: `type.googleapis.com/google.rpc.ErrorInfo`. This is used to determine the schema of the data in the `value` field and is the discriminator for the `debug` field."
+        value:
+          type: string
+          format: binary
+          description: The Protobuf message, serialized as bytes and base64-encoded. The specific message type is identified by the `type` field.
+        debug:
+          oneOf:
+            - type: object
+              title: Any
+              additionalProperties: true
+              description: Detailed error information.
+          discriminator:
+            propertyName: type
+          title: Debug
+          description: Deserialized error detail payload. The 'type' field indicates the schema. This field is for easier debugging and should not be relied upon for application logic.
+      additionalProperties: true
+      description: Contains an arbitrary serialized message along with a @type that describes the type of the serialized message, with an additional debug field for ConnectRPC error details.
+    google.api.HttpBody:
+      type: object
+      properties:
+        content_type:
+          type: string
+          title: content_type
+          description: The HTTP Content-Type header value specifying the content type of the body.
+        data:
+          type: string
+          title: data
+          format: byte
+          description: The HTTP request/response body as raw binary.
+        extensions:
+          type: array
+          items:
+            $ref: "#/components/schemas/google.protobuf.Any"
+          title: extensions
+          description: |-
+            Application specific response metadata. Must be set in the first response
+             for streaming APIs.
+      title: HttpBody
+      additionalProperties: false
+      description: |-
+        Message that represents an arbitrary HTTP body. It should only be used for
+         payload formats that can't be represented as JSON, such as raw binary or
+         an HTML page.
+
+
+         This message can be used both in streaming and non-streaming API methods in
+         the request as well as the response.
+
+         It can be used as a top-level request field, which is convenient if one
+         wants to extract parameters from either the URL or HTTP template into the
+         request fields and also want access to the raw HTTP body.
+
+         Example:
+
+             message GetResourceRequest {
+               // A unique request id.
+               string request_id = 1;
+
+               // The raw HTTP body is bound to this field.
+               google.api.HttpBody http_body = 2;
+
+             }
+
+             service ResourceService {
+               rpc GetResource(GetResourceRequest)
+                 returns (google.api.HttpBody);
+               rpc UpdateResource(google.api.HttpBody)
+                 returns (google.protobuf.Empty);
+
+             }
+
+         Example with streaming methods:
+
+             service CaldavService {
+               rpc GetCalendar(stream google.api.HttpBody)
+                 returns (stream google.api.HttpBody);
+               rpc UpdateCalendar(stream google.api.HttpBody)
+                 returns (stream google.api.HttpBody);
+
+             }
+
+         Use of this type only changes how the request and response bodies are
+         handled, all other features will continue to work unchanged.
+    google.protobuf.Any:
+      type: object
+      properties:
+        type:
+          type: string
+        value:
+          type: string
+          format: binary
+      additionalProperties: true
+      description: Contains an arbitrary serialized message along with a @type that describes the type of the serialized message.
+    google.protobuf.ListValue:
+      type: object
+      properties:
+        values:
+          type: array
+          items:
+            $ref: "#/components/schemas/google.protobuf.Value"
+          title: values
+          description: Repeated field of dynamically typed values.
+      title: ListValue
+      additionalProperties: false
+      description: |-
+        `ListValue` is a wrapper around a repeated field of values.
+
+         The JSON representation for `ListValue` is JSON array.
+    google.protobuf.NullValue:
+      type: string
+      title: NullValue
+      enum:
+        - NULL_VALUE
+      description: |-
+        `NullValue` is a singleton enumeration to represent the null value for the
+         `Value` type union.
+
+         The JSON representation for `NullValue` is JSON `null`.
+    google.protobuf.Struct:
+      type: object
+      additionalProperties:
+        $ref: "#/components/schemas/google.protobuf.Value"
+      description: |-
+        `Struct` represents a structured data value, consisting of fields
+         which map to dynamically typed values. In some languages, `Struct`
+         might be supported by a native representation. For example, in
+         scripting languages like JS a struct is represented as an
+         object. The details of that representation are described together
+         with the proto support for the language.
+
+         The JSON representation for `Struct` is JSON object.
+    google.protobuf.Struct.FieldsEntry:
+      type: object
+      properties:
+        key:
+          type: string
+          title: key
+        value:
+          title: value
+          $ref: "#/components/schemas/google.protobuf.Value"
+      title: FieldsEntry
+      additionalProperties: false
+    google.protobuf.Value:
+      oneOf:
+        - type: "null"
+        - type: number
+        - type: string
+        - type: boolean
+        - type: array
+        - type: object
+          additionalProperties: true
+      description: |-
+        `Value` represents a dynamically typed value which can be either
+         null, a number, a string, a boolean, a recursive struct value, or a
+         list of values. A producer of value is expected to set one of these
+         variants. Absence of any variant indicates an error.
+
+         The JSON representation for `Value` is JSON value.
+    within.website.x.iam.oidc.v1.DocumentRequest:
+      type: object
+      properties:
+        document:
+          title: document
+          $ref: "#/components/schemas/google.protobuf.Struct"
+      title: DocumentRequest
+      additionalProperties: false
+    within.website.x.iam.oidc.v1.ProtocolRequest:
+      type: object
+      properties:
+        response_type:
+          type: string
+          title: response_type
+        client_id:
+          type: string
+          title: client_id
+        redirect_uri:
+          type: string
+          title: redirect_uri
+        scope:
+          type: string
+          title: scope
+        state:
+          type: string
+          title: state
+        nonce:
+          type: string
+          title: nonce
+        code_challenge:
+          type: string
+          title: code_challenge
+        code_challenge_method:
+          type: string
+          title: code_challenge_method
+        resource:
+          type: string
+          title: resource
+        prompt:
+          type: string
+          title: prompt
+        max_age:
+          type: string
+          title: max_age
+        grant_type:
+          type: string
+          title: grant_type
+        code:
+          type: string
+          title: code
+        refresh_token:
+          type: string
+          title: refresh_token
+        code_verifier:
+          type: string
+          title: code_verifier
+        client_assertion:
+          type: string
+          title: client_assertion
+        client_assertion_type:
+          type: string
+          title: client_assertion_type
+        error:
+          type: string
+          title: error
+        error_description:
+          type: string
+          title: error_description
+        iss:
+          type: string
+          title: iss
+        token:
+          type: string
+          title: token
+        token_type_hint:
+          type: string
+          title: token_type_hint
+        logout_token:
+          type: string
+          title: logout_token
+        csrf:
+          type: string
+          title: csrf
+        decision:
+          type: string
+          title: decision
+        transaction:
+          type: string
+          title: transaction
+        session_id:
+          type: string
+          title: session_id
+        grant_id:
+          type: string
+          title: grant_id
+        action:
+          type: string
+          title: action
+          description: Used by browser forms for narrowly scoped account/session actions.
+        id:
+          type: string
+          title: id
+        response_mode:
+          type: string
+          title: response_mode
+          description: |-
+            Retain unsupported extensions so the protocol engine can reject them;
+             dropping these would silently change requested security semantics.
+        request:
+          type: string
+          title: request
+        request_uri:
+          type: string
+          title: request_uri
+        client_secret:
+          type: string
+          title: client_secret
+      title: ProtocolRequest
+      additionalProperties: false
+      description: |-
+        ProtocolRequest carries standard OAuth parameters. Credentials and browser
+         cookies travel in request headers, never in administrative identity fields.
+    within.website.x.iam.oidc.v1.ProtocolResponse:
+      type: object
+      properties:
+        body:
+          title: body
+          $ref: "#/components/schemas/google.api.HttpBody"
+        result:
+          title: result
+          $ref: "#/components/schemas/google.protobuf.Struct"
+        http_status:
+          type: integer
+          title: http_status
+          format: int32
+      title: ProtocolResponse
+      additionalProperties: false
+      description: |-
+        Native RPC clients get structured JSON and the protocol status. HTTP routes
+         return body verbatim (including HTML), with status/headers set by the bridge.
+         Protocol failures are responses here; transport failures use Connect errors.
+security: []
+tags:
+  - name: within.website.x.iam.oidc.v1.ProviderService
+  - name: within.website.x.iam.oidc.v1.BrowserService
+  - name: within.website.x.iam.oidc.v1.AdministrationService
+    description: All administrative operations require an existing SigV4/SigV4A admin.
