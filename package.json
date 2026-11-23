@@ -38,7 +38,7 @@
     "husky": "^9.1.7",
     "lint-staged": "^17.6.1",
     "prettier": "^3.10.1",
-    "semantic-release": "^25.0.9",
+    "semantic-release": "^26.0.1",
     "tailwindcss": "^4.3.0"
   },
   "commitlint": {
